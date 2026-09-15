@@ -26,7 +26,7 @@ use uc_daemon_client::{DaemonConfigClient, DaemonConnectionState, DaemonRequestE
 use crate::commands::record_trace_fields;
 
 /// Default file name suggested in the export save dialog.
-const DEFAULT_BUNDLE_FILE_NAME: &str = "uniclipboard-config.ucbundle";
+const DEFAULT_BUNDLE_FILE_NAME: &str = "Clipboard-config.ucbundle";
 /// Bundle extension (without the leading dot) used for dialog filters.
 const BUNDLE_EXTENSION: &str = "ucbundle";
 
@@ -173,7 +173,7 @@ fn map_dialog_path(
 /// Prompt for a save location and export the current configuration to an
 /// encrypted `.ucbundle` there.
 ///
-/// Pops a native save dialog (default name `uniclipboard-config.ucbundle`); if
+/// Pops a native save dialog (default name `Clipboard-config.ucbundle`); if
 /// the user cancels, returns [`ConfigCommandError::Cancelled`]. Otherwise calls
 /// the daemon `POST /config/export` with the chosen `target_path`, returning the
 /// absolute path the bundle landed at. No export password is taken — the daemon

@@ -500,7 +500,7 @@ export const commands = {
 	 *  Prompt for a save location and export the current configuration to an
 	 *  encrypted `.ucbundle` there.
 	 * 
-	 *  Pops a native save dialog (default name `uniclipboard-config.ucbundle`); if
+	 *  Pops a native save dialog (default name `Clipboard-config.ucbundle`); if
 	 *  the user cancels, returns [`ConfigCommandError::Cancelled`]. Otherwise calls
 	 *  the daemon `POST /config/export` with the chosen `target_path`, returning the
 	 *  absolute path the bundle landed at. No export password is taken — the daemon

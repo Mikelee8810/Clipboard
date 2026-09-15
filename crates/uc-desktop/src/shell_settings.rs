@@ -139,7 +139,7 @@ impl DesktopRuntime {
 
         let hostname = gethostname::gethostname()
             .to_str()
-            .unwrap_or("Uniclipboard Device")
+            .unwrap_or("Clipboard Device")
             .to_string();
         general.insert(
             "device_name".to_string(),
