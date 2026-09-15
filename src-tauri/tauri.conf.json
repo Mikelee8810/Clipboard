@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config",
-  "productName": "UniClipboard",
+  "productName": "Clipboard",
   "version": "1.0.0-alpha.11",
   "identifier": "app.uniclipboard.desktop",
   "build": {
@@ -16,7 +16,7 @@
       {
         "label": "main",
         "create": false,
-        "title": "UniClipboard",
+        "title": "Clipboard",
         "width": 800,
         "height": 600,
         "minWidth": 900,
