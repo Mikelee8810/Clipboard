@@ -24,7 +24,7 @@ pub async fn export_startup_logs(
         let result = tauri::async_runtime::spawn_blocking(move || {
             worker_span.in_scope(|| -> anyhow::Result<Option<String>> {
                 let name = format!(
-                    "uniclipboard-logs-{}.zip",
+                    "Clipboard-logs-{}.zip",
                     chrono::Utc::now().format("%Y%m%d-%H%M%S")
                 );
                 let Some(selected) = app
