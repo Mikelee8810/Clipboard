@@ -68,6 +68,13 @@ afterEach(() => {
 })
 
 describe('SyncSection', () => {
+  it('shows realtime sync as available', () => {
+    setup()
+
+    expect(screen.getByText('settings.sections.sync.syncFrequency.realtime')).toBeInTheDocument()
+    expect(screen.queryByText('devices.settings.badges.comingSoon')).not.toBeInTheDocument()
+  })
+
   it('keeps file sync available when automatic sync is disabled', () => {
     const { container } = setup()
 

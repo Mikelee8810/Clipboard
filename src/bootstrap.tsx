@@ -21,8 +21,8 @@ import { store } from '@/store'
 
 initializeWebviewContextMenu()
 
-// Initialize diagnostics before React mounts. The provider owns SDK setup;
-// the persisted diagnostics setting still controls remote delivery.
+// Initialize the local diagnostics compatibility surface before React mounts.
+// Clipboard keeps logs on the device and never enables a remote provider.
 initializeDiagnostics()
 
 // Attach host context without blocking rendering when the runtime is not ready.

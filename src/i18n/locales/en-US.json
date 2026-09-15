@@ -111,8 +111,8 @@
     "listSeparator": ", ",
     "notification": {
       "title": "Review device relationship",
-      "decision": "Your device group changed. Open UniClipboard to decide what to do.",
-      "status": "A device sync relationship changed. Open UniClipboard to review it."
+      "decision": "Your device group changed. Open Clipboard to decide what to do.",
+      "status": "A device sync relationship changed. Open Clipboard to review it."
     },
     "modal": {
       "title": "Choose which devices to keep syncing with",
@@ -209,8 +209,8 @@
     "packageManager": {
       "title": "Please upgrade via your package manager",
       "portableTitle": "Please download the new portable version",
-      "debHint": "UniClipboard was installed via apt (Debian/Ubuntu). Run this in a terminal to upgrade:",
-      "rpmHint": "UniClipboard was installed via dnf/yum (Fedora/RHEL). Run this in a terminal to upgrade:",
+      "debHint": "Clipboard was installed via apt (Debian/Ubuntu). Run this in a terminal to upgrade:",
+      "rpmHint": "Clipboard was installed via dnf/yum (Fedora/RHEL). Run this in a terminal to upgrade:",
       "portableHint": "You're running the portable build. It doesn't update in place — download the new portable zip from the release page and replace the executable (your data folder stays untouched).",
       "debCommand": "sudo apt update && sudo apt install --only-upgrade uniclipboard",
       "rpmCommand": "sudo dnf upgrade uniclipboard",
@@ -222,7 +222,7 @@
   },
   "updater": {
     "window": {
-      "title": "A new version of UniClipboard is available!",
+      "title": "A new version of Clipboard is available!",
       "subtitle": "{{app}} {{version}} is now available—you have {{currentVersion}}. Would you like to download it now?",
       "readySubtitle": "{{app}} {{version}} has been downloaded and is ready to install.",
       "skipThisVersion": "Skip This Version",
@@ -231,7 +231,7 @@
       "checking": "Checking for the latest version…",
       "autoUpdate": "Automatically download updates in the future",
       "upToDateTitle": "You're up to date!",
-      "upToDateBody": "You're already running the latest version of UniClipboard.",
+      "upToDateBody": "You're already running the latest version of Clipboard.",
       "close": "Close"
     }
   },
@@ -289,7 +289,7 @@
         },
         "autoStart": {
           "label": "Launch at startup",
-          "description": "Start UniClipboard when the system boots"
+          "description": "Start Clipboard when the system boots"
         },
         "startupMode": {
           "summaries": {
@@ -330,8 +330,8 @@
             "description": "Send anonymous feature usage statistics to improve the product. Clipboard content is never collected."
           },
           "notice": {
-            "title": "Help improve UniClipboard",
-            "body": "UniClipboard collects anonymous diagnostics and usage data to help improve the app. Your clipboard content is never collected or transmitted. You can change these choices anytime in Settings > General > Privacy.",
+            "title": "Help improve Clipboard",
+            "body": "Clipboard collects anonymous diagnostics and usage data to help improve the app. Your clipboard content is never collected or transmitted. You can change these choices anytime in Settings > General > Privacy.",
             "accept": "OK",
             "optOut": "Disable"
           }
@@ -453,7 +453,7 @@
         },
         "syncFrequency": {
           "label": "Sync frequency",
-          "description": "Control how often uniClipboard checks for new content",
+          "description": "Clipboard sync delivers new content in real time.",
           "realtime": "Real-time",
           "30s": "Every 30s",
           "1m": "Every minute",
@@ -829,7 +829,7 @@
           "label": "Double-tap modifier",
           "description": "Open the quick panel by tapping a modifier key twice. The recorded shortcut remains active.",
           "checking": "Checking whether this desktop session supports modifier double-tap.",
-          "permissionRequired": "macOS Accessibility permission is required. Grant access in System Settings, then return to UniClipboard.",
+          "permissionRequired": "macOS Accessibility permission is required. Grant access in System Settings, then return to Clipboard.",
           "unsupported": "Modifier double-tap is unavailable in this display session, including Wayland sessions. The recorded shortcut remains active.",
           "openSettings": "Open Accessibility settings",
           "openSettingsError": "Could not open Accessibility settings. Open System Settings > Privacy & Security > Accessibility manually.",
@@ -845,7 +845,7 @@
       },
       "about": {
         "title": "About",
-        "appName": "UniClipboard",
+        "appName": "Clipboard",
         "version": "Version {{version}}",
         "checkUpdate": "Check for updates",
         "checkingUpdate": "Checking...",
@@ -869,19 +869,19 @@
           "rc": "Release Candidate",
           "alphaWarning": {
             "title": "Switch to Alpha?",
-            "description": "Alpha builds may include features and regressions that have not been fully validated. UniClipboard will check the alpha channel immediately after switching.",
+            "description": "Alpha builds may include features and regressions that have not been fully validated. Clipboard will check the alpha channel immediately after switching.",
             "cancel": "Cancel",
             "confirm": "Switch"
           }
         },
         "sponsors": {
           "title": "Sponsors",
-          "thanks": "Thanks to these wonderful people whose sponsorship keeps UniClipboard moving forward.",
+          "thanks": "Thanks to these wonderful people whose sponsorship keeps Clipboard moving forward.",
           "goldBadge": "Gold",
           "becomeSponsor": "Become a sponsor →",
           "githubStar": "Star on GitHub →"
         },
-        "copyright": "© 2025 UniClipboard. All rights reserved.",
+        "copyright": "© 2025 Clipboard. All rights reserved.",
         "links": {
           "privacyPolicy": "Privacy Policy",
           "termsOfService": "Terms of Service",
@@ -891,7 +891,7 @@
     }
   },
   "unlock": {
-    "title": "Unlock UniClipboard",
+    "title": "Unlock Clipboard",
     "description": "Your data is encrypted. Please unlock to continue.",
     "button": "Unlock",
     "unlocking": "Unlocking...",
@@ -902,11 +902,11 @@
     "macOSNote": "On macOS, you can choose \"Always Allow\" in the keychain prompt to enable seamless auto-unlock.",
     "keychainModal": {
       "title": "Grant Keychain Access",
-      "description": "To enable auto-unlock, UniClipboard needs permanent access to your macOS Keychain.",
+      "description": "To enable auto-unlock, Clipboard needs permanent access to your macOS Keychain.",
       "step1": "A macOS Keychain access prompt will appear",
       "step2": "Select \"Always Allow\" in the prompt",
       "step3": "Enter your macOS password to confirm",
-      "note": "This is a macOS system dialog, not part of UniClipboard.",
+      "note": "This is a macOS system dialog, not part of Clipboard.",
       "confirm": "I understand",
       "cancel": "Cancel",
       "verifying": "Verifying access...",
@@ -1334,7 +1334,7 @@
     },
     "protection": {
       "label": "Protection",
-      "upgradePeerHelp": "Update UniClipboard on the other device to the latest version.",
+      "upgradePeerHelp": "Update Clipboard on the other device to the latest version.",
       "bootstrap": {
         "awaiting_readmission": "Security upgrade is waiting for {{count}} member to be readmitted.",
         "recovery_required": "Security upgrade needs recovery before members can sync."
@@ -1533,7 +1533,7 @@
             "android": "Android"
           },
           "ios": {
-            "scanLabel": "Scan to install UniClipboard App (TestFlight)",
+            "scanLabel": "Scan to install Clipboard App (TestFlight)",
             "scanQrAlt": "QR code for the TestFlight invite link",
             "openInBrowser": "Open TestFlight in browser",
             "shortcutFallback": "Don't want the App? Scan to install the Shortcut as fallback",
@@ -1639,7 +1639,7 @@
         },
         "connectTitle": "Connect {{label}}",
         "connectSubtitle": "Scan with your phone — paired in seconds",
-        "scanInstruction": "Open UniClipboard on your phone and scan this code to connect",
+        "scanInstruction": "Open Clipboard on your phone and scan this code to connect",
         "wifiSameNetwork": "Make sure your phone is on the same Wi-Fi as this computer",
         "manualEntry": {
           "title": "Can't scan? Enter the username and password manually",
@@ -1881,7 +1881,7 @@
           "not_unlocked": "Space session is locked. Restart the app so the keychain re-unlocks it.",
           "sponsor_rejected": "Sponsor did not recognise the invitation code. Ask them to issue a fresh one.",
           "sponsor_declined": "Sponsor declined the pairing.",
-          "sponsor_upgrade_required": "The other device is using an older version. Update UniClipboard on that device, then create a new invitation code.",
+          "sponsor_upgrade_required": "The other device is using an older version. Update Clipboard on that device, then create a new invitation code.",
           "unreadable_history_confirmation_required": "Some local history cannot be read with the current key. Continue only if you want to keep those encrypted records without making them available in the new space.",
           "invitation_not_found": "Invitation code has already been used or is no longer valid. Ask the sponsor to issue a fresh one.",
           "invitation_expired": "Invitation expired. Ask the sponsor to issue a fresh one.",
@@ -1989,7 +1989,7 @@
   "feedback": {
     "modal": {
       "title": "Send Feedback",
-      "description": "Your feedback helps us improve UniClipboard. Please describe your issue or suggestion below.",
+      "description": "Your feedback helps us improve Clipboard. Please describe your issue or suggestion below.",
       "label": {
         "content": "Feedback Content",
         "email": "Email Address (Optional)"
@@ -2180,7 +2180,7 @@
         "cta": "Start new space"
       },
       "join": {
-        "title": "I already use UniClipboard elsewhere",
+        "title": "I already use Clipboard elsewhere",
         "description": "Get an invitation code from that device and connect this one.",
         "cta": "Join via pairing"
       },
@@ -2278,7 +2278,7 @@
         "sponsorUnreachable": "The host device is not reachable right now. Make sure both devices are online.",
         "sponsorRejected": "The host did not recognise this code. Ask them to issue a new one.",
         "sponsorDeclined": "The host declined the pairing request.",
-        "sponsorUpgradeRequired": "The other device is using an older version. Update UniClipboard on that device, then create a new invitation code.",
+        "sponsorUpgradeRequired": "The other device is using an older version. Update Clipboard on that device, then create a new invitation code.",
         "timeout": "The pairing handshake timed out. Please try again.",
         "connectionLost": "The connection dropped mid-handshake. Please try again.",
         "serviceUnavailable": "The daemon is not ready yet. Please try again in a moment.",
@@ -2305,7 +2305,7 @@
           "base_history_changed": "The host space changed. Get a new invitation and try again.",
           "joiner_history_ahead": "This device history cannot join the space.",
           "history_conflict": "The two histories cannot be merged.",
-          "peer_upgrade_required": "The other device must update UniClipboard.",
+          "peer_upgrade_required": "The other device must update Clipboard.",
           "cancelled": "This join was cancelled.",
           "removed_before_activation": "The other device removed this device before confirmation."
         }

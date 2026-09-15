@@ -1,7 +1,6 @@
 /**
- * The application's diagnostics entry point. Sentry remains the sole provider.
- * Keep provider selection here; callers must not import SDKs or private adapters.
- * Product analytics has its own daemon-owned path and consent setting.
+ * The application's diagnostics entry point. Clipboard writes local logs and
+ * keeps this compatibility surface no-op so shared callers need no branching.
  */
 export {
   initSentry as initializeDiagnostics,

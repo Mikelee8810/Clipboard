@@ -19,7 +19,10 @@ import type {
   DiagnosticTrace,
 } from './types'
 
-const sentryEnabled = Boolean(import.meta.env.VITE_SENTRY_DSN)
+// Clipboard keeps diagnostics in local log files. The upstream Sentry
+// integration remains as a compatibility shell for shared callers, but the
+// fork never initializes or sends to a remote diagnostics provider.
+const sentryEnabled = false
 export const DEVICE_ROLE_WEBVIEW = 'webview'
 
 /**
@@ -245,10 +248,12 @@ export function captureDiagnosticException(
   error: unknown,
   context?: DiagnosticExceptionContext
 ): void {
+  if (!sentryEnabled) return
   Sentry.captureException(error, context)
 }
 
 export function recordDiagnosticBreadcrumb(breadcrumb: DiagnosticBreadcrumb): void {
+  if (!sentryEnabled) return
   Sentry.addBreadcrumb(breadcrumb)
 }
 
@@ -257,10 +262,12 @@ export function writeDiagnosticLog(
   message: string,
   attributes?: Record<string, unknown>
 ): void {
+  if (!sentryEnabled) return
   Sentry.logger[level](message, attributes)
 }
 
 export async function submitDiagnosticFeedback(feedback: DiagnosticFeedback): Promise<void> {
+  if (!sentryEnabled) return
   const associatedEventId = Sentry.captureMessage('User Feedback')
   Sentry.captureFeedback({ ...feedback, name: 'User', associatedEventId })
 }

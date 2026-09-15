@@ -138,7 +138,7 @@ export function SetupBrandPanel() {
         <div className="flex size-10 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur">
           <ClipboardCheck className="size-5" />
         </div>
-        <span className="text-ui-section font-semibold">UniClipboard</span>
+        <span className="text-ui-section font-semibold">Clipboard</span>
       </div>
 
       {/* Value proposition. */}

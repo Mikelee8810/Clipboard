@@ -59,7 +59,7 @@ export function AppStatusScreen({
       <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center px-6 py-10 sm:px-10">
         <div className="mb-10 flex items-center gap-3">
           <img src={appIcon} alt="" className="size-10 shrink-0" />
-          <span className="text-ui-section font-semibold">UniClipboard</span>
+          <span className="text-ui-section font-semibold">Clipboard</span>
         </div>
         <div className="mb-4 flex items-center gap-2 text-ui-body font-medium text-destructive">
           <AlertCircle className="size-4" aria-hidden="true" />

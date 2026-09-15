@@ -31,7 +31,7 @@ import appIcon from '@/updater/app-icon.png'
 const log = createLogger('updater-window')
 
 /** Same target as PackageManagerUpdateDialog's manual-download routing. */
-const RELEASE_PAGE_URL = 'https://uniclipboard.app/download'
+const RELEASE_PAGE_URL = 'https://github.com/Mikelee8810/Clipboard/releases/latest'
 
 interface UpdateState {
   phase: DownloadPhase
@@ -522,10 +522,10 @@ const UpdaterWindow: React.FC = () => {
   const subtitle = upToDate
     ? t('updater.window.upToDateBody')
     : phase === 'ready' && info
-      ? t('updater.window.readySubtitle', { app: 'UniClipboard', version: info.version })
+      ? t('updater.window.readySubtitle', { app: 'Clipboard', version: info.version })
       : info
         ? t('updater.window.subtitle', {
-            app: 'UniClipboard',
+            app: 'Clipboard',
             version: info.version,
             currentVersion: info.currentVersion ?? '?',
           })

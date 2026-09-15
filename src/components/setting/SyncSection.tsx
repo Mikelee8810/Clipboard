@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { SettingGroup } from '@/components/setting/SettingGroup'
 import { SettingRow } from '@/components/setting/SettingRow'
 import { useOptimisticSetting } from '@/components/setting/useOptimisticSetting'
-import { Switch, Badge } from '@/components/ui'
+import { Switch } from '@/components/ui'
 import { useSetting } from '@/hooks/useSetting'
 import { FileSyncSettingsGroup } from './FileSyncSettingsGroup'
 
@@ -26,15 +26,6 @@ const SyncSection: React.FC = () => {
     next => updateSyncSetting({ syncOnRestore: next }),
     { failureLog: 'Failed to change sync-on-restore setting' }
   )
-  // Sync frequency options (for display in coming-soon label)
-  const syncFrequencyOptions = [
-    { value: 'realtime', label: t('settings.sections.sync.syncFrequency.realtime') },
-    { value: '30s', label: t('settings.sections.sync.syncFrequency.30s') },
-    { value: '1m', label: t('settings.sections.sync.syncFrequency.1m') },
-    { value: '5m', label: t('settings.sections.sync.syncFrequency.5m') },
-    { value: '15m', label: t('settings.sections.sync.syncFrequency.15m') },
-  ]
-
   // Show error message if any
   if (error) {
     return (
@@ -89,14 +80,9 @@ const SyncSection: React.FC = () => {
           label={t('settings.sections.sync.syncFrequency.label')}
           description={t('settings.sections.sync.syncFrequency.description')}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-ui-body text-muted-foreground">
-              {syncFrequencyOptions.find(
-                o => o.value === (setting?.sync.syncFrequency ?? 'realtime')
-              )?.label ?? t('settings.sections.sync.syncFrequency.realtime')}
-            </span>
-            <Badge variant="secondary">{t('devices.settings.badges.comingSoon')}</Badge>
-          </div>
+          <span className="text-ui-body text-muted-foreground">
+            {t('settings.sections.sync.syncFrequency.realtime')}
+          </span>
         </SettingRow>
       </SettingGroup>
 

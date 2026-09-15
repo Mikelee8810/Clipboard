@@ -1,15 +1,8 @@
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  captureUpdateActionInvoked,
-  captureUpdateDialogOpened,
-  captureUpdateDismissed,
-  type DismissSource,
-  toUiPhase,
-} from '@/api/update-telemetry'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,10 +23,10 @@ import { useShortcutLayer } from '@/hooks/useShortcutLayer'
 import { useUpdate } from '@/hooks/useUpdate'
 import { createLogger } from '@/lib/logger'
 import appIcon from '@/updater/app-icon.png'
-import { SponsorsGroup } from './about/SponsorsGroup'
 import { UpdatePreferencesGroup } from './UpdatePreferencesGroup'
 
 const log = createLogger('about-section')
+const GITHUB_REPOSITORY_URL = 'https://github.com/Mikelee8810/Clipboard'
 
 function parseChannel(version: string): string {
   const match = version.match(/-(alpha|beta|rc)/)
@@ -78,8 +71,6 @@ const AboutSection: React.FC = () => {
   const [appVersion, setAppVersion] = useState<string>('')
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false)
   const [packageManagerDialogOpen, setPackageManagerDialogOpen] = useState(false)
-  /** See `Sidebar.tsx` for the dismissal-reason ref pattern. */
-  const dialogDismissReasonRef = useRef<DismissSource | null>(null)
   const isInstallingUpdate =
     downloadProgress.phase === 'downloading' || downloadProgress.phase === 'installing'
   useShortcutLayer({
@@ -111,11 +102,6 @@ const AboutSection: React.FC = () => {
         toast.success(t('update.noUpdate'))
         return
       }
-      // After a successful check the backend state is at least `available`,
-      // so `toUiPhase` returns a non-null value. Fall back to `available`
-      // defensively if state hasn't propagated yet.
-      const uiPhase = toUiPhase(downloadProgress.phase) ?? 'available'
-      captureUpdateDialogOpened('sidebar_icon', uiPhase)
       // deb/rpm: Tauri's in-app updater can't install system packages; route
       // the user to apt/dnf with a copy-able command instead. windowsportable:
       // the NSIS updater would install into Program Files, not the portable
@@ -133,34 +119,20 @@ const AboutSection: React.FC = () => {
 
   const handleInstallUpdate = async () => {
     if (!updateInfo || isInstallingUpdate) return
-    captureUpdateActionInvoked('install', 'started')
     try {
       await installUpdate()
       setUpdateDialogOpen(false)
     } catch (error) {
-      captureUpdateActionInvoked('install', 'failed')
       log.error({ err: error }, '更新失败')
       toast.error(t('update.installFailed'))
     }
   }
 
   const handleUpdateDialogOpenChange = (open: boolean) => {
-    if (!open && updateDialogOpen) {
-      const uiPhase = toUiPhase(downloadProgress.phase)
-      if (uiPhase) {
-        const source: DismissSource = dialogDismissReasonRef.current ?? 'dialog_closed'
-        captureUpdateDismissed(uiPhase, source)
-      }
-      dialogDismissReasonRef.current = null
-    }
     setUpdateDialogOpen(open)
   }
 
   const handlePackageManagerDialogOpenChange = (open: boolean) => {
-    if (!open && packageManagerDialogOpen) {
-      const uiPhase = toUiPhase(downloadProgress.phase) ?? 'available'
-      captureUpdateDismissed(uiPhase, 'package_manager_dialog_closed')
-    }
     setPackageManagerDialogOpen(open)
   }
 
@@ -214,14 +186,11 @@ const AboutSection: React.FC = () => {
       {/* Update settings */}
       <UpdatePreferencesGroup />
 
-      {/* Sponsors */}
-      <SponsorsGroup />
-
       {/* Footer: links + copyright */}
       <div className="space-y-2.5 pt-1 text-center">
         <div className="flex justify-center gap-x-5 text-ui-body">
           <a
-            href="https://github.com/UniClipboard/UniClipboard"
+            href={GITHUB_REPOSITORY_URL}
             className="text-muted-foreground transition-colors hover:text-foreground"
             target="_blank"
             rel="noreferrer"
@@ -229,7 +198,7 @@ const AboutSection: React.FC = () => {
             {t('settings.sections.about.links.privacyPolicy')}
           </a>
           <a
-            href="https://github.com/UniClipboard/UniClipboard"
+            href={GITHUB_REPOSITORY_URL}
             className="text-muted-foreground transition-colors hover:text-foreground"
             target="_blank"
             rel="noreferrer"
@@ -237,7 +206,7 @@ const AboutSection: React.FC = () => {
             {t('settings.sections.about.links.termsOfService')}
           </a>
           <a
-            href="https://github.com/UniClipboard/UniClipboard/blob/main/ABOUT.md"
+            href={`${GITHUB_REPOSITORY_URL}/blob/main/ABOUT.md`}
             className="text-muted-foreground transition-colors hover:text-foreground"
             target="_blank"
             rel="noreferrer"
@@ -269,14 +238,7 @@ const AboutSection: React.FC = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={isInstallingUpdate}
-              onClick={() => {
-                dialogDismissReasonRef.current = 'dialog_later'
-              }}
-            >
-              {t('update.later')}
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isInstallingUpdate}>{t('update.later')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={event => {
                 event.preventDefault()

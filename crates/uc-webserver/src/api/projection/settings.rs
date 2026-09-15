@@ -158,8 +158,8 @@ impl IntoApiDto<SettingsDto> for app_settings::SettingsView {
                 language: self.general.language,
                 device_name: self.general.device_name,
                 update_channel: self.general.update_channel.map(IntoApiDto::into_api_dto),
-                telemetry_enabled: uc_observability::is_telemetry_enabled(),
-                usage_analytics_enabled: self.general.usage_analytics_enabled,
+                telemetry_enabled: false,
+                usage_analytics_enabled: false,
                 debug_mode: self.general.debug_mode,
             },
             sync: SyncSettingsDto {

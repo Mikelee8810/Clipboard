@@ -20,11 +20,10 @@ export function getDeviceIcon(deviceName?: string | null) {
 export const contentTypeEntries: {
   field: keyof ContentTypes
   i18nKey: string
-  status: 'editable' | 'coming_soon'
 }[] = [
-  { field: 'text', i18nKey: 'syncText', status: 'editable' },
-  { field: 'image', i18nKey: 'syncImage', status: 'editable' },
-  { field: 'file', i18nKey: 'syncFile', status: 'editable' },
-  { field: 'link', i18nKey: 'syncLink', status: 'editable' },
-  { field: 'richText', i18nKey: 'syncRichText', status: 'editable' },
+  { field: 'text', i18nKey: 'syncText' },
+  { field: 'image', i18nKey: 'syncImage' },
+  { field: 'file', i18nKey: 'syncFile' },
+  { field: 'link', i18nKey: 'syncLink' },
+  { field: 'richText', i18nKey: 'syncRichText' },
 ]

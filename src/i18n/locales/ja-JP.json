@@ -111,8 +111,8 @@
     "listSeparator": "、",
     "notification": {
       "title": "デバイス関係の確認",
-      "decision": "デバイスグループが変更されました。UniClipboard で対応してください。",
-      "status": "デバイスの同期関係が変わりました。UniClipboard で確認してください。"
+      "decision": "デバイスグループが変更されました。Clipboard で対応してください。",
+      "status": "デバイスの同期関係が変わりました。Clipboard で確認してください。"
     },
     "modal": {
       "title": "このデバイスが同期を続ける相手を選択",
@@ -209,8 +209,8 @@
     "packageManager": {
       "title": "パッケージ マネージャー経由でアップグレードしてください",
       "portableTitle": "新しいポータブル バージョンをダウンロードしてください",
-      "debHint": "UniClipboard は apt 経由でインストールされました(Debian/Ubuntu)。ターミナルでこれを実行してアップグレードします。",
-      "rpmHint": "UniClipboard は dnf/yum (Fedora/RHEL) 経由でインストールされました。ターミナルでこれを実行してアップグレードします。",
+      "debHint": "Clipboard は apt 経由でインストールされました(Debian/Ubuntu)。ターミナルでこれを実行してアップグレードします。",
+      "rpmHint": "Clipboard は dnf/yum (Fedora/RHEL) 経由でインストールされました。ターミナルでこれを実行してアップグレードします。",
       "portableHint": "ポータブル ビルドを実行しています。このファイルはその場で更新されません。リリース ページから新しいポータブル zip をダウンロードし、実行可能ファイルを置き換えます (データ フォルダーは変更されません)。",
       "debCommand": "sudo apt update && sudo apt install --only-upgrade uniclipboard",
       "rpmCommand": "sudo dnf upgrade uniclipboard",
@@ -222,7 +222,7 @@
   },
   "updater": {
     "window": {
-      "title": "新しいバージョンの UniClipboard が利用可能になりました。",
+      "title": "新しいバージョンの Clipboard が利用可能になりました。",
       "subtitle": "{{app}} {{version}} が利用可能です。現在のバージョンは {{currentVersion}} です。今すぐダウンロードしますか？",
       "readySubtitle": "{{app}} {{version}} がダウンロードされ、インストールする準備ができています。",
       "skipThisVersion": "このバージョンをスキップ",
@@ -231,7 +231,7 @@
       "checking": "最新バージョンを確認中…",
       "autoUpdate": "将来的にアップデートを自動的にダウンロードします",
       "upToDateTitle": "最新のバージョンです。",
-      "upToDateBody": "すでに UniClipboard の最新バージョンを実行しています。",
+      "upToDateBody": "すでに Clipboard の最新バージョンを実行しています。",
       "close": "閉じる"
     }
   },
@@ -289,7 +289,7 @@
         },
         "autoStart": {
           "label": "起動時に開始",
-          "description": "システム起動時に UniClipboard を開始します"
+          "description": "システム起動時に Clipboard を開始します"
         },
         "startupMode": {
           "summaries": {
@@ -330,8 +330,8 @@
             "description": "製品を改善するために匿名の機能使用状況統計を送信します。クリップボードのコンテンツは収集されません。"
           },
           "notice": {
-            "title": "UniClipboard の改善にご協力ください",
-            "body": "UniClipboard は、アプリの改善に役立てるため、匿名の診断データと使用状況データを収集します。クリップボードの内容が収集または送信されることはありません。これらの選択はいつでも [設定] > [一般] > [プライバシー] で変更できます。",
+            "title": "Clipboard の改善にご協力ください",
+            "body": "Clipboard は、アプリの改善に役立てるため、匿名の診断データと使用状況データを収集します。クリップボードの内容が収集または送信されることはありません。これらの選択はいつでも [設定] > [一般] > [プライバシー] で変更できます。",
             "accept": "OK",
             "optOut": "無効"
           }
@@ -453,7 +453,7 @@
         },
         "syncFrequency": {
           "label": "同期頻度",
-          "description": "uniClipboard が新しいコンテンツをチェックする頻度を制御します",
+          "description": "Clipboard は新しいコンテンツをリアルタイムで同期します。",
           "realtime": "リアルタイム",
           "30s": "30 秒ごと",
           "1m": "毎分",
@@ -829,7 +829,7 @@
           "label": "修飾キーを 2 回タップします",
           "description": "修飾キーを 2 回タップして、クイック パネルを開きます。記録されたショートカットはアクティブなままです。",
           "checking": "このデスクトップ セッションが修飾子のダブルタップをサポートしているかどうかを確認しています。",
-          "permissionRequired": "macOS アクセシビリティ権限が必要です。システム設定でアクセスを許可し、UniClipboard に戻ります。",
+          "permissionRequired": "macOS アクセシビリティ権限が必要です。システム設定でアクセスを許可し、Clipboard に戻ります。",
           "unsupported": "Wayland セッションを含むこの表示セッションでは、修飾子のダブルタップは使用できません。記録されたショートカットはアクティブなままです。",
           "openSettings": "ユーザー補助設定を開きます",
           "openSettingsError": "ユーザー補助設定を開けませんでした。 [システム設定] > [プライバシーとセキュリティ] > [アクセシビリティ] を手動で開きます。",
@@ -845,7 +845,7 @@
       },
       "about": {
         "title": "概要",
-        "appName": "UniClipboard",
+        "appName": "Clipboard",
         "version": "バージョン {{version}}",
         "checkUpdate": "更新を確認します",
         "checkingUpdate": "確認中...",
@@ -869,19 +869,19 @@
           "rc": "リリース候補",
           "alphaWarning": {
             "title": "アルファに切り替えますか?",
-            "description": "アルファ ビルドには、完全に検証されていない機能やリグレッションが含まれている場合があります。 UniClipboard は、切り替え直後にアルファ チャネルをチェックします。",
+            "description": "アルファ ビルドには、完全に検証されていない機能やリグレッションが含まれている場合があります。 Clipboard は、切り替え直後にアルファ チャネルをチェックします。",
             "cancel": "キャンセル",
             "confirm": "切り替え"
           }
         },
         "sponsors": {
           "title": "スポンサー",
-          "thanks": "スポンサーシップにより UniClipboard が前進し続ける素晴らしい人々のおかげです。",
+          "thanks": "スポンサーシップにより Clipboard が前進し続ける素晴らしい人々のおかげです。",
           "goldBadge": "ゴールド",
           "becomeSponsor": "スポンサーになる →",
           "githubStar": "GitHub でスターを付ける →"
         },
-        "copyright": "© 2025 UniClipboard.無断転載を禁じます。",
+        "copyright": "© 2025 Clipboard.無断転載を禁じます。",
         "links": {
           "privacyPolicy": "プライバシー ポリシー",
           "termsOfService": "利用規約",
@@ -891,7 +891,7 @@
     }
   },
   "unlock": {
-    "title": "UniClipboardのロックを解除",
+    "title": "Clipboardのロックを解除",
     "description": "データは暗号化されます。続行するにはロックを解除してください。",
     "button": "ロック解除",
     "unlocking": "ロック解除中...",
@@ -902,11 +902,11 @@
     "macOSNote": "macOS では、[常に許可] を選択できます。 ",
     "keychainModal": {
       "title": "キーチェーン アクセスの許可",
-      "description": "自動ロック解除を有効にするには、UniClipboard が macOS キーチェーンに永続的にアクセスする必要があります。",
+      "description": "自動ロック解除を有効にするには、Clipboard が macOS キーチェーンに永続的にアクセスする必要があります。",
       "step1": "macOS キーチェーン アクセス プロンプトが表示されます",
       "step2": "プロンプトで [常に許可] を選択します",
       "step3": "確認のために macOS パスワードを入力します",
-      "note": "これは macOS システム ダイアログであり、UniClipboard の一部ではありません。",
+      "note": "これは macOS システム ダイアログであり、Clipboard の一部ではありません。",
       "confirm": "私理解する",
       "cancel": "キャンセル",
       "verifying": "アクセスを確認しています...",
@@ -1352,7 +1352,7 @@
     },
     "protection": {
       "label": "保護状態",
-      "upgradePeerHelp": "相手側のデバイスの UniClipboard を最新バージョンに更新してください。",
+      "upgradePeerHelp": "相手側のデバイスの Clipboard を最新バージョンに更新してください。",
       "bootstrap": {
         "awaiting_readmission": "セキュリティ更新は {{count}} 台のデバイスの再参加を待機しています。",
         "recovery_required": "メンバーが同期する前にセキュリティ更新を復旧する必要があります。"
@@ -1533,7 +1533,7 @@
             "android": "Android"
           },
           "ios": {
-            "scanLabel": "スキャンして UniClipboard アプリ (TestFlight) をインストールします",
+            "scanLabel": "スキャンして Clipboard アプリ (TestFlight) をインストールします",
             "scanQrAlt": "TestFlight 招待リンクの QR コード",
             "openInBrowser": "ブラウザで TestFlight を開きます",
             "shortcutFallback": "アプリが不要ですか?スキャンしてフォールバックとしてショートカットをインストールします",
@@ -1639,7 +1639,7 @@
         },
         "connectTitle": "接続 {{label}}",
         "connectSubtitle": "携帯電話でスキャン — 数秒でペアリングされます",
-        "scanInstruction": "携帯電話で UniClipboard を開いて、このコードをスキャンして接続します",
+        "scanInstruction": "携帯電話で Clipboard を開いて、このコードをスキャンして接続します",
         "wifiSameNetwork": "携帯電話がこれと同じ Wi-Fi 上にあることを確認してくださいコンピュータ",
         "manualEntry": {
           "title": "スキャンできませんか?ユーザー名とパスワードを手動で入力してください",
@@ -1880,7 +1880,7 @@
           "not_unlocked": "スペース セッションはロックされています。アプリを再起動すると、キーチェーンが再度ロックを解除します。",
           "sponsor_rejected": "スポンサーが招待コードを認識しませんでした。新しいものを発行するよう依頼してください。",
           "sponsor_declined": "スポンサーがペアリングを拒否しました。",
-          "sponsor_upgrade_required": "相手のデバイスのバージョンが古いため、相手のデバイスで UniClipboard を更新してから、招待コードを再作成してください。",
+          "sponsor_upgrade_required": "相手のデバイスのバージョンが古いため、相手のデバイスで Clipboard を更新してから、招待コードを再作成してください。",
           "unreadable_history_confirmation_required": "現在のキーでは読み取れないローカル履歴があります。新しいスペースで利用できなくなる暗号化済み記録を保持することに同意する場合のみ続行してください。",
           "invitation_not_found": "招待コードはすでに使用されているか、無効になっています。スポンサーに新しい招待状を発行するよう依頼してください。",
           "invitation_expired": "招待状の有効期限が切れました。スポンサーに新しいパスフレーズを発行するよう依頼してください。",
@@ -1988,7 +1988,7 @@
   "feedback": {
     "modal": {
       "title": "フィードバックの送信",
-      "description": "あなたのフィードバックは UniClipboard の改善に役立ちます。以下に問題または提案について説明してください。",
+      "description": "あなたのフィードバックは Clipboard の改善に役立ちます。以下に問題または提案について説明してください。",
       "label": {
         "content": "フィードバックの内容",
         "email": "メール アドレス (オプション)"
@@ -2179,7 +2179,7 @@
         "cta": "新しいスペースを開始します"
       },
       "join": {
-        "title": "すでに他の場所で UniClipboard を使用しています",
+        "title": "すでに他の場所で Clipboard を使用しています",
         "description": "そのデバイスから招待コードを取得し、これを接続します。",
         "cta": "ペアリング経由で参加する"
       },
@@ -2277,7 +2277,7 @@
         "sponsorUnreachable": "現在、ホスト デバイスにアクセスできません。両方のデバイスがオンラインであることを確認してください。",
         "sponsorRejected": "ホストはこのコードを認識できませんでした。新しいものを発行するよう依頼してください。",
         "sponsorDeclined": "ホストはペアリング要求を拒否しました。",
-        "sponsorUpgradeRequired": "相手のデバイスのバージョンが古いため、相手のデバイスで UniClipboard を更新してから、招待コードを再作成してください。",
+        "sponsorUpgradeRequired": "相手のデバイスのバージョンが古いため、相手のデバイスで Clipboard を更新してから、招待コードを再作成してください。",
         "timeout": "ペアリング ハンドシェイクがタイムアウトになりました。もう一度お試しください。",
         "connectionLost": "ハンドシェイク中に接続が切断されました。もう一度お試しください。",
         "serviceUnavailable": "デーモンはまだ準備ができていません。しばらくしてからもう一度お試しください。",
@@ -2304,7 +2304,7 @@
           "base_history_changed": "相手のスペースが変更されました。新しい招待コードを取得してください。",
           "joiner_history_ahead": "このデバイスの履歴はスペースに参加できません。",
           "history_conflict": "両方の履歴を統合できません。",
-          "peer_upgrade_required": "相手のデバイスで UniClipboard の更新が必要です。",
+          "peer_upgrade_required": "相手のデバイスで Clipboard の更新が必要です。",
           "cancelled": "この参加は取り消されました。",
           "removed_before_activation": "確認前に相手がこのデバイスを削除しました。"
         }

@@ -39,7 +39,7 @@ const log = createLogger('mobile-sync-install-helper')
 const TESTFLIGHT_URL = 'https://testflight.apple.com/join/nyNQ8dQe'
 // The Android client is a SyncClipboard-protocol-compatible fork; the APK
 // ships via GitHub releases.
-const ANDROID_RELEASES_URL = 'https://github.com/UniClipboard/uc-android/releases/latest'
+const ANDROID_RELEASES_URL = 'https://github.com/Mikelee8810/UniClip/releases/latest'
 
 interface MobileSyncInstallHelperProps {
   /** Install QR for the SyncClipboard Shortcut (backend-rendered base64 PNG). */

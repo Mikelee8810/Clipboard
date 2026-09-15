@@ -32,7 +32,7 @@ import { createLogger } from '@/lib/logger'
 
 const log = createLogger('package-manager-update-dialog')
 
-const RELEASE_PAGE_URL = 'https://uniclipboard.app/download'
+const RELEASE_PAGE_URL = 'https://github.com/Mikelee8810/Clipboard/releases/latest'
 
 interface PackageManagerUpdateDialogProps {
   open: boolean

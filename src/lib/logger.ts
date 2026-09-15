@@ -43,10 +43,10 @@ function transmitDiagnostics(level: Level, logEvent: LogEvent): void {
  * Application-wide pino logger.
  *
  * - In development: writes to browser DevTools console (default pino/browser
- *   behaviour) and forwards structured records to the diagnostics provider (gated at
- *   runtime by `setDiagnosticsEnabled`).
- * - In production: console output is suppressed below 'warn'; the provider receives
- *   all records at 'info' and above.
+ *   behaviour) and routes structured records through the local diagnostics
+ *   compatibility surface.
+ * - In production: console output is suppressed below 'warn'; local log export
+ *   remains the durable diagnostics path.
  *
  * Prefer creating module-level child loggers via `createLogger('module-name')`
  * for structured context rather than adding prefix strings to messages.
@@ -71,8 +71,7 @@ export const logger = pino({
 
 /**
  * Create a child logger bound to a named module.
- * The `module` field is forwarded as a diagnostic log attribute so logs can be
- * filtered by component in the diagnostics viewer.
+ * The `module` field is retained as a local log attribute for filtering.
  */
 export function createLogger(module: string): pino.Logger {
   return logger.child({ module })
