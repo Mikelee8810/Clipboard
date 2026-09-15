@@ -136,7 +136,7 @@ impl TrayState {
 
         // Build the tray icon
         let mut builder = TrayIconBuilder::with_id("uc-tray")
-            .tooltip("UniClipboard")
+            .tooltip("Clipboard")
             .show_menu_on_left_click(false)
             .menu(&menu)
             .on_menu_event(|app, event| match event.id().as_ref() {
@@ -513,7 +513,7 @@ fn show_sync_error(app: &tauri::AppHandle) {
     };
     app.dialog()
         .message(message)
-        .title("UniClipboard")
+        .title("Clipboard")
         .kind(tauri_plugin_dialog::MessageDialogKind::Error)
         .show(|_| {});
 }

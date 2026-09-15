@@ -40,7 +40,7 @@ export function StartupProgressScreen({ snapshot, onRetry, onExport }: Props) {
       <div className="m-auto w-full max-w-2xl px-6 py-12 sm:px-12">
         <div className="mb-10 flex items-center gap-3">
           <img src={appIcon} alt="" className="size-10 shrink-0" />
-          <span className="text-ui-section font-semibold">UniClipboard</span>
+          <span className="text-ui-section font-semibold">Clipboard</span>
         </div>
         <div className="mb-4 flex items-center gap-2 text-ui-body text-muted-foreground">
           {failed ? (

@@ -124,7 +124,7 @@ async fn pick_save_path(app: AppHandle) -> Result<Option<String>, ConfigCommandE
         app.dialog()
             .file()
             .set_file_name(DEFAULT_BUNDLE_FILE_NAME)
-            .add_filter("UniClipboard config bundle", &[BUNDLE_EXTENSION])
+            .add_filter("Clipboard config bundle", &[BUNDLE_EXTENSION])
             .blocking_save_file()
     })
     .await
@@ -141,7 +141,7 @@ async fn pick_open_path(app: AppHandle) -> Result<Option<String>, ConfigCommandE
     let result = tauri::async_runtime::spawn_blocking(move || {
         app.dialog()
             .file()
-            .add_filter("UniClipboard config bundle", &[BUNDLE_EXTENSION])
+            .add_filter("Clipboard config bundle", &[BUNDLE_EXTENSION])
             .blocking_pick_file()
     })
     .await

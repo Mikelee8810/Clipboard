@@ -108,9 +108,16 @@ async fn get_settings_handler(
 )]
 async fn update_settings_handler(
     State(state): State<DaemonApiState>,
-    Json(payload): Json<SettingsPatchDto>,
+    Json(mut payload): Json<SettingsPatchDto>,
 ) -> Result<Json<ApiEnvelope<SettingsUpdateResultDto>>, ApiError> {
     info!("update settings request received");
+
+    // Clipboard does not collect remote diagnostics or usage analytics. Keep
+    // this boundary fail-closed for older clients and persisted settings.
+    if let Some(general) = payload.general.as_mut() {
+        general.telemetry_enabled = Some(false);
+        general.usage_analytics_enabled = Some(false);
+    }
 
     // D-D1：`network` 段非空（任何字段变更）触发 restart_required = true。
     // network 段里的 iroh 相关字段都是 endpoint bind-time 常量，仍走
@@ -127,19 +134,6 @@ async fn update_settings_handler(
         .and_then(|general| general.debug_mode)
         .is_some();
     let restart_required = payload.network.is_some() || debug_mode_changed;
-
-    // 取出可能存在的 telemetry 新值，再传 patch 给 facade 写盘 — 写盘成功后再
-    // 把 atomic 推进新值，保证持久化与运行时状态保持单调一致（如果写盘失败，
-    // 也不会污染运行时 gate）。
-    //
-    // `usage_analytics_enabled` 走同样的"先取值、写盘、再推 gate"流程，但
-    // 与 `telemetry_enabled` 是两个独立的开关（schema doc §6.4，GDPR
-    // 友好实践）：前者控制 Sentry 错误上报，后者控制产品 telemetry。
-    let telemetry_update = payload.general.as_ref().and_then(|g| g.telemetry_enabled);
-    let analytics_update = payload
-        .general
-        .as_ref()
-        .and_then(|g| g.usage_analytics_enabled);
 
     // The facade persists the patch. ADR-008 §0.1 folds `success` +
     // `restart_required` INTO the payload DTO, so the updated `SettingsView` is
@@ -161,15 +155,12 @@ async fn update_settings_handler(
         }
     }
 
-    if let Some(enabled) = analytics_update {
-        uc_observability::set_analytics_enabled(enabled);
-    }
-    if let Some(enabled) = telemetry_update {
-        uc_observability::telemetry_gate::save_preference(enabled).map_err(|error| {
-            tracing::warn!(error = %error, error_kind = "telemetry_preference_save_failed", "Failed to save error reporting preference");
-            ApiError::internal("failed to save error reporting preference")
-        })?;
-    }
+    uc_observability::set_analytics_enabled(false);
+    uc_observability::set_telemetry_enabled(false);
+    uc_observability::telemetry_gate::save_preference(false).map_err(|error| {
+        tracing::warn!(error = %error, error_kind = "telemetry_preference_save_failed", "Failed to save local diagnostics preference");
+        ApiError::internal("failed to save local diagnostics preference")
+    })?;
 
     info!(restart_required, "update settings succeeded");
     // ADR-008 §0.1: wire is `ApiEnvelope<SettingsUpdateResultDto>` —

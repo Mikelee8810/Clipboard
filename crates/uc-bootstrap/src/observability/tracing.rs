@@ -124,16 +124,12 @@ struct BootstrapSettings {
 #[derive(Deserialize)]
 #[serde(default)]
 struct BootstrapGeneralSettings {
-    usage_analytics_enabled: bool,
     debug_mode: bool,
 }
 
 impl Default for BootstrapGeneralSettings {
     fn default() -> Self {
-        Self {
-            usage_analytics_enabled: true,
-            debug_mode: false,
-        }
+        Self { debug_mode: false }
     }
 }
 
@@ -265,51 +261,18 @@ fn install_tracing_subscriber(
     let settings = load_bootstrap_settings(&paths.settings_path);
     let profile = select_log_profile(&settings);
 
-    // Import the legacy preference before Engine can rewrite its settings.
-    // The desktop-owned value controls Sentry independently of Engine settings.
-    let telemetry_enabled = uc_observability::telemetry_gate::initialize_preference(&paths.settings_path)
-        .unwrap_or_else(|error| {
-            ::tracing::warn!(error = %error, error_kind = "telemetry_preference_unavailable", "Error reporting disabled because its preference could not be loaded");
-            false
-        });
+    // Clipboard keeps diagnostics in local JSON logs and never enables a
+    // remote diagnostics or analytics provider.
+    let telemetry_enabled = false;
     uc_observability::set_telemetry_enabled(telemetry_enabled);
 
-    // Step 2c: 同样的"读盘 → 推 gate"流程，但作用对象是产品 telemetry
-    // 开关（schema doc §6.4 双开关方案）。本调用在 sink 接入前也是无害
-    // 的——`uc-observability::analytics_gate` 的初值就是 true，这里只是
-    // 把用户上次的选择落到 gate，让首次事件构造时就尊重持久化偏好。
-    let usage_analytics_enabled = settings.general.usage_analytics_enabled;
+    let usage_analytics_enabled = false;
     uc_observability::set_analytics_enabled(usage_analytics_enabled);
 
-    // Step 3: Initialize Sentry whenever a DSN is available.
-    //
-    // ## DSN 来源优先级
-    //
-    // 1. **运行时** `SENTRY_DSN` env —— 给 dev / 自部署用户运行时覆盖。
-    // 2. **编译期** `SENTRY_DSN` env —— CI 在 release build 时注入,等价前端
-    //    `VITE_SENTRY_DSN` 的处理方式。这是必需路径,否则用户机器上没人会
-    //    设这个 env,sentry 在终端用户那边永远不会启用。
-    //
-    // ## 与 telemetry_enabled 的关系
-    //
-    // Sentry initializes whenever a DSN exists. Payload-specific hooks drop
-    // events, breadcrumbs, and logs while telemetry is disabled; the sampler
-    // rejects new transactions, and the final transport gate catches every
-    // envelope, including transactions started before the toggle changed.
-    //
-    // ## 防双重 panic 上报
-    //
-    // sentry crate 的默认 `default-integrations` 启用 `sentry-panic`,会自动
-    // 把 panic 捕获并上报为 Exception。同时 `install_panic_logging_hook` 把
-    // panic 写成 `tracing::error!(target: "panic", ...)` 进 jsonl
-    // (jsonl 是离线排障的关键,不能省)。这条 tracing event 默认会再被
-    // sentry-tracing layer 转成 sentry Event,导致同一个 panic 在 sentry 上
-    // 出现两条 issue。这里用 `event_filter` 让 sentry-tracing 主动忽略
-    // `target = "panic"` 的 event,把 panic→sentry 的职责完全交给
-    // sentry-panic integration,jsonl 一侧不受影响。
-    let runtime_dsn = std::env::var("SENTRY_DSN").ok().filter(|s| !s.is_empty());
-    let compile_time_dsn = option_env!("SENTRY_DSN").filter(|s| !s.is_empty());
-    let dsn = runtime_dsn.or_else(|| compile_time_dsn.map(String::from));
+    // Step 3: Keep the provider disabled. The compatibility code below remains
+    // available to shared crates, but this fork never constructs a DSN or
+    // initializes a remote diagnostics transport.
+    let dsn: Option<String> = None;
 
     let sentry_dsn_present = dsn.is_some();
 

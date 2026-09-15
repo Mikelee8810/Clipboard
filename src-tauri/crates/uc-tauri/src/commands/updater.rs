@@ -207,19 +207,17 @@ fn parse_channel(s: &str) -> UpdateChannel {
     }
 }
 
-/// Build the production updater endpoint list for a channel.
+/// Build the production updater endpoint list for Clipboard releases.
 ///
-/// The primary host is the CDN-fronted release server; the GitHub Pages
-/// mirror is the fallback the plugin tries if the primary fails.
-fn default_updater_endpoints(channel_str: &str) -> Result<Vec<url::Url>, String> {
-    let primary: url::Url = format!("https://release.uniclipboard.app/{channel_str}.json")
-        .parse()
-        .map_err(|e| format!("Invalid primary updater URL: {e}"))?;
-    let fallback: url::Url =
-        format!("https://uniclipboard.github.io/UniClipboard/{channel_str}.json")
+/// The fork publishes its signed `latest.json` manifest as a GitHub release
+/// asset. Keep one authoritative endpoint so update checks never fall back to
+/// the upstream project's release service.
+fn default_updater_endpoints(_channel_str: &str) -> Result<Vec<url::Url>, String> {
+    let endpoint: url::Url =
+        "https://github.com/Mikelee8810/Clipboard/releases/latest/download/latest.json"
             .parse()
-            .map_err(|e| format!("Invalid fallback updater URL: {e}"))?;
-    Ok(vec![primary, fallback])
+            .map_err(|e| format!("Invalid Clipboard updater URL: {e}"))?;
+    Ok(vec![endpoint])
 }
 
 /// Debug-only: let the local update test harness redirect the updater to a
@@ -1386,18 +1384,12 @@ mod tests {
     }
 
     #[test]
-    fn default_updater_endpoints_match_release_hosts() {
-        // Locks the production endpoint format preserved across the refactor
-        // that introduced the debug-only `UC_UPDATE_ENDPOINT` override.
+    fn default_updater_endpoints_use_clipboard_github_releases() {
         let eps = default_updater_endpoints("alpha").unwrap();
-        assert_eq!(eps.len(), 2);
+        assert_eq!(eps.len(), 1);
         assert_eq!(
             eps[0].as_str(),
-            "https://release.uniclipboard.app/alpha.json"
-        );
-        assert_eq!(
-            eps[1].as_str(),
-            "https://uniclipboard.github.io/UniClipboard/alpha.json"
+            "https://github.com/Mikelee8810/Clipboard/releases/latest/download/latest.json"
         );
     }
 

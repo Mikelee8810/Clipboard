@@ -111,8 +111,8 @@
     "listSeparator": ", ",
     "notification": {
       "title": "Revise a relação dos dispositivos",
-      "decision": "O grupo de dispositivos mudou. Abra o UniClipboard para decidir o que fazer.",
-      "status": "Uma relação de sincronização mudou. Abra o UniClipboard para revisar."
+      "decision": "O grupo de dispositivos mudou. Abra o Clipboard para decidir o que fazer.",
+      "status": "Uma relação de sincronização mudou. Abra o Clipboard para revisar."
     },
     "modal": {
       "title": "Escolha com quais dispositivos continuar sincronizando",
@@ -209,8 +209,8 @@
     "packageManager": {
       "title": "Atualize pelo seu gerenciador de pacotes",
       "portableTitle": "Baixe a nova versão portátil",
-      "debHint": "O UniClipboard foi instalado via apt (Debian/Ubuntu). Execute isto em um terminal para atualizar:",
-      "rpmHint": "O UniClipboard foi instalado via dnf/yum (Fedora/RHEL). Execute isto em um terminal para atualizar:",
+      "debHint": "O Clipboard foi instalado via apt (Debian/Ubuntu). Execute isto em um terminal para atualizar:",
+      "rpmHint": "O Clipboard foi instalado via dnf/yum (Fedora/RHEL). Execute isto em um terminal para atualizar:",
       "portableHint": "Você está usando a versão portátil. Ela não se atualiza sozinha — baixe o novo zip portátil na página da versão e substitua o executável (sua pasta de dados permanece intacta).",
       "debCommand": "sudo apt update && sudo apt install --only-upgrade uniclipboard",
       "rpmCommand": "sudo dnf upgrade uniclipboard",
@@ -222,7 +222,7 @@
   },
   "updater": {
     "window": {
-      "title": "Uma nova versão do UniClipboard está disponível!",
+      "title": "Uma nova versão do Clipboard está disponível!",
       "subtitle": "O {{app}} {{version}} já está disponível — você tem a {{currentVersion}}. Deseja baixá-la agora?",
       "readySubtitle": "O {{app}} {{version}} foi baixado e está pronto para instalar.",
       "skipThisVersion": "Ignorar esta versão",
@@ -231,7 +231,7 @@
       "checking": "Procurando a versão mais recente…",
       "autoUpdate": "Baixar atualizações automaticamente no futuro",
       "upToDateTitle": "Tudo atualizado!",
-      "upToDateBody": "Você já está usando a versão mais recente do UniClipboard.",
+      "upToDateBody": "Você já está usando a versão mais recente do Clipboard.",
       "close": "Fechar"
     }
   },
@@ -289,7 +289,7 @@
         },
         "autoStart": {
           "label": "Iniciar junto com o sistema",
-          "description": "Iniciar o UniClipboard ao iniciar o sistema"
+          "description": "Iniciar o Clipboard ao iniciar o sistema"
         },
         "startupMode": {
           "summaries": {
@@ -330,8 +330,8 @@
             "description": "Envia estatísticas anônimas de uso dos recursos para melhorar o produto. O conteúdo da área de transferência nunca é coletado."
           },
           "notice": {
-            "title": "Ajude a melhorar o UniClipboard",
-            "body": "O UniClipboard coleta diagnósticos e dados de uso anônimos para ajudar a melhorar o app. O conteúdo da sua área de transferência nunca é coletado nem transmitido. Você pode alterar essas escolhas quando quiser em Configurações > Geral > Privacidade.",
+            "title": "Ajude a melhorar o Clipboard",
+            "body": "O Clipboard coleta diagnósticos e dados de uso anônimos para ajudar a melhorar o app. O conteúdo da sua área de transferência nunca é coletado nem transmitido. Você pode alterar essas escolhas quando quiser em Configurações > Geral > Privacidade.",
             "accept": "OK",
             "optOut": "Desativar"
           }
@@ -453,7 +453,7 @@
         },
         "syncFrequency": {
           "label": "Frequência de sincronização",
-          "description": "Controla com que frequência o uniClipboard procura conteúdo novo",
+          "description": "O Clipboard sincroniza novos conteúdos em tempo real.",
           "realtime": "Em tempo real",
           "30s": "A cada 30s",
           "1m": "A cada minuto",
@@ -829,7 +829,7 @@
           "label": "Toque duplo no modificador",
           "description": "Abre o painel rápido tocando duas vezes em uma tecla modificadora. O atalho gravado continua ativo.",
           "checking": "Verificando se esta sessão do desktop oferece suporte ao toque duplo no modificador.",
-          "permissionRequired": "É necessária a permissão de Acessibilidade do macOS. Conceda o acesso nas Configurações do Sistema e volte ao UniClipboard.",
+          "permissionRequired": "É necessária a permissão de Acessibilidade do macOS. Conceda o acesso nas Configurações do Sistema e volte ao Clipboard.",
           "unsupported": "O toque duplo no modificador não está disponível nesta sessão de exibição, incluindo sessões Wayland. O atalho gravado continua ativo.",
           "openSettings": "Abrir configurações de Acessibilidade",
           "openSettingsError": "Não foi possível abrir as configurações de Acessibilidade. Abra Configurações do Sistema > Privacidade e Segurança > Acessibilidade manualmente.",
@@ -845,7 +845,7 @@
       },
       "about": {
         "title": "Sobre",
-        "appName": "UniClipboard",
+        "appName": "Clipboard",
         "version": "Versão {{version}}",
         "checkUpdate": "Verificar atualizações",
         "checkingUpdate": "Verificando...",
@@ -869,19 +869,19 @@
           "rc": "Release Candidate",
           "alphaWarning": {
             "title": "Mudar para o canal Alpha?",
-            "description": "As versões alpha podem trazer recursos e regressões que ainda não foram totalmente validados. O UniClipboard vai verificar o canal alpha logo após a mudança.",
+            "description": "As versões alpha podem trazer recursos e regressões que ainda não foram totalmente validados. O Clipboard vai verificar o canal alpha logo após a mudança.",
             "cancel": "Cancelar",
             "confirm": "Mudar"
           }
         },
         "sponsors": {
           "title": "Patrocinadores",
-          "thanks": "Obrigado a estas pessoas incríveis, cujo patrocínio mantém o UniClipboard avançando.",
+          "thanks": "Obrigado a estas pessoas incríveis, cujo patrocínio mantém o Clipboard avançando.",
           "goldBadge": "Ouro",
           "becomeSponsor": "Seja um patrocinador →",
           "githubStar": "Deixe uma estrela no GitHub →"
         },
-        "copyright": "© 2025 UniClipboard. Todos os direitos reservados.",
+        "copyright": "© 2025 Clipboard. Todos os direitos reservados.",
         "links": {
           "privacyPolicy": "Política de Privacidade",
           "termsOfService": "Termos de Serviço",
@@ -891,7 +891,7 @@
     }
   },
   "unlock": {
-    "title": "Desbloquear o UniClipboard",
+    "title": "Desbloquear o Clipboard",
     "description": "Seus dados estão criptografados. Desbloqueie para continuar.",
     "button": "Desbloquear",
     "unlocking": "Desbloqueando...",
@@ -902,11 +902,11 @@
     "macOSNote": "No macOS, você pode escolher \"Sempre Permitir\" no aviso do Keychain para que o desbloqueio automático funcione sem interrupções.",
     "keychainModal": {
       "title": "Conceder acesso ao Keychain",
-      "description": "Para ativar o desbloqueio automático, o UniClipboard precisa de acesso permanente ao Keychain do macOS.",
+      "description": "Para ativar o desbloqueio automático, o Clipboard precisa de acesso permanente ao Keychain do macOS.",
       "step1": "Um aviso de acesso ao Keychain do macOS será exibido",
       "step2": "Selecione \"Sempre Permitir\" no aviso",
       "step3": "Digite a senha do seu macOS para confirmar",
-      "note": "Esta é uma janela do sistema macOS, não faz parte do UniClipboard.",
+      "note": "Esta é uma janela do sistema macOS, não faz parte do Clipboard.",
       "confirm": "Entendi",
       "cancel": "Cancelar",
       "verifying": "Verificando acesso...",
@@ -1355,7 +1355,7 @@
     },
     "protection": {
       "label": "Proteção",
-      "upgradePeerHelp": "Atualize o UniClipboard no outro dispositivo para a versão mais recente.",
+      "upgradePeerHelp": "Atualize o Clipboard no outro dispositivo para a versão mais recente.",
       "bootstrap": {
         "awaiting_readmission": "A atualização de segurança aguarda a readmissão de {{count}} membro.",
         "recovery_required": "A atualização de segurança precisa ser recuperada antes da sincronização dos membros."
@@ -1536,7 +1536,7 @@
             "android": "Android"
           },
           "ios": {
-            "scanLabel": "Escaneie para instalar o app UniClipboard (TestFlight)",
+            "scanLabel": "Escaneie para instalar o app Clipboard (TestFlight)",
             "scanQrAlt": "QR code do link de convite do TestFlight",
             "openInBrowser": "Abrir o TestFlight no navegador",
             "shortcutFallback": "Não quer o app? Escaneie para instalar o Atalho como alternativa",
@@ -1642,7 +1642,7 @@
         },
         "connectTitle": "Conectar {{label}}",
         "connectSubtitle": "Escaneie com o celular — pareado em segundos",
-        "scanInstruction": "Abra o UniClipboard no seu celular e escaneie este código para conectar",
+        "scanInstruction": "Abra o Clipboard no seu celular e escaneie este código para conectar",
         "wifiSameNetwork": "Verifique se o celular está no mesmo Wi-Fi que este computador",
         "manualEntry": {
           "title": "Não consegue escanear? Digite o nome de usuário e a senha manualmente",
@@ -1887,7 +1887,7 @@
           "not_unlocked": "A sessão do Espaço está bloqueada. Reinicie o app para que o keychain a desbloqueie novamente.",
           "sponsor_rejected": "O anfitrião não reconheceu o código de convite. Peça que ele gere um novo.",
           "sponsor_declined": "O anfitrião recusou o pareamento.",
-          "sponsor_upgrade_required": "O outro dispositivo está usando uma versão antiga. Atualize o UniClipboard nele e gere um novo código de convite.",
+          "sponsor_upgrade_required": "O outro dispositivo está usando uma versão antiga. Atualize o Clipboard nele e gere um novo código de convite.",
           "unreadable_history_confirmation_required": "Parte do histórico local não pode ser lida com a chave atual. Continue somente se quiser manter esses registros criptografados, que não ficarão disponíveis no novo espaço.",
           "invitation_not_found": "O código de convite já foi usado ou não é mais válido. Peça ao anfitrião que gere um novo.",
           "invitation_expired": "Convite expirado. Peça ao anfitrião que gere um novo.",
@@ -1995,7 +1995,7 @@
   "feedback": {
     "modal": {
       "title": "Enviar feedback",
-      "description": "Seu feedback nos ajuda a melhorar o UniClipboard. Descreva abaixo seu problema ou sugestão.",
+      "description": "Seu feedback nos ajuda a melhorar o Clipboard. Descreva abaixo seu problema ou sugestão.",
       "label": {
         "content": "Conteúdo do feedback",
         "email": "Endereço de e-mail (opcional)"
@@ -2186,7 +2186,7 @@
         "cta": "Criar novo Espaço"
       },
       "join": {
-        "title": "Já uso o UniClipboard em outro dispositivo",
+        "title": "Já uso o Clipboard em outro dispositivo",
         "description": "Obtenha nele um código de convite e conecte este dispositivo.",
         "cta": "Entrar via pareamento"
       },
@@ -2284,7 +2284,7 @@
         "sponsorUnreachable": "Não foi possível alcançar o dispositivo anfitrião agora. Verifique se os dois dispositivos estão online.",
         "sponsorRejected": "O dispositivo anfitrião não reconheceu este código. Peça um novo.",
         "sponsorDeclined": "O dispositivo anfitrião recusou a solicitação de pareamento.",
-        "sponsorUpgradeRequired": "O outro dispositivo está usando uma versão antiga. Atualize o UniClipboard nele e gere um novo código de convite.",
+        "sponsorUpgradeRequired": "O outro dispositivo está usando uma versão antiga. Atualize o Clipboard nele e gere um novo código de convite.",
         "timeout": "O handshake de pareamento expirou. Tente novamente.",
         "connectionLost": "A conexão caiu durante o handshake. Tente novamente.",
         "serviceUnavailable": "O daemon ainda não está pronto. Tente novamente em instantes.",
@@ -2311,7 +2311,7 @@
           "base_history_changed": "O espaço do anfitrião mudou. Obtenha um novo convite.",
           "joiner_history_ahead": "O histórico deste dispositivo não pode entrar no espaço.",
           "history_conflict": "Os dois históricos não podem ser combinados.",
-          "peer_upgrade_required": "O outro dispositivo precisa atualizar o UniClipboard.",
+          "peer_upgrade_required": "O outro dispositivo precisa atualizar o Clipboard.",
           "cancelled": "Esta entrada foi cancelada.",
           "removed_before_activation": "O outro dispositivo removeu este dispositivo antes da confirmação."
         }

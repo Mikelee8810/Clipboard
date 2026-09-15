@@ -161,10 +161,10 @@ pub fn notify_running_in_background(app: &AppHandle) {
     let result = app
         .notification()
         .builder()
-        .title("UniClipboard")
+        .title("Clipboard")
         .body(
-            "UniClipboard 仍在后台运行，点应用图标可重新打开窗口。\n\
-             Still running in the background — open it from the app icon to show the window again.",
+            "Clipboard 仍在后台运行，点应用图标可重新打开窗口。\n\
+             Clipboard is still running in the background — open the app from its icon to show the window again.",
         )
         .show();
 

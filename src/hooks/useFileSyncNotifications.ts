@@ -108,7 +108,7 @@ export function useFileSyncNotifications(): void {
               count === 1
                 ? t('clipboard.notification.syncStartSingle', { device })
                 : t('clipboard.notification.syncStartBatch', { count, device })
-            void notify('UniClipboard', body)
+            void notify('Clipboard', body)
           }
         }
         pendingStarts.current = new Map()
@@ -126,7 +126,7 @@ export function useFileSyncNotifications(): void {
             count === 1
               ? t('clipboard.notification.syncCompleteSingle')
               : t('clipboard.notification.syncCompleteBatch', { count })
-          void notify('UniClipboard', body)
+          void notify('Clipboard', body)
         }
         pendingCompletes.current = new Map()
         completeBatchTimer.current = null

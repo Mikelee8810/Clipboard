@@ -148,13 +148,11 @@ export default function SyncPreferencesControl({
         </div>
 
         <div>
-          {contentTypeEntries.map(({ field, status }) => {
+          {contentTypeEntries.map(({ field }) => {
             const Icon = CONTENT_TYPE_ICONS[field]!
             const label = t(`devices.settings.sync.typeLabels.${field}`)
-            const unavailable = status === 'coming_soon'
             const fileSyncOff = field === 'file' && globalFileSyncOff
-            const disabled =
-              !syncEnabled || globalSyncOff || fileSyncOff || unavailable || isLoading
+            const disabled = !syncEnabled || globalSyncOff || fileSyncOff || isLoading
             const direction = getSyncDirection(
               sendEnabled && (sendContentTypes?.[field] ?? true),
               receiveEnabled && (receiveContentTypes?.[field] ?? true)
@@ -175,11 +173,6 @@ export default function SyncPreferencesControl({
                         className="mt-1 max-w-full border-warning/20 bg-warning/10 px-1.5 py-0 text-warning"
                       >
                         {t('devices.settings.badges.globalFileSyncOff')}
-                      </Badge>
-                    )}
-                    {unavailable && (
-                      <Badge variant="secondary" className="mt-1 px-1.5 py-0 ">
-                        {t('devices.settings.badges.comingSoon')}
                       </Badge>
                     )}
                   </span>

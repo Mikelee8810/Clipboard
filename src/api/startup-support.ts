@@ -1,7 +1,7 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { commands } from '@/lib/ipc'
 
-export const STARTUP_SUPPORT_URL = 'https://github.com/UniClipboard/UniClipboard/issues/new/choose'
+export const STARTUP_SUPPORT_URL = 'https://github.com/Mikelee8810/Clipboard/issues/new/choose'
 
 export function exportStartupLogs(): Promise<string | null> {
   return commands.exportStartupLogs()

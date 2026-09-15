@@ -111,8 +111,8 @@
     "listSeparator": "、",
     "notification": {
       "title": "裝置關係需要查看",
-      "decision": "裝置群組發生變化，請在 UniClipboard 中處理。",
-      "status": "部分裝置的同步關係已改變，請開啟 UniClipboard 查看。"
+      "decision": "裝置群組發生變化，請在 Clipboard 中處理。",
+      "status": "部分裝置的同步關係已改變，請開啟 Clipboard 查看。"
     },
     "modal": {
       "title": "選擇這台裝置繼續與誰同步",
@@ -209,8 +209,8 @@
     "packageManager": {
       "title": "請通過系統包管理器升級",
       "portableTitle": "請下載新的便攜版",
-      "debHint": "你目前通過 apt（Debian/Ubuntu）安裝了 UniClipboard，請在終端執行以下命令升級：",
-      "rpmHint": "你目前通過 dnf/yum（Fedora/RHEL）安裝了 UniClipboard，請在終端執行以下命令升級：",
+      "debHint": "你目前通過 apt（Debian/Ubuntu）安裝了 Clipboard，請在終端執行以下命令升級：",
+      "rpmHint": "你目前通過 dnf/yum（Fedora/RHEL）安裝了 Clipboard，請在終端執行以下命令升級：",
       "portableHint": "你正在運行便攜版，它不會原地自更新——請從發佈頁下載新的便攜版 zip 並替換可執行檔案（你的資料目錄不受影響）。",
       "debCommand": "sudo apt update && sudo apt install --only-upgrade uniclipboard",
       "rpmCommand": "sudo dnf upgrade uniclipboard",
@@ -222,7 +222,7 @@
   },
   "updater": {
     "window": {
-      "title": "UniClipboard 有新版本可用！",
+      "title": "Clipboard 有新版本可用！",
       "subtitle": "{{app}} {{version}} 現已可用——你目前使用的是 {{currentVersion}}。是否要立即下載？",
       "readySubtitle": "{{app}} {{version}} 已下載完成，隨時可以安裝。",
       "skipThisVersion": "跳過此版本",
@@ -231,7 +231,7 @@
       "checking": "正在檢查最新版本…",
       "autoUpdate": "今後自動下載更新",
       "upToDateTitle": "已是最新版本！",
-      "upToDateBody": "你已經在使用最新的 UniClipboard。",
+      "upToDateBody": "你已經在使用最新的 Clipboard。",
       "close": "關閉"
     }
   },
@@ -289,7 +289,7 @@
         },
         "autoStart": {
           "label": "開機自啟動",
-          "description": "系統啟動時自動啟動 UniClipboard"
+          "description": "系統啟動時自動啟動 Clipboard"
         },
         "startupMode": {
           "summaries": {
@@ -330,8 +330,8 @@
             "description": "發送匿名功能使用統計，用於改進產品，不包含剪貼簿內容。"
           },
           "notice": {
-            "title": "幫助改進 UniClipboard",
-            "body": "UniClipboard 會收集匿名診斷與使用資料以幫助改進應用程式。您的剪貼簿內容絕不會被收集或傳輸。您可以隨時在 設定 > 通用 > 隱私 中分別更改這些選項。",
+            "title": "幫助改進 Clipboard",
+            "body": "Clipboard 會收集匿名診斷與使用資料以幫助改進應用程式。您的剪貼簿內容絕不會被收集或傳輸。您可以隨時在 設定 > 通用 > 隱私 中分別更改這些選項。",
             "accept": "好的",
             "optOut": "關閉"
           }
@@ -453,7 +453,7 @@
         },
         "syncFrequency": {
           "label": "同步頻率",
-          "description": "控制 uniClipboard 檢查新內容的頻率",
+          "description": "Clipboard 會即時傳遞新內容。",
           "realtime": "實時同步",
           "30s": "每30秒",
           "1m": "每分鐘",
@@ -829,7 +829,7 @@
           "label": "雙擊修飾鍵",
           "description": "連續輕按兩次修飾鍵打開快捷面板；已錄制的快捷鍵仍然有效。",
           "checking": "正在檢查目前桌面會話是否支持雙擊修飾鍵。",
-          "permissionRequired": "雙擊修飾鍵需要 macOS 輔助功能權限。請在系統設定中授權，然後返回 UniClipboard。",
+          "permissionRequired": "雙擊修飾鍵需要 macOS 輔助功能權限。請在系統設定中授權，然後返回 Clipboard。",
           "unsupported": "目前顯示會話不支持雙擊修飾鍵，Wayland 會話暫不支持；已錄制的快捷鍵仍然有效。",
           "openSettings": "打開輔助功能設定",
           "openSettingsError": "無法打開輔助功能設定，請手動前往「系統設定 > 隱私與安全性 > 輔助功能」。",
@@ -845,7 +845,7 @@
       },
       "about": {
         "title": "關於",
-        "appName": "UniClipboard",
+        "appName": "Clipboard",
         "version": "版本 {{version}}",
         "checkUpdate": "檢查更新",
         "checkingUpdate": "正在檢查...",
@@ -876,12 +876,12 @@
         },
         "sponsors": {
           "title": "贊助者",
-          "thanks": "感謝以下朋友的贊助支持，讓 UniClipboard 持續向前。",
+          "thanks": "感謝以下朋友的贊助支持，讓 Clipboard 持續向前。",
           "goldBadge": "金牌",
           "becomeSponsor": "成為贊助者 →",
           "githubStar": "去 GitHub 點 Star →"
         },
-        "copyright": "© 2025 UniClipboard. All rights reserved.",
+        "copyright": "© 2025 Clipboard. All rights reserved.",
         "links": {
           "privacyPolicy": "隱私政策",
           "termsOfService": "使用條款",
@@ -891,7 +891,7 @@
     }
   },
   "unlock": {
-    "title": "解鎖 UniClipboard",
+    "title": "解鎖 Clipboard",
     "description": "您的資料已加密，請解鎖以繼續。",
     "button": "解鎖",
     "unlocking": "正在解鎖...",
@@ -902,11 +902,11 @@
     "macOSNote": "在 macOS 上，您可以在鑰匙串提示中選擇“始終允許”以啓用無縫自動解鎖。",
     "keychainModal": {
       "title": "授權鑰匙串訪問",
-      "description": "要啓用自動解鎖，UniClipboard 需要獲得 macOS 鑰匙串的永久訪問權限。",
+      "description": "要啓用自動解鎖，Clipboard 需要獲得 macOS 鑰匙串的永久訪問權限。",
       "step1": "macOS 鑰匙串訪問提示將會出現",
       "step2": "在提示中選擇「始終允許」",
       "step3": "輸入 macOS 密碼確認",
-      "note": "這是 macOS 系統對話框，不是 UniClipboard 的一部分。",
+      "note": "這是 macOS 系統對話框，不是 Clipboard 的一部分。",
       "confirm": "我知道了",
       "cancel": "取消",
       "verifying": "正在驗證訪問權限...",
@@ -1351,7 +1351,7 @@
     },
     "protection": {
       "label": "保護狀態",
-      "upgradePeerHelp": "請將另一台裝置上的 UniClipboard 升級到最新版本。",
+      "upgradePeerHelp": "請將另一台裝置上的 Clipboard 升級到最新版本。",
       "bootstrap": {
         "awaiting_readmission": "安全升級正在等待 {{count}} 個成員重新准入。",
         "recovery_required": "安全升級需要恢復，成員暫時無法同步。"
@@ -1532,7 +1532,7 @@
             "android": "Android"
           },
           "ios": {
-            "scanLabel": "掃碼安裝 UniClipboard App（TestFlight）",
+            "scanLabel": "掃碼安裝 Clipboard App（TestFlight）",
             "scanQrAlt": "TestFlight 邀請連結二維碼",
             "openInBrowser": "在瀏覽器打開 TestFlight",
             "shortcutFallback": "不想裝 App？掃碼安裝快捷指令兜底",
@@ -1638,7 +1638,7 @@
         },
         "connectTitle": "連接 {{label}}",
         "connectSubtitle": "用手機掃一掃，幾秒完成配對",
-        "scanInstruction": "打開手機上的 UniClipboard，掃描二維碼即可連接",
+        "scanInstruction": "打開手機上的 Clipboard，掃描二維碼即可連接",
         "wifiSameNetwork": "確保手機和這台電腦連在同一個 Wi-Fi",
         "manualEntry": {
           "title": "掃碼不成功？手動輸入使用者名和密碼",
@@ -1879,7 +1879,7 @@
           "not_unlocked": "空間會話未解鎖，請重新啟動應用程式讓 keychain 重新解鎖。",
           "sponsor_rejected": "對方未識別這個邀請碼，請讓對方重新生成。",
           "sponsor_declined": "對方拒絕了配對請求。",
-          "sponsor_upgrade_required": "對方裝置版本過舊，請先在對方裝置上更新 UniClipboard，然後重新生成邀請碼。",
+          "sponsor_upgrade_required": "對方裝置版本過舊，請先在對方裝置上更新 Clipboard，然後重新生成邀請碼。",
           "unreadable_history_confirmation_required": "部分本地歷史無法使用目前的金鑰讀取。只有在你同意保留這些加密記錄，且接受它們無法在新空間使用時才繼續。",
           "invitation_not_found": "邀請碼已被使用或失效，請讓對方重新生成一個。",
           "invitation_expired": "邀請碼已過期，請讓對方重新生成一個。",
@@ -1987,7 +1987,7 @@
   "feedback": {
     "modal": {
       "title": "發送意見回饋",
-      "description": "您的意見回饋將幫助我們改進 UniClipboard。請在下方描述您的問題或建議。",
+      "description": "您的意見回饋將幫助我們改進 Clipboard。請在下方描述您的問題或建議。",
       "label": {
         "content": "意見回饋內容",
         "email": "電子郵箱（選填）"
@@ -2276,7 +2276,7 @@
         "sponsorUnreachable": "暫時無法連接對方裝置，請確認兩台裝置都在線。",
         "sponsorRejected": "對方未識別該邀請碼，請讓對方重新生成。",
         "sponsorDeclined": "對方拒絕了本次配對請求。",
-        "sponsorUpgradeRequired": "對方裝置版本過舊，請先在對方裝置上更新 UniClipboard，然後重新生成邀請碼。",
+        "sponsorUpgradeRequired": "對方裝置版本過舊，請先在對方裝置上更新 Clipboard，然後重新生成邀請碼。",
         "timeout": "配對握手超時，請重試。",
         "connectionLost": "配對過程中連接中斷，請重試。",
         "serviceUnavailable": "守護進程尚未就緒，請稍後重試。",
@@ -2303,7 +2303,7 @@
           "base_history_changed": "對方空間已發生變化，請重新取得邀請碼。",
           "joiner_history_ahead": "本機歷史無法加入該空間。",
           "history_conflict": "兩邊的歷史無法合併。",
-          "peer_upgrade_required": "對方裝置需要更新 UniClipboard。",
+          "peer_upgrade_required": "對方裝置需要更新 Clipboard。",
           "cancelled": "本次加入已取消。",
           "removed_before_activation": "對方在確認前取消了這台裝置。"
         }

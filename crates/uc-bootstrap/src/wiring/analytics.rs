@@ -5,11 +5,10 @@ use std::sync::Arc;
 
 use uc_engine::{Engine, Operation, OperationResult};
 use uc_observability::analytics::{
-    build_event_context, global_event_context, hash_space_id_for_telemetry, load_or_create_ids,
-    load_space_person_id, set_global_event_context, AnalyticsIdentityPort, AnalyticsIds,
-    AnalyticsPersonId, AnalyticsPort, AppChannel, Event, EventContextInputs, GatedAnalyticsSink,
-    InstallSource, LocalAnalyticsIdentity, NoopAnalyticsIdentity, NoopAnalyticsSink, PosthogSink,
-    StdoutSink,
+    build_event_context, global_event_context, hash_space_id_for_telemetry,
+    set_global_event_context, AnalyticsIdentityPort, AnalyticsIds, AnalyticsPersonId,
+    AnalyticsPort, AppChannel, Event, EventContextInputs, InstallSource, NoopAnalyticsIdentity,
+    NoopAnalyticsSink,
 };
 
 #[derive(Clone)]
@@ -21,53 +20,15 @@ pub struct DesktopHostAnalytics {
 }
 
 impl DesktopHostAnalytics {
-    pub(crate) fn new(analytics_dir: PathBuf) -> Self {
-        let persisted_ids = std::fs::create_dir_all(&analytics_dir)
-            .map_err(anyhow::Error::from)
-            .and_then(|()| load_or_create_ids(&analytics_dir));
-        let (ids, identity, person_id): (
-            AnalyticsIds,
-            Arc<dyn AnalyticsIdentityPort>,
-            AnalyticsPersonId,
-        ) = match persisted_ids {
-            Ok(ids) => {
-                let person_id = match load_space_person_id(&analytics_dir) {
-                    Ok(Some(id)) => AnalyticsPersonId::SpaceShared(id),
-                    Ok(None) => AnalyticsPersonId::Solo(ids.anonymous_user_id),
-                    Err(error) => {
-                        tracing::warn!(
-                            error = %error,
-                            error_kind = "analytics_space_identity_load_failed",
-                            retryable = false,
-                            fallback = "solo",
-                            "analytics space identity unavailable"
-                        );
-                        AnalyticsPersonId::Solo(ids.anonymous_user_id)
-                    }
-                };
-                (
-                    ids,
-                    Arc::new(LocalAnalyticsIdentity::new(analytics_dir.clone())),
-                    person_id,
-                )
-            }
-            Err(error) => {
-                tracing::warn!(
-                    error = %error,
-                    error_kind = "analytics_identity_load_failed",
-                    retryable = false,
-                    fallback = "ephemeral",
-                    "analytics identity storage unavailable"
-                );
-                let ids = AnalyticsIds::ephemeral();
-                let person_id = AnalyticsPersonId::Solo(ids.anonymous_user_id);
-                (ids, Arc::new(NoopAnalyticsIdentity), person_id)
-            }
-        };
-
+    pub(crate) fn new(_analytics_dir: PathBuf) -> Self {
+        // Clipboard keeps the analytics interfaces required by the engine, but
+        // this fork deliberately uses ephemeral identity and a no-op sink.
+        // No analytics directory, identifiers, or remote events are created.
+        let ids = AnalyticsIds::ephemeral();
+        let person_id = AnalyticsPersonId::Solo(ids.anonymous_user_id);
         Self {
-            sink: build_analytics_sink(),
-            identity,
+            sink: Arc::new(NoopAnalyticsSink),
+            identity: Arc::new(NoopAnalyticsIdentity),
             ids,
             person_id,
         }
@@ -185,34 +146,6 @@ async fn read_space_id_hash(engine: &Engine) -> Option<String> {
     }
 }
 
-fn build_analytics_sink() -> Arc<dyn AnalyticsPort> {
-    let inner: Arc<dyn AnalyticsPort> = if cfg!(debug_assertions) {
-        Arc::new(StdoutSink::new())
-    } else {
-        let runtime_key = std::env::var("POSTHOG_PROJECT_KEY")
-            .ok()
-            .filter(|key| !key.is_empty());
-        match resolve_posthog_key(runtime_key, option_env!("POSTHOG_PROJECT_KEY")) {
-            Some(key) => Arc::new(PosthogSink::new(key)),
-            None => {
-                tracing::info!(
-                    analytics_backend = "noop",
-                    reason = "posthog_project_key_missing",
-                    "product analytics disabled"
-                );
-                Arc::new(NoopAnalyticsSink)
-            }
-        }
-    };
-    Arc::new(GatedAnalyticsSink::new(inner))
-}
-
-fn resolve_posthog_key(runtime: Option<String>, compile: Option<&'static str>) -> Option<String> {
-    runtime
-        .filter(|key| !key.is_empty())
-        .or_else(|| compile.filter(|key| !key.is_empty()).map(String::from))
-}
-
 fn parse_app_channel(version: &str) -> AppChannel {
     let Some(suffix) = version.split_once('-').map(|(_, suffix)| suffix) else {
         return AppChannel::Stable;
@@ -256,55 +189,6 @@ mod tests {
                 .unwrap_or_else(|poison| poison.into_inner())
                 .push(event);
         }
-    }
-
-    #[test]
-    fn desktop_host_analytics_creates_its_identity_directory() {
-        let root = tempfile::tempdir().expect("create analytics test root");
-        let analytics_dir = root.path().join("nested").join("analytics");
-
-        let analytics = DesktopHostAnalytics::new(analytics_dir.clone());
-
-        assert!(analytics_dir.is_dir());
-        assert!(analytics_dir.join("installation_id").is_file());
-        assert!(analytics_dir.join("analytics_device_id").is_file());
-        assert!(analytics.ids.is_first_run);
-    }
-
-    #[test]
-    fn desktop_host_analytics_uses_ephemeral_identity_when_storage_is_unavailable() {
-        let root = tempfile::tempdir().expect("create analytics test root");
-        let blocked_path = root.path().join("not-a-directory");
-        std::fs::write(&blocked_path, b"blocked").expect("create blocking file");
-
-        let analytics = DesktopHostAnalytics::new(blocked_path);
-
-        assert!(!analytics.ids.is_first_run);
-        assert_ne!(
-            analytics.ids.anonymous_user_id,
-            analytics.ids.analytics_device_id
-        );
-        assert_eq!(
-            analytics.person_id,
-            AnalyticsPersonId::Solo(analytics.ids.anonymous_user_id)
-        );
-    }
-
-    #[test]
-    fn runtime_posthog_key_takes_precedence() {
-        assert_eq!(
-            resolve_posthog_key(Some("runtime".into()), Some("compile")).as_deref(),
-            Some("runtime")
-        );
-    }
-
-    #[test]
-    fn empty_posthog_keys_are_ignored() {
-        assert_eq!(resolve_posthog_key(Some(String::new()), Some("")), None);
-        assert_eq!(
-            resolve_posthog_key(Some(String::new()), Some("compile")).as_deref(),
-            Some("compile")
-        );
     }
 
     #[test]
