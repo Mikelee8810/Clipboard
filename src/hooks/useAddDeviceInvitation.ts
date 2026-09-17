@@ -11,7 +11,7 @@ import { isUnlockSpaceError, unlockSpaceWithPassphrase } from '@/api/security'
 import type { SetupInvitationRevokedEvent } from '@/api/setupEvents'
 import { activeDeviceIds, findNewActiveDeviceId } from '@/components/device/pairing-success-utils'
 import { daemonWs } from '@/lib/daemon-ws'
-import { formatInvitationCode } from '@/lib/invitation-code'
+import { formatPairingCode } from '@/lib/invitation-code'
 import { createLogger } from '@/lib/logger'
 
 const log = createLogger('add-device-dialog')
@@ -95,8 +95,16 @@ export function useAddDeviceInvitation({
           update({ issuedAtMs: state.currentInvitation.expiresAtMs - DEFAULT_TTL_MS })
           log.info({ event: 'invitation_ready', mode: 'reused' }, 'pairing invitation ready')
         } else if (state.rePairingRequired) {
-          update({ step: 'credentials' })
-          log.info({ event: 'credentials_required' }, 're-pairing credentials required')
+          // No user passphrase: unlock with this device's saved space secret.
+          await unlockSpaceWithPassphrase('')
+          initialDeviceIdsRef.current = activeDeviceIds(await getDeviceTrustSnapshot())
+          const issued = await issuePairingInvitation()
+          if (cancelled) return
+          update({ invitation: issued, issuedAtMs: Date.now() })
+          log.info(
+            { event: 'invitation_ready', mode: 'auto_re_pairing' },
+            'pairing invitation ready'
+          )
         } else {
           const issued = await issuePairingInvitation()
           if (cancelled) return
@@ -191,7 +199,7 @@ export function useAddDeviceInvitation({
   const totalMs = invitation && issuedAtMs ? invitation.expiresAtMs - issuedAtMs : DEFAULT_TTL_MS
   const progress = invitation ? Math.max(0, Math.min(100, (remaining / totalMs) * 100)) : 0
   const display = useMemo(
-    () => (invitation ? formatInvitationCode(invitation.code) : ''),
+    () => (invitation ? formatPairingCode(invitation.code) : ''),
     [invitation]
   )
 

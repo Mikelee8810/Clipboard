@@ -42,7 +42,7 @@ describe('startup recovery screen', () => {
     fireEvent.click(screen.getByRole('button', { name: '联系作者' }))
     await waitFor(() =>
       expect(screen.getByRole('alert')).toHaveTextContent(
-        'https://github.com/UniClipboard/UniClipboard/issues/new/choose'
+        'https://github.com/Mikelee8810/Clipboard/issues/new/choose'
       )
     )
   })
@@ -102,7 +102,7 @@ describe('startup recovery screen', () => {
     fireEvent.click(screen.getByRole('button', { name: '联系作者' }))
     await waitFor(() =>
       expect(native.openUrl).toHaveBeenCalledWith(
-        'https://github.com/UniClipboard/UniClipboard/issues/new/choose'
+        'https://github.com/Mikelee8810/Clipboard/issues/new/choose'
       )
     )
   })

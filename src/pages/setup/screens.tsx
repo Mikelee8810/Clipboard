@@ -38,12 +38,11 @@ import type {
   RedeemInvitationErrorKind,
   ActiveJoinSpaceResponse,
 } from '@/api/daemon/setupV2'
-import { InvitationCodeInput } from '@/components/InvitationCodeInput'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useConfigImport, type ConfigImportErrorKind } from '@/hooks/useConfigImport'
-import { INVITATION_CODE_LENGTH, formatInvitationCode } from '@/lib/invitation-code'
+import { formatPairingCode, isPairingCodeComplete } from '@/lib/invitation-code'
 import { cn } from '@/lib/utils'
 
 // ── Common shell ───────────────────────────────────────────────────────────
@@ -293,8 +292,6 @@ function initializeErrorMessage(
 
 interface InitializeForm {
   deviceName: string
-  pass1: string
-  pass2: string
   errorKind: InitializeSpaceErrorKind | null
 }
 
@@ -323,11 +320,9 @@ export function InitializeSpaceScreen({
       action.type === 'default_name'
         ? { ...state, deviceName: state.deviceName || action.name }
         : { ...state, ...action.changes },
-    { deviceName: '', pass1: '', pass2: '', errorKind: null }
+    { deviceName: '', errorKind: null }
   )
-  const { deviceName, pass1, pass2, errorKind } = form
-  const [showPass1, setShowPass1] = useState(false)
-  const [showPass2, setShowPass2] = useState(false)
+  const { deviceName, errorKind } = form
 
   const errorMessage = initializeErrorMessage(t, errorKind)
 
@@ -357,18 +352,10 @@ export function InitializeSpaceScreen({
       updateForm({ type: 'edit', changes: { errorKind: 'device_name_required' } })
       return
     }
-    if (!pass1) {
-      updateForm({ type: 'edit', changes: { errorKind: 'passphrase_mismatch' } })
-      return
-    }
-    if (pass1 !== pass2) {
-      updateForm({ type: 'edit', changes: { errorKind: 'passphrase_mismatch' } })
-      return
-    }
     const res = await onSubmit({
       deviceName: deviceName.trim(),
-      passphrase: pass1,
-      passphraseConfirm: pass2,
+      passphrase: '',
+      passphraseConfirm: '',
     })
     if (!res.ok) updateForm({ type: 'edit', changes: { errorKind: res.kind } })
   }
@@ -419,51 +406,6 @@ export function InitializeSpaceScreen({
             placeholder={t('placeholders.deviceName')}
           />
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="pass1">{t('labels.passphrase')}</Label>
-          <div className="relative">
-            <Input
-              id="pass1"
-              type={showPass1 ? 'text' : 'password'}
-              value={pass1}
-              onChange={e => updateForm({ type: 'edit', changes: { pass1: e.target.value } })}
-              disabled={loading}
-              className="pr-10"
-              placeholder={t('placeholders.passphrase')}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass1(!showPass1)}
-              className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {showPass1 ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="pass2">{t('labels.passphraseConfirm')}</Label>
-          <div className="relative">
-            <Input
-              id="pass2"
-              type={showPass2 ? 'text' : 'password'}
-              value={pass2}
-              onChange={e => updateForm({ type: 'edit', changes: { pass2: e.target.value } })}
-              disabled={loading}
-              className="pr-10"
-              placeholder={t('placeholders.passphraseConfirm')}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass2(!showPass2)}
-              className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {showPass2 ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
-          </div>
-        </div>
       </div>
     </ScreenShell>
   )
@@ -501,7 +443,7 @@ export function ShowInvitationScreen({
 
   const remaining = expiresAtMs - now
   const expired = remaining <= 0
-  const display = useMemo(() => formatInvitationCode(code), [code])
+  const display = useMemo(() => formatPairingCode(code), [code])
   const handledExpiryCodeRef = useRef<string | null>(null)
   const cancelExpiredInvitation = useEffectEvent(onCancel)
 
@@ -612,20 +554,17 @@ export function RedeemInvitationScreen({
     keyPrefix: 'setup.redeemInvitation',
   })
   const [code, setCode] = useState('')
-  const [pass, setPass] = useState('')
-  const [showPass, setShowPass] = useState(false)
   const [errorKind, setErrorKind] = useState<RedeemInvitationErrorKind | null>(null)
-  const passInputRef = useRef<HTMLInputElement>(null)
 
   const errorMessage = redeemErrorMessage(t, errorKind)
-  const codeComplete = code.length === INVITATION_CODE_LENGTH
-  const canSubmit = codeComplete && pass.length > 0 && !loading
+  const codeComplete = isPairingCodeComplete(code)
+  const canSubmit = codeComplete && !loading
   const codeInvalid = errorKind === 'invitation_not_found' || errorKind === 'invitation_expired'
 
   const handleSubmit = async () => {
     setErrorKind(null)
     if (!canSubmit) return
-    const res = await onSubmit({ code, passphrase: pass })
+    const res = await onSubmit({ code: formatPairingCode(code), passphrase: '' })
     if (!res.ok) {
       setErrorKind(res.kind)
       // These failures all consume or invalidate the one-time invitation.
@@ -636,7 +575,6 @@ export function RedeemInvitationScreen({
         res.kind === 'passphrase_mismatch'
       ) {
         setCode('')
-        setPass('')
       }
     }
   }
@@ -683,60 +621,21 @@ export function RedeemInvitationScreen({
             {t('labels.code')}
           </Label>
           <div data-testid="setup-redeem-code">
-            <InvitationCodeInput
+            <Input
               id="join-code"
-              value={code}
-              onChange={value => {
-                setCode(value)
-                if (value.length === INVITATION_CODE_LENGTH) passInputRef.current?.focus()
-              }}
+              value={formatPairingCode(code)}
+              onChange={e => setCode(e.target.value)}
               disabled={loading}
-              invalid={codeInvalid}
+              aria-invalid={codeInvalid || undefined}
               autoFocus
+              autoComplete="off"
+              spellCheck={false}
+              className="h-11 w-[22ch] rounded-md bg-card text-center font-mono shadow-xs"
+              placeholder="123-456-ABCDEFGHJK"
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             />
           </div>
         </div>
-
-        <AnimatePresence initial={false}>
-          {codeComplete && (
-            <m.div
-              key="passphrase"
-              initial={{ opacity: 0, height: 0, y: -4 }}
-              animate={{ opacity: 1, height: 'auto', y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -4 }}
-              transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
-              className="overflow-hidden"
-            >
-              <div className="mx-auto w-[calc(100%-0.25rem)] space-y-2">
-                <Label htmlFor="join-pass" className="font-medium text-muted-foreground">
-                  {t('labels.passphrase')}
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="join-pass"
-                    ref={passInputRef}
-                    autoFocus
-                    type={showPass ? 'text' : 'password'}
-                    value={pass}
-                    onChange={e => setPass(e.target.value)}
-                    disabled={loading}
-                    className="h-10 rounded-md bg-card pr-10 shadow-xs"
-                    placeholder={t('placeholders.passphrase')}
-                    onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    className="absolute right-0 top-0 flex h-full items-center px-2 text-muted-foreground transition-colors hover:text-foreground"
-                    tabIndex={-1}
-                  >
-                    {showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                  </button>
-                </div>
-              </div>
-            </m.div>
-          )}
-        </AnimatePresence>
       </div>
     </ScreenShell>
   )

@@ -12,6 +12,7 @@ use axum::Router;
 use crate::api::server::DaemonApiState;
 
 pub mod setup;
+pub mod space_secret;
 
 /// Build the aggregated v2 router. Call sites in
 /// [`crate::api::routes`] mount this with a single `.merge(...)`.

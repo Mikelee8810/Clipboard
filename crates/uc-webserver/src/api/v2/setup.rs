@@ -77,10 +77,14 @@ pub(crate) async fn initialize(
     State(state): State<DaemonApiState>,
     Json(req): Json<InitializeSpaceRequest>,
 ) -> Result<Json<ApiEnvelope<InitializeSpaceResponse>>, ApiError> {
+    // No user passphrase: this device generates and keeps its own space secret.
+    let secret = super::space_secret::generate();
+    super::space_secret::store(&secret)
+        .map_err(|e| ApiError::internal(format!("failed to save space secret: {e}")))?;
     let result = state
         .execute(Operation::CreateSpace(CreateSpaceInput {
-            passphrase: SecretString::new(req.passphrase),
-            passphrase_confirmation: SecretString::new(req.passphrase_confirm),
+            passphrase: SecretString::new(secret.clone()),
+            passphrase_confirmation: SecretString::new(secret),
             device_name: req.device_name,
         }))
         .await
@@ -169,8 +173,10 @@ pub(crate) async fn issue_invitation(
             "engine returned an unexpected invitation result",
         ));
     };
+    let secret = super::space_secret::load_or_create()
+        .map_err(|e| ApiError::internal(format!("failed to load space secret: {e}")))?;
     Ok(Json(ApiEnvelope::now(IssueInvitationResponse {
-        code: invitation_code,
+        code: super::space_secret::combine(&invitation_code, &secret),
         expires_at_ms,
     })))
 }
@@ -240,11 +246,12 @@ pub(crate) async fn redeem(
     State(state): State<DaemonApiState>,
     Json(req): Json<RedeemRequest>,
 ) -> Result<Json<ApiEnvelope<JoinSpaceResponse>>, ApiError> {
+    let (invitation_code, secret) = super::space_secret::resolve_join(&req.code, &req.passphrase);
     let result = state
         .execute(Operation::JoinSpace(JoinSpaceInput {
-            invitation_code: req.code,
+            invitation_code,
             device_name: None,
-            passphrase: SecretString::new(req.passphrase),
+            passphrase: SecretString::new(secret),
             preserve_unreadable_history: false,
         }))
         .await
@@ -504,11 +511,13 @@ pub(crate) async fn switch_space(
     State(state): State<DaemonApiState>,
     Json(req): Json<SwitchSpaceRequest>,
 ) -> Result<Json<ApiEnvelope<JoinSpaceResponse>>, ApiError> {
+    let (invitation_code, secret) =
+        super::space_secret::resolve_join(&req.code, &req.new_passphrase);
     let result = state
         .execute(Operation::JoinSpace(JoinSpaceInput {
-            invitation_code: req.code,
+            invitation_code,
             device_name: None,
-            passphrase: SecretString::new(req.new_passphrase),
+            passphrase: SecretString::new(secret),
             preserve_unreadable_history: req.preserve_unreadable_history,
         }))
         .await

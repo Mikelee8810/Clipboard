@@ -1,6 +1,5 @@
-import { AlertCircle, ArrowRightLeft, CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { AlertCircle, ArrowRightLeft, CheckCircle2, Loader2 } from 'lucide-react'
 import { Trans, useTranslation } from 'react-i18next'
-import { InvitationCodeInput } from '@/components/InvitationCodeInput'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useDialogSessionReset } from '@/hooks/useDialogSessionReset'
 import { useSwitchSpace } from '@/hooks/useSwitchSpace'
+import { formatPairingCode } from '@/lib/invitation-code'
 import { cn } from '@/lib/utils'
 
 interface SwitchSpaceDialogProps {
@@ -52,17 +52,12 @@ function SwitchSpaceDialogInner({
   const {
     step,
     code,
-    pass,
-    showPass,
     errorKind,
     result,
-    codeComplete,
     canSubmit,
     retryLabel,
     failureMessage,
     setCode,
-    setPass,
-    togglePassVisibility,
     handleSubmit,
     handleRetry,
     handleCancelPending,
@@ -77,46 +72,25 @@ function SwitchSpaceDialogInner({
           <Label htmlFor="switch-code" className="sr-only">
             {t('labels.code')}
           </Label>
-          <InvitationCodeInput
+          <Input
             id="switch-code"
-            value={code}
-            onChange={setCode}
-            invalid={errorKind === 'invitation_not_found' || errorKind === 'invitation_expired'}
+            value={formatPairingCode(code)}
+            onChange={e => setCode(e.target.value)}
+            aria-invalid={
+              errorKind === 'invitation_not_found' ||
+              errorKind === 'invitation_expired' ||
+              undefined
+            }
             autoFocus
-            className="relative w-full justify-center gap-8 before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:font-mono before:text-ui-section before:font-semibold before:text-muted-foreground before:content-['-']"
+            autoComplete="off"
+            spellCheck={false}
+            className="h-11 w-[22ch] rounded-md text-center font-mono"
+            placeholder="123-456-ABCDEFGHJK"
+            onKeyDown={e => {
+              if (e.key === 'Enter') void handleSubmit()
+            }}
           />
         </div>
-
-        {codeComplete && (
-          <div className="w-0 min-w-full space-y-2">
-            <Label htmlFor="switch-pass" className="text-muted-foreground">
-              {t('labels.newPassphrase')}
-            </Label>
-            <div className="relative">
-              <Input
-                id="switch-pass"
-                autoFocus
-                type={showPass ? 'text' : 'password'}
-                value={pass}
-                onChange={e => setPass(e.target.value)}
-                placeholder={t('placeholders.newPassphrase')}
-                className="h-10 pr-10"
-                onKeyDown={e => {
-                  if (e.key === 'Enter') void handleSubmit()
-                }}
-              />
-              <button
-                type="button"
-                onClick={togglePassVisibility}
-                className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground transition-colors hover:text-foreground"
-                tabIndex={-1}
-                aria-label={showPass ? 'hide passphrase' : 'show passphrase'}
-              >
-                {showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     )
   } else if (step === 'migrating') {

@@ -8,7 +8,7 @@ import {
   type SwitchSpaceResponse,
 } from '@/api/daemon/setupV2'
 import { type JoinAdmissionResolution, useJoinAdmission } from '@/hooks/useJoinAdmission'
-import { INVITATION_CODE_LENGTH } from '@/lib/invitation-code'
+import { formatPairingCode, isPairingCodeComplete } from '@/lib/invitation-code'
 import { createLogger } from '@/lib/logger'
 import { useAppDispatch } from '@/store/hooks'
 import { fetchLocalDeviceInfo, fetchSpaceMembers } from '@/store/slices/devicesSlice'
@@ -23,7 +23,6 @@ type ActiveJoinSpaceResponse = Extract<SwitchSpaceResponse, { status: 'active' }
 interface SwitchState {
   step: Step
   code: string
-  pass: string
   showPass: boolean
   errorKind: SwitchSpaceErrorKind | null
   errorRaw: string | null
@@ -39,7 +38,6 @@ export function useSwitchSpace({ onOpenChange }: { onOpenChange: (open: boolean)
     {
       step: 'input',
       code: '',
-      pass: '',
       showPass: false,
       errorKind: null,
       errorRaw: null,
@@ -47,10 +45,10 @@ export function useSwitchSpace({ onOpenChange }: { onOpenChange: (open: boolean)
       pendingJoinId: null,
     }
   )
-  const { step, code, pass, errorKind, errorRaw, pendingJoinId } = state
+  const { step, code, errorKind, errorRaw, pendingJoinId } = state
 
-  const codeComplete = code.length === INVITATION_CODE_LENGTH
-  const canSubmit = codeComplete && pass.length > 0 && step === 'input'
+  const codeComplete = isPairingCodeComplete(code)
+  const canSubmit = codeComplete && step === 'input'
 
   // Keep the close timer stable across parent renders.
   const closeDialog = useEffectEvent(() => onOpenChange(false))
@@ -81,14 +79,14 @@ export function useSwitchSpace({ onOpenChange }: { onOpenChange: (open: boolean)
 
   const handleSubmit = async (preserveUnreadableHistory = false) => {
     // Validate inputs independently from step check
-    if (!codeComplete || pass.length === 0) return
+    if (!codeComplete) return
     // Allow submission when in 'input' step OR when preserveUnreadableHistory retry is triggered
     if (step !== 'input' && !preserveUnreadableHistory) return
     update({ errorKind: null, errorRaw: null, step: 'migrating' })
     try {
       const res = await switchSpace({
-        code,
-        newPassphrase: pass,
+        code: formatPairingCode(code),
+        newPassphrase: '',
         preserveUnreadableHistory,
       })
       if (res.status === 'active') {
@@ -120,9 +118,9 @@ export function useSwitchSpace({ onOpenChange }: { onOpenChange: (open: boolean)
 
   const handleRetry = () => {
     if (isCodeDead) {
-      update({ code: '', pass: '' })
+      update({ code: '' })
     } else if (errorKind === 'passphrase_mismatch') {
-      update({ pass: '' })
+      update({ code: '' })
     }
     update({ errorKind: null, errorRaw: null, step: 'input' })
   }
@@ -163,7 +161,6 @@ export function useSwitchSpace({ onOpenChange }: { onOpenChange: (open: boolean)
     retryLabel,
     failureMessage,
     setCode: (code: string) => update({ code }),
-    setPass: (pass: string) => update({ pass }),
     togglePassVisibility: () => update({ showPass: !state.showPass }),
     handleSubmit,
     handleRetry,

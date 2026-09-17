@@ -314,7 +314,12 @@ async fn unlock_with_passphrase_handler(
 ) -> Result<Json<ApiEnvelope<UnlockSpaceResponse>>, ApiError> {
     let result = state
         .execute(Operation::UnlockSpace(UnlockSpaceInput {
-            passphrase: SecretString::new(req.passphrase),
+            // Empty passphrase means "use this device's saved space secret".
+            passphrase: SecretString::new(if req.passphrase.trim().is_empty() {
+                crate::api::v2::space_secret::load().unwrap_or_default()
+            } else {
+                req.passphrase
+            }),
         }))
         .await
         .map_err(map_unlock_engine_err)?;

@@ -36,15 +36,54 @@ fn build_legacy_identity_fallback(
     build_identity_storage(primary, app_data_root.join("iroh-identity"))
 }
 
+/// Keys the daemon used to keep in the system keychain before the file-backed
+/// store became the default on macOS. They are migrated on first read.
+#[cfg(target_os = "macos")]
+const LEGACY_KEYCHAIN_KEYS: &[&str] = &[
+    "kek:v1:profile:default",
+    "profile_admission_master_key:v1",
+    "profile_content_vault_key:v1",
+    "profile_lifecycle_marker:v1",
+];
+
+/// macOS: keep secrets in a file under the app data root. An ad-hoc signed
+/// build changes identity on every rebuild, and the Keychain answers each
+/// rebuild with a fresh authorization prompt for every item; the file store
+/// never prompts. Values already in the Keychain are pulled over once.
+#[cfg(target_os = "macos")]
+fn build_primary_secure_storage(
+    app_data_root: PathBuf,
+) -> WiringResult<Arc<dyn SecureStorageProvider>> {
+    use uc_platform::system_secure_storage::SystemSecureStorage;
+
+    let primary: Arc<dyn SecureStorageProvider> = Arc::new(
+        FileSecureStorage::new_in_app_data_root(app_data_root)
+            .map_err(|error| WiringError::SecureStorageInit(error.to_string()))?,
+    );
+    let legacy: Arc<dyn SecureStorageProvider> = Arc::new(SystemSecureStorage::new());
+    Ok(Arc::new(MigratingSecureStorage::new(
+        primary,
+        legacy,
+        LEGACY_KEYCHAIN_KEYS
+            .iter()
+            .map(|key| (*key).to_string())
+            .collect(),
+    )))
+}
+
+#[cfg(not(target_os = "macos"))]
+fn build_primary_secure_storage(
+    app_data_root: PathBuf,
+) -> WiringResult<Arc<dyn SecureStorageProvider>> {
+    uc_platform::secure_storage::create_default_secure_storage_in_app_data_root(app_data_root)
+        .map_err(|error| WiringError::SecureStorageInit(error.to_string()))
+}
+
 pub(crate) fn build_secure_storage_prelude(
     paths: &DesktopHostPaths,
 ) -> WiringResult<SecureStoragePrelude> {
     let app_data_root = paths.app_data_root_dir.clone();
-    let secure_storage =
-        uc_platform::secure_storage::create_default_secure_storage_in_app_data_root(
-            app_data_root.clone(),
-        )
-        .map_err(|error| WiringError::SecureStorageInit(error.to_string()))?;
+    let secure_storage = build_primary_secure_storage(app_data_root.clone())?;
 
     let secure_storage = build_legacy_identity_fallback(secure_storage, &app_data_root);
 

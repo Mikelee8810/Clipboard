@@ -3,7 +3,7 @@
  * The inner form resets only after the closing animation has finished.
  */
 
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -146,7 +146,7 @@ describe('AddDeviceDialog invitation issuing', () => {
     expect(issuePairingInvitation).not.toHaveBeenCalled()
   })
 
-  it('confirms the original passphrase before issuing a re-pairing invitation', async () => {
+  it('re-pairs automatically with the saved space secret (no passphrase prompt)', async () => {
     getSetupState.mockResolvedValue({
       hasCompleted: true,
       currentInvitation: null,
@@ -158,66 +158,17 @@ describe('AddDeviceDialog invitation issuing', () => {
       <I18nextProvider i18n={i18n}>
         <AddDeviceDialog open onOpenChange={() => undefined} />
       </I18nextProvider>
-    )
-
-    const input = await screen.findByLabelText(
-      i18n.t('devices.addDevice.rePairing.passphraseLabel')
-    )
-    expect(issuePairingInvitation).not.toHaveBeenCalled()
-    fireEvent.change(input, { target: { value: 'original-passphrase' } })
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: i18n.t('devices.addDevice.rePairing.submit'),
-      })
     )
 
     await waitFor(() => expect(screen.getByLabelText('012-345')).toBeInTheDocument())
-    expect(unlockSpaceWithPassphrase).toHaveBeenCalledWith('original-passphrase')
+    expect(screen.queryByTestId('re-pairing-passphrase-step')).not.toBeInTheDocument()
+    expect(unlockSpaceWithPassphrase).toHaveBeenCalledWith('')
     expect(issuePairingInvitation).toHaveBeenCalledOnce()
     expect(logInfo).toHaveBeenCalledWith(
-      { event: 'invitation_ready', mode: 'legacy_re_pairing' },
-      're-pairing invitation ready'
-    )
-    expect(JSON.stringify(logInfo.mock.calls)).not.toContain('original-passphrase')
-  })
-
-  it('keeps the confirmation step open after a wrong passphrase', async () => {
-    getSetupState.mockResolvedValue({
-      hasCompleted: true,
-      currentInvitation: null,
-      deviceName: 'test',
-      rePairingRequired: true,
-    })
-    unlockSpaceWithPassphrase.mockRejectedValue({ code: 'WRONG_PASSPHRASE' })
-
-    render(
-      <I18nextProvider i18n={i18n}>
-        <AddDeviceDialog open onOpenChange={() => undefined} />
-      </I18nextProvider>
-    )
-
-    const input = await screen.findByLabelText(
-      i18n.t('devices.addDevice.rePairing.passphraseLabel')
-    )
-    fireEvent.change(input, { target: { value: 'wrong-passphrase' } })
-    fireEvent.click(
-      screen.getByRole('button', { name: i18n.t('devices.addDevice.rePairing.submit') })
-    )
-
-    expect(
-      await screen.findByText(i18n.t('devices.addDevice.rePairing.wrongPassphrase'))
-    ).toBeInTheDocument()
-    expect(input).toHaveValue('wrong-passphrase')
-    expect(issuePairingInvitation).not.toHaveBeenCalled()
-    expect(logInfo).toHaveBeenCalledWith(
-      { error_kind: 'wrong_passphrase', event: 'credentials_rejected' },
-      're-pairing credentials rejected'
-    )
-    expect(JSON.stringify([...logInfo.mock.calls, ...logWarn.mock.calls])).not.toContain(
-      'wrong-passphrase'
+      { event: 'invitation_ready', mode: 'auto_re_pairing' },
+      'pairing invitation ready'
     )
   })
-
   it('replaces the invitation with success after a new member is confirmed', async () => {
     const onSuccess = vi.fn()
     getDeviceTrustSnapshot

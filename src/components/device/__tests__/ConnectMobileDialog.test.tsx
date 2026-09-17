@@ -182,22 +182,14 @@ describe('ConnectMobileDialog', () => {
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('submits direct pairing credentials from the shared footer', async () => {
+  it('re-pairs automatically without asking for a passphrase', async () => {
     const user = userEvent.setup()
     api.getSetup.mockResolvedValue({ currentInvitation: null, rePairingRequired: true })
     render(<ConnectMobileDialog open {...callbacks()} />)
     await screen.findByRole('textbox')
     await user.click(screen.getByRole('tab', { name: /设备直连/ }))
-    const input = await screen.findByLabelText(
-      i18n.t('devices.addDevice.rePairing.passphraseLabel')
-    )
-    const submit = screen.getByTestId('re-pairing-confirm-passphrase')
-    expect(submit.closest('[data-slot="dialog-footer"]')?.parentElement).toBe(
-      screen.getByRole('dialog')
-    )
-    await user.type(input, 'test passphrase')
-    await user.click(submit)
     expect(await screen.findByTestId('add-device-invitation-code')).toBeVisible()
-    expect(api.unlock).toHaveBeenCalledExactlyOnceWith('test passphrase')
+    expect(screen.queryByTestId('re-pairing-passphrase-step')).not.toBeInTheDocument()
+    expect(api.unlock).toHaveBeenCalledExactlyOnceWith('')
   })
 })
