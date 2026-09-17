@@ -574,7 +574,7 @@ impl TaskWindow {
             progress_bar.setMinValue(0.0);
             progress_bar.setMaxValue(1.0);
             progress_bar.setControlSize(NSControlSize::Small);
-            progress_bar.setAccessibilityLabel(Some(&NSString::from_str("文件接收进度")));
+            progress_bar.setAccessibilityLabel(Some(&NSString::from_str("File receive progress")));
             progress_bar.setTranslatesAutoresizingMaskIntoConstraints(false);
             let width_constraint = progress_bar
                 .widthAnchor()
@@ -720,7 +720,10 @@ impl OverflowWindow {
         let (panel, background) = create_panel(mtm, 50.0);
         let title =
             NSTextField::labelWithString(&NSString::from_str(&format_overflow_title(count)), mtm);
-        let label = NSTextField::labelWithString(&NSString::from_str("较早的传输仍在继续"), mtm);
+        let label = NSTextField::labelWithString(
+            &NSString::from_str("Earlier transfers are still running"),
+            mtm,
+        );
         unsafe {
             title.setFont(Some(&NSFont::systemFontOfSize(NSFont::systemFontSize())));
             label.setFont(Some(&NSFont::systemFontOfSize(
@@ -886,7 +889,7 @@ fn create_close_overlay(
         button.setImagePosition(NSCellImagePosition::ImageOnly);
         button.setImageScaling(NSImageScaling::ScaleNone);
         let symbol_name = NSString::from_str("xmark");
-        let symbol_description = NSString::from_str("关闭");
+        let symbol_description = NSString::from_str("Close");
         if let Some(image) = NSImage::imageWithSystemSymbolName_accessibilityDescription(
             &symbol_name,
             Some(&symbol_description),
@@ -967,7 +970,7 @@ fn task_key(row: &ActivityHudRow) -> String {
 }
 
 fn format_overflow_title(count: usize) -> String {
-    format!("还有 {count} 个传输")
+    format!("{count} more transfers")
 }
 
 fn apply_progress_value(bar: &NSProgressIndicator, row: &ActivityHudRow) {
@@ -989,12 +992,18 @@ fn apply_progress_value(bar: &NSProgressIndicator, row: &ActivityHudRow) {
 fn update_close_control(button: &NSButton, row: &ActivityHudRow, action: HudCloseAction) {
     let title = format_title(row);
     let (label, help) = match action {
-        HudCloseAction::Cancel => (format!("取消传输 {title}"), "停止接收这个传输".to_owned()),
-        HudCloseAction::Dismiss => (
-            format!("关闭失败提示 {title}"),
-            "关闭这个失败的传输提示".to_owned(),
+        HudCloseAction::Cancel => (
+            format!("Cancel transfer {title}"),
+            "Stop receiving this transfer".to_owned(),
         ),
-        HudCloseAction::Disabled => (format!("传输状态 {title}"), "当前无法关闭".to_owned()),
+        HudCloseAction::Dismiss => (
+            format!("Dismiss failed transfer {title}"),
+            "Dismiss this failed transfer notice".to_owned(),
+        ),
+        HudCloseAction::Disabled => (
+            format!("Transfer status {title}"),
+            "Cannot be closed right now".to_owned(),
+        ),
     };
     unsafe {
         button.setEnabled(!matches!(action, HudCloseAction::Disabled));
@@ -1010,25 +1019,25 @@ fn format_title(row: &ActivityHudRow) -> String {
             if names.len() == 1 {
                 names[0].clone()
             } else {
-                format!("{} 等 {} 项", names[0], names.len())
+                format!("{} and {} more", names[0], names.len() - 1)
             }
         }
-        _ => "正在接收文件…".to_string(),
+        _ => "Receiving from another device…".to_string(),
     }
 }
 
 fn format_subtitle(row: &ActivityHudRow) -> String {
     match &row.state {
         RowState::Receiving => format_progress_subtitle(row),
-        RowState::CancelPending => "取消中…".to_string(),
-        RowState::Completed => "已完成".to_string(),
+        RowState::CancelPending => "Cancelling…".to_string(),
+        RowState::Completed => "Done".to_string(),
         RowState::Failed { reason } => match reason {
-            Some(r) => format!("失败:{}", r),
-            None => "失败".to_string(),
+            Some(r) => format!("Failed: {}", r),
+            None => "Failed".to_string(),
         },
         RowState::Cancelled { reason } => match reason {
-            Some(r) => format!("已取消:{}", r),
-            None => "已取消".to_string(),
+            Some(r) => format!("Cancelled: {}", r),
+            None => "Cancelled".to_string(),
         },
     }
 }
@@ -1041,7 +1050,7 @@ fn format_progress_subtitle(row: &ActivityHudRow) -> String {
             let speed_s = format_bytes(speed as u64);
             match row.eta_ms {
                 Some(eta) => format!(
-                    "{} / {} · {}/s · 剩 {}",
+                    "{} / {} · {}/s · {} left",
                     transferred,
                     total_s,
                     speed_s,
@@ -1073,11 +1082,11 @@ fn format_bytes(bytes: u64) -> String {
 fn format_eta(eta_ms: u64) -> String {
     let secs = eta_ms / 1_000;
     if secs >= 60 {
-        format!("{} 分 {} 秒", secs / 60, secs % 60)
+        format!("{} min {} s", secs / 60, secs % 60)
     } else if secs == 0 {
-        "<1 秒".to_string()
+        "<1 s".to_string()
     } else {
-        format!("{} 秒", secs)
+        format!("{} s", secs)
     }
 }
 
