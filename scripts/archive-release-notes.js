@@ -16,7 +16,7 @@
  *     --notes-file docs/changelog/0.11.0-alpha.6.md \
  *     --zh-notes-file docs/changelog/0.11.0-alpha.6.zh.md \
  *     [--pub-date 2026-05-22T10:30:00Z] \
- *     [--bucket uniclipboard-releases]
+ *     [--bucket clipboard-releases]
  *
  * 所需环境变量（供 wrangler r2 调用使用）：
  *   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
@@ -29,7 +29,7 @@ import path from 'node:path'
 import process from 'node:process'
 import semver from 'semver'
 
-const DEFAULT_BUCKET = 'uniclipboard-releases'
+const DEFAULT_BUCKET = 'clipboard-releases'
 
 function parseArgs(argv = process.argv.slice(2)) {
   const options = {

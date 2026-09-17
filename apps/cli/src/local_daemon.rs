@@ -142,7 +142,7 @@ impl fmt::Display for LocalDaemonError {
                         f,
                         "an incompatible daemon (version {observed}) is already running for this \
                          profile; this CLI expects {expected_package_version}. Stop it with \
-                         `uniclip stop` and restart, or upgrade the daemon to match ({details})"
+                         `clip stop` and restart, or upgrade the daemon to match ({details})"
                     )
                 }
             }

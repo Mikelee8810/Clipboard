@@ -13,7 +13,7 @@
 //! into the CLI build (which would block the P5-4 slimming goal).
 //!
 //! Only the PURE classification lives here. Process-control concerns — spawning
-//! `uniclipd`, terminating a stale PID, bootstrap orchestration — stay in
+//! `clipd`, terminating a stale PID, bootstrap orchestration — stay in
 //! `uc-daemon-local`/`uc-daemon-process`.
 
 use semver::Version;

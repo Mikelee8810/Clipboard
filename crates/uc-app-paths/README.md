@@ -1,10 +1,10 @@
 # uc-app-paths
 
-The **directory-layout authority** for UniClipboard: the single source of truth
+The **directory-layout authority** for Clipboard: the single source of truth
 for *where* the app's data and cache directories live.
 
 It owns the path-resolution policy — the app directory name
-(`app.uniclipboard.desktop`), the `UC_PROFILE` suffix, the portable ("green")
+(`app.clipboard.desktop`), the `UC_PROFILE` suffix, the portable ("green")
 redirect, and the per-platform base directories — and exposes them as pure
 functions that depend on **only** `dirs` + `std`.
 

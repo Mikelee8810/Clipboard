@@ -75,7 +75,7 @@ The `useEffect` dependencies should be `[reduxItems]` so it recomputes the inter
 IMPORTANT: Do NOT extract timestamp logic to a separate hook or component. The simplest approach (tick counter as useMemo dependency) is the correct one here - it keeps all logic colocated and avoids over-engineering.
 </action>
 <verify>
-<automated>cd /home/wuy6/myprojects/UniClipboard && bun run build</automated>
+<automated>cd /home/wuy6/myprojects/Clipboard && bun run build</automated>
 </verify>
 <done> - `tick` state variable exists and increments on a setInterval - Interval is 30s when recent items exist, 60s otherwise - `clipboardItems` useMemo includes `tick` in its dependency array - Interval cleans up properly (clearInterval in useEffect cleanup) - No interval runs when clipboard list is empty - Build succeeds with no TypeScript errors
 </done>

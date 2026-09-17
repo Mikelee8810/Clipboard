@@ -1,4 +1,4 @@
-//! `uniclip mobile setup` — one-shot setup wizard.
+//! `clip mobile setup` — one-shot setup wizard.
 //!
 //! Routes through daemon HTTP endpoints (P5-2b ADR) instead of in-process
 //! facade calls.

@@ -81,7 +81,7 @@ Use a function-based manualChunks that checks `id.includes('node_modules/...')` 
    Note: `fallback={null}` is appropriate here because the app already shows loading states (encryption loading returns null, setup gate loading). A blank flash is acceptable for these fast local route transitions in a desktop app.
    </action>
    <verify>
-   <automated>cd /home/wuy6/myprojects/UniClipboard && bun run build 2>&1 | grep -c "chunks are larger than" | grep -q "0" && echo "PASS: No chunk size warnings" || echo "FAIL: Chunk size warning still present"</automated>
+   <automated>cd /home/wuy6/myprojects/Clipboard && bun run build 2>&1 | grep -c "chunks are larger than" | grep -q "0" && echo "PASS: No chunk size warnings" || echo "FAIL: Chunk size warning still present"</automated>
    </verify>
    <done>
 
@@ -108,7 +108,7 @@ Use a function-based manualChunks that checks `id.includes('node_modules/...')` 
 3. If any chunk still exceeds 500 kB, adjust the manualChunks grouping by further splitting the largest group.
    </action>
    <verify>
-   <automated>cd /home/wuy6/myprojects/UniClipboard && bun run build 2>&1 | tail -20 && echo "---" && ls -la dist/assets/\*.js 2>/dev/null | wc -l && echo "JS chunk files produced"</automated>
+   <automated>cd /home/wuy6/myprojects/Clipboard && bun run build 2>&1 | tail -20 && echo "---" && ls -la dist/assets/\*.js 2>/dev/null | wc -l && echo "JS chunk files produced"</automated>
    </verify>
    <done>
 

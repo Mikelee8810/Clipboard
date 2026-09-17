@@ -1,4 +1,4 @@
-//! `uniclip mobile network ...` — LAN listener advanced configuration.
+//! `clip mobile network ...` — LAN listener advanced configuration.
 //!
 //! Routes through daemon HTTP endpoints (P5-2b ADR).
 

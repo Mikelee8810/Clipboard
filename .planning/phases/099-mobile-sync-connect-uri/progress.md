@@ -10,7 +10,7 @@
 | 阶段 3A: TS 解析器 + Vitest | ✅ 完成 | `23452385` | `src/lib/mobileSyncConnectUri.ts` + 跨语言 golden vector 22 测试 |
 | 阶段 3B: 凭据弹窗 UI | ✅ 完成 | `3b220f75` | `MobileSyncCredentialModal.tsx` 主 QR 文案 + 次要卡片; i18n + 单测同步; 9/9 + 80/513 通过 |
 | 阶段 4A: iOS App + Shortcut 集成文档 | ✅ 完成 | `aeb85dd5` | `docs/integrations/{ios-app-connect-uri,ios-shortcut}.md` + spec §9/§11 重排 |
-| 阶段 4B: iOS App 仓库 Swift 落地 | ✅ 完成 (跨仓库) | — | `/Users/mark/MyProjects/iOSApp/UniClipboard`, 用户真机扫码测试通过 |
+| 阶段 4B: iOS App 仓库 Swift 落地 | ✅ 完成 (跨仓库) | — | `/Users/mark/MyProjects/iOSApp/Clipboard`, 用户真机扫码测试通过 |
 | 阶段 5: 凭据弹窗 Tab 重构 | ✅ 完成 | (本地未提交) | 按"接入方式"分 (扫码接入 / 安装快捷指令); install URL 独立 QR (后端 + DTO + bindings + UI + i18n + 单测) |
 | 阶段 4C: Shortcut 模板更新 + iCloud | ⏳ 仓库外手工 | — | 用户在 Shortcuts.app 操作 |
 
@@ -54,7 +54,7 @@
 ### 2026-05-18 (阶段 4 范围澄清 + 4A 文档落地)
 
 - **关键澄清**: 用户指出"接入端"的真实预期是 iOS 原生 App (走 URL scheme + .onOpenURL，让系统相机扫码即可跳 App 自动填表),**不是** 先前理解的 SyncClipboard 快捷指令。Shortcut 路径降为兜底但仍维护; Android 文档不写 (spec §9.3 已覆盖第三方实现契约)。
-- **survey iOS App** (`/Users/mark/MyProjects/iOSApp/UniClipboard`): SwiftUI App / iOS 26.2 / Swift 5 MainActor / SwiftPM 测试; 已有 `SyncClipboardClient` / `AppSettings` / `ServerConfig` / `SetupFlowView` (Welcome → ServerForm → AutoSwitch) / `QRScannerView` + `ServerQRPayload` (JSON / URL-userinfo); **没有** URL scheme 注册，**没有** .onOpenURL handler。`ServerQRPayload` 与 connect URI 不兼容 (前者不带 scheme，后者是 `uniclipboard://` URL) — 决策保留 legacy 格式，新增 `uniclipboard://` 分支共存。
+- **survey iOS App** (`/Users/mark/MyProjects/iOSApp/Clipboard`): SwiftUI App / iOS 26.2 / Swift 5 MainActor / SwiftPM 测试; 已有 `SyncClipboardClient` / `AppSettings` / `ServerConfig` / `SetupFlowView` (Welcome → ServerForm → AutoSwitch) / `QRScannerView` + `ServerQRPayload` (JSON / URL-userinfo); **没有** URL scheme 注册，**没有** .onOpenURL handler。`ServerQRPayload` 与 connect URI 不兼容 (前者不带 scheme，后者是 `clipboard://` URL) — 决策保留 legacy 格式，新增 `clipboard://` 分支共存。
 - **新增 `docs/integrations/ios-app-connect-uri.md`** (~430 行，英文):
   - §1-2 Why 与 URL scheme 注册 (Xcode 26 UI 路径; CFBundleURLTypes 不能走 INFOPLIST_KEY_*; plutil 验证命令)。
   - §3 `.onOpenURL` 挂 WindowGroup 根 + AppViewModel.handleIncomingURL 路由 sketch。
@@ -88,7 +88,7 @@
   - 新增二级"首次安装"卡片包裹 install URL 字段 (border + bg-card/50 突出降级), 沿用 CredentialField 自带 copy 按钮。
   - 顶部组件注释更新 iOS tab 描述：主操作 = connect URI QR, 次要 = 首次安装。明确"桌面端打开 iCloud 链接无意义，只复制即可，在 iPhone Safari 粘贴"。
 - **单测** (`MobileSyncCredentialModal.test.tsx`):
-  - mockPayload 加 `connectUri: 'uniclipboard://connect?v=1&svc=mobile-sync&p=...'` 字段 (DTO 阶段 2 已有，之前测试缺字段是 TS 隐式默认 tolerated)。
+  - mockPayload 加 `connectUri: 'clipboard://connect?v=1&svc=mobile-sync&p=...'` 字段 (DTO 阶段 2 已有，之前测试缺字段是 TS 隐式默认 tolerated)。
   - 新增 `renders the QR as the primary auto-fill action with the new alt text`: 断言 QR alt 文案 = "QR code that auto-fills the sync credentials", img src 来自 PNG base64, label 文案存在。
   - 新增 `shows the install-shortcut secondary card with the install URL`: 断言"首次安装"标题 + install link label + install URL 字面值三件套都可见。
 - **测试结果**:
@@ -159,11 +159,11 @@
   1. 编解码模块归 `uc-application` ✅
   2. `o` 字段采用"生成侧白名单 + 解析侧宽松" ✅
   3. `install_url` DTO 字段保留 ✅
-- **scheme alias 决定**: 用户裁定仅保留 `uniclipboard://`, 不接受 `uniclip://` 别名。
+- **scheme alias 决定**: 用户裁定仅保留 `clipboard://`, 不接受 `clip://` 别名。
 - **阶段 0 完成**: 写入 `docs/architecture/mobile-sync-connect-uri.md`, §7 golden vector 用 Python base64 实算独立验证 happy-path 与负例 5/6 的字节准确性。
 - **阶段 1 完成**: `connect_uri.rs` + 22 单元测试通过。
   - 首次测试发现 `parse_rejects_missing_pwd` 失败 (serde 直接报错走 `PayloadDecodeFailed`), 加 `#[serde(default)]` 后归并到 `MissingField`, 与规范 §4.2 错误码归并对齐 — **决策已写入 task_plan.md**。
-  - URL crate probe 实测：`uniclipboard://connect?...` 在 `url 2.x` 下正常解析 host/query, 无需手写 parser。
+  - URL crate probe 实测：`clipboard://connect?...` 在 `url 2.x` 下正常解析 host/query, 无需手写 parser。
 - **提交**: `ec59277b feat(mobile-sync): add connect URI v1 protocol spec and codec` — 3 files / 983 insertions。pre-commit hook 跑了 cargo fmt + autocorrect-fix, 不影响功能。
 - **planning 文件落盘**: 按项目 `.planning/phases/NNN-slug/` 惯例创建 099 目录，三件套就位。
 
@@ -179,7 +179,7 @@
 ## 决策日志
 
 - 2026-05-18: 三个开放问题 (模块归属 / `o` 白名单 / `install_url` 保留) 按用户裁定。
-- 2026-05-18: 单一 scheme — 仅 `uniclipboard://`, 拒绝 `uniclip://` alias。
+- 2026-05-18: 单一 scheme — 仅 `clipboard://`, 拒绝 `clip://` alias。
 - 2026-05-18: `MissingField` 归并语义 — serde struct 字段加 `#[serde(default)]`。
 - 2026-05-18: Golden vector 选用 `proto`/`label`/`did` 三个 `o` 键，URI 259 字符。
 - 2026-05-18: 编解码模块归 `uc-application` 而非 `uc-core` — 它服务于 use case, payload schema 属应用层契约。
@@ -191,10 +191,10 @@
 - 2026-05-18 (阶段 3B): install URL 不加 "Open in Shortcuts" CTA, 沿用 CredentialField 自带 copy; 同时把刚加的 `installShortcut.cta` i18n 文案删除避免孤儿键。
 - 2026-05-18 (阶段 3B): 前端单测只断言 UI 结构 (alt 文案 + 次要卡片可见), 不跑跨语言 byte-level 比对 —— 那是阶段 3A 的 `mobileSyncConnectUri.test.ts` 职责。
 - 2026-05-18 (阶段 4 范围): iOS 原生 App (URL scheme + .onOpenURL) 是主路径，SyncClipboard 快捷指令降为兜底但仍维护; Android 文档不写。
-- 2026-05-18 (阶段 4A): iOS App 既有 `ServerQRPayload` 与 connect URI 不兼容 — 保留 legacy 在 `ServerQRPayload.parse` 入口新增 `uniclipboard://` 分支并存，而非弃用旧格式。
+- 2026-05-18 (阶段 4A): iOS App 既有 `ServerQRPayload` 与 connect URI 不兼容 — 保留 legacy 在 `ServerQRPayload.parse` 入口新增 `clipboard://` 分支并存，而非弃用旧格式。
 - 2026-05-18 (阶段 4A): iOS Swift parser 故意不实现 encoder — desktop 是唯一颁发方，iOS encoder = dead code + drift 风险; golden test 三方独立断言同一字面值就是 drift detector。
 - 2026-05-18 (阶段 4A): URL scheme 注册走 Xcode UI (Target → Info → URL Types) 而非 INFOPLIST_KEY_* — Xcode 26 generated-Info.plist 模型下 `array<dict>` 无法用 INFOPLIST_KEY_* 表达，PlistBuddy build phase 是更重的备选。
-- 2026-05-18 (阶段 4A): .onOpenURL 挂 `UniClipboardApp` 的 `WindowGroup` 根 (非 ContentView) — 防 SetupFlow/TabView 状态切换重新挂载时丢消息。
+- 2026-05-18 (阶段 4A): .onOpenURL 挂 `ClipboardApp` 的 `WindowGroup` 根 (非 ContentView) — 防 SetupFlow/TabView 状态切换重新挂载时丢消息。
 - 2026-05-18 (阶段 5): Tab 按"接入方式"分而非"平台", 反映"凭据/QR 协议平台无关"的实际事实，同时治掉旧 Android tab 啥都没有的死角。
 - 2026-05-18 (阶段 5): install URL QR 走后端 `render_qr_code` 二次渲染 — 与 connect URI QR 共用同一管线 (视觉/编码风格一致), 前端零新依赖，缺点是 DTO 多带 ~600 字节 PNG (可接受)。
 - 2026-05-18 (阶段 5): mockPayload 两个 QR base64 字面值故意不同 — 防止前端把 `installQrCodePngBase64` ↔ `qrCodePngBase64` 串位 (字段名相近，类型相同，复制粘贴失误是真实风险); 后端 use case 测试也加了对称断言。

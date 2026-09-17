@@ -185,7 +185,7 @@ fn run_join(joiner: &Node, code: &str, device_name: &str, no_wait: bool) -> Valu
     }
     let asserted = assert_cmd::Command::new(joiner.cli.binary_path())
         .env("UC_PROFILE", &joiner.cli.profile_name)
-        .env("UNICLIPBOARD_ENV", "development")
+        .env("CLIPBOARD_ENV", "development")
         .args(&args)
         .timeout(if no_wait {
             Duration::from_secs(10)
@@ -592,7 +592,7 @@ async fn pending_join_survives_ctrl_c_and_daemon_restart_then_can_be_cancelled()
 
     let child = Command::new(joiner.cli.binary_path())
         .env("UC_PROFILE", &joiner.cli.profile_name)
-        .env("UNICLIPBOARD_ENV", "development")
+        .env("CLIPBOARD_ENV", "development")
         .args([
             "--json",
             "join",

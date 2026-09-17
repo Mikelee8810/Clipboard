@@ -24,7 +24,7 @@ result: pass
 
 ### 3. Clipboard Capture Still Works
 
-expected: With the app running, copy some text in another application. The copied text appears in UniClipboard's clipboard list automatically.
+expected: With the app running, copy some text in another application. The copied text appears in Clipboard's clipboard list automatically.
 result: pass
 
 ### 4. Settings Accessible

@@ -49,7 +49,7 @@ impl Node {
         let stop_task = tokio::task::spawn_blocking(move || {
             let output = std::process::Command::new(binary)
                 .env("UC_PROFILE", profile)
-                .env("UNICLIPBOARD_ENV", "development")
+                .env("CLIPBOARD_ENV", "development")
                 .args(["--json", "stop"])
                 .output()
                 .expect("run stop command");

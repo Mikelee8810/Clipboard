@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Prepare the `uniclipd` daemon as a Tauri sidecar (externalBin).
+// Prepare the `clipd` daemon as a Tauri sidecar (externalBin).
 //
-// ADR-008 D13 bundles `uniclipd` into the GUI installer so the GUI (and CLI)
+// ADR-008 D13 bundles `clipd` into the GUI installer so the GUI (and CLI)
 // can spawn it as a *sibling* of the app executable — see
 // `uc-daemon-local` `spawn.rs::resolve_daemon_exe_path`, whose first strategy
-// is "look for `uniclipd` next to the current exe". Tauri's externalBin
-// mechanism copies `src-tauri/binaries/uniclipd-<target-triple>` into the
+// is "look for `clipd` next to the current exe". Tauri's externalBin
+// mechanism copies `src-tauri/binaries/clipd-<target-triple>` into the
 // bundle next to the main binary (Contents/MacOS on macOS, usr/bin on Linux,
 // install dir on Windows) with the triple suffix stripped, which lands exactly
 // where the sibling lookup expects it.
@@ -20,7 +20,7 @@
 //
 // `tauri build`/`tauri dev` hard-fail if the expected sidecar file is missing,
 // so this must complete before either runs. snap/AUR packaging bypasses
-// tauri-cli (plain `cargo build`) and therefore installs `uniclipd` directly
+// tauri-cli (plain `cargo build`) and therefore installs `clipd` directly
 // instead of going through this script.
 //
 // Usage:
@@ -84,7 +84,7 @@ const exeSuffix = isWindows ? '.exe' : ''
 const profile = release ? 'release' : 'debug'
 
 // 1) Build the daemon binary for the requested target.
-const buildArgs = ['build', '-p', 'uc-daemon', '--bin', 'uniclipd']
+const buildArgs = ['build', '-p', 'uc-daemon', '--bin', 'clipd']
 if (release) buildArgs.push('--release')
 if (target) buildArgs.push('--target', target)
 console.log(`[sidecar] cargo ${buildArgs.join(' ')}`)
@@ -93,13 +93,13 @@ execFileSync('cargo', buildArgs, { cwd: repoRoot, stdio: 'inherit' })
 // 2) Locate the compiled binary. With `--target` cargo nests the output under
 //    the triple; a native build (no `--target`) lands in target/<profile>/.
 const builtPath = target
-  ? join(repoRoot, 'target', triple, profile, `uniclipd${exeSuffix}`)
-  : join(repoRoot, 'target', profile, `uniclipd${exeSuffix}`)
+  ? join(repoRoot, 'target', triple, profile, `clipd${exeSuffix}`)
+  : join(repoRoot, 'target', profile, `clipd${exeSuffix}`)
 
-// 3) Stage it under the Tauri sidecar name `uniclipd-<triple>`.
+// 3) Stage it under the Tauri sidecar name `clipd-<triple>`.
 const binariesDir = join(srcTauri, 'binaries')
 mkdirSync(binariesDir, { recursive: true })
-const sidecarPath = join(binariesDir, `uniclipd-${triple}${exeSuffix}`)
+const sidecarPath = join(binariesDir, `clipd-${triple}${exeSuffix}`)
 copyFileSync(builtPath, sidecarPath)
 if (!isWindows) chmodSync(sidecarPath, 0o755)
 console.log(`[sidecar] staged ${builtPath} -> ${sidecarPath}`)

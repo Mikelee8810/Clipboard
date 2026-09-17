@@ -1,4 +1,4 @@
-//! `uniclip space invite` — sponsor side of Slice 1 pairing.
+//! `clip space invite` — sponsor side of Slice 1 pairing.
 //!
 //! ## Execution paths
 //!

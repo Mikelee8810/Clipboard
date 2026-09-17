@@ -22,7 +22,7 @@ anyhow = "1.0"
 fs2 = "0.4"
 # Used unconditionally by auth / instance_lock, all of which compile on every
 # platform. Keeping them cfg(unix)-only broke the Windows build of every crate
-# that links this one (uniclipd, the GUI via uc-desktop, the CLI): the modules
+# that links this one (clipd, the GUI via uc-desktop, the CLI): the modules
 # `use` these crates while the deps were absent on Windows. The genuinely
 # unix-only syscalls (EAGAIN in instance_lock) are already `#[cfg(unix)]`-gated
 # in the source, so only `libc` stays target-scoped below.

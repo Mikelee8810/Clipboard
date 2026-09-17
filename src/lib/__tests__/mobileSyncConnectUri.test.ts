@@ -23,14 +23,14 @@ import {
  * 任何修改都必须同步更新 Rust 端 + 规范文档 §7.1。
  */
 const GOLDEN_URI =
-  'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
+  'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
 
 /**
  * 多候选 golden vector — 与 Rust `connect_uri.rs::GOLDEN_MULTI_URL_URI`
  * 字面量字节相同(规范 §7.3)。payload 含 `urls` 三项, `url === urls[0]`。
  */
 const GOLDEN_MULTI_URL_URI =
-  'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwczovLzIwMy0wLTExMy0xMC5zc2xpcC5pbyIsInVybHMiOlsiaHR0cHM6Ly8yMDMtMC0xMTMtMTAuc3NsaXAuaW8iLCJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJodHRwOi8vMTAwLjY0LjAuNTo0MjcyMCJdLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
+  'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwczovLzIwMy0wLTExMy0xMC5zc2xpcC5pbyIsInVybHMiOlsiaHR0cHM6Ly8yMDMtMC0xMTMtMTAuc3NsaXAuaW8iLCJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJodHRwOi8vMTAwLjY0LjAuNTo0MjcyMCJdLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
 
 const GOLDEN_MULTI_URLS = [
   'https://203-0-113-10.sslip.io',
@@ -222,40 +222,40 @@ describe('mobileSyncConnectUri / parse (negative, mirrors Rust §7.2)', () => {
     ).toThrowError(expect.objectContaining({ code: 'INVALID_SCHEME' }) as never)
   })
 
-  it('rejects uniclip:// alias with INVALID_SCHEME (single-scheme decision)', () => {
-    expect(() =>
-      parseConnectUri('uniclip://connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ')
-    ).toThrowError(expect.objectContaining({ code: 'INVALID_SCHEME' }) as never)
+  it('rejects clip:// alias with INVALID_SCHEME (single-scheme decision)', () => {
+    expect(() => parseConnectUri('clip://connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ')).toThrowError(
+      expect.objectContaining({ code: 'INVALID_SCHEME' }) as never
+    )
   })
 
   it('rejects wrong host with INVALID_SCHEME', () => {
     expect(() =>
-      parseConnectUri('uniclipboard://other?v=1&svc=mobile-sync&p=eyJ2IjoxfQ')
+      parseConnectUri('clipboard://other?v=1&svc=mobile-sync&p=eyJ2IjoxfQ')
     ).toThrowError(expect.objectContaining({ code: 'INVALID_SCHEME' }) as never)
   })
 
   it('§7.2 #2 — rejects unsupported envelope v with UNSUPPORTED_VERSION', () => {
     expect(() =>
-      parseConnectUri('uniclipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ')
+      parseConnectUri('clipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ')
     ).toThrowError(expect.objectContaining({ code: 'UNSUPPORTED_VERSION' }) as never)
   })
 
   it('§7.2 #3 — rejects unsupported service with UNSUPPORTED_SERVICE', () => {
-    expect(() => parseConnectUri('uniclipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ')).toThrowError(
+    expect(() => parseConnectUri('clipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ')).toThrowError(
       expect.objectContaining({ code: 'UNSUPPORTED_SERVICE' }) as never
     )
   })
 
   it('§7.2 #4 — rejects malformed base64 with PAYLOAD_DECODE_FAILED', () => {
     expect(() =>
-      parseConnectUri('uniclipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#')
+      parseConnectUri('clipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#')
     ).toThrowError(expect.objectContaining({ code: 'PAYLOAD_DECODE_FAILED' }) as never)
   })
 
   it('§7.2 #5 — rejects missing pwd with MISSING_FIELD(pwd)', () => {
     // base64 of {"v":1,"url":"http://a.b","user":"u"}
     const uri =
-      'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ'
+      'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ'
     expect(() => parseConnectUri(uri)).toThrowError(
       expect.objectContaining({ code: 'MISSING_FIELD', field: 'pwd' }) as never
     )
@@ -264,14 +264,14 @@ describe('mobileSyncConnectUri / parse (negative, mirrors Rust §7.2)', () => {
   it('§7.2 #6 — rejects non-http url in payload with INVALID_URL', () => {
     // base64 of {"v":1,"url":"ftp://a.b","user":"u","pwd":"p"}
     const uri =
-      'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ'
+      'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ'
     expect(() => parseConnectUri(uri)).toThrowError(
       expect.objectContaining({ code: 'INVALID_URL' }) as never
     )
   })
 
   it('rejects missing p param with PAYLOAD_DECODE_FAILED', () => {
-    expect(() => parseConnectUri('uniclipboard://connect?v=1&svc=mobile-sync')).toThrowError(
+    expect(() => parseConnectUri('clipboard://connect?v=1&svc=mobile-sync')).toThrowError(
       expect.objectContaining({ code: 'PAYLOAD_DECODE_FAILED' }) as never
     )
   })
@@ -279,7 +279,7 @@ describe('mobileSyncConnectUri / parse (negative, mirrors Rust §7.2)', () => {
   it('rejects payload v mismatch with UNSUPPORTED_VERSION', () => {
     // base64 of {"v":2,"url":"http://a.b","user":"u","pwd":"p"} ↓
     const uri =
-      'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoyLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUiLCJwd2QiOiJwIn0'
+      'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoyLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUiLCJwd2QiOiJwIn0'
     expect(() => parseConnectUri(uri)).toThrowError(
       expect.objectContaining({ code: 'UNSUPPORTED_VERSION' }) as never
     )
@@ -290,7 +290,7 @@ describe('mobileSyncConnectUri / forward compat + round-trip', () => {
   it('parse ignores unknown o.* keys (forward compat)', () => {
     // base64 of {"v":1,"url":"http://a.b","user":"u","pwd":"p","o":{"future_key":"future_val","label":"L"}}
     const uri =
-      'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUiLCJwd2QiOiJwIiwibyI6eyJmdXR1cmVfa2V5IjoiZnV0dXJlX3ZhbCIsImxhYmVsIjoiTCJ9fQ'
+      'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUiLCJwd2QiOiJwIiwibyI6eyJmdXR1cmVfa2V5IjoiZnV0dXJlX3ZhbCIsImxhYmVsIjoiTCJ9fQ'
     const p = parseConnectUri(uri)
     expect(p.o.future_key).toBe('future_val')
     expect(p.o.label).toBe('L')

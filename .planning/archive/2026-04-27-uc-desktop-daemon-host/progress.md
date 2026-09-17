@@ -9,19 +9,19 @@
 - 删除 `uc-desktop` 中复制出来的 daemon 二进制入口，避免新增第二个 daemon 命令。
 - 更新 `src-tauri/Cargo.toml`，将 `uc-desktop` 加入 workspace。
 - 更新 `uc-desktop/Cargo.toml`，将包名和库名改为 `uc-desktop` / `uc_desktop`。
-- 将 `uc-daemon` 缩成兼容壳，只依赖 `uc-desktop`，继续保留 `uniclipboard-daemon` 二进制。
+- 将 `uc-daemon` 缩成兼容壳，只依赖 `uc-desktop`，继续保留 `clipboard-daemon` 二进制。
 - 将 `uc-daemon/src/lib.rs` 改为重新导出 `uc-desktop`，保持旧 `uc_daemon::*` 调用路径可用。
 - 新增 `src-tauri/crates/uc-desktop/AGENTS.md`，说明 `uc-desktop` 只做桌面宿主，不写业务规则。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-tauri`，通过。
 - 运行 `cargo check -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 开始第二阶段：收拢启动和应用入口装配。
 - 在 `uc-bootstrap/src/non_gui_runtime.rs` 新增 `build_app_facade_from_deps`、`AppFacadeAssemblyOptions`、`ClipboardRestoreAssembly`。
 - 将 CLI 查询 runtime、完整 CLI runtime、Tauri runtime、desktop daemon 入口改为共用 `build_app_facade_from_deps`。
 - 保留运行模式差异：daemon 仍传入 space setup、roster、clipboard sync、blob transfer、restore、search coordinator；Tauri 仍只传入 restore；CLI 按命令类型传入需要的能力。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-bootstrap -p uc-desktop -p uc-tauri`，通过。
-- 运行 `cargo check -p uc-cli -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p uc-cli -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出，说明 `uc-tauri` 没有重新依赖 `uc-desktop` 或 `uc-daemon`。
 - 运行 `git diff --check`，通过。
 - 提交 `70d14e52 arch: introduce uc-desktop host crate`。
@@ -32,7 +32,7 @@
 - 为服务清单补充 2 个单元测试，覆盖解锁独立模式和 GUI/锁定延迟模式。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo fmt --all`，通过。
-- 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `git diff --check`，通过。
 - 提交 `4aa9ecd1 refactor: extract desktop daemon service plan`。
 - 开始第四阶段：抽出 daemon runtime worker 装配。
@@ -42,7 +42,7 @@
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `264ad6dd refactor: extract desktop daemon shutdown signal`。
 - 开始第七阶段：引入明确的 daemon 运行模式。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/run_mode.rs`，定义 `Standalone`、`GuiSidecar`、`Hybrid` 三种模式。
@@ -53,7 +53,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `ae095ee8 refactor: move desktop daemon host into daemon module`。
 - 开始第二十阶段：收窄 `uc-daemon` 兼容导出面。
 - 将 `uc-daemon/src/lib.rs` 从 `pub use uc_desktop::*` 改为只保留 `entrypoint::run`、`daemon::run_mode::*`、`process_metadata::*` 三类旧路径。
@@ -61,7 +61,7 @@
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-daemon -p uc-cli`，通过。
 - 运行 `cargo check -p uc-desktop`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
@@ -75,7 +75,7 @@
 - 对收窄可见性后显露的保留状态查询入口加 `dead_code` 允许，避免干扰后续编译检查。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
@@ -84,7 +84,7 @@
 - 移动 `app.rs` 到 `daemon/app.rs`，并更新 app assembly、run loop 和启动恢复引用路径。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
@@ -93,7 +93,7 @@
 - 移动 `peers/` 到 `daemon/peers/`，移动 `search/` 到 `daemon/search/`，并更新 app/search assembly 的引用路径。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
@@ -102,17 +102,17 @@
 - 移动 `workers/` 到 `daemon/workers/`，并更新 runtime assembly 和 app assembly 的引用路径。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
 - 提交 `b14a1e83 refactor: narrow uc-daemon compatibility exports`。
 - 开始第二十一阶段：将 `uc-cli` 从 `uc-daemon` 兼容壳迁出。
 - `uc-cli` 隐藏 daemon 子命令改为直接调用 `uc_desktop::daemon::run`。
-- `uniclip start/stop` 读取 PID 改为直接调用 `uc_daemon_local::process_metadata::read_pid_file`。
+- `clip start/stop` 读取 PID 改为直接调用 `uc_daemon_local::process_metadata::read_pid_file`。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-cli -p uc-daemon -p uc-desktop`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `cargo tree -p uc-cli | rg "uc-daemon v|uc-desktop|uc-daemon-local|uc-daemon-contract"`，确认 `uc-cli` 仍依赖桌面宿主、本机 daemon 控制和 daemon 协议，但不再依赖 `uc-daemon`。
 - 运行 `rg -n "uc_daemon::|uc-daemon =" src-tauri/crates/uc-cli src-tauri/crates/uc-cli/Cargo.toml`，无输出。
@@ -122,7 +122,7 @@
 - 删除 `src-tauri/crates/uc-desktop/src/entrypoint.rs`，并从 `uc-desktop/src/lib.rs` 移除模块导出。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
 - 提交 `06fbf904 refactor: narrow desktop host public modules`。
@@ -131,7 +131,7 @@
 - 旧 `uc_daemon::process_metadata::*` 兼容路径改为直接转发 `uc-daemon-local`。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `rg -n "uc_desktop::process_metadata|crate::process_metadata|pub mod process_metadata" src-tauri/crates/uc-desktop src-tauri/crates/uc-daemon -g '*.rs'`，只剩 `uc-daemon` 兼容导出。
 - 运行 `git diff --check`，通过。
@@ -140,7 +140,7 @@
 - 移动 `service.rs` 到 `daemon/service.rs`，移动 `state.rs` 到 `daemon/state.rs`，并更新内部引用路径。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
@@ -149,7 +149,7 @@
 - 将 `app`、`peers`、`search`、`service`、`state`、`workers` 改为 crate 内可见，继续公开 `daemon` 和 `process_metadata`。
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true`，无输出。
 - 运行 `git diff --check`，通过。
 - 提交 `0656cb88 refactor: centralize desktop daemon api facade handles`。
@@ -162,7 +162,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `6393b10d refactor: extract desktop daemon bootstrap assembly`。
 - 开始第十八阶段：收回 daemon API facade 句柄。
 - 调整 `daemon/app_facade_assembly.rs`，由它从 `SpaceSetupAssembly` 中提取 setup/roster facade，并返回 `AppFacade` 与本机设备 ID。
@@ -171,7 +171,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `9ea4bc30 refactor: extract desktop daemon service assembly`。
 - 开始第十七阶段：抽出 daemon bootstrap 拆包装配。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/bootstrap.rs`，集中构造 daemon bootstrap 并拆出 background、non-gui bundle、space setup 等宿主句柄。
@@ -180,7 +180,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `03943051 refactor: extract desktop daemon runtime controls`。
 - 开始第十六阶段：抽出 daemon 服务清单装配。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/service_assembly.rs`，集中把 runtime workers 和 search service 组装成 `DaemonServicePlan`。
@@ -189,7 +189,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `f755e8da refactor: extract desktop daemon tokio runtime`。
 - 开始第十五阶段：抽出 daemon 运行控制量。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/runtime_controls.rs`，集中创建 WS 事件通道、deferred ready notify、剪贴板采集 gate 和初始解锁状态。
@@ -198,7 +198,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `4dda4904 refactor: extract desktop daemon run loop`。
 - 开始第十四阶段：抽出 daemon Tokio runtime 创建。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/tokio_runtime.rs`，集中创建 daemon 长生命周期 Tokio runtime。
@@ -207,7 +207,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `69c2f244 refactor: extract desktop daemon app assembly`。
 - 开始第十三阶段：抽出 daemon 运行循环。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/run_loop.rs`，集中处理启动恢复、daemon run 和 space setup shutdown。
@@ -216,7 +216,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `17b0ff43 refactor: extract desktop daemon background task startup`。
 - 开始第十二阶段：抽出 daemon 应用实例装配。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/app_assembly.rs`，集中构造 `DaemonApp`。
@@ -225,7 +225,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `5351a069 refactor: extract desktop daemon app facade assembly`。
 - 开始第十一阶段：抽出 daemon 后台 blob 任务启动。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/background_tasks.rs`，封装 daemon runtime 上的 blob 后台任务启动。
@@ -234,7 +234,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `dfee513a refactor: extract desktop daemon search assembly`。
 - 开始第十阶段：抽出 daemon AppFacade 装配。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/app_facade_assembly.rs`，集中声明 daemon 模式传给 `AppFacade` 的能力。
@@ -243,7 +243,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `797c55cc refactor: centralize desktop daemon mode flags`。
 - 开始第九阶段：抽出 daemon 搜索服务装配。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/search_assembly.rs`，集中构造 `SearchCoordinator` 和 `SearchCoordinatorService`。
@@ -252,7 +252,7 @@
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 记录 hybrid daemon 本地连接信息待办：`.planning/todos/pending/2026-04-27-hybrid-daemon-connection-info.md`。
 - 开始第八阶段：收口 daemon 运行模式参数解析。
 - 将 `--gui-managed` / `--hybrid` 的组合规则收敛到 `DaemonRunMode::from_flags`。
@@ -260,7 +260,7 @@
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo test -p uc-desktop daemon::run_mode -- --nocapture`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 运行 `git diff --check`，通过。
 - 开始第五阶段：抽出 daemon 启动恢复任务。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/startup_recovery.rs`，集中处理后台解锁、空间会话恢复、presence 预热和 CLI 模式 deferred services 触发。
@@ -269,7 +269,7 @@
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 - 提交 `f790844c refactor: extract desktop daemon startup recovery`。
 - 开始第六阶段：抽出 GUI 管理模式关闭信号。
 - 新增 `src-tauri/crates/uc-desktop/src/daemon/shutdown.rs`，集中把 GUI 父进程 stdin 关闭转换为 daemon 关闭信号。
@@ -277,7 +277,7 @@
 - 运行 `cargo fmt --all`，通过。
 - 运行 `cargo check -p uc-desktop -p uc-daemon -p uc-cli`，通过。
 - 运行 `cargo test -p uc-desktop daemon::service_plan -- --nocapture`，通过。
-- 运行 `cargo check -p uniclipboard`，通过，并成功准备 daemon 二进制。
+- 运行 `cargo check -p clipboard`，通过，并成功准备 daemon 二进制。
 
 ## 工作区备注
 

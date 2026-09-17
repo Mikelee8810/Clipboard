@@ -1,7 +1,7 @@
 //! GUI 端 daemon 协调类型（ADR-008）。
 //!
 //! daemon runtime + host entry points（run_mode、workers、装配链、main loop、
-//! `run` / `run_standalone_from_env`）全部住在 `uc-daemon`（产出 `uniclipd`
+//! `run` / `run_standalone_from_env`）全部住在 `uc-daemon`（产出 `clipd`
 //! 二进制）。GUI 进程从不在进程内跑 daemon 代码，所以本模块只拥有
 //! [`DaemonOwnership`]——GUI 内存里"是否已 attach 到外部 daemon"的轻量标记。
 //!

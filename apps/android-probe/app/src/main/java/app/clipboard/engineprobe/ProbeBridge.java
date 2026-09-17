@@ -1,4 +1,4 @@
-package app.uniclipboard.engineprobe;
+package app.clipboard.engineprobe;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,7 +16,7 @@ import javax.crypto.spec.GCMParameterSpec;
 
 final class ProbeBridge {
     private static final String KEYSTORE = "AndroidKeyStore";
-    private static final String KEY_ALIAS = "app.uniclipboard.engineprobe.storage";
+    private static final String KEY_ALIAS = "app.clipboard.engineprobe.storage";
     private static final String CIPHER = "AES/GCM/NoPadding";
     private static final String PREFERENCES = "encrypted_secure_storage";
 

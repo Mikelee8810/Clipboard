@@ -15,7 +15,7 @@
 //!                                         pre-refactor baseline for #886.
 //!
 //! Key knobs (apply to both subcommands unless noted):
-//!   --tuned           (default) match uniclipboard's production QUIC config
+//!   --tuned           (default) match clipboard's production QUIC config
 //!   --vanilla         use iroh's stock QuicTransportConfig defaults
 //!   --window-mb N     override stream_receive_window (after --tuned/--vanilla)
 //!   --store {mem,fs}  receiver backing store (default fs); mem isolates disk I/O
@@ -54,7 +54,7 @@ struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
 
-    /// Apply uniclipboard production transport config (BBR + 32 MB stream window
+    /// Apply clipboard production transport config (BBR + 32 MB stream window
     /// + 64 MB send window + 60s idle + 15s keepalive). Default ON.
     #[arg(long, default_value_t = true, global = true)]
     tuned: bool,
@@ -194,7 +194,7 @@ enum Cmd {
 
         /// ALPN the storm dials on. Defaults to production CLIPBOARD_ALPN
         /// so endpoint behaviour matches the real dispatch path.
-        #[arg(long, default_value = "uniclipboard/clipboard/0")]
+        #[arg(long, default_value = "clipboard/clipboard/0")]
         alpn: String,
     },
 }

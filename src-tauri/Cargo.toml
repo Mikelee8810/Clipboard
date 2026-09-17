@@ -1,7 +1,7 @@
 # Tauri packaging shell. The cargo workspace lives at the repo root
 # Cargo.toml; this is a plain package manifest for the desktop app bin.
 [package]
-name = "uniclipboard"
+name = "clipboard"
 version = "1.0.0-alpha.11"
 license.workspace = true
 description = "一个剪切板同步工具"
@@ -14,7 +14,7 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "uniclipboard_lib"
+name = "clipboard_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

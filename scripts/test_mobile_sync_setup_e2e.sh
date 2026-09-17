@@ -21,11 +21,11 @@
 # Requirements:
 #   * macOS(profile data dir 走 `~/Library/Application Support`)
 #   * `--dev` 模式(避开 keychain、用 file-based secure storage)
-#   * uniclip binary 已 build:`cargo build -p uc-cli --bin uniclip`
+#   * clip binary 已 build:`cargo build -p uc-cli --bin clip`
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclip}"
+CLI="${CLI:-./target/debug/clip}"
 PROFILE="${PROFILE:-redesign-setup-e2e}"
 PASSPHRASE="${PASSPHRASE:-redesign-setup-passphrase}"
 COMMON=("--dev" "--profile" "$PROFILE")
@@ -37,11 +37,11 @@ fi
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclip" >&2
+    echo "Build first: cargo build -p uc-cli --bin clip" >&2
     exit 2
 fi
 
-PROFILE_DIR="$HOME/Library/Application Support/app.uniclipboard.desktop-$PROFILE"
+PROFILE_DIR="$HOME/Library/Application Support/app.clipboard.desktop-$PROFILE"
 TMPDIR_RUN="$(mktemp -d -t uc_setup_e2e.XXXXXX)"
 
 PASS_COUNT=0

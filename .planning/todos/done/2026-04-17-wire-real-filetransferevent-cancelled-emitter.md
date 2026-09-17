@@ -60,6 +60,6 @@ TBD — 需要成体系地接通 UI → daemon → use case → 平台层关停�
 - **DB 不迁移**：旧行保留 `failed + cancelled:*` reason，前端 `resolveEntryTransferStatus` 加 fallback 识别 `cancelled:` 前缀，老数据按 cancelled 渲染
 - **视角翻转**：cancel reason 的 `LocalUser` / `RemotePeer` 沿反向通道发回 sender 时对调，sender UI 收到的就是它自己视角的 reason
 
-配套用例 5 修复（commit `6922e632`）：cancel 时 entry 落库 + `uniclip-missing://` URI scheme 表达未完成 file refs + 前端 `removePendingEntry` 兜底，避免取消后 placeholder 永远置顶 + 重启消失。
+配套用例 5 修复（commit `6922e632`）：cancel 时 entry 落库 + `clip-missing://` URI scheme 表达未完成 file refs + 前端 `removePendingEntry` 兜底，避免取消后 placeholder 永远置顶 + 重启消失。
 
 调研事实 / 设计推导 / advisor 复核细节归档在 `.planning/archive/2026-05-23-direct-transfer-fixes/`。

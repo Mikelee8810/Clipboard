@@ -15,7 +15,7 @@ concurrency:
 jobs:
   validate:
     name: Verify and check Engine update
-    if: ${{ github.event.client_payload.repository == 'UniClipboard/Engine' }}
+    if: ${{ github.event.client_payload.repository == 'Clipboard/Engine' }}
     runs-on: ubuntu-latest
     outputs:
       base_sha: ${{ steps.base.outputs.sha }}
@@ -118,8 +118,8 @@ jobs:
           git_auth() {
             git -c credential.helper= -c credential.helper='!f() { echo "username=x-access-token"; echo "password=$GH_TOKEN"; }; f' "$@"
           }
-          git config user.name "uniclipboard-engine-release[bot]"
-          git config user.email "uniclipboard-engine-release[bot]@users.noreply.github.com"
+          git config user.name "clipboard-engine-release[bot]"
+          git config user.email "clipboard-engine-release[bot]@users.noreply.github.com"
           git checkout -B "$BRANCH"
           git commit -m "chore(engine): adopt $ENGINE_VERSION"
           if git_auth ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then

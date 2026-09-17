@@ -1,4 +1,4 @@
-# Roadmap: UniClipboard Desktop
+# Roadmap: Clipboard Desktop
 
 ## 当前里程碑：v0.7.0 LAN-only Mode
 
@@ -88,9 +88,9 @@ Plans:
 **Success criteria（可观察的用户行为或可验证状态）：**
 
 1. 打开 Settings → Network 分类可见 "LAN-only Mode" 开关，**默认 OFF**（关闭 = 允许 fallback，对应后端 `allow_relay_fallback: true`）；之前的 `'settings.sections.network.placeholder'` 占位 i18n key 与 `NetworkSection.tsx` 占位组件已被替换，无残留。
-2. 切换开关后：UI 立即显示**持久 inline 通知**（非一秒 toast）"重启生效"，并切换到 "pending change" 三态视觉（区别于 applied OFF / applied ON 两个稳定态）；通知含"立即重启"按钮，点击后 daemon 走优雅 shutdown + relaunch 路径，重启完成后 UI 回到稳定态且新值已生效。
-3. 开关附近显示 info icon，hover/点击展开 tooltip 列出开启后**仍会走外网**的 4 类请求：(a) 首次配对 rendezvous、(b) OTLP 遥测（独立由 General 控制）、(c) pkarr DHT NodeId 解析、(d) auto-update GitHub 检查；措辞与 `docs/lan-only.md` 完全一致，不含 "fully offline / 完全离线 / 绝对私有" 等绝对化用词。
-4. 前端 store 内部状态名为 `allowRelayFallback`（驼峰），**不**维护 `lanOnly` 镜像；UI 组件用 `checked={!setting.network.allowRelayFallback}` 决定开关视觉；写入 debounce ≥ 500ms 防止反复切换爆 disk I/O。
+2. 切换开关后：UI 立即显示 **持久 inline 通知**（非一秒 toast）"重启生效"，并切换到 "pending change" 三态视觉（区别于 applied OFF / applied ON 两个稳定态）；通知含"立即重启"按钮，点击后 daemon 走优雅 shutdown + relaunch 路径，重启完成后 UI 回到稳定态且新值已生效。
+3. 开关附近显示 info icon，hover/点击展开 tooltip 列出开启后 **仍会走外网** 的 4 类请求：(a) 首次配对 rendezvous、(b) OTLP 遥测（独立由 General 控制）、(c) pkarr DHT NodeId 解析、(d) auto-update GitHub 检查；措辞与 `docs/lan-only.md` 完全一致，不含 "fully offline / 完全离线 / 绝对私有" 等绝对化用词。
+4. 前端 store 内部状态名为 `allowRelayFallback`（驼峰），**不** 维护 `lanOnly` 镜像；UI 组件用 `checked={!setting.network.allowRelayFallback}` 决定开关视觉；写入 debounce ≥ 500ms 防止反复切换爆 disk I/O。
 
 **Key risks / pitfall 防御：**
 - Pitfall 5（"LAN-only" 营销语 vs 边界透明）—— tooltip / `docs/lan-only.md` / changelog 三处一致；i18n 禁用绝对化词
@@ -103,7 +103,7 @@ Plans:
 
 ### Phase 96: 连接通道指示器
 
-**Goal：** 用户在设备列表与 system tray 都能直观看到当前 LAN-only Mode 状态以及每台已配对设备走的是 LAN 直连 / Relay 中继 / Offline / Unknown / Out of LAN，从而**可肉眼验证**开关效果；通道判定来自 infra 层单一真相源，前后通过事件 + polling 双路径刷新。
+**Goal：** 用户在设备列表与 system tray 都能直观看到当前 LAN-only Mode 状态以及每台已配对设备走的是 LAN 直连 / Relay 中继 / Offline / Unknown / Out of LAN，从而 **可肉眼验证** 开关效果；通道判定来自 infra 层单一真相源，前后通过事件 + polling 双路径刷新。
 
 **Requirements covered：** INDIC-01, INDIC-02, INDIC-03, INDIC-04
 
@@ -111,7 +111,7 @@ Plans:
 
 **Success criteria（可观察的用户行为或可验证状态）：**
 
-1. 设备列表中每台已配对设备显示连接通道徽章，至少 4 态可见：`LAN / Relay / Offline / Unknown`；徽章值来自 infra 层 `ConnectionChannelPort::channel_for(device)` 单点产出（grep application 层无 `if peer.ip.starts_with("192.168")` 之类 IP 段推断），UI 同时订阅既有 `peers.changed` 事件流 + 5–15s polling 双路径刷新；`Unknown` 态在 UI 显式可见，**不会**被默认渲染为 LAN/Relay。
+1. 设备列表中每台已配对设备显示连接通道徽章，至少 4 态可见：`LAN / Relay / Offline / Unknown`；徽章值来自 infra 层 `ConnectionChannelPort::channel_for(device)` 单点产出（grep application 层无 `if peer.ip.starts_with("192.168")` 之类 IP 段推断），UI 同时订阅既有 `peers.changed` 事件流 + 5–15s polling 双路径刷新；`Unknown` 态在 UI 显式可见，**不会** 被默认渲染为 LAN/Relay。
 2. hover 通道徽章可见 tooltip 解释当前通道含义，特别针对 Relay 显示 "加密中继，元数据可见" 之类就近论证（内容与 `docs/lan-only.md` 一致）。
 3. 在 LAN-only Mode = ON 状态下断网或跨网段设备仍在 paired 列表，但显示为灰色 "Out of LAN" 态 + tooltip 说明（不是静默失联）；恢复同网段后徽态自动回到 LAN（事件或下一轮 polling 内）。
 4. system tray icon 上可视化当前 LAN-only Mode 启用状态（差异图标 / 状态徽章），用户不打开主窗口也能确认；切换 + 重启后 tray icon 状态在 daemon 起来后随之更新。
@@ -127,7 +127,7 @@ Plans:
 
 ### Phase 97: onboarding + 文档 + 跨平台 QA gate
 
-**Goal：** 首次配对完成的用户能看到一次性 inline banner 发现 LAN-only Mode；维护者/贡献者 / reviewer / Release notes 读者从 `docs/lan-only.md` / `docs/terminology.md` / changelog 三处获得**完全一致**的边界披露；release 不发布除非跨平台 QA 矩阵全部通过。
+**Goal：** 首次配对完成的用户能看到一次性 inline banner 发现 LAN-only Mode；维护者/贡献者 / reviewer / Release notes 读者从 `docs/lan-only.md` / `docs/terminology.md` / changelog 三处获得 **完全一致** 的边界披露；release 不发布除非跨平台 QA 矩阵全部通过。
 
 **Requirements covered：** ONBORD-01, DOC-01, DOC-02, DOC-03
 

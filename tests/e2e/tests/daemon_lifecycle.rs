@@ -1,6 +1,6 @@
 //! E2E tests for daemon lifecycle: start, health check, stop.
 //!
-//! These tests require `uniclipd` and `uniclip` binaries to be pre-built:
+//! These tests require `clipd` and `clip` binaries to be pre-built:
 //!   cargo build -p uc-daemon -p uc-cli
 //!
 //! Run with:

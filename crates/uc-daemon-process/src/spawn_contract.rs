@@ -29,8 +29,8 @@ pub const RUN_MODE_ONESHOT: &str = "oneshot";
 /// presence makes the daemon enforce the D9 contract via
 /// [`validate_unattended_unlock`]: keyring auto-unlock must be available.
 ///
-/// Absent for GUI spawn (attended) and interactive `uniclip start` (lenient
-/// unattended — the user is at a terminal and can `uniclip unlock`); those keep
+/// Absent for GUI spawn (attended) and interactive `clip start` (lenient
+/// unattended — the user is at a terminal and can `clip unlock`); those keep
 /// their current force-unlock behavior.
 pub const UNATTENDED_ENV: &str = "UC_DAEMON_UNATTENDED";
 

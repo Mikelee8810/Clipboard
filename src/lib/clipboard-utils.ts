@@ -46,7 +46,7 @@ function extractFileNameFromUri(uri: string): string {
  * The daemon projection carries received files as `file://` URIs (produced by
  * Rust `Url::from_file_path`); the native `reveal_path` command expects a plain
  * filesystem path, so we decode it here. Returns `null` for non-`file://` URIs
- * (e.g. `uniclip-missing://` placeholders) or unparseable input.
+ * (e.g. `clip-missing://` placeholders) or unparseable input.
  *
  * Windows note: `file:///C:/dir/f.txt` decodes to a pathname of `/C:/dir/f.txt`,
  * so the leading slash before the drive letter is stripped. Received files always
@@ -80,18 +80,18 @@ export function parseFileNamesFromUriList(uriList: string): string[] {
  * persists the entry so user-facing artifacts (filename / size) survive
  * restart, but the file itself is unavailable for open/copy/drag operations.
  *
- * Format: `uniclip-missing:///<encoded-filename>?size=<bytes>&reason=cancelled`
+ * Format: `clip-missing:///<encoded-filename>?size=<bytes>&reason=cancelled`
  */
-const UNICLIP_MISSING_SCHEME = 'uniclip-missing:'
+const CLIP_MISSING_SCHEME = 'clip-missing:'
 
-function isUniclipMissingUri(uri: string): boolean {
+function isClipMissingUri(uri: string): boolean {
   const trimmed = uri.trim().toLowerCase()
-  return trimmed.startsWith(`${UNICLIP_MISSING_SCHEME}//`)
+  return trimmed.startsWith(`${CLIP_MISSING_SCHEME}//`)
 }
 
 /**
  * Parse a newline-separated URI list into per-file metadata, distinguishing
- * `file://` URIs (real local files) from `uniclip-missing://` placeholders
+ * `file://` URIs (real local files) from `clip-missing://` placeholders
  * (transfer cancelled before this blob completed).
  *
  * Order of entries matches the URI list line order so callers can zip with
@@ -110,7 +110,7 @@ export function parseFileItemsFromUriList(uriList: string): Array<{
       {
         name: extractFileNameFromUri(trimmed),
         path: fileUriToLocalPath(trimmed),
-        missing: isUniclipMissingUri(trimmed),
+        missing: isClipMissingUri(trimmed),
       },
     ]
   })

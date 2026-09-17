@@ -1,20 +1,20 @@
 ---
 title: CLI Reference
-description: Every uniclip subcommand — members, send/watch, search, blob, mobile sync, and exit codes.
+description: Every clip subcommand — members, send/watch, search, blob, mobile sync, and exit codes.
 ---
 
-This is the full `uniclip` subcommand reference. New to the CLI?
+This is the full `clip` subcommand reference. New to the CLI?
 Start with the [CLI overview](../cli/getting-started).
 
 ## Space
 
 | Command                     | Effect                                                                                                         |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `uniclip space status`      | Show the current space and device-trust summary.                                                               |
-| `uniclip space init`        | Create a new encrypted space for this profile.                                                                 |
-| `uniclip space invite`      | Issue a one-time pairing invitation.                                                                           |
-| `uniclip space join`        | Join or re-pair with a sponsoring device; add `--switch` to move to a different space.                        |
-| `uniclip space reset --yes` | Rebuild as a new one-device space while retaining local history, completed files, settings, and device access. |
+| `clip space status`      | Show the current space and device-trust summary.                                                               |
+| `clip space init`        | Create a new encrypted space for this profile.                                                                 |
+| `clip space invite`      | Issue a one-time pairing invitation.                                                                           |
+| `clip space join`        | Join or re-pair with a sponsoring device; add `--switch` to move to a different space.                        |
+| `clip space reset --yes` | Rebuild as a new one-device space while retaining local history, completed files, settings, and device access. |
 
 Space reset permanently discards old pairing, trust, and sync relationships.
 Every device must pair again. It does not erase local history and is not a
@@ -24,29 +24,29 @@ factory reset.
 
 | Command                   | What it shows                                                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `uniclip members`         | This space's members — the local device plus paired peers — with each peer's last-known reachability: `{name} ({online \| offline \| unknown})`. |
-| `uniclip members --probe` | Same, but actively pings every paired peer first so the states are fresh (adds a network round-trip).                                            |
+| `clip members`         | This space's members — the local device plus paired peers — with each peer's last-known reachability: `{name} ({online \| offline \| unknown})`. |
+| `clip members --probe` | Same, but actively pings every paired peer first so the states are fresh (adds a network round-trip).                                            |
 
-`uniclip devices` is an alias for `uniclip members`. Both honour `--json`
+`clip devices` is an alias for `clip members`. Both honour `--json`
 for scripting.
 
 ### Join requests
 
 | Command                  | Effect                                                                                  |
 | ------------------------ | --------------------------------------------------------------------------------------- |
-| `uniclip space join --no-wait` | Record a pending join and return without waiting for its final result.                  |
-| `uniclip space join status`    | Show the current join request and its Engine-owned status.                              |
-| `uniclip space join cancel`    | Request cancellation of the current pending join.                                      |
+| `clip space join --no-wait` | Record a pending join and return without waiting for its final result.                  |
+| `clip space join status`    | Show the current join request and its Engine-owned status.                              |
+| `clip space join cancel`    | Request cancellation of the current pending join.                                      |
 
-Without `--no-wait`, `uniclip space join` waits for a final result. Ctrl-C stops only
+Without `--no-wait`, `clip space join` waits for a final result. Ctrl-C stops only
 that local wait; use `space join cancel` when the request itself should be cancelled.
 
 ### Device trust changes
 
 | Command                                       | Effect                                                                                     |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `uniclip member trust status`                 | Show the current device-group change, its identifier, and the effect of each choice.      |
-| `uniclip member trust choose` | Select an available option for a current device-group issue. |
+| `clip member trust status`                 | Show the current device-group change, its identifier, and the effect of each choice.      |
+| `clip member trust choose` | Select an available option for a current device-group issue. |
 
 Interactive terminals can follow the prompts. Scripts and JSON callers should pass
 `--issue <ISSUE-ID>` and `--choice <CHOICE-ID>` using identifiers returned by
@@ -57,8 +57,8 @@ Query again if state has changed; a submitted choice may still be pending or req
 
 | Command                                        | Effect                                                                  |
 | ---------------------------------------------- | ----------------------------------------------------------------------- |
-| `uniclip member sync show <DEVICE>`            | Show send, receive, and content-type preferences for one member.        |
-| `uniclip member sync set <DEVICE> [OPTIONS]`   | Change only the preferences explicitly supplied on the command line.    |
+| `clip member sync show <DEVICE>`            | Show send, receive, and content-type preferences for one member.        |
+| `clip member sync set <DEVICE> [OPTIONS]`   | Change only the preferences explicitly supplied on the command line.    |
 
 `<DEVICE>` can be a device ID, or an unambiguous device name in an interactive
 terminal. `set` accepts `--send on|off`, `--receive on|off`, and comma-separated
@@ -69,21 +69,21 @@ no types.
 
 ```bash
 # Send text to every online paired device
-uniclip send "hello from the CLI"
+clip send "hello from the CLI"
 
 # Or pipe stdin
-echo "from a heredoc" | uniclip send
+echo "from a heredoc" | clip send
 
 # Restrict fan-out to specific devices (repeatable)
-uniclip send "scoped message" --peer DEVICE_ID_A --peer DEVICE_ID_B
+clip send "scoped message" --peer DEVICE_ID_A --peer DEVICE_ID_B
 
 # Re-fan-out a previously captured local entry. No stdin / positional
 # text is read. Without `--peer`, targets default to the diff of
 # trusted peers minus those that already received this entry.
-uniclip send --resend <ENTRY_ID>
+clip send --resend <ENTRY_ID>
 
 # Watch inbound clipboard payloads as they arrive (Ctrl-C to stop)
-uniclip watch
+clip watch
 ```
 
 `--resend` only re-fans-out entries that were **captured locally** and
@@ -91,7 +91,7 @@ whose payload is still cached. Entries originating on a remote peer
 cannot be re-sent from this device; combine `--resend` with `--peer ...`
 to force a specific fan-out target.
 
-`uniclip watch` is a **diagnostic observer**: it prints the first text
+`clip watch` is a **diagnostic observer**: it prints the first text
 representation (or a per-rep summary for image-only payloads) but
 does **not** write the system clipboard — that's the daemon's job.
 
@@ -101,12 +101,12 @@ does **not** write the system clipboard — that's the daemon's job.
 # Sender: dispatch a file to paired peers via the daemon's blob
 # pipeline. The daemon handles blob storage and transfer — the CLI
 # exits once the dispatch is acknowledged.
-uniclip send -f ./big-file.bin
+clip send -f ./big-file.bin
 
 # Receiver: wait for the first inbound file, export it from the
 # daemon's cache, and write it to disk (defaults to cwd; pass --out
 # for a different directory). Ctrl-C to stop waiting.
-uniclip recv --out ./inbox
+clip recv --out ./inbox
 ```
 
 `send -f` is mutually exclusive with positional text and `--resend`.
@@ -121,16 +121,16 @@ system clipboard to paste from — use `get`, which returns immediately.
 
 ```bash
 # Newest usable entry (text/link prints to stdout)
-uniclip get
+clip get
 
 # Newest entry of a kind: image | file | text | link
-uniclip get --type image
+clip get --type image
 
-# A specific entry by id (from `uniclip search`), into a directory
-uniclip get --id <ENTRY_ID> --out ./inbox
+# A specific entry by id (from `clip search`), into a directory
+clip get --id <ENTRY_ID> --out ./inbox
 
 # Browse recent entries instead of materializing one
-uniclip get --list -n 20
+clip get --list -n 20
 ```
 
 Output contract: **text / link** content is printed to stdout
@@ -143,25 +143,25 @@ to stderr, so stdout stays clean. Unlike `recv`, `get` never blocks.
 
 ## Search
 
-`uniclip search` exposes the encrypted full-text index that backs the
+`clip search` exposes the encrypted full-text index that backs the
 GUI dashboard search.
 
 ```bash
-uniclip search status                    # is the index ready / building?
-uniclip search rebuild                   # rebuild from history (synchronous)
-uniclip search "report"                  # default query
-uniclip search "report" \
+clip search status                    # is the index ready / building?
+clip search rebuild                   # rebuild from history (synchronous)
+clip search "report"                  # default query
+clip search "report" \
     --type text --ext md \
     --limit 20 --detailed
-uniclip search "report" \
+clip search "report" \
     --from-ms 1710000000000 --to-ms 1710100000000
-uniclip search "report" \
+clip search "report" \
     --source-device "Laptop"             # only clips from that device
 ```
 
 `--source-device` filters by the device a clip arrived from. It accepts a
 device name (case-insensitive) or a device id and is repeatable; run
-`uniclip members` to see the available names. `--detailed` (and `--json`)
+`clip members` to see the available names. `--detailed` (and `--json`)
 output includes each result's `source` device id.
 
 `rebuild` blocks until the rebuild finishes; useful when scripting a
@@ -172,15 +172,15 @@ diagnostic snapshot.
 > **Note:** `blob`, `probe`, and `dev` subcommands are only available in
 > development builds (`dev-tools` feature). Release binaries do not include them.
 
-`uniclip blob` is the headless interface to the chunked-blob pipeline
+`clip blob` is the headless interface to the chunked-blob pipeline
 described in [Sync content](../core-features/sync#large-payloads-files--big-images).
 
 ```bash
 # Publish a local file as an encrypted blob and print its ticket
-uniclip blob publish ./sample.bin
+clip blob publish ./sample.bin
 
 # Fetch a blob by ticket + entry ID into a local file
-uniclip blob fetch <TICKET> --entry-id <ENTRY_ID> --out ./restored.bin
+clip blob fetch <TICKET> --entry-id <ENTRY_ID> --out ./restored.bin
 ```
 
 Useful when debugging file-sync failures or verifying a peer can
@@ -188,43 +188,43 @@ reach blob storage.
 
 ## Mobile sync
 
-`uniclip mobile ...` is the CLI surface for the mobile companion
+`clip mobile ...` is the CLI surface for the mobile companion
 feature. It mirrors the **Devices → Mobile sync** panel in the GUI and
 the protocol is documented in the [Mobile LAN API](../reference/mobile-api).
 
 ```bash
 # One-shot wizard: turn the feature on, configure the LAN listener,
 # register one iPhone, print the install QR + a one-time password.
-uniclip mobile setup
+clip mobile setup
 
 # Read-only view (allowed while the daemon is running)
-uniclip mobile status            # combined: feature + LAN + paired devices
+clip mobile status            # combined: feature + LAN + paired devices
 
 # Paired device management
-uniclip mobile add --label "My iPhone" \
+clip mobile add --label "My iPhone" \
     [--username my_user] [--password-stdin]
-uniclip mobile revoke <device-id>
+clip mobile revoke <device-id>
 
 # Advanced listener configuration (write commands — daemon must be stopped).
 # `setup` already covers the common case; reach for these to re-point the
 # address or front the listener with a reverse proxy.
-uniclip mobile network interfaces
+clip mobile network interfaces
 # LAN form: advertise an internal IPv4 → install URL is http://<IP>:<port>
-uniclip mobile network set --ip <LAN_IPV4> [--port 42720] --accept-network-risk
+clip mobile network set --ip <LAN_IPV4> [--port 42720] --accept-network-risk
 # Reverse-proxy form: advertise a full base URL → install URL/QR points at
 # the HTTPS front-end (e.g. Caddy), while the listener stays plain HTTP.
-uniclip mobile network set --url https://clip.example.com --accept-network-risk
-uniclip mobile network off       # stop just the LAN listener
+clip mobile network set --url https://clip.example.com --accept-network-risk
+clip mobile network off       # stop just the LAN listener
 
 # Disable the feature entirely (master switch + listener off; paired
 # device records stay until you `revoke` them).
-uniclip mobile disable
+clip mobile disable
 ```
 
 Behavioural notes:
 
 - **Write commands refuse to run while a same-profile daemon is up.**
-  Stop the daemon (`uniclip stop` / quit the GUI) before running
+  Stop the daemon (`clip stop` / quit the GUI) before running
   `setup`, `add`, `network set`, etc. The read command (`space status`) is
   tolerant of a running daemon.
 - **`--json` implies non-interactive.** No prompts will be shown.
@@ -246,7 +246,7 @@ Behavioural notes:
   …) while the listener itself stays plain HTTP on the internal
   network. The two are mutually exclusive and setting one clears the
   other; `mobile status` reflects whichever is active.
-- A **debug** subcommand group exists (`uniclip mobile debug`)
+- A **debug** subcommand group exists (`clip mobile debug`)
   but is hidden from `--help` — it is reserved for development and
   E2E scripts (it bypasses HTTP and pokes the facade directly), and
   may change without notice.
@@ -257,11 +257,11 @@ install, password rotation — see the [Mobile sync guide](../core-features/mobi
 ## Debug & log export
 
 ```bash
-uniclip debug status                       # is persistent debug logging on?
-uniclip debug on                           # enable verbose local logging
-uniclip debug off                          # back to the normal profile
-uniclip debug export-logs                  # zip the last 24h to Downloads
-uniclip debug export-logs --since-hours 6  # narrow the window
+clip debug status                       # is persistent debug logging on?
+clip debug on                           # enable verbose local logging
+clip debug off                          # back to the normal profile
+clip debug export-logs                  # zip the last 24h to Downloads
+clip debug export-logs --since-hours 6  # narrow the window
 ```
 
 `debug on` / `off` persists a more verbose logging profile across
@@ -277,9 +277,9 @@ is available in the GUI under **Settings → General**.
 ## Upgrade-detection cursor
 
 ```bash
-uniclip upgrade            # bare command prints status
-uniclip upgrade status     # same as the bare command
-uniclip upgrade ack        # advance the cursor to the current build
+clip upgrade            # bare command prints status
+clip upgrade status     # same as the bare command
+clip upgrade ack        # advance the cursor to the current build
 ```
 
 Inspects or advances the upgrade-detection cursor — exposed for manual
@@ -288,28 +288,28 @@ verification of the upgrade module. Most users never need this.
 ## Hidden commands
 
 The following commands exist but are deliberately hidden from
-`uniclip --help`:
+`clip --help`:
 
-- `uniclip probe ...` — clipboard-diagnostic group (replaces the old
+- `clip probe ...` — clipboard-diagnostic group (replaces the old
   `clipboard-probe` binary). The only CLI path that writes the system
   clipboard, and only via `probe restore`. Development and E2E only.
-- `uniclip dev seed-clipboard --text <TEXT>` — debug seeding for
+- `clip dev seed-clipboard --text <TEXT>` — debug seeding for
   switch-space data-integrity tests.
-- `uniclip dev dump-clipboard --limit <N>` — debug printing of decrypted
+- `clip dev dump-clipboard --limit <N>` — debug printing of decrypted
   history.
-- `uniclip dev capture-files --path <PATH>` — captures one or more files
+- `clip dev capture-files --path <PATH>` — captures one or more files
   or directories through the real local-capture pipeline and prints the
   persisted file-set manifest. Repeat `--path` for mixed selections.
   `--max-members` and `--max-bytes` temporarily override the file-set
   caps for this capture only; the override is not written back to the
   profile's settings.
-- `uniclip dev pairing ...` — pairing-invitation diagnostics: `addrs`
+- `clip dev pairing ...` — pairing-invitation diagnostics: `addrs`
   lists candidate addresses after the product filter has run, and
   `issue --addr <IP>` issues an invitation constrained to one local
   IP. Refuses to run while the daemon is up. Intended for triaging
   [pairing failures on virtual-NIC setups](../help/troubleshooting#pairing-failures).
-- `uniclipd` — the background daemon, shipped as a **separate binary**
-  (no longer a `uniclip daemon` subcommand). `uniclip start` and the
+- `clipd` — the background daemon, shipped as a **separate binary**
+  (no longer a `clip daemon` subcommand). `clip start` and the
   desktop app spawn it for you; you'll see it in `ps`, but don't launch
   it directly.
 
@@ -319,15 +319,15 @@ seeing things in `ps` or in commit history.
 
 ## Exit codes
 
-`uniclip` uses stable exit codes (defined in the source under
+`clip` uses stable exit codes (defined in the source under
 `src/exit_codes.rs`). `0` is success; non-zero values map to
 distinct failure classes (configuration, network, pairing, etc.) and
 are stable across releases. Scripts should branch on exit code rather
 than parse human-readable output.
 
-`uniclip get` additionally uses `6` when no entry matched the selector,
+`clip get` additionally uses `6` when no entry matched the selector,
 and `7` when an entry matched but its payload is unavailable (`Lost` or
 not yet downloaded — re-send it from the source device).
 
-For the most up-to-date list of subcommands, run `uniclip --help` —
+For the most up-to-date list of subcommands, run `clip --help` —
 the binary's help is the source of truth.

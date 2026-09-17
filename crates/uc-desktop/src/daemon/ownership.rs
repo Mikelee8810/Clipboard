@@ -1,6 +1,6 @@
 //! GUI 进程对 daemon runtime 的所有权跟踪（GUI-framework agnostic）。
 //!
-//! ADR-008 P3-3 起 GUI 永远是外部 `uniclipd` 的纯客户端——daemon 从来不在 GUI
+//! ADR-008 P3-3 起 GUI 永远是外部 `clipd` 的纯客户端——daemon 从来不在 GUI
 //! 进程内启动，所以历史上的 `Owned(DaemonHandle)`（GUI 进程内 daemon、退出时
 //! 调 `DaemonHandle::shutdown`）已成死代码，本类型在 ADR-008 P4-3 (D3) 收敛为
 //! 一个轻量信息标记：

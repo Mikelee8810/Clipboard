@@ -1,11 +1,11 @@
 apply plugin: "com.android.application"
 
 android {
-    namespace "app.uniclipboard.engineprobe"
+    namespace "app.clipboard.engineprobe"
     compileSdk 36
 
     defaultConfig {
-        applicationId "app.uniclipboard.engineprobe"
+        applicationId "app.clipboard.engineprobe"
         minSdk 24
         targetSdk 34
         versionCode 1

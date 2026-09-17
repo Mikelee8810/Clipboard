@@ -425,7 +425,7 @@ pub fn with_system_defaults(data_dir: PathBuf) -> Self {
         vault_key_path: data_dir.join("vault/key"),
         vault_snapshot_path: data_dir.join("vault/snapshot"),
         webserver_port: 0,
-        database_path: data_dir.join("uniclipboard.db"),
+        database_path: data_dir.join("clipboard.db"),
         silent_start: false,
     }
 }

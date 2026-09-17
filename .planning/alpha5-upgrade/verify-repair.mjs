@@ -16,7 +16,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const results = []
 for (const scenario of ['fresh', 'failed-upgrade', 'changed-source']) {
   const profile = `dev-upgrade-alpha5-repair-${scenario}-${randomUUID()}`
-  const root = path.join(os.homedir(), 'Library/Application Support', `app.uniclipboard.desktop-${profile}`)
+  const root = path.join(os.homedir(), 'Library/Application Support', `app.clipboard.desktop-${profile}`)
   const logs = path.resolve('.planning/alpha5-upgrade', profile)
   fs.mkdirSync(logs, { recursive: true })
   const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'alpha5-repair-'))
@@ -27,12 +27,12 @@ for (const scenario of ['fresh', 'failed-upgrade', 'changed-source']) {
   }
   fs.cpSync(path.join(stage, 'data'), root, { recursive: true, errorOnExist: true, force: false })
   fs.rmSync(stage, { recursive: true })
-  const env = { ...process.env, UC_PROFILE: profile, UNICLIPBOARD_ENV: 'development', RUST_LOG: 'info' }
+  const env = { ...process.env, UC_PROFILE: profile, CLIPBOARD_ENV: 'development', RUST_LOG: 'info' }
   let active
   const exited = child => child.exitCode !== null || child.signalCode !== null
   function start(directory, label, clipboard = false) {
     const fd = fs.openSync(path.join(logs, `${label}.log`), 'w')
-    active = spawn(path.resolve(directory, 'uniclipd'), [], {
+    active = spawn(path.resolve(directory, 'clipd'), [], {
       env: { ...env, UC_DAEMON_RUN_MODE: clipboard ? '' : 'server' }, stdio: ['ignore', fd, fd],
     })
     active.on('error', error => { throw error })
@@ -58,7 +58,7 @@ for (const scenario of ['fresh', 'failed-upgrade', 'changed-source']) {
     throw new Error('Startup timed out')
   }
   function cli(directory, args) {
-    return execFileSync(path.resolve(directory, 'uniclip'), args, { env, timeout: 15000, encoding: 'utf8' })
+    return execFileSync(path.resolve(directory, 'clip'), args, { env, timeout: 15000, encoding: 'utf8' })
   }
   async function broken(label, type) {
     const child = start(brokenDirectory, label)

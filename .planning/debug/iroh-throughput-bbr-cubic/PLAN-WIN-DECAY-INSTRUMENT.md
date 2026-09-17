@@ -25,7 +25,7 @@ The decay is one (or several) of:
   disk IO, throttling subsequent writes
 - Most likely culprit if Defender exclusion isn't in place for the entire
   iroh-blobs store dir (`%LOCALAPPDATA%\...\iroh-blobs_dev\`) AND the
-  uniclipboard file-cache (`%LOCALAPPDATA%\...\file-cache\`)
+  clipboard file-cache (`%LOCALAPPDATA%\...\file-cache\`)
 
 ### H2: NTFS fragmentation under sustained sequential writes
 - iroh-blobs FsStore writes the blob in chunks as ranges arrive
@@ -61,7 +61,7 @@ Each of the five hypotheses needs its own data channel. Run them
 ### Test scenario
 
 - File: **15 GB random bytes** (`/tmp/testfile-large.bin`, regenerated each run)
-- Path: Mac (production uniclipboard) → Win (production uniclipboard)
+- Path: Mac (production clipboard) → Win (production clipboard)
 - Wall-clock target: long enough to reproduce decay if user reports it
   (`>10 minutes`); 15 GB at 40 MB/s ≈ 6 minutes start, plus decay time
 - One run with **Defender exclusion in place**, one run **without** —
@@ -72,7 +72,7 @@ Each of the five hypotheses needs its own data channel. Run them
 #### Channel 1: receiver throughput curve
 
 The spike binary already prints checkpointed `FETCH ts=... bytes=...` lines
-every 4 MB. For production uniclipboard the equivalent is the existing
+every 4 MB. For production clipboard the equivalent is the existing
 `blob fetch: progress checkpoint` log entries (already in JSON Lines
 format under `%LOCALAPPDATA%\...\desktop\logs\`).
 

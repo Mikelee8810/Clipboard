@@ -5,7 +5,7 @@ pub(crate) fn is_development_environment(value: Option<&str>) -> bool {
 }
 
 pub(crate) fn development_mode() -> bool {
-    let runtime_environment = std::env::var("UNICLIPBOARD_ENV").ok();
+    let runtime_environment = std::env::var("CLIPBOARD_ENV").ok();
     is_development_environment(runtime_environment.as_deref())
 }
 

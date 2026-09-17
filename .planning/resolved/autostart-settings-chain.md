@@ -14,10 +14,10 @@ next_action: Resolved. Human verified via logs that toggling auto_start in Setti
 
 ## Symptoms
 
-expected: Toggling the auto_start option in Settings should enable/disable OS-level autostart for UniClipboard on login (at least on macOS first, eventually multi-platform), by flowing through a use case that calls AutostartPort which in turn calls tauri-plugin-autostart.
+expected: Toggling the auto_start option in Settings should enable/disable OS-level autostart for Clipboard on login (at least on macOS first, eventually multi-platform), by flowing through a use case that calls AutostartPort which in turn calls tauri-plugin-autostart.
 actual: The Settings auto_start option can be changed in the UI, but there is currently no implemented chain that detects this field change and invokes AutostartPort/tauri-plugin-autostart, so OS-level autostart is not actually updated. The user has not yet verified post-reboot behavior; investigation should first confirm whether any autostart wiring exists and, if not, design and implement the missing chain.
 errors: No known error messages yet; user has not inspected logs specifically for autostart-related errors. Start from code inspection.
-reproduction: From the Settings screen in the desktop app, toggle the auto_start/"launch at login" switch, apply/save if needed, then (once implemented) reboot or log out/in to verify whether UniClipboard starts automatically. Currently, expectation is that this has no effect because the backend chain is missing.
+reproduction: From the Settings screen in the desktop app, toggle the auto_start/"launch at login" switch, apply/save if needed, then (once implemented) reboot or log out/in to verify whether Clipboard starts automatically. Currently, expectation is that this has no effect because the backend chain is missing.
 timeline: This behavior is believed to be "never implemented" rather than a regression; the user notes that the chain "is simply not implemented at all".
 
 ## Eliminated

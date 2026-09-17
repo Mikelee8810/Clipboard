@@ -32,10 +32,10 @@ export async function collectEngineEvidence(run) {
   for (const [index, profile] of run.profiles.entries()) {
     validateTestProfile(profile)
     const role = 'abcde'[index]
-    const directory = join(homedir(), 'Library/Logs', `app.uniclipboard.desktop-${profile}`)
+    const directory = join(homedir(), 'Library/Logs', `app.clipboard.desktop-${profile}`)
     try {
       for (const file of await readdir(directory)) {
-        if (!file.startsWith('uniclipboard-daemon.json.')) continue
+        if (!file.startsWith('clipboard-daemon.json.')) continue
         for (const line of (await readFile(join(directory, file), 'utf8')).split('\n')) {
           if (!line) continue
           try {

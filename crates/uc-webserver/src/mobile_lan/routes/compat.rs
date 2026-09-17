@@ -11,7 +11,7 @@ pub(super) async fn get_api_time() -> Json<String> {
 }
 
 pub(super) async fn get_api_version() -> Json<String> {
-    Json(format!("UniClipboard {}", env!("CARGO_PKG_VERSION")))
+    Json(format!("Clipboard {}", env!("CARGO_PKG_VERSION")))
 }
 
 pub(super) async fn root_compat() -> &'static str {

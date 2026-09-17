@@ -81,9 +81,9 @@ class EngineRuntime {
     try {
       const documentPicker = new picker.DocumentViewPicker(context);
       const exportId = Date.now();
-      const exportText = `UniClipboard HarmonyOS export check ${exportId}`;
+      const exportText = `Clipboard HarmonyOS export check ${exportId}`;
       const uris = await documentPicker.save({
-        newFileNames: [`uniclipboard-export-check-${exportId}.txt`],
+        newFileNames: [`clipboard-export-check-${exportId}.txt`],
         fileSuffixChoices: ['Text|.txt']
       });
       if (uris.length === 0) {
@@ -100,7 +100,7 @@ class EngineRuntime {
       }
       this.privateStorage.assertNoPlaintext(
         [context.filesDir, context.cacheDir, context.tempDir],
-        [exportText, 'uniclipboard-export-check-']
+        [exportText, 'clipboard-export-check-']
       );
       this.details = 'Export complete';
       return this.snapshot();

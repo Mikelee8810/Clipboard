@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# End-to-end verification of `uniclip send -f` + `uniclip recv` + Ctrl-C
+# End-to-end verification of `clip send -f` + `clip recv` + Ctrl-C
 # cancel pipeline (P1-7 verdict for the cancel work).
 #
 # Pair alice/bob via the same flow as test_clipboard_e2e.sh, then:
@@ -16,7 +16,7 @@ set -eu
 # can take SIGPIPE when the reader closes early; we don't want that to
 # abort the script.
 
-CLI="${CLI:-./target/debug/uniclip}"
+CLI="${CLI:-./target/debug/clip}"
 PASSPHRASE="${PASSPHRASE:-hunter22hunter22}"
 PAIR_WAIT_SECS="${PAIR_WAIT_SECS:-30}"
 BIG_SIZE_MB="${BIG_SIZE_MB:-800}"
@@ -32,8 +32,8 @@ if [[ ! -x "$CLI" ]]; then
 fi
 
 APP_ROOT="$HOME/Library/Application Support"
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-alice"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-bob"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-alice"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-bob"
 WORK="$(mktemp -d -t uc_filetest.XXXXXX)"
 BIG_FILE="$WORK/big.bin"
 SMALL_FILE="$WORK/small.bin"

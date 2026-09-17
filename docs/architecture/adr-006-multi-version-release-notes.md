@@ -52,7 +52,7 @@
 ### 2.2 R2 目录结构
 
 ```
-uniclipboard-releases/
+clipboard-releases/
 ├── manifests/
 │   ├── stable.json                    # 现有 — 当前最新版 manifest（含单版 notes，用作 from 缺省兜底）
 │   ├── alpha.json
@@ -218,7 +218,7 @@ async function mergeNotes(channel, fromVersion, env) {
 ```json
 "endpoints": [
   "https://release.uniclipboard.app/stable.json?from={{current_version}}",
-  "https://uniclipboard.github.io/UniClipboard/stable.json"
+  "https://clipboard.github.io/Clipboard/stable.json"
 ]
 ```
 

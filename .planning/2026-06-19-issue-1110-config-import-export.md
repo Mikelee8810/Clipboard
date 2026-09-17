@@ -37,18 +37,18 @@
 - portable(exe 同级有 `portable.dat`,或 `UC_PORTABLE=1`)→ `resolve_portable_root` (`lib.rs:94`) 返回 `<exe>/data`。
 - installer → `base_data_local_dir` (`lib.rs:142`) 走 `dirs::data_local_dir()`(Windows `%LOCALAPPDATA%`)。
 
-installer 同级没有 `portable.dat`,永远只读 `%LOCALAPPDATA%\app.uniclipboard.desktop\`,放在安装目录旁的 `data` 无任何代码会读。
+installer 同级没有 `portable.dat`,永远只读 `%LOCALAPPDATA%\app.clipboard.desktop\`,放在安装目录旁的 `data` 无任何代码会读。
 
 ### 坎 2 — portable 的 `data/` 多嵌套一层
 
-`crates/uc-platform/src/app_dirs.rs::get_app_dirs()` 在 base 之上再 join 一次 `app.uniclipboard.desktop`,实际布局：
+`crates/uc-platform/src/app_dirs.rs::get_app_dirs()` 在 base 之上再 join 一次 `app.clipboard.desktop`,实际布局：
 
 ```text
-<exe>/data/app.uniclipboard.desktop/uniclipboard.db   ← 真正的库
+<exe>/data/app.clipboard.desktop/clipboard.db   ← 真正的库
 <exe>/data/logs/                                       ← 日志(不在上面那层)
 ```
 
-而 installer 库在 `%LOCALAPPDATA%\app.uniclipboard.desktop\uniclipboard.db`。正确手动迁移需要把 `data\app.uniclipboard.desktop\*` **合并** 进 `%LOCALAPPDATA%\app.uniclipboard.desktop\`,多一层嵌套，用户基本猜不到。
+而 installer 库在 `%LOCALAPPDATA%\app.clipboard.desktop\clipboard.db`。正确手动迁移需要把 `data\app.clipboard.desktop\*` **合并** 进 `%LOCALAPPDATA%\app.clipboard.desktop\`,多一层嵌套，用户基本猜不到。
 
 ### 坎 3 — 密钥后端在两种模式下不同 (最隐蔽，导致「必须重新配对」)
 
@@ -61,7 +61,7 @@ installer 同级没有 `portable.dat`,永远只读 `%LOCALAPPDATA%\app.uniclipbo
 
 ### 可恢复 vs 不可恢复 (决定难点)
 
-- **加密历史不会丢。** unlock 走 `derive_kek_argon2id(passphrase, keyslot.salt, kdf)`(`crates/uc-infra/src/security/space_access_adapter.rs`):KEK 是用 **passphrase + DB 内 salt 现场 Argon2 派生**,keyring 里的 KEK 只是「免输密码自动解锁」的缓存。只要 `uniclipboard.db` 在 + 记得 passphrase，重输一次密码即可解开全部历史。
+- **加密历史不会丢。** unlock 走 `derive_kek_argon2id(passphrase, keyslot.salt, kdf)`(`crates/uc-infra/src/security/space_access_adapter.rs`):KEK 是用 **passphrase + DB 内 salt 现场 Argon2 派生**,keyring 里的 KEK 只是「免输密码自动解锁」的缓存。只要 `clipboard.db` 在 + 记得 passphrase，重输一次密码即可解开全部历史。
 - **真正带不过去的是 iroh 设备身份。** `iroh-identity:v1`(`crates/uc-infra/src/network/iroh/identity_store.rs:26`) 是随机生成、不可派生的 32 字节 Ed25519 私钥，只经 secure storage 存取。installer 读不到那个文件 → `ensure_secret_key` 生成全新 NodeId → 对所有对端是新设备 → **必须重新配对**。
 
 > 结论：用户说的「从头重配」≈ 重设 passphrase(其实可省)+ **重新配对所有设备**(无法靠复制文件规避)。本功能的核心价值，就是把 **坎 3 的密钥后端鸿沟** 抹平，做到迁移后 **无需重新配对**。
@@ -103,7 +103,7 @@ installer 同级没有 `portable.dat`,永远只读 `%LOCALAPPDATA%\app.uniclipbo
 
 | 项 | 来源 | 是否入包 | 说明 |
 |---|---|---|---|
-| `uniclipboard.db` | data root | ✅ 必须 | 加密历史 + 设备/peer 元数据 (KeySlot 不在此，见下一行) |
+| `clipboard.db` | data root | ✅ 必须 | 加密历史 + 设备/peer 元数据 (KeySlot 不在此，见下一行) |
 | `vault/device_id.txt` | data root | ✅ 必须 | 业务设备 UUID |
 | `vault/keyslot.json` | data root | ✅ 必须 | KeySlot(salt/kdf/wrapped master key);`JsonKeySlotStore` 根在 `vault_dir`(`assembly.rs:485`),是独立文件不在 DB |
 | `vault/.setup_status` | data root | ✅ 必须 | `SetupStatus{has_completed,space_id}`,`FileSetupStatusRepository` 根在 `vault_dir`(`setup_status.rs:13`)。**这是 facade「已初始化」闸门的真相源**——漏带它则导入后机器显示未初始化 (实现期 gate 发现的遗漏，已补) |
@@ -157,7 +157,7 @@ running daemon 持有 sqlite 句柄与 secure storage，直接热替换整库有
 
 ### 3.7 DB 一致性快照
 
-daemon 持库时不可裸拷开着 WAL 的 `uniclipboard.db`。导出用 sqlite 在线备份 / `VACUUM INTO` 产出一致性快照文件再入包。
+daemon 持库时不可裸拷开着 WAL 的 `clipboard.db`。导出用 sqlite 在线备份 / `VACUUM INTO` 产出一致性快照文件再入包。
 
 ---
 
@@ -175,7 +175,7 @@ daemon 持库时不可裸拷开着 WAL 的 `uniclipboard.db`。导出用 sqlite 
 │       manifest.json      # schema_ver, app_version, created_at(由调用方注入),
 │                          # source_mode(portable/installer), profile_id,
 │                          # device_fingerprint, included[]
-│       db/uniclipboard.db # 一致性快照
+│       db/clipboard.db # 一致性快照
 │       vault/device_id.txt
 │       vault/keyslot.json
 │       vault/.setup_status
@@ -343,7 +343,7 @@ daemon 持库时不可裸拷开着 WAL 的 `uniclipboard.db`。导出用 sqlite 
 在功能落地前，可手动迁移 **历史 + 设置**(但 **设备仍需重新配对**,因 iroh 身份在 portable 是文件、在 installer 走凭据管理器，无法靠复制带过去):
 
 1. 关闭两端程序。
-2. 把 portable 的 `…\data\app.uniclipboard.desktop\` **里面的内容** 复制并合并到 installer 的 `%LOCALAPPDATA%\app.uniclipboard.desktop\`(注意是合并这一层的内容，不是把 `data` 整个塞进去)。
+2. 把 portable 的 `…\data\app.clipboard.desktop\` **里面的内容** 复制并合并到 installer 的 `%LOCALAPPDATA%\app.clipboard.desktop\`(注意是合并这一层的内容，不是把 `data` 整个塞进去)。
 3. 启动 installer 版，输入原 passphrase 解锁 → 历史与设置恢复。
 4. 重新配对各设备 (此步无法规避)。
 

@@ -23,7 +23,7 @@
 
 - macOS（当前只支持 macOS；Windows/Linux 的构件格式与安装路径不同）。
 - 仓库能正常构建桌面端：`bun install` 已跑过，Rust 工具链可用。
-- 脚本会自动把 `uniclipd` daemon 作为 sidecar 暂存（已存在则跳过，`--rebuild-sidecar` 可强制重建）。
+- 脚本会自动把 `clipd` daemon 作为 sidecar 暂存（已存在则跳过，`--rebuild-sidecar` 可强制重建）。
 
 ## 一次性准备：生成开发密钥
 
@@ -31,7 +31,7 @@
 node scripts/dev-update-loop.mjs keygen
 ```
 
-会在 `~/.uniclip-dev-updater/` 下生成一把一次性 minisign 密钥（私钥默认无密码）。这把钥匙只用于本地测试，**不要** 用线上密钥，也不会被提交进仓库。
+会在 `~/.clip-dev-updater/` 下生成一把一次性 minisign 密钥（私钥默认无密码）。这把钥匙只用于本地测试，**不要** 用线上密钥，也不会被提交进仓库。
 
 ## 完整流程
 
@@ -57,7 +57,7 @@ node scripts/dev-update-loop.mjs run
 
 app 启动后，在界面里触发一次"检查更新"（设置页 / 关于页 / 托盘菜单均可）。然后观察它：发现新版本 → 下载 → 校验 → 安装 → 重启。重启后新 daemon 会接管，旧 daemon 被驱逐——这正是 #1063 要验证的行为。
 
-`run` 用的数据目录通过 `UC_PROFILE=updtest` 隔离（数据落在 `app.uniclipboard.desktop-updtest`），不会动到你日常使用的安装实例。`app.restart()` 会带着同样的环境变量重新拉起进程，所以 override 在重启后依然有效。
+`run` 用的数据目录通过 `UC_PROFILE=updtest` 隔离（数据落在 `app.clipboard.desktop-updtest`），不会动到你日常使用的安装实例。`app.restart()` 会带着同样的环境变量重新拉起进程，所以 override 在重启后依然有效。
 
 ## 验证 #1063（更新重启不卡死）
 
@@ -69,10 +69,10 @@ app 启动后，在界面里触发一次"检查更新"（设置页 / 关于页 /
 `app.restart()` 之后，新进程会脱离当前终端，**终端不再有日志输出**。重启后的行为改看日志文件：
 
 ```text
-~/Library/Application Support/app.uniclipboard.desktop-updtest/logs/
+~/Library/Application Support/app.clipboard.desktop-updtest/logs/
 ```
 
-在那里确认：新 daemon 正常起来（出现实例锁驱逐相关日志），主窗口能正常进入，而不是卡在 loading。如果主窗口卡死、或必须手动 kill `uniclipd` 才能恢复，说明竞态仍在。
+在那里确认：新 daemon 正常起来（出现实例锁驱逐相关日志），主窗口能正常进入，而不是卡在 loading。如果主窗口卡死、或必须手动 kill `clipd` 才能恢复，说明竞态仍在。
 
 ## 重复测试
 

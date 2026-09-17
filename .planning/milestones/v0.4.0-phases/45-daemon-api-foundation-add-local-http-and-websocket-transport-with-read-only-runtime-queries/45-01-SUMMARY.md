@@ -84,7 +84,7 @@ Each task was committed atomically:
 
 ## Decisions Made
 
-- Used a dedicated daemon token file named `uniclipboard-daemon.token` and repaired Unix permissions to `0o600` when necessary.
+- Used a dedicated daemon token file named `clipboard-daemon.token` and repaired Unix permissions to `0o600` when necessary.
 - Serialized daemon transport DTOs in camelCase and reserved `type` / `sessionId` explicitly for WebSocket compatibility.
 - Kept pairing-session reads daemon-owned and nullable rather than proxying into Tauri-owned state before Phase 46.
 

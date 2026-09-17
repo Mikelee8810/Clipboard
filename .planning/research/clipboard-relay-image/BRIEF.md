@@ -1,9 +1,9 @@
-# Brief: 使用 UniClipboard relay 镜像简化自建中继
+# Brief: 使用 Clipboard relay 镜像简化自建中继
 
 **Date:** 2026-07-28
 **Status:** Locked
 **Implemented:** 2026-07-28
-**Research question:** self-host-relay 指南应如何改用 UniClipboard 官方镜像，并减少用户需要理解和维护的部署细节？
+**Research question:** self-host-relay 指南应如何改用 Clipboard 官方镜像，并减少用户需要理解和维护的部署细节？
 
 ## Recommendation
 
@@ -15,13 +15,13 @@
 2. 镜像和桌面端都使用 `iroh-relay 1.0.0-rc.1`，不存在旧指南中 `0.98.x` 镜像的版本错配问题。
 3. 镜像默认以非特权用户运行，监听 `3340`，自带 `/healthz` 健康检查，并强制配置一个访问令牌。
 4. 镜像不负责公网 TLS；官方 relay README 要求生产环境使用支持 WebSocket 的反向代理，并保留 `Authorization` 请求头。
-5. 旧指南推荐的 `n0computer/iroh-relay:0.98.2-docker2`、`config.toml`、源码构建、systemd、NodeId allowlist 和 UDP/7842 已不再对应当前 UniClipboard relay 的部署模型。
+5. 旧指南推荐的 `n0computer/iroh-relay:0.98.2-docker2`、`config.toml`、源码构建、systemd、NodeId allowlist 和 UDP/7842 已不再对应当前 Clipboard relay 的部署模型。
 
 ## Approach
 
 ### What to use
 
-- `ghcr.io/uniclipboard/relay:latest`：由 UniClipboard 维护并与桌面端协议版本对齐。
+- `ghcr.io/uniclipboard/relay:latest`：由 Clipboard 维护并与桌面端协议版本对齐。
 - Docker Compose：在一个文件中声明 relay、Caddy、证书卷和重启策略。
 - Caddy：自动申请和续期公网证书，并代理 WebSocket。
 - `UC_RELAY_TOKEN`：用 `openssl rand -hex 32` 生成，保存在权限为 `0600` 的 `.env` 中。

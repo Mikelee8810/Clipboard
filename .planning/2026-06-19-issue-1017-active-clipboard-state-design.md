@@ -114,7 +114,7 @@ pull 失败 / 写失败 / 锁定 / 被 receive 闸门拒绝 → **OS 没写成 �
 
 ### D12 — 线格协议（**审查精化：0xC2 多路复用要改 read_frame**）
 - state 消息字段：`{content_hash, entry_id, activated_at_ms, activated_by}`，postcard。
-- state 新 ALPN `uniclipboard/active-clipboard/0`，magic **0xC3**。
+- state 新 ALPN `clipboard/active-clipboard/0`，magic **0xC3**。
 - **pull 0xC2 的归属要显式定**：若复用 clipboard ALPN，现有 `read_frame`（`clipboard_wire.rs:307`）**硬拒非 0xC1**，复用就 **必须改 read_frame + receiver 按 magic 解复用**；或干脆把 0xC2 定成 **独立 ALPN sibling**（更干净）。**裁决建议：独立 sibling ALPN**，不动现有 0xC1 帧。
 - **威胁模型（已知接受项）**：明文 state 里 `content_hash` = 无盐 `blake3(plaintext)`，对 in-space 方是内容确认/关联预言机——但 **现有 0xC1 `WireHeaderV2.content_hash` 已经在明文里送同样的 hash**，故 0xC3 **不引入新暴露**。停用「不可逆 hash 故无害」措辞；可选 future：`keyed_hash(master_key, ...)`。
 

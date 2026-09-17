@@ -125,7 +125,7 @@ When cloning from a reference app or screenshot:
 1. **Study the reference** thoroughly before making any changes:
    ```bash
    # If reference is a file in the repo
-   Read /Users/mark/MyProjects/iOSApp/UniClipboard/Views/ServerSwitcherView.swift
+   Read /Users/mark/MyProjects/iOSApp/Clipboard/Views/ServerSwitcherView.swift
    
    # If reference is a screenshot
    # Read the image file for visual analysis

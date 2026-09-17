@@ -7,7 +7,7 @@
 #
 # 环境变量：
 #   E2E_REMOTE_HOST   远端主机别名 (默认 fedora，需要在 ~/.ssh/config 配好)
-#   E2E_REMOTE_PATH   远端项目路径 (默认 projects/uniclipboard，相对 $HOME)
+#   E2E_REMOTE_PATH   远端项目路径 (默认 projects/clipboard，相对 $HOME)
 #   E2E_SKIP_SYNC=1   跳过 rsync，直接用远端已有代码
 #   E2E_KEEP_PROFILE=1 透传给 wdio.conf.mjs，跑完不清 profile data
 
@@ -17,7 +17,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT" || { echo "无法切到 REPO_ROOT: $REPO_ROOT" >&2; exit 1; }
 
 REMOTE_HOST="${E2E_REMOTE_HOST:-fedora}"
-REMOTE_PATH="${E2E_REMOTE_PATH:-projects/uniclipboard}"
+REMOTE_PATH="${E2E_REMOTE_PATH:-projects/clipboard}"
 
 list_cards() {
   for f in e2e/cards/*.md; do
@@ -93,6 +93,6 @@ EXIT_CODE=$?
 
 # 3) 抓远端日志摘要（最多 3 个最近 log 文件名，给归因 agent 起点）
 echo "[3/3] 远端日志摘要"
-ssh "$REMOTE_HOST" "ls -t ~/.local/share/app.uniclipboard.desktop-wdio/logs 2>/dev/null | head -3" || true
+ssh "$REMOTE_HOST" "ls -t ~/.local/share/app.clipboard.desktop-wdio/logs 2>/dev/null | head -3" || true
 
 exit $EXIT_CODE

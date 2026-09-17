@@ -29,7 +29,7 @@
 
 ## 重复运行
 
-先准备已核验的 alpha.5 发布目录和上述提交编译的当前 `uniclip`、`uniclipd`：
+先准备已核验的 alpha.5 发布目录和上述提交编译的当前 `clip`、`clipd`：
 
 ```bash
 node .planning/alpha5-upgrade/replay.mjs <alpha.5发布目录> <当前程序目录>

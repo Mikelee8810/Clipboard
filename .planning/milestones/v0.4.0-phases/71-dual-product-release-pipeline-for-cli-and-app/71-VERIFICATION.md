@@ -64,7 +64,7 @@ Not applicable — this phase produces CI workflow files and scripts, not compon
 | generate-release-notes tests pass                   | `bun test -- scripts/__tests__/generate-release-notes.test.ts`                        | 3 pass, 0 fail                              | ✓ PASS |
 | bump-version tests pass (incl. workspace assertion) | `bun test -- scripts/__tests__/bump-version.test.ts`                                  | 6 pass, 0 fail                              | ✓ PASS |
 | build-cli.yml has all required sections             | content check for `workflow_call`, `workflow_dispatch`, `setup-matrix`, `cargo build` | all 5 found                                 | ✓ PASS |
-| CLI artifact collection wired into release.yml      | `grep -c 'uniclipboard-cli-' .github/workflows/release.yml`                           | 3 matches                                   | ✓ PASS |
+| CLI artifact collection wired into release.yml      | `grep -c 'clipboard-cli-' .github/workflows/release.yml`                           | 3 matches                                   | ✓ PASS |
 
 ### Requirements Coverage
 
@@ -99,7 +99,7 @@ No items require human verification for the core pipeline logic. However, the fo
    - **Why human:** GitHub Actions environment required; cannot test artifact download/upload locally
 
 2. **CLI binary execution on target platforms**
-   - **Test:** Download a produced `uniclipboard-cli-{version}-{target}.tar.gz` and run `./uniclipboard-cli --help`
+   - **Test:** Download a produced `clipboard-cli-{version}-{target}.tar.gz` and run `./clipboard-cli --help`
    - **Expected:** CLI starts without errors, shows help text
    - **Why human:** Requires an actual compiled binary from a CI run
 

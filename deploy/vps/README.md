@@ -1,6 +1,6 @@
-# UniClipboard headless server node — VPS deployment
+# Clipboard headless server node — VPS deployment
 
-Run UniClipboard headless on your own VPS as an always-online Space member. The
+Run Clipboard headless on your own VPS as an always-online Space member. The
 node syncs clipboard over iroh like any desktop peer and serves the mobile-sync
 gateway to your phone behind a TLS reverse proxy. There is **no system
 clipboard** — it is a relay/online member, not a desktop.
@@ -15,10 +15,10 @@ This stack is the implementation of
                   │  iroh direct (UDP, RelayMode=Disabled)
                   ▼
    ┌─────────────────────────────────────────────┐  VPS
-   │  app container (uniclip start --server)       │
+   │  app container (clip start --server)       │
    │   • iroh member  → published UDP :42999/udp   │◀── public internet
    │   • mobile_lan   → expose :42720 (internal)   │
-   │   • HOME=/data   → volume `uniclip-state`     │
+   │   • HOME=/data   → volume `clip-state`     │
    └──────────────────────┬──────────────────────┘
                            │ http  app:42720  (internal Docker net only)
    ┌──────────────────────▼──────────────────────┐
@@ -63,7 +63,7 @@ docker compose pull
 ```
 
 Track `:latest` by default, or pin a release in `.env` with
-`UC_IMAGE=ghcr.io/uniclipboard/uniclipboard-server:vX.Y.Z`.
+`UC_IMAGE=ghcr.io/uniclipboard/clipboard-server:vX.Y.Z`.
 
 **Option B — build from source.** Requires ~4 GB RAM:
 
@@ -72,7 +72,7 @@ docker compose build
 ```
 
 On a small droplet, build elsewhere and ship it — e.g.
-`docker save ghcr.io/uniclipboard/uniclipboard-server:latest | ssh vps 'docker load'`,
+`docker save ghcr.io/uniclipboard/clipboard-server:latest | ssh vps 'docker load'`,
 or push to your own registry and set `UC_IMAGE` accordingly.
 
 ## 1. Configure
@@ -87,17 +87,17 @@ cp .env.example .env
 
 `join` and the `mobile` write commands refuse to run while a daemon is up,
 so all provisioning happens in one-off containers first. They share the same
-`uniclip-state` volume, so what they write is exactly what the long-running
+`clip-state` volume, so what they write is exactly what the long-running
 daemon reads in step 3.
 
 Make sure the image is available first — `docker compose pull` (Option A) or
 `docker compose build` (Option B), per [Image: pull or build](#image-pull-or-build).
 
-**a. Join the Space.** On a desktop already in the Space, run `uniclip invite`
+**a. Join the Space.** On a desktop already in the Space, run `clip invite`
 (or use the desktop UI) to get an invitation code, then:
 
 ```bash
-docker compose run --rm app uniclip join
+docker compose run --rm app clip join
 ```
 
 This prompts interactively for the **invitation code** and the **Space
@@ -105,7 +105,7 @@ passphrase** (run it from an interactive terminal). For a fully non-interactive
 run you can pass them as flags instead — note these land in your shell history:
 
 ```bash
-docker compose run --rm app uniclip join --code <CODE> --passphrase <PASSPHRASE>
+docker compose run --rm app clip join --code <CODE> --passphrase <PASSPHRASE>
 ```
 
 **b. Enable the mobile-sync gateway for the public domain.** `--url`
@@ -113,7 +113,7 @@ makes the phone's install URL/QR point at Caddy instead of a LAN IP:
 
 ```bash
 docker compose run --rm app \
-  uniclip mobile network set \
+  clip mobile network set \
   --url https://${UC_DOMAIN:-clip.example.com} \
   --accept-network-risk
 ```
@@ -121,11 +121,11 @@ docker compose run --rm app \
 **c. Register your phone.** Mints credentials and prints the install QR/URL:
 
 ```bash
-docker compose run --rm app uniclip mobile add --label "My iPhone"
+docker compose run --rm app clip mobile add --label "My iPhone"
 ```
 
 Scan the QR (or open the printed `https://<domain>` URL) in the SyncClipboard /
-UniClipboard mobile client. Repeat for each phone.
+Clipboard mobile client. Repeat for each phone.
 
 ## 3. Start the stack
 
@@ -133,7 +133,7 @@ UniClipboard mobile client. Repeat for each phone.
 docker compose up -d
 ```
 
-`app` runs `uniclip start --server --foreground` as its main process (headless,
+`app` runs `clip start --server --foreground` as its main process (headless,
 no system clipboard). Caddy starts once `app` reports healthy, issues the
 certificate for `UC_DOMAIN`, and begins proxying.
 
@@ -162,15 +162,15 @@ Acceptance walk-through:
 ## State & backups
 
 Everything needed to keep identity + membership + mobile credentials lives under
-`HOME=/data` on the `uniclip-state` volume, so the node **never re-pairs** across
-restarts. Under `/data/.local/share/app.uniclipboard.desktop/`:
+`HOME=/data` on the `clip-state` volume, so the node **never re-pairs** across
+restarts. Under `/data/.local/share/app.clipboard.desktop/`:
 
 | State                         | Path                                  |
 | ----------------------------- | ------------------------------------- |
 | iroh identity (node secret)   | `iroh-identity/` (file secure storage)|
 | file-based KEK                | `keyring/`                            |
 | keyslot + device id           | `vault/keyslot.json`, `vault/device_id.txt` |
-| database                      | `uniclipboard.db`                     |
+| database                      | `clipboard.db`                     |
 | iroh blob cache               | `iroh-blobs/blobs.db`                 |
 | settings (mobile creds, LAN)  | `settings.json`                       |
 
@@ -178,13 +178,13 @@ The daemon falls back to file-based secure storage automatically (no D-Bus /
 keyring on a headless box), so the iroh secret and KEK are on the volume — keep
 the volume and you keep the node.
 
-Back up both named volumes — `uniclip-state` (re-pairing if lost) and
+Back up both named volumes — `clip-state` (re-pairing if lost) and
 `caddy-data` (TLS certificates / ACME account; losing it forces re-issuance and
 risks Let's Encrypt rate limits):
 
 ```bash
-docker run --rm -v uniclip-state:/data -v "$PWD":/backup alpine \
-  tar czf /backup/uniclip-state.tgz -C /data .
+docker run --rm -v clip-state:/data -v "$PWD":/backup alpine \
+  tar czf /backup/clip-state.tgz -C /data .
 ```
 
 ## Operations
@@ -197,13 +197,13 @@ docker compose pull && docker compose up -d    # update (Option A: prebuilt imag
 docker compose up -d --build           # update (Option B: rebuild from source)
 ```
 
-Updates keep the `uniclip-state` volume, so no re-pairing — a new image just
+Updates keep the `clip-state` volume, so no re-pairing — a new image just
 swaps the binary. To move to a pinned release, bump `UC_IMAGE` in `.env` before
 `docker compose pull`.
 
 To change the advertised domain or add devices later, **stop the daemon first**
 (`docker compose down`), rerun the relevant `docker compose run --rm app
-uniclip mobile …` command, then `docker compose up -d` — the write commands
+clip mobile …` command, then `docker compose up -d` — the write commands
 still refuse to run while the daemon is up.
 
 ## Security notes

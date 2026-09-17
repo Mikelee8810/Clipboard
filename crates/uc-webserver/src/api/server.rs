@@ -510,7 +510,7 @@ pub(crate) async fn request_tracing_middleware(request: Request<Body>, next: Nex
 
         match level_action {
             // Access-log echo only — root cause lives in the handler that mapped
-            // the facade error to ApiError, not here. Earlier UNICLIPBOARD-RUST-5
+            // the facade error to ApiError, not here. Earlier CLIPBOARD-RUST-5
             // tried to fingerprint 5xx by status code, but a per-status static
             // template ("daemon http upstream unavailable" etc.) is just a reskin
             // of the HTTP status — it carries no signal beyond `status` itself

@@ -60,7 +60,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $base = "https://github.com/UniClipboard/UniClipboard/releases/download/v$env:VERSION"
-          $exe  = "UniClipboard_${env:VERSION}_x64-setup.exe"
+          $exe  = "Clipboard_${env:VERSION}_x64-setup.exe"
 
           Write-Host "Downloading $base/$exe"
           Invoke-WebRequest -Uri "$base/$exe" -OutFile $exe
@@ -77,14 +77,14 @@ jobs:
             Write-Error "下载的 $exe 的 sha256 未出现在 SHA256SUMS.txt,中止以防被篡改"
           }
 
-          $nuspec  = 'packaging/chocolatey/uniclipboard.nuspec'
+          $nuspec  = 'packaging/chocolatey/clipboard.nuspec'
           $install = 'packaging/chocolatey/tools/chocolateyInstall.ps1'
           (Get-Content $nuspec)  -replace '<version>[^<]*</version>', "<version>$env:VERSION</version>" | Set-Content $nuspec
           (Get-Content $install) -replace "checksum64\s+= '[^']*'", "checksum64     = '$sha'" | Set-Content $install
 
       - name: Pack
         shell: pwsh
-        run: choco pack packaging/chocolatey/uniclipboard.nuspec --out packaging/chocolatey
+        run: choco pack packaging/chocolatey/clipboard.nuspec --out packaging/chocolatey
 
       - name: Push
         shell: pwsh
@@ -93,4 +93,4 @@ jobs:
           VERSION: ${{ steps.resolve.outputs.version }}
         run: |
           choco apikey --key $env:CHOCO_API_KEY --source https://push.chocolatey.org/
-          choco push "packaging/chocolatey/uniclipboard.$env:VERSION.nupkg" --source https://push.chocolatey.org/
+          choco push "packaging/chocolatey/clipboard.$env:VERSION.nupkg" --source https://push.chocolatey.org/

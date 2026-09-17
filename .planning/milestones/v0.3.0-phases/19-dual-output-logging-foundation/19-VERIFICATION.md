@@ -80,7 +80,7 @@ No TODO/FIXME/PLACEHOLDER/HACK markers found in uc-observability crate. No empty
 ### 1. Dual Output Live Behavior
 
 **Test:** Run `bun tauri dev` and perform a clipboard copy
-**Expected:** Pretty console output appears in terminal AND a JSON file is created in `~/Library/Logs/com.uniclipboard/` with valid NDJSON entries containing span fields
+**Expected:** Pretty console output appears in terminal AND a JSON file is created in `~/Library/Logs/com.clipboard/` with valid NDJSON entries containing span fields
 **Why human:** Requires running the full app and observing real tracing output from both layers simultaneously
 
 ### 2. Profile Switching

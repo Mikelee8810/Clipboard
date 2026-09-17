@@ -130,10 +130,10 @@ jobs:
       - name: install frontend dependencies
         run: bun install
 
-      - name: prepare uniclipd sidecar
-        # ADR-008 D13: bundle the standalone `uniclipd` daemon into the GUI
+      - name: prepare clipd sidecar
+        # ADR-008 D13: bundle the standalone `clipd` daemon into the GUI
         # installer as a Tauri sidecar (externalBin). `tauri build` verifies
-        # `src-tauri/binaries/uniclipd-<triple>` exists, so stage it first,
+        # `src-tauri/binaries/clipd-<triple>` exists, so stage it first,
         # forwarding the same `${{ matrix.args }}` the GUI build uses so the
         # name matches what tauri-cli looks up. See build.yml for the full note.
         shell: bash
@@ -169,7 +169,7 @@ jobs:
           VITE_SENTRY_PROJECT: ${{ secrets.VITE_SENTRY_PROJECT }}
         with:
           tagName: v${{ inputs.version }}
-          releaseName: UniClipboard Alpha v${{ inputs.version }}
+          releaseName: Clipboard Alpha v${{ inputs.version }}
           releaseBody: Alpha build for testing.
           releaseDraft: false
           prerelease: true

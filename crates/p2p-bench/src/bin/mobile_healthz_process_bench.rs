@@ -1,14 +1,14 @@
 //! Process-isolated benchmark for the mobile LAN `/healthz` endpoint.
 //!
-//! This binary starts a real `uniclipd` profile, configures a real mobile
-//! device through `uniclip`, drives both endpoints from this separate process,
+//! This binary starts a real `clipd` profile, configures a real mobile
+//! device through `clip`, drives both endpoints from this separate process,
 //! samples only the daemon PID, and validates the daemon's exact JSON log file.
 //!
 //! Build the three release binaries first, then provide an absolute log path:
 //!
 //! ```bash
-//! cargo build --release -p uc-daemon --bin uniclipd
-//! cargo build --release -p uc-cli --bin uniclip
+//! cargo build --release -p uc-daemon --bin clipd
+//! cargo build --release -p uc-cli --bin clip
 //! cargo build --release -p p2p-bench --bin mobile_healthz_process_bench
 //! UC_LOG_FILE="$(pwd)/target/mobile-healthz-daemon.jsonl" \
 //!   target/release/mobile_healthz_process_bench
@@ -39,7 +39,7 @@ const MAX_RECORDED_LATENCY_MICROS: u64 = 60_000_000;
 #[derive(Parser, Debug)]
 #[command(
     name = "mobile_healthz_process_bench",
-    about = "Measure /healthz and /SyncClipboard.json against a separate uniclipd process"
+    about = "Measure /healthz and /SyncClipboard.json against a separate clipd process"
 )]
 struct Cli {
     /// Concurrent persistent HTTP workers per endpoint.
@@ -66,11 +66,11 @@ struct Cli {
     #[arg(long)]
     profile: Option<String>,
 
-    /// Path to a prebuilt release `uniclipd` binary.
+    /// Path to a prebuilt release `clipd` binary.
     #[arg(long)]
     daemon_bin: Option<PathBuf>,
 
-    /// Path to a prebuilt release `uniclip` binary.
+    /// Path to a prebuilt release `clip` binary.
     #[arg(long)]
     cli_bin: Option<PathBuf>,
 }
@@ -189,7 +189,7 @@ impl DaemonChild {
             .env("UC_LOG_FILE", log_file)
             .env("UC_LOG_PROFILE", "prod")
             .env("UC_PORTABLE", "1")
-            .env("UNICLIPBOARD_ENV", "development")
+            .env("CLIPBOARD_ENV", "development")
             .env_remove("RUST_LOG")
             .env_remove("SENTRY_DSN")
             .stdin(Stdio::null())
@@ -404,7 +404,7 @@ fn run_cli(binary: &Path, profile: &str, args: &[&str], stdin: Option<&str>) -> 
     command
         .env("UC_PROFILE", profile)
         .env("UC_PORTABLE", "1")
-        .env("UNICLIPBOARD_ENV", "development")
+        .env("CLIPBOARD_ENV", "development")
         .env_remove("UC_LOG_FILE")
         .env_remove("RUST_LOG")
         .args(args)
@@ -430,7 +430,7 @@ fn run_cli(binary: &Path, profile: &str, args: &[&str], stdin: Option<&str>) -> 
     let output = child.wait_with_output().context("wait for CLI command")?;
     ensure!(
         output.status.success(),
-        "uniclip {:?} failed with {}: {}",
+        "clip {:?} failed with {}: {}",
         args,
         output.status,
         String::from_utf8_lossy(&output.stderr)
@@ -757,8 +757,8 @@ async fn main() -> Result<()> {
     std::env::set_var("UC_PORTABLE", "1");
     let _artifacts = ProfileArtifacts::resolve(&profile)?;
 
-    let daemon_binary = sibling_binary(cli.daemon_bin, "uniclipd")?;
-    let cli_binary = sibling_binary(cli.cli_bin, "uniclip")?;
+    let daemon_binary = sibling_binary(cli.daemon_bin, "clipd")?;
+    let cli_binary = sibling_binary(cli.cli_bin, "clip")?;
 
     println!(
         "=== mobile LAN process-isolated health benchmark ===\n\

@@ -16,7 +16,7 @@ Base: `main` (`07adc0bc`) · HEAD: `ea09cdd3` (spot-capricorn)
 | `ArcSwapOption<XxxFacade>` (5 字段) | 🔴 **真冗余** | swap 频率从设计的"每次 reload"降为"一辈子 1 次", swap_out 实际撞在进程退出。应回退 OnceCell |
 | `SearchFacade::clear_coordinator` | 🔴 **死代码** | 全工程零调用点。set/clear 二选一 |
 | `Clone` derive on AppDeps/WiredDependencies | 🟡 **保留，改注释** | clone 调用点都是启动期 fan-out, 不是 reload, 但 derive 本身廉价，论据需重写 |
-| `build_process_runtime` / `build_daemon_lifecycle` 拆分 | 🟢 **保留** | 真正理由是 async/sync 边界 + standalone daemon binary 与 GUI shell 共用同一套装配 (`uniclip daemon` 仍是生产路径) |
+| `build_process_runtime` / `build_daemon_lifecycle` 拆分 | 🟢 **保留** | 真正理由是 async/sync 边界 + standalone daemon binary 与 GUI shell 共用同一套装配 (`clip daemon` 仍是生产路径) |
 | `BackgroundRuntimeDeps` 拆出 | 🟢 **保留，改注释** | 物理理由 (mpsc Receiver 不可 Clone) 仍成立，但注释里"为 reload 准备"那层论据要换 |
 | `ProcessRuntimeHandles` 4 字段透传 | 🟡 **可精简** | 后 2 字段属于"BackgroundRuntimeDeps 一次性消费"副作用，可再合并一层 |
 | `graceful_shutdown_port_reuse` 测试 | 🟢 **保留，改注释** | `app.restart()` 也需要端口及时释放，契约价值未变，但文件头注释还在说 "in-process reload" |
@@ -179,6 +179,6 @@ Base: `main` (`07adc0bc`) · HEAD: `ea09cdd3` (spot-capricorn)
 1. **新增的 mobile_sync / connection_channel / network UX / iroh LAN-only / packaging RPM 等大功能模块** 都符合 hex arch, port 抽象每个都有 ≥1 production adapter + N 个 test fake, 未发现"为未来扩展预留的空 port"
 2. **OTLP 整套被废弃后，后端清理干净** (Cargo 依赖 / 模块文件全删), 唯一硬伤是前端用户披露文案 R5
 3. **方案 C 留下的最大遗产是 ArcSwap**: 这是为高频 reload 准备的热切换原语，决策 C 之后没用上，应回退到 OnceCell。这是用户最自然怀疑的角度，也是事实
-4. **Phase A/B/C 的其余拆分** (build_process_runtime / build_daemon_lifecycle / Clone derive / deps 共享) 的 **理由变了，但物理价值还在** —— standalone daemon binary 通过 `uniclip start` 仍是生产路径，"共用进程级装配"的论据成立
+4. **Phase A/B/C 的其余拆分** (build_process_runtime / build_daemon_lifecycle / Clone derive / deps 共享) 的 **理由变了，但物理价值还在** —— standalone daemon binary 通过 `clip start` 仍是生产路径，"共用进程级装配"的论据成立
 
 需要处理的实际代码量约 110 行删除 + ~120 行注释回写 + 1 个前端 i18n 改名。

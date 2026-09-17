@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 <Feature since="0.7.0" status="experimental">
   HTTP companion mode — LAN by default, cross-network via a server node or Tailscale. iPhone via the
-  **UniClipboard iOS App (TestFlight public beta)** — recommended — or the bundled Shortcut, or any
+  **Clipboard iOS App (TestFlight public beta)** — recommended — or the bundled Shortcut, or any
   SyncClipboard-compatible client.
 </Feature>
 
@@ -105,13 +105,13 @@ scan-first credentials modal:
 - **Big QR (top, always on)** — encodes **every reachable candidate
   address** (the public entry if configured, plus all qualifying
   interface IPs including Tailscale CGNAT) together with the
-  credentials as a single `uniclipboard://connect` URI, so one code
+  credentials as a single `clipboard://connect` URI, so one code
   works whether the phone is on the LAN or coming in from outside;
   clients that understand the candidate list probe them in order.
-  Scan it from the **UniClipboard iOS App** (TestFlight public
+  Scan it from the **Clipboard iOS App** (TestFlight public
   beta — recommended; see [Pair an iPhone](#pair-an-iphone) below),
   the
-  [UniClipboard Android client](https://github.com/UniClipboard/UniClip),
+  [Clipboard Android client](https://github.com/UniClipboard/UniClip),
   or any other SyncClipboard-protocol client. All fields auto-fill;
   no typing. A baseUrl dropdown sits next to the QR so you can
   switch which address is the preferred (first) candidate — the
@@ -148,18 +148,18 @@ an Argon2id hash after the modal closes.
 ```bash
 # One-shot: enable feature + LAN listener, register one device,
 # print install QR + a one-time password.
-uniclip stop                                 # required: writes refuse a running daemon
-uniclip mobile setup                    # interactive (recommended)
+clip stop                                 # required: writes refuse a running daemon
+clip mobile setup                    # interactive (recommended)
 
 # Or non-interactive (e.g. CI / scripts)
-uniclip mobile setup \
+clip mobile setup \
     --label "My iPhone 15" \
     --accept-network-risk \
     --non-interactive
 # → prints baseUrl, username, password (one-time), installUrl, and a
 #   multi-address QR (ASCII) that the phone probes address-by-address
 
-uniclip start                                # bring the daemon back up
+clip start                                # bring the daemon back up
 ```
 
 For non-interactive runs, `--label` and `--accept-network-risk` are
@@ -175,18 +175,18 @@ QR carries every detected interface, so there is normally nothing to pick.
   The plaintext password is shown **once**. If the user loses it,
   click the device card on the **Mobile sync** grid, press
   **Edit device** inside the dialog and set or regenerate the password
-  (or `uniclip mobile revoke <id>` + `add`) — there
+  (or `clip mobile revoke <id>` + `add`) — there
   is no way to retrieve the original.
 </Callout>
 
 ## Pair an iPhone
 
-There are two iOS options. **The UniClipboard iOS App is the
+There are two iOS options. **The Clipboard iOS App is the
 recommended path**; the Shortcut stays as a fallback.
 
-### iOS (UniClipboard App — TestFlight public beta)
+### iOS (Clipboard App — TestFlight public beta)
 
-The UniClipboard iOS App is currently distributed through
+The Clipboard iOS App is currently distributed through
 **TestFlight** as a public beta. Invite link:
 
 [https://testflight.apple.com/join/nyNQ8dQe](https://testflight.apple.com/join/nyNQ8dQe)
@@ -199,7 +199,7 @@ The UniClipboard iOS App is currently distributed through
 
 On your iPhone, open the **App Store**, search for **TestFlight**,
 and install it. TestFlight is Apple's official beta-distribution
-app and is required to install the UniClipboard beta build.
+app and is required to install the Clipboard beta build.
 
 </Step>
 
@@ -214,7 +214,7 @@ https://testflight.apple.com/join/nyNQ8dQe
 ```
 
 iOS will hand the link off to the TestFlight app. Tap **Accept**,
-then **Install**, and UniClipboard will be added to the Home Screen.
+then **Install**, and Clipboard will be added to the Home Screen.
 
 </Step>
 
@@ -236,7 +236,7 @@ from the App right away.)
 
 #### Enter the connection info in the App
 
-Open the UniClipboard iOS App, tap **Add server**, and scan the big
+Open the Clipboard iOS App, tap **Add server**, and scan the big
 QR from the desktop credentials modal. The base URL, username, and
 password are filled in automatically; just confirm and save. Once
 connected, the iPhone syncs clipboard with the desktop in both
@@ -259,7 +259,7 @@ desktop over the local network and doesn't depend on the proxy.
 
 </Callout>
 
-### iOS (Shortcut — fallback, no UniClipboard App)
+### iOS (Shortcut — fallback, no Clipboard App)
 
 If TestFlight isn't an option right now, the Shortcut path still
 works. In the credentials modal, expand the **"Haven't installed a
@@ -269,7 +269,7 @@ sub-QR.
 
 1. Scan the Shortcut install QR with the iPhone Camera (or open the
    install link in Safari). iOS prompts to install
-   `UniClipboard.shortcut`.
+   `Clipboard.shortcut`.
 2. Open the installed Shortcut and **manually** paste the base URL,
    username, and password (from the **Credentials** amber disclosure
    at the bottom of the modal — use its **Backup** button to copy
@@ -280,7 +280,7 @@ sub-QR.
 
 ### Android / other clients
 
-The **UniClipboard Android client** lives at
+The **Clipboard Android client** lives at
 [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip)
 — one client for both iOS and Android, with Android APKs published in
 [releases](https://github.com/UniClipboard/UniClip/releases/latest)
@@ -314,7 +314,7 @@ Either way, the connection settings are the same:
   IP:
 
 ```bash
-uniclip mobile network set \
+clip mobile network set \
     --url https://clip.example.com \
     --accept-network-risk
 ```
@@ -329,7 +329,7 @@ public internet. The `--ip <IP>` form instead produces the LAN
 </Callout>
 
 <Callout type="info">
-  The UniClipboard mobile app speaks the same SyncClipboard-compatible protocol as the desktop
+  The Clipboard mobile app speaks the same SyncClipboard-compatible protocol as the desktop
   listener. Bugs in the app itself are usually best filed at
   [UniClipboard/UniClip](https://github.com/UniClipboard/UniClip/issues), while protocol-side bugs
   on the desktop listener belong here in the main repo.
@@ -367,18 +367,18 @@ the two.
 
 | Action               | GUI                                                                        | CLI                                                    |
 | -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------ |
-| List paired devices  | Devices page → Mobile sync panel                                           | `uniclip mobile status`                                |
-| Add another device   | Mobile sync panel → **Add device**                                         | `uniclip mobile add --label "…"`                       |
+| List paired devices  | Devices page → Mobile sync panel                                           | `clip mobile status`                                |
+| Add another device   | Mobile sync panel → **Add device**                                         | `clip mobile add --label "…"`                       |
 | Edit a device        | Click device card → dialog → **Edit device** (label / username / password) | _GUI only today_; mint a new one and re-pair the phone |
-| Revoke a device      | Click device card → dialog → **Revoke**                                    | `uniclip mobile revoke <device-id>`                    |
-| Disable feature      | Configure dialog → switch off                                              | `uniclip mobile disable`                               |
-| Inspect listener URL | Mobile sync panel header                                                   | `uniclip mobile status`                                |
+| Revoke a device      | Click device card → dialog → **Revoke**                                    | `clip mobile revoke <device-id>`                    |
+| Disable feature      | Configure dialog → switch off                                              | `clip mobile disable`                               |
+| Inspect listener URL | Mobile sync panel header                                                   | `clip mobile status`                                |
 
 **Editing** lets you change the label, username, and/or password from
 the **Edit device** view. Setting or regenerating the password mints a
 fresh one-time password and atomically invalidates the previous
 Argon2id hash; changing the username reissues the password too. The old
-credentials stop working immediately, so update the phone (UniClipboard
+credentials stop working immediately, so update the phone (Clipboard
 iOS App, Shortcut, or other client) with the new credentials.
 
 **Revoking** removes the device record. Any subsequent request with
@@ -429,11 +429,11 @@ images, what to do after changing the LAN IP), see
 - [Mobile LAN API](../reference/mobile-api) — the wire protocol that
   the listener speaks (SyncClipboard-compatible HTTP + JSON).
 - [Mobile sync connect URI](../reference/mobile-connect-uri) — the
-  `uniclipboard://connect` QR protocol. Read this if you're writing
+  `clipboard://connect` QR protocol. Read this if you're writing
   a new SyncClipboard-compatible client or shortcut that consumes
   the **Scan to add** QR.
 - [CLI reference — Mobile sync](../cli/reference#mobile-sync) — every
-  `uniclip mobile ...` subcommand and flag.
+  `clip mobile ...` subcommand and flag.
 - [Self-hosting a headless server node](../guides/self-host-server-node)
   — run the gateway on a public VPS so the phone reaches it over HTTPS
   from any network.

@@ -2,7 +2,7 @@
 #
 # Single-machine end-to-end pairing smoke test (Slice 1).
 #
-# Spawns two uniclip processes under separate --profile names. The two paths
+# Spawns two clip processes under separate --profile names. The two paths
 # may point at different Engine versions for release interoperability checks:
 #   * alice: initialize space (A1) + issue invitation (B1) + wait for joiner
 #   * bob:   redeem invitation (B2)
@@ -20,8 +20,8 @@
 
 set -euo pipefail
 
-ALICE_CLI="${ALICE_CLI:-${CLI:-./target/debug/uniclip}}"
-BOB_CLI="${BOB_CLI:-${CLI:-./target/debug/uniclip}}"
+ALICE_CLI="${ALICE_CLI:-${CLI:-./target/debug/clip}}"
+BOB_CLI="${BOB_CLI:-${CLI:-./target/debug/clip}}"
 PASSPHRASE="${PASSPHRASE:-hunter22hunter22}"
 WAIT_SECS="${WAIT_SECS:-30}"
 COMMON_FLAGS="--dev"
@@ -42,18 +42,18 @@ fi
 for cli in "$ALICE_CLI" "$BOB_CLI"; do
     if [[ ! -x "$cli" ]]; then
         echo "ERROR: CLI binary not found at $cli" >&2
-        echo "Build first: cargo build -p uc-cli --bin uniclip" >&2
+        echo "Build first: cargo build -p uc-cli --bin clip" >&2
         exit 2
     fi
 done
 
 APP_ROOT="$HOME/Library/Application Support"
 # NB: uc-platform's `DirsAppDirsAdapter` joins APP_DIR_NAME with the
-# profile via a hyphen (`app.uniclipboard.desktop-<profile>`), so the
+# profile via a hyphen (`app.clipboard.desktop-<profile>`), so the
 # script's cleanup must match that exact scheme — NOT the underscore
 # form used by `apply_profile_suffix` elsewhere.
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-$ALICE_PROFILE"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-$BOB_PROFILE"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-$ALICE_PROFILE"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-$BOB_PROFILE"
 
 cleanup() {
     if [[ -n "${ALICE_PID:-}" ]] && kill -0 "$ALICE_PID" 2>/dev/null; then

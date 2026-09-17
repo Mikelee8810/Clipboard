@@ -1,23 +1,23 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
-PackageIdentifier: UniClipboard.UniClipboard
+PackageIdentifier: Clipboard.Clipboard
 PackageVersion: 0.15.0
 PackageLocale: en-US
-Publisher: UniClipboard
+Publisher: Clipboard
 PublisherUrl: https://uniclipboard.app/
 PublisherSupportUrl: https://github.com/UniClipboard/UniClipboard/issues
-PackageName: UniClipboard
+PackageName: Clipboard
 PackageUrl: https://uniclipboard.app/
 License: AGPL-3.0-only
 LicenseUrl: https://github.com/UniClipboard/UniClipboard/blob/main/LICENSE
-Copyright: Copyright UniClipboard
+Copyright: Copyright Clipboard
 ShortDescription: Encrypted peer-to-peer clipboard sync between your devices
 Description: |-
-  UniClipboard syncs your clipboard securely across your devices on the local
+  Clipboard syncs your clipboard securely across your devices on the local
   network. End-to-end encrypted and powered by iroh QUIC — no clouds, no
   accounts, no third-party servers, just direct peer-to-peer sync of text,
   images, and files. Pair your devices once via the in-app QR code, then
   anything you copy on one device is automatically available on the others.
-Moniker: uniclipboard
+Moniker: clipboard
 Tags:
   - clipboard
   - sync

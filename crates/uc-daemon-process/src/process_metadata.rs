@@ -13,7 +13,7 @@ use uc_app_paths::app_data_root;
 #[serde(rename_all = "snake_case")]
 pub enum DaemonProcessMode {
     /// 独立 daemon 进程：`cli start` 拉起的 detached 子进程，或者用户在
-    /// 终端直接 `uniclipboard-daemon`。`cli stop` 可以安全地 SIGTERM 它。
+    /// 终端直接 `clipboard-daemon`。`cli stop` 可以安全地 SIGTERM 它。
     Standalone,
     /// in-process daemon：旧版 GUI 在自己的进程里跑 daemon 时写下的标记。
     /// ADR-008 P3-3 (B2'-3) 起 GUI 转纯客户端,**不再产生**此模式;保留它
@@ -23,7 +23,7 @@ pub enum DaemonProcessMode {
     InProcess,
 }
 
-/// Environment variable a spawner sets on the detached `uniclipd` child to
+/// Environment variable a spawner sets on the detached `clipd` child to
 /// record who launched it (see [`DaemonSpawnOrigin`]).
 pub const SPAWN_ORIGIN_ENV: &str = "UC_DAEMON_SPAWN_ORIGIN";
 
@@ -31,22 +31,22 @@ pub const SPAWN_ORIGIN_ENV: &str = "UC_DAEMON_SPAWN_ORIGIN";
 ///
 /// Persisted in the PID file so that even a *cold-restarted* GUI can tell
 /// whether the daemon it attached to is one a GUI brought up (lifecycle-bound,
-/// stoppable on full quit) versus a user's own `uniclip start` daemon (an
+/// stoppable on full quit) versus a user's own `clip start` daemon (an
 /// independent service a GUI must never stop).
 ///
 /// Resolved from [`SPAWN_ORIGIN_ENV`], which the spawn primitive
 /// ([`crate::spawn::spawn_detached_daemon`]) sets on the child; a manually-run
-/// `uniclipd` (or a legacy PID file predating this field) is [`Self::Unknown`]
+/// `clipd` (or a legacy PID file predating this field) is [`Self::Unknown`]
 /// and conservatively treated as **not** GUI-owned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum DaemonSpawnOrigin {
     /// Detached-spawned by a GUI process — its lifecycle is bound to the GUI.
     Gui,
-    /// Started by `uniclip start` / headless / oneshot / a service manager —
+    /// Started by `clip start` / headless / oneshot / a service manager —
     /// an independent daemon a GUI must leave running.
     Cli,
-    /// Unknown launcher: legacy PID files, or `uniclipd` run directly.
+    /// Unknown launcher: legacy PID files, or `clipd` run directly.
     #[default]
     Unknown,
 }
@@ -86,7 +86,7 @@ pub struct DaemonPidMetadata {
     pub pid: u32,
     pub mode: DaemonProcessMode,
     /// Unix epoch milliseconds 时刻——daemon 写 PID 文件那一瞬间。
-    /// 只用于诊断（`uniclip status` / 日志），不参与功能判断。
+    /// 只用于诊断（`clip status` / 日志），不参与功能判断。
     pub started_at_ms: u64,
     /// Who launched this daemon (ADR-008 D3). `#[serde(default)]` so PID files
     /// predating the field deserialize to [`DaemonSpawnOrigin::Unknown`] — i.e.
@@ -440,17 +440,14 @@ pub fn should_evict_holder(
     ordering == Ordering::Greater
 }
 
-const DAEMON_BINARY_NAME: &str = "uniclipd";
+const DAEMON_BINARY_NAME: &str = "clipd";
 
 fn is_daemon_binary_name(name: &str) -> bool {
-    // Match "uniclipd", "uniclipd.exe", and cargo test binary names like
-    // "uniclipd-<hash>". Also accept "uniclip" for the legacy single-binary
+    // Match "clipd", "clipd.exe", and cargo test binary names like
+    // "clipd-<hash>". Also accept "clip" for the legacy single-binary
     // mode where the daemon ran inside the CLI binary.
     let base = name.strip_suffix(".exe").unwrap_or(name);
-    base == "uniclipd"
-        || base.starts_with("uniclipd-")
-        || base == "uniclip"
-        || base.starts_with("uniclip-")
+    base == "clipd" || base.starts_with("clipd-") || base == "clip" || base.starts_with("clip-")
 }
 
 #[cfg(unix)]
@@ -637,9 +634,9 @@ mod tests {
     #[test]
     fn verifies_running_executables_after_rebuild_unlinks_them() {
         for (name, unlink, expected_active) in [
-            ("uniclipd", true, true),
+            ("clipd", true, true),
             ("unrelated-process", true, false),
-            ("uniclipd (deleted)", false, false),
+            ("clipd (deleted)", false, false),
         ] {
             let temp = TempDir::new().unwrap();
             let executable = temp.path().join(name);

@@ -64,7 +64,7 @@
 ## Test Artifact Cleanup
 
 - Moved the isolated test profile data, logs, and exported ZIP to Trash.
-- Deleted two task-only Keychain entries for service `UniClipboard-codex-diag-e2e` and verified none remain.
+- Deleted two task-only Keychain entries for service `Clipboard-codex-diag-e2e` and verified none remain.
 
 ## External Action Completed
 

@@ -1,4 +1,4 @@
-//! E2E tests for `uniclip get` — the one-shot reader for already-synced
+//! E2E tests for `clip get` — the one-shot reader for already-synced
 //! clipboard entries (issue #1025).
 //!
 //! `get` is the non-blocking counterpart to `recv`: instead of subscribing and

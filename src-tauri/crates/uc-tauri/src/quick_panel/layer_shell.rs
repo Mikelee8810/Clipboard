@@ -74,7 +74,7 @@ impl LayerShell {
         unsafe {
             let ptr = window.to_glib_none().0;
             (self.init)(ptr);
-            (self.namespace)(ptr, c"uniclipboard-quick-panel".as_ptr());
+            (self.namespace)(ptr, c"clipboard-quick-panel".as_ptr());
             (self.layer)(ptr, 3); // GTK_LAYER_SHELL_LAYER_OVERLAY
             (self.exclusive_zone)(ptr, -1); // Do not reserve or avoid work area.
             (self.anchor)(ptr, 0, 1); // Left
@@ -95,7 +95,7 @@ impl LayerShell {
         // SAFETY: live layer window; anchor all edges without reserving space.
         unsafe {
             let ptr = window.to_glib_none().0;
-            (self.namespace)(ptr, c"uniclipboard-quick-panel-dismiss".as_ptr());
+            (self.namespace)(ptr, c"clipboard-quick-panel-dismiss".as_ptr());
             (self.anchor)(ptr, 1, 1); // Right
             (self.anchor)(ptr, 3, 1); // Bottom
         }

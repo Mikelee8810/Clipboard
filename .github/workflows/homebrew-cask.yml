@@ -16,7 +16,7 @@ on:
       fork_repo:
         description: 'Pushable fork used to open the PR'
         required: true
-        default: 'UniClipboard/homebrew-cask'
+        default: 'Clipboard/homebrew-cask'
         type: string
 
 permissions:
@@ -28,9 +28,9 @@ jobs:
     runs-on: macos-latest
     env:
       CASK_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
-      FORK_REPO: ${{ inputs.fork_repo || 'UniClipboard/homebrew-cask' }}
+      FORK_REPO: ${{ inputs.fork_repo || 'Clipboard/homebrew-cask' }}
     steps:
-      - name: Checkout UniClipboard
+      - name: Checkout Clipboard
         uses: actions/checkout@v4
 
       - name: Resolve release metadata
@@ -48,13 +48,13 @@ jobs:
           fi
 
           ASSETS_JSON="$(gh release view "v${VERSION}" --repo "${GITHUB_REPOSITORY}" --json assets)"
-          ARM_DIGEST="$(jq -r --arg version "$VERSION" '.assets[] | select(.name == "UniClipboard_" + $version + "_aarch64.dmg") | .digest // empty' <<<"$ASSETS_JSON")"
-          INTEL_DIGEST="$(jq -r --arg version "$VERSION" '.assets[] | select(.name == "UniClipboard_" + $version + "_x64.dmg") | .digest // empty' <<<"$ASSETS_JSON")"
+          ARM_DIGEST="$(jq -r --arg version "$VERSION" '.assets[] | select(.name == "Clipboard_" + $version + "_aarch64.dmg") | .digest // empty' <<<"$ASSETS_JSON")"
+          INTEL_DIGEST="$(jq -r --arg version "$VERSION" '.assets[] | select(.name == "Clipboard_" + $version + "_x64.dmg") | .digest // empty' <<<"$ASSETS_JSON")"
 
           ARM_SHA="${ARM_DIGEST#sha256:}"
           INTEL_SHA="${INTEL_DIGEST#sha256:}"
           if [ -z "$ARM_SHA" ] || [ -z "$INTEL_SHA" ]; then
-            echo "Missing GitHub release asset digests for UniClipboard_${VERSION}_{aarch64,x64}.dmg" >&2
+            echo "Missing GitHub release asset digests for Clipboard_${VERSION}_{aarch64,x64}.dmg" >&2
             exit 1
           fi
 
@@ -70,8 +70,8 @@ jobs:
             -e 's/__VERSION__/${{ steps.release.outputs.version }}/g' \
             -e 's/__SHA256_ARM__/${{ steps.release.outputs.arm_sha }}/g' \
             -e 's/__SHA256_INTEL__/${{ steps.release.outputs.intel_sha }}/g' \
-            packaging/homebrew/casks/uniclipboard.rb > rendered/uniclipboard.rb
-          cat rendered/uniclipboard.rb
+            packaging/homebrew/casks/clipboard.rb > rendered/clipboard.rb
+          cat rendered/clipboard.rb
 
       - name: Checkout Homebrew cask fork
         uses: actions/checkout@v4
@@ -92,7 +92,7 @@ jobs:
           fi
 
           cd homebrew-cask
-          git config user.name "UniClipboard Release Bot"
+          git config user.name "Clipboard Release Bot"
           git config user.email "release@uniclipboard.app"
           git remote add upstream https://github.com/Homebrew/homebrew-cask.git || true
           DEFAULT_BRANCH=$(gh repo view Homebrew/homebrew-cask --json defaultBranchRef --jq '.defaultBranchRef.name')
@@ -107,37 +107,37 @@ jobs:
           gh api -X POST "repos/${FORK_REPO}/merge-upstream" -f branch="$DEFAULT_BRANCH" >/dev/null
 
           git fetch upstream "$DEFAULT_BRANCH"
-          git checkout -B "uniclipboard-${VERSION}" "upstream/$DEFAULT_BRANCH"
+          git checkout -B "clipboard-${VERSION}" "upstream/$DEFAULT_BRANCH"
 
           mkdir -p Casks/u
           IS_NEW=0
-          if [ ! -f Casks/u/uniclipboard.rb ]; then
+          if [ ! -f Casks/u/clipboard.rb ]; then
             IS_NEW=1
           fi
-          cp ../rendered/uniclipboard.rb Casks/u/uniclipboard.rb
+          cp ../rendered/clipboard.rb Casks/u/clipboard.rb
 
           # brew audit no longer accepts file paths; use brew style for local
           # syntax/format checking. Full audit runs via BrewTestBot on the PR.
-          brew style Casks/u/uniclipboard.rb
+          brew style Casks/u/clipboard.rb
 
           if [ "$IS_NEW" -eq 1 ]; then
-            COMMIT_SUBJECT="Add uniclipboard ${VERSION}"
-            PR_TITLE="Add uniclipboard ${VERSION}"
+            COMMIT_SUBJECT="Add clipboard ${VERSION}"
+            PR_TITLE="Add clipboard ${VERSION}"
           else
-            COMMIT_SUBJECT="Update uniclipboard to ${VERSION}"
-            PR_TITLE="Update uniclipboard to ${VERSION}"
+            COMMIT_SUBJECT="Update clipboard to ${VERSION}"
+            PR_TITLE="Update clipboard to ${VERSION}"
           fi
 
-          git add Casks/u/uniclipboard.rb
+          git add Casks/u/clipboard.rb
           git commit -m "$COMMIT_SUBJECT"
-          git push --force origin "uniclipboard-${VERSION}"
+          git push --force origin "clipboard-${VERSION}"
 
           RELEASE_URL="https://github.com/UniClipboard/UniClipboard/releases/tag/v${VERSION}"
           if [ "$IS_NEW" -eq 1 ]; then
-            INTRO="Adds the UniClipboard macOS GUI cask."
+            INTRO="Adds the Clipboard macOS GUI cask."
             NAMED_CASK_CHECK="[x]"
           else
-            INTRO="Updates uniclipboard to ${VERSION}."
+            INTRO="Updates clipboard to ${VERSION}."
             NAMED_CASK_CHECK="[ ]"
           fi
 
@@ -156,11 +156,11 @@ jobs:
           # real token). Homebrew/.github's check_template.rb diff-matches each template
           # checkbox against this body and auto-closes the PR when fewer than 75% survive.
           # Any reworded line silently drops the PR. See UniClipboard/UniClipboard#1194.
-          PR_BODY="$(printf '%s\n\nRelease: %s\n\n-----\n\nAfter making any changes to a cask, existing or new, verify:\n\n- [x] The submission is for [a stable version](https://docs.brew.sh/Acceptable-Casks#stable-versions) or [documented exception](https://docs.brew.sh/Acceptable-Casks#but-there-is-no-stable-version).\n- [ ] `brew audit --cask --online <cask>` is error-free.\n- [x] `brew style --fix <cask>` reports no offenses.%s\n\n-----\n\n- [x] AI was used to generate or assist with generating this PR. *Please specify below how you used AI to help you, and what steps you have taken to manually verify the changes, including [`zap` stanza](https://docs.brew.sh/Cask-Cookbook#stanza-zap) paths*.\n\nThis cask PR was generated by the UniClipboard automated release CI. `brew style` runs in CI on a macOS runner; the unchecked items (`brew audit --cask --online`/`--new`, install, uninstall) require local macOS testing not performed in CI and are validated by BrewTestBot.' \
+          PR_BODY="$(printf '%s\n\nRelease: %s\n\n-----\n\nAfter making any changes to a cask, existing or new, verify:\n\n- [x] The submission is for [a stable version](https://docs.brew.sh/Acceptable-Casks#stable-versions) or [documented exception](https://docs.brew.sh/Acceptable-Casks#but-there-is-no-stable-version).\n- [ ] `brew audit --cask --online <cask>` is error-free.\n- [x] `brew style --fix <cask>` reports no offenses.%s\n\n-----\n\n- [x] AI was used to generate or assist with generating this PR. *Please specify below how you used AI to help you, and what steps you have taken to manually verify the changes, including [`zap` stanza](https://docs.brew.sh/Cask-Cookbook#stanza-zap) paths*.\n\nThis cask PR was generated by the Clipboard automated release CI. `brew style` runs in CI on a macOS runner; the unchecked items (`brew audit --cask --online`/`--new`, install, uninstall) require local macOS testing not performed in CI and are validated by BrewTestBot.' \
             "$INTRO" "$RELEASE_URL" "$NEW_CASK_SECTION")"
           gh pr create \
             --repo Homebrew/homebrew-cask \
-            --head "${FORK_REPO%/*}:uniclipboard-${VERSION}" \
+            --head "${FORK_REPO%/*}:clipboard-${VERSION}" \
             --base "$DEFAULT_BRANCH" \
             --title "$PR_TITLE" \
             --body "$PR_BODY"

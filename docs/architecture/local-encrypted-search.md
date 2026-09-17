@@ -6,7 +6,7 @@
 
 ## 目标
 
-为 UniClipboard 提供一套实用的、本地专用的加密历史搜索能力，同时不改变现有加密内容的存储格式。
+为 Clipboard 提供一套实用的、本地专用的加密历史搜索能力，同时不改变现有加密内容的存储格式。
 
 V1 明确是 **本地加密索引**，不是远程可搜索加密协议。
 
@@ -144,7 +144,7 @@ API 同时应支持通过 `from_ms` 和 `to_ms` 指定绝对时间范围。
 
 ## 为什么选择本地加密索引而不是 SSE
 
-UniClipboard V1 的搜索需求是本地的：
+Clipboard V1 的搜索需求是本地的：
 
 - 索引在本地生成
 - 查询在本地执行
@@ -698,7 +698,7 @@ search」把五个从内容派生的字段以 **明文** 落进 `search_document
 - **列级加密**：五个内容派生字段打包成单个 JSON，经 XChaCha20-Poly1305 封成固定二进制
   信封 `[magic "UCSR"][version][nonce 24B][ciphertext]`，写入新列 `render_payload BLOB`；
   五个明文列 `DROP COLUMN`。稳态下每条被索引的行都写入加密 payload，`NULL` 一律按损坏行降级。
-- **独立 render_key**：`HKDF-SHA256(ikm=master_key, salt=profile_id, info="uniclipboard-search-render/v1")`，
+- **独立 render_key**：`HKDF-SHA256(ikm=master_key, salt=profile_id, info="clipboard-search-render/v1")`，
   与 search_key（HMAC-PRF）用途分离；AAD `uc:search_render:v1|{entry_id}` 绑定密文到行。
 - **锁定态一律 423**：`GET /search/query`（含 filter-only 浏览）与 `GET /search/tags` 在 handler
   入口前置 `session_ready` 校验，未就绪返回 423；引擎层派生 render_key 失败返回 `SessionLocked`

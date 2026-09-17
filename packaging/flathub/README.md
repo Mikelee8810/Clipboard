@@ -2,14 +2,14 @@
 
 本目录是提交到 [Flathub](https://github.com/flathub) 的 Flatpak 包源：
 
-- `app.uniclipboard.desktop.yml` — Flatpak manifest（app-id = Tauri identifier）
-- `app.uniclipboard.desktop.metainfo.xml` — AppStream 元数据（Flathub 强制要求）
+- `app.clipboard.desktop.yml` — Flatpak manifest（app-id = Tauri identifier）
+- `app.clipboard.desktop.metainfo.xml` — AppStream 元数据（Flathub 强制要求）
 
 ## 重要：Flathub 不进 Repology
 
 和 winget 一样，**Repology 不抓 Flathub**，这一步不会改变 packaging-status 徽章。做它的理由：Flathub 是 Linux 桌面应用覆盖面最大的分发渠道（远超 deb/rpm/AppImage 总和），补齐最大的真实分发缺口。
 ```bash
-flatpak install flathub app.uniclipboard.desktop
+flatpak install flathub app.clipboard.desktop
 ```
 
 ## 这是几个渠道里最难的一个
@@ -28,16 +28,16 @@ flatpak install flathub app.uniclipboard.desktop
    flatpak install flathub org.gnome.Platform//46 org.gnome.Sdk//46
    # 先填 manifest 里两个 deb 的 sha256（全 0 占位）：
    #   sha256sum 下载好的 .deb，或与 release SHA256SUMS.txt 核对（勿用沙箱产出的 hash）
-   flatpak-builder --user --install --force-clean build-dir packaging/flathub/app.uniclipboard.desktop.yml
-   flatpak run app.uniclipboard.desktop      # 起、托盘、配对、复制粘贴同步全测一遍
+   flatpak-builder --user --install --force-clean build-dir packaging/flathub/app.clipboard.desktop.yml
+   flatpak run app.clipboard.desktop      # 起、托盘、配对、复制粘贴同步全测一遍
    ```
    校验 metadata：
    ```bash
    flatpak run org.freedesktop.appstream-glib validate \
-     packaging/flathub/app.uniclipboard.desktop.metainfo.xml
+     packaging/flathub/app.clipboard.desktop.metainfo.xml
    ```
 
-2. **申请上架**：fork [`flathub/flathub`](https://github.com/flathub/flathub)，基于 `new-pr` 分支提交 manifest + metainfo，开 PR。Flathub reviewer 会过权限、构建、AppStream。合并后会为本应用建独立仓库 `flathub/app.uniclipboard.desktop`，后续版本在那里维护（可启用 Flatpak External Data Checker 自动跟随 release）。
+2. **申请上架**：fork [`flathub/flathub`](https://github.com/flathub/flathub)，基于 `new-pr` 分支提交 manifest + metainfo，开 PR。Flathub reviewer 会过权限、构建、AppStream。合并后会为本应用建独立仓库 `flathub/app.clipboard.desktop`，后续版本在那里维护（可启用 Flatpak External Data Checker 自动跟随 release）。
 
 ## 待确认
 

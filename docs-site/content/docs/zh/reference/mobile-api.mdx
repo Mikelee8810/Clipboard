@@ -10,7 +10,7 @@ description: 桌面守护进程对外暴露的、SyncClipboard 兼容的 HTTP �
 所有接口都挂在 **根路径**。主要 SyncClipboard 路径是
 `/SyncClipboard.json` 和 `/file/{dataName}`；兼容 Android 客户端时还会用到
 `/api/history/*`、`/api/time`、`/api/version`、`/version`、`/` 和 `/file`。
-此外还有两个 UniClipboard **私有扩展**，都不属于 SyncClipboard 协议，第三方
+此外还有两个 Clipboard **私有扩展**，都不属于 SyncClipboard 协议，第三方
 客户端可以忽略：
 
 - `GET /api/sse/clipboard`（Server-Sent Events）：桌面剪贴板更新时向订阅的
@@ -38,7 +38,7 @@ TCP 连接本身就已经暴露了。反过来，让每次探测都跑一遍 Arg
 
 ## 兼容边界
 
-UniClipboard 暴露的是当前剪贴板同步和 Android 客户端兼容所需的
+Clipboard 暴露的是当前剪贴板同步和 Android 客户端兼容所需的
 SyncClipboard 服务端子集，不是完整的 SyncClipboard 历史服务端。
 
 | 接口组                                                                          | 当前状态                                                                                                 |
@@ -50,8 +50,8 @@ SyncClipboard 服务端子集，不是完整的 SyncClipboard 历史服务端。
 | `POST /api/history/query`、`GET /api/history/statistics`                        | 基于当前最新一条返回兼容结果；没有当前内容时返回空结果。                                                 |
 | `PATCH /api/history/{type}/{hash}`、`DELETE /api/history/clear`、`DELETE /file` | 仅用于兼容客户端流程。服务端会接收请求，但不会通过这些接口持久化标星、置顶、删除、清空或文件夹删除状态。 |
 | `GET /api/time`、`GET /api/version`、`GET /version`、`/`                        | 客户端用于确认服务在线的探测接口。                                                                       |
-| `GET /api/sse/clipboard`                                                        | UniClipboard 私有推送扩展（SSE），只送变更信号不送内容；不属于 SyncClipboard 协议。                      |
-| `GET /healthz`                                                                  | UniClipboard 私有存活探测，公开且常数成本；不属于 SyncClipboard 协议，旧服务端返回 `404`。               |
+| `GET /api/sse/clipboard`                                                        | Clipboard 私有推送扩展（SSE），只送变更信号不送内容；不属于 SyncClipboard 协议。                      |
+| `GET /healthz`                                                                  | Clipboard 私有存活探测，公开且常数成本；不属于 SyncClipboard 协议，旧服务端返回 `404`。               |
 
 ## 上传行为
 
@@ -65,7 +65,7 @@ SyncClipboard 服务端子集，不是完整的 SyncClipboard 历史服务端。
 请求仍限制为 **16 MiB**，因为它们只是很小的协议文档，不是文件正文。
 
 部分 Android 客户端会把图片按 `application/octet-stream` 发送。遇到这种情况时，
-UniClipboard 会根据文件名和文件开头字节识别图片格式，让 JPEG、PNG、GIF、WEBP、
+Clipboard 会根据文件名和文件开头字节识别图片格式，让 JPEG、PNG、GIF、WEBP、
 BMP、TIFF、HEIC 和 HEIF 上传继续保持为图片，而不是被误报成文本或普通文件。
 
 <APIPage

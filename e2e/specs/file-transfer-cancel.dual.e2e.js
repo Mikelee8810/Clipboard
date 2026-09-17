@@ -47,7 +47,7 @@ dualDescribe('接收中的文件传输', () => {
       waitForPairedPeer(joiner, joinerConnection),
     ])
 
-    const transferFile = path.join(tmpdir(), `uniclip-e2e-cancel-${Date.now()}.bin`)
+    const transferFile = path.join(tmpdir(), `clip-e2e-cancel-${Date.now()}.bin`)
     createTransferFile(transferFile)
     copyFileToSystemClipboard(transferFile)
     const captureResponse = await daemonRequest(sponsorConnection, '/clipboard/capture-current', {

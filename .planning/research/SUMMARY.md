@@ -1,6 +1,6 @@
 # Project Research Summary
 
-**项目：** UniClipboard Desktop — v0.7.0 LAN-only Mode
+**项目：** Clipboard Desktop — v0.7.0 LAN-only Mode
 **研究域：** 给已上线的「局域网 + 公网中继混合系统」加一个用户可控的 LAN-only 开关 + 连接通道（LAN / Relay / Offline）可观察指示器
 **调研日期：** 2026-05-04
 **整体置信度：** HIGH（4 路 researcher 独立验证后一致；关键 API、行号、版本、产品决策全部可追溯）
@@ -9,14 +9,14 @@
 
 ## Executive Summary
 
-这是一次**范围窄、改动小、信任价值大**的里程碑。技术上不重写网络栈、不引入新依赖、不动六边形分层；产品上回答 B 站用户的一句话："有没有局域网专用版？我能不能确定流量没出局域网？我怎么验证？"。落地手段就两件：(1) 把 `IrohNodeConfig.disable_relays`（已存在的内部测试钩子，`uc-infra/src/network/iroh/node.rs:161`）暴露成用户可控的「LAN-only Mode」开关 + 持久化字段 `network.allow_relay_fallback`；(2) 给设备列表加「LAN / Relay / Offline」连接通道徽章，让开关效果**可肉眼验证**。两件事产品强耦合（必须同期发布，否则单发开关 = 没担保的承诺，单发徽章 = 没人 care 的信息），但技术解耦（可并行开发）。
+这是一次 **范围窄、改动小、信任价值大** 的里程碑。技术上不重写网络栈、不引入新依赖、不动六边形分层；产品上回答 B 站用户的一句话："有没有局域网专用版？我能不能确定流量没出局域网？我怎么验证？"。落地手段就两件：(1) 把 `IrohNodeConfig.disable_relays`（已存在的内部测试钩子，`uc-infra/src/network/iroh/node.rs:161`）暴露成用户可控的「LAN-only Mode」开关 + 持久化字段 `network.allow_relay_fallback`；(2) 给设备列表加「LAN / Relay / Offline」连接通道徽章，让开关效果 **可肉眼验证**。两件事产品强耦合（必须同期发布，否则单发开关 = 没担保的承诺，单发徽章 = 没人 care 的信息），但技术解耦（可并行开发）。
 
 **整个里程碑的所有失败模式都收敛到两条主因**，是后续 phase 设计与 review 必须贴脑门的红线：
 
 - **主因 A：反向命名导致的「语义颠倒」。** UI 文案 "LAN-only Mode = ON"，后端字段 `network.allow_relay_fallback` = `false`，iroh 字段 `IrohNodeConfig.disable_relays` = `true` —— **三层语义两次反转**。任何一处取反搞反编译器都不报错，但用户层面是「开了开关流量还在走中继」或「关了开关跨网段设备突然失联」的口碑炸点。每一处涉及方向的代码必须强制集中在唯一一个翻译函数里，配 truth-table 单测覆盖。
 - **主因 B：iroh `RelayMode` 是 bind 时常量，不是运行时旋钮（`node.rs:368-396`）。** `Endpoint::builder().relay_mode(...).bind()` 完成后 relay 行为就被冻结了，settings 改不动它，必须重启进程。任何「顺手做个运行时热切换」的尝试都会出现「endpoint 关了重 bind 但 ALPN handler 没重新挂」「`Arc<Endpoint>` 被多个 adapter 共享改不动」「UI 显示已生效但实际还在走 relay」三类半生效灾难。整个里程碑的 UX 必须诚实承担「重启生效」语义。
 
-最高风险不是技术实现而是**产品诚信**："LAN-only" 是营销最优解，但实际行为比字面意思弱（首次配对仍走 `rendezvous.uniclipboard.app`、OTLP 遥测仍开、pkarr DHT 仍发包、auto-update 仍查 GitHub）。文档、UI tooltip、changelog 三处任一含糊措辞或者出现 "fully offline / 完全离线 / 绝对私有" 这类绝对化用词，就会从「信任锚点」变成「营销谎言」，且这种口碑伤害**不可逆**。本里程碑必须把「不属于 LAN-only 范围的外网请求」清单作为 Phase 5 的 release blocker。
+最高风险不是技术实现而是 **产品诚信**："LAN-only" 是营销最优解，但实际行为比字面意思弱（首次配对仍走 `rendezvous.uniclipboard.app`、OTLP 遥测仍开、pkarr DHT 仍发包、auto-update 仍查 GitHub）。文档、UI tooltip、changelog 三处任一含糊措辞或者出现 "fully offline / 完全离线 / 绝对私有" 这类绝对化用词，就会从「信任锚点」变成「营销谎言」，且这种口碑伤害 **不可逆**。本里程碑必须把「不属于 LAN-only 范围的外网请求」清单作为 Phase 5 的 release blocker。
 
 ---
 
@@ -24,7 +24,7 @@
 
 ### 推荐 stack 增量（来自 STACK.md，HIGH 置信度，无新依赖）
 
-整个里程碑**禁止替换任何既有技术、禁止新增任何 crate / npm 依赖**。所有目标 API 已在 lockfile：
+整个里程碑 **禁止替换任何既有技术、禁止新增任何 crate / npm 依赖**。所有目标 API 已在 lockfile：
 
 | 维度 | 改动 | 关键引用 |
 |---|---|---|
@@ -34,7 +34,7 @@
 | 可观察性 | 不动 `uc-observability` crate，仅新增 span/字段命名（dotted name `network.channel_probe`，attrs `{ peer, channel = "lan|relay|offline" }`），不引入 metrics 层 | `uc-observability/src/profile.rs:53-54` |
 | 测试套 | 不增工具：`tokio test-util` + `tempfile` + `mockall` + `wiremock` + 既有双 endpoint loopback fixture（`slice2_phase1_presence_e2e.rs:354-356`），用 `RelayMode::Disabled` 验证「LAN-only=true ⇒ `addr().addrs` 不含 Relay 项」 | `uc-infra/tests/iroh_presence_probe.rs:17-29` |
 
-**铁律：** 范围内禁止替换 iroh / Diesel / serde / React / Radix UI 任何一项。本里程碑**唯一**真正的"新增能力"是 `ConnectionChannelPort` + `IrohConnectionChannelAdapter`（约 30 行 helper），**其余全是把既有钩子接通**。
+**铁律：** 范围内禁止替换 iroh / Diesel / serde / React / Radix UI 任何一项。本里程碑 **唯一** 真正的"新增能力"是 `ConnectionChannelPort` + `IrohConnectionChannelAdapter`（约 30 行 helper），**其余全是把既有钩子接通**。
 
 **关键陷阱：** 不要在新代码里再去找 iroh 0.95 时代的 `Endpoint::conn_type` —— 它在 0.97/0.98 已被 `remote_info` 替代（`tests/iroh_presence_probe.rs:5-11` 注释有明确迁移记录）；也不要试图运行时切 `RelayMode`（无公开 API）；也不要把 `iroh::_events::conn_type::changed` 这个内部 tracing target 当公开接口用。
 
@@ -101,7 +101,7 @@
 
 | 来源 | 建议 phase 数 | 排序 |
 |---|---|---|
-| ARCHITECTURE.md | 4（Phase A 后端 → Phase B 前端开关 → Phase C 通道徽章 → Phase D onboarding+文档） | 后端先行，前端开关与通道徽章可并行 |
+| ARCHITECTURE.md | 4（Phase A 后端 → Phase B 前端开关 → Phase C 通道徽章 → Phase D onboarding+ 文档） | 后端先行，前端开关与通道徽章可并行 |
 | FEATURES.md | 暗含 4–5 phase（schema → wiring → UI → 通道徽章 → 文档/onboarding） | 同上结论 |
 | PITFALLS.md | 6 phase（schema / 注入 / 通道指示器 / 重启 UX / 文档+onboarding / QA 验收） | 多分一个独立 QA phase |
 
@@ -142,7 +142,7 @@
 
 #### Phase C · 连接通道指示器（可与 Phase B 并行）
 
-**Rationale：** 这是本里程碑**唯一真正的"新增能力"**，与开关行为技术解耦但产品同期发布（信任锚点核心）。新增 `ConnectionChannelPort` 抽象不让 application 层耦合 iroh API。
+**Rationale：** 这是本里程碑 **唯一真正的"新增能力"**，与开关行为技术解耦但产品同期发布（信任锚点核心）。新增 `ConnectionChannelPort` 抽象不让 application 层耦合 iroh API。
 
 **Delivers：**
 - `uc-core::ports::connection_channel::ConnectionChannelPort` + `ConnectionChannel { Direct, Relay, Offline, Unknown }` enum

@@ -8,7 +8,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps'
 
 **This page is Android-only.** On iOS, clipboard access goes through the keyboard extension, the share extension, and per-app "paste from other apps" permission — those are covered elsewhere and do not apply to Android.
 
-Since Android 10, the system blocks background apps from reading the clipboard by default: when the app is not in the foreground, it can neither read what you copied elsewhere nor write remote content into the system clipboard. To make "copy syncs automatically" and "remote content is written to this device automatically" work in the background too, UniClipboard has to use a special mechanism to work around this restriction. Under **Settings → Background → Background reading method**, the app offers three; pick any one:
+Since Android 10, the system blocks background apps from reading the clipboard by default: when the app is not in the foreground, it can neither read what you copied elsewhere nor write remote content into the system clipboard. To make "copy syncs automatically" and "remote content is written to this device automatically" work in the background too, Clipboard has to use a special mechanism to work around this restriction. Under **Settings → Background → Background reading method**, the app offers three; pick any one:
 
 - **Timed polling** (default) — reads/writes via an overlay window and checks the clipboard on a timer. Works out of the box, no computer needed.
 - **ADB events** — also reads/writes via the overlay window, but only fires when the system actually reports a copy. Less interference and lower power, but needs a computer once for setup.
@@ -64,7 +64,7 @@ The ADB events method still uses the same overlay window for reading/writing, bu
 Permissions needed:
 
 - **Overlay window permission (SYSTEM_ALERT_WINDOW)** — for reading/writing the clipboard, same as Timed polling.
-- **READ_LOGS permission** — used to listen for system copy events. **This permission cannot be requested from within the app** — you must grant it by running one adb command from a computer, and **you must restart the app after granting it** for it to take effect. UniClipboard uses it only to detect that a copy happened; it does not read other log content.
+- **READ_LOGS permission** — used to listen for system copy events. **This permission cannot be requested from within the app** — you must grant it by running one adb command from a computer, and **you must restart the app after granting it** for it to take effect. Clipboard uses it only to detect that a copy happened; it does not read other log content.
 
 To grant it: first set up adb per **[Preparation: USB debugging and adb](#preparation-usb-debugging-and-adb)** below, then run:
 
@@ -85,7 +85,7 @@ Once you set the reading method to "ADB events" in the app, the Settings page wa
 
 <Tab value="Shizuku">
 
-Shizuku is a third-party open-source tool that safely grants system-level permissions to ordinary apps. Once set up, UniClipboard uses its privileged service to read/write the clipboard directly — **no overlay window, no focus grabbing, and event-driven**, giving the most stable background experience. On MIUI (Xiaomi / HyperOS) it can also **disable the "smart clipboard" restriction** that interferes with background clipboard read/write.
+Shizuku is a third-party open-source tool that safely grants system-level permissions to ordinary apps. Once set up, Clipboard uses its privileged service to read/write the clipboard directly — **no overlay window, no focus grabbing, and event-driven**, giving the most stable background experience. On MIUI (Xiaomi / HyperOS) it can also **disable the "smart clipboard" restriction** that interferes with background clipboard read/write.
 
 <Steps>
 
@@ -112,7 +112,7 @@ Shizuku needs its service started once after every reboot. Pick one method:
 
 <Callout type="warn">
   With the no-root method, **you must restart the Shizuku service after every phone reboot** (an
-  inherent limitation of Shizuku, not a UniClipboard issue). If you want something hands-off,
+  inherent limitation of Shizuku, not a Clipboard issue). If you want something hands-off,
   consider the default Timed polling method.
 </Callout>
 
@@ -122,8 +122,8 @@ Shizuku needs its service started once after every reboot. Pick one method:
 
 ### Authorize and switch to Shizuku
 
-- **Authorize** UniClipboard inside Shizuku (it prompts on first use).
-- Back in UniClipboard, go to **Settings → Background → Background reading method** and switch it to Shizuku.
+- **Authorize** Clipboard inside Shizuku (it prompts on first use).
+- Back in Clipboard, go to **Settings → Background → Background reading method** and switch it to Shizuku.
 
 </Step>
 
@@ -206,12 +206,12 @@ Just allow each one as the walkthrough prompts you. Below that is a set of advan
 - **Background upload from this device** — push content copied on this device to the desktop while in the background.
 - **Background reading method** — switch among **Timed polling**, **ADB events**, and **Shizuku** (tap in to swipe and compare).
 
-UniClipboard **does not use the Accessibility service** — you don't need to enable any accessibility permission in the system.
+Clipboard **does not use the Accessibility service** — you don't need to enable any accessibility permission in the system.
 
 <Callout type="warn">
 Whether background sync runs reliably over the long term **depends heavily on your phone's vendor OS**. Chinese vendor systems like MIUI / HyperOS, EMUI / HarmonyOS, ColorOS, and Funtouch generally have more aggressive background management than stock Android — even with the permissions above granted, they may suspend the app and drop sync after the screen locks or after a period of inactivity.
 
-We recommend, where possible: turn on the **persistent notification**, add UniClipboard to the system's battery "unrestricted / always allow background" allowlist, and "lock" it in the recent tasks list so it isn't cleared by a one-tap sweep. MIUI users can also use the **Shizuku method** to disable the "smart clipboard" restriction. These are system-level behaviors that the app cannot fully handle on your behalf.
+We recommend, where possible: turn on the **persistent notification**, add Clipboard to the system's battery "unrestricted / always allow background" allowlist, and "lock" it in the recent tasks list so it isn't cleared by a one-tap sweep. MIUI users can also use the **Shizuku method** to disable the "smart clipboard" restriction. These are system-level behaviors that the app cannot fully handle on your behalf.
 
 </Callout>
 

@@ -65,7 +65,7 @@ try {
       encoding: 'utf8',
     }),
     binaries: Object.fromEntries(
-      ['uniclipboard', 'uniclipd'].map(name => [
+      ['clipboard', 'clipd'].map(name => [
         name,
         {
           path: resolve('target/debug', name),

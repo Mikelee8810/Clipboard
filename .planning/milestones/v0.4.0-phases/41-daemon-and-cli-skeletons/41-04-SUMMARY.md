@@ -59,7 +59,7 @@ completed: 2026-03-18
 
 - Added a shared `resolve_daemon_socket_path()` module in `uc-daemon` with Unix byte-length guarding and test coverage
 - Removed duplicated CLI socket path logic so daemon bind and CLI connect now resolve identically
-- Verified end-to-end daemon startup on `/tmp/uniclipboard-daemon.sock`, successful `status` RPC, and clean socket removal on `SIGTERM`
+- Verified end-to-end daemon startup on `/tmp/clipboard-daemon.sock`, successful `status` RPC, and clean socket removal on `SIGTERM`
 
 ## Task Commits
 

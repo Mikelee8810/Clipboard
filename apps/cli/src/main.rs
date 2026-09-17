@@ -31,11 +31,7 @@ fn init_macos_appkit() {
 fn init_macos_appkit() {}
 
 #[derive(Parser)]
-#[command(
-    name = "uniclip",
-    version,
-    about = "UniClipboard command-line interface"
-)]
+#[command(name = "clip", version, about = "Clipboard command-line interface")]
 struct Cli {
     /// Output in JSON format
     #[arg(long, global = true)]
@@ -74,7 +70,7 @@ enum Commands {
         /// Run as a headless server node (VPS / container): no system
         /// clipboard and no clipboard watcher. The node still syncs over
         /// iroh as a normal Space member and serves the mobile-sync gateway.
-        /// Join the Space first (`uniclip space join`) before starting.
+        /// Join the Space first (`clip space join`) before starting.
         #[arg(long)]
         server: bool,
     },
@@ -124,7 +120,7 @@ enum Commands {
     /// backup → handshake → swap → commit). This is destructive and prompts
     /// for confirmation; pass `--yes` to skip the prompt in non-interactive
     /// contexts. A daemon crash mid-migration auto-resumes on the next
-    /// `uniclip` invocation thanks to `MigrationStatePort` persistence.
+    /// `clip` invocation thanks to `MigrationStatePort` persistence.
     #[command(args_conflicts_with_subcommands = true, hide = true)]
     Join {
         /// Invitation code printed by the sponsor's `invite`. Prompted
@@ -265,7 +261,7 @@ enum Commands {
     ///
     /// Selection (default: the newest usable entry):
     /// * `--type <image|file|text|link>` — newest entry of that kind.
-    /// * `--id <ENTRY-ID>` — a specific entry (see `uniclip search`).
+    /// * `--id <ENTRY-ID>` — a specific entry (see `clip search`).
     /// * `--list` — list recent entries instead of materializing one.
     ///
     /// Output: text/link content prints to stdout; image/file bytes are
@@ -280,7 +276,7 @@ enum Commands {
         /// Restrict selection to the newest entry of this kind.
         #[arg(long = "type", value_name = "KIND", value_enum)]
         kind: Option<commands::get::GetKind>,
-        /// Select a specific entry by id (from `uniclip search`).
+        /// Select a specific entry by id (from `clip search`).
         #[arg(long, value_name = "ENTRY-ID", conflicts_with = "kind")]
         id: Option<String>,
         /// List recent entries instead of materializing one.
@@ -466,7 +462,7 @@ impl From<OnOff> for bool {
 
 fn warn_legacy_space_command(command: &str, replacement: &str) {
     ui::warn(&format!(
-        "`uniclip {command}` is deprecated; use `uniclip {replacement}` instead. This alias will be removed in a future release."
+        "`clip {command}` is deprecated; use `clip {replacement}` instead. This alias will be removed in a future release."
     ));
 }
 
@@ -562,7 +558,7 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     if cli.dev {
-        std::env::set_var("UNICLIPBOARD_ENV", "development");
+        std::env::set_var("CLIPBOARD_ENV", "development");
     }
 
     // `--profile <name>` must land as `UC_PROFILE` BEFORE any bootstrap
@@ -784,17 +780,16 @@ mod tests {
     use clap::{CommandFactory, Parser};
 
     #[test]
-    fn cli_binary_name_is_uniclip() {
+    fn cli_binary_name_is_clip() {
         let command = Cli::command();
 
-        assert_eq!(command.get_name(), "uniclip");
+        assert_eq!(command.get_name(), "clip");
     }
 
     #[test]
     fn detailed_capture_commands_parse_with_bounded_minutes() {
-        let started =
-            Cli::try_parse_from(["uniclip", "debug", "capture", "start", "--minutes", "15"])
-                .expect("capture start must parse");
+        let started = Cli::try_parse_from(["clip", "debug", "capture", "start", "--minutes", "15"])
+            .expect("capture start must parse");
         assert!(matches!(
             started.command,
             Some(Commands::Debug {
@@ -804,14 +799,13 @@ mod tests {
             })
         ));
 
-        let invalid =
-            Cli::try_parse_from(["uniclip", "debug", "capture", "start", "--minutes", "16"]);
+        let invalid = Cli::try_parse_from(["clip", "debug", "capture", "start", "--minutes", "16"]);
         assert!(invalid.is_err());
     }
 
     #[test]
     fn no_subcommand_displays_help() {
-        let result = Cli::try_parse_from(["uniclip"]);
+        let result = Cli::try_parse_from(["clip"]);
 
         match result {
             Ok(cli) => {
@@ -823,7 +817,7 @@ mod tests {
 
     #[test]
     fn setup_command_is_removed() {
-        let result = Cli::try_parse_from(["uniclip", "setup"]);
+        let result = Cli::try_parse_from(["clip", "setup"]);
 
         assert!(
             result.is_err(),
@@ -833,7 +827,7 @@ mod tests {
 
     #[test]
     fn switch_space_command_is_removed() {
-        let result = Cli::try_parse_from(["uniclip", "switch-space", "--code", "ABCD-1234"]);
+        let result = Cli::try_parse_from(["clip", "switch-space", "--code", "ABCD-1234"]);
 
         assert!(
             result.is_err(),
@@ -844,7 +838,7 @@ mod tests {
     #[test]
     fn space_status_is_the_canonical_status_command() {
         let cli =
-            Cli::try_parse_from(["uniclip", "space", "status"]).expect("space status must parse");
+            Cli::try_parse_from(["clip", "space", "status"]).expect("space status must parse");
 
         assert!(matches!(
             cli.command,
@@ -857,10 +851,10 @@ mod tests {
     #[test]
     fn legacy_space_commands_remain_parseable() {
         for args in [
-            vec!["uniclip", "status"],
-            vec!["uniclip", "init"],
-            vec!["uniclip", "invite"],
-            vec!["uniclip", "join"],
+            vec!["clip", "status"],
+            vec!["clip", "init"],
+            vec!["clip", "invite"],
+            vec!["clip", "join"],
         ] {
             assert!(
                 Cli::try_parse_from(args).is_ok(),
@@ -871,7 +865,7 @@ mod tests {
 
     #[test]
     fn space_join_status_and_cancel_are_nested_commands() {
-        let status = Cli::try_parse_from(["uniclip", "space", "join", "status"])
+        let status = Cli::try_parse_from(["clip", "space", "join", "status"])
             .expect("space join status must parse");
         assert!(matches!(
             status.command,
@@ -883,7 +877,7 @@ mod tests {
             })
         ));
 
-        let cancel = Cli::try_parse_from(["uniclip", "space", "join", "cancel"])
+        let cancel = Cli::try_parse_from(["clip", "space", "join", "cancel"])
             .expect("space join cancel must parse");
         assert!(matches!(
             cancel.command,
@@ -899,7 +893,7 @@ mod tests {
     #[test]
     fn space_init_and_join_keep_existing_options() {
         let init = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "space",
             "init",
             "--passphrase",
@@ -919,7 +913,7 @@ mod tests {
         ));
 
         let join = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "space",
             "join",
             "--code",
@@ -950,11 +944,11 @@ mod tests {
     #[test]
     fn space_reset_requires_explicit_confirmation() {
         assert!(
-            Cli::try_parse_from(["uniclip", "space", "reset"]).is_err(),
+            Cli::try_parse_from(["clip", "space", "reset"]).is_err(),
             "space reset must reject an unconfirmed rebuild"
         );
 
-        let reset = Cli::try_parse_from(["uniclip", "space", "reset", "--yes"])
+        let reset = Cli::try_parse_from(["clip", "space", "reset", "--yes"])
             .expect("confirmed space reset must parse");
         assert!(matches!(
             reset.command,
@@ -969,7 +963,7 @@ mod tests {
         // `--switch` opts into the destructive migration path; `--yes` skips
         // its confirmation in non-interactive contexts.
         let cli = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "join",
             "--code",
             "ABCD-1234",
@@ -1001,15 +995,9 @@ mod tests {
     fn join_defaults_to_re_pair_without_switch() {
         // A bare `join` (no `--switch`) must route to the non-destructive
         // redeem / re-pair path regardless of setup state (issue #1023).
-        let cli = Cli::try_parse_from([
-            "uniclip",
-            "join",
-            "--code",
-            "ABCD-1234",
-            "--passphrase",
-            "pw",
-        ])
-        .expect("bare join must parse");
+        let cli =
+            Cli::try_parse_from(["clip", "join", "--code", "ABCD-1234", "--passphrase", "pw"])
+                .expect("bare join must parse");
         let Some(Commands::Join { switch, .. }) = cli.command else {
             panic!("expected Join command");
         };
@@ -1019,7 +1007,7 @@ mod tests {
     #[test]
     fn join_no_wait_parses_on_start_flow() {
         let cli = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "join",
             "--code",
             "ABCD-1234",
@@ -1042,7 +1030,7 @@ mod tests {
     #[test]
     fn join_status_and_cancel_parse_without_join_inputs() {
         let status =
-            Cli::try_parse_from(["uniclip", "join", "status"]).expect("join status must parse");
+            Cli::try_parse_from(["clip", "join", "status"]).expect("join status must parse");
         assert!(matches!(
             status.command,
             Some(Commands::Join {
@@ -1052,7 +1040,7 @@ mod tests {
         ));
 
         let cancel =
-            Cli::try_parse_from(["uniclip", "join", "cancel"]).expect("join cancel must parse");
+            Cli::try_parse_from(["clip", "join", "cancel"]).expect("join cancel must parse");
         assert!(matches!(
             cancel.command,
             Some(Commands::Join {
@@ -1064,13 +1052,13 @@ mod tests {
 
     #[test]
     fn join_subcommands_reject_join_inputs() {
-        let result = Cli::try_parse_from(["uniclip", "join", "status", "--code", "ABCD-1234"]);
+        let result = Cli::try_parse_from(["clip", "join", "status", "--code", "ABCD-1234"]);
         assert!(result.is_err());
     }
 
     #[test]
     fn member_trust_commands_parse_expected_safety_flags() {
-        let status = Cli::try_parse_from(["uniclip", "member", "trust", "status"])
+        let status = Cli::try_parse_from(["clip", "member", "trust", "status"])
             .expect("member trust status must parse");
         assert!(matches!(
             status.command,
@@ -1082,7 +1070,7 @@ mod tests {
         ));
 
         let choose = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "member",
             "trust",
             "choose",
@@ -1106,12 +1094,12 @@ mod tests {
             })
         ));
 
-        assert!(Cli::try_parse_from(["uniclip", "member", "trust", "apply"]).is_err());
+        assert!(Cli::try_parse_from(["clip", "member", "trust", "apply"]).is_err());
     }
 
     #[test]
     fn member_sync_show_and_partial_set_parse() {
-        let show = Cli::try_parse_from(["uniclip", "member", "sync", "show", "device-a"])
+        let show = Cli::try_parse_from(["clip", "member", "sync", "show", "device-a"])
             .expect("member sync show must parse");
         assert!(matches!(
             show.command,
@@ -1123,7 +1111,7 @@ mod tests {
         ));
 
         let set = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "member",
             "sync",
             "set",
@@ -1146,7 +1134,7 @@ mod tests {
 
     #[test]
     fn search_rebuild_no_wait_is_removed() {
-        let result = Cli::try_parse_from(["uniclip", "search", "rebuild", "--no-wait"]);
+        let result = Cli::try_parse_from(["clip", "search", "rebuild", "--no-wait"]);
 
         assert!(
             result.is_err(),
@@ -1157,7 +1145,7 @@ mod tests {
     #[test]
     fn search_query_is_flattened_to_top_level() {
         // `search <query>` no longer requires the `query` subcommand.
-        let cli = Cli::try_parse_from(["uniclip", "search", "report", "--type", "text"])
+        let cli = Cli::try_parse_from(["clip", "search", "report", "--type", "text"])
             .expect("flattened search query must parse");
         let Some(Commands::Search { subcommand, .. }) = cli.command else {
             panic!("expected Search command");
@@ -1171,7 +1159,7 @@ mod tests {
     #[test]
     fn search_accepts_repeatable_source_device_filter() {
         let cli = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "search",
             "report",
             "--source-device",
@@ -1186,7 +1174,7 @@ mod tests {
     #[test]
     fn search_status_still_parses_as_subcommand() {
         let cli =
-            Cli::try_parse_from(["uniclip", "search", "status"]).expect("search status must parse");
+            Cli::try_parse_from(["clip", "search", "status"]).expect("search status must parse");
         let Some(Commands::Search { subcommand, .. }) = cli.command else {
             panic!("expected Search command");
         };
@@ -1198,8 +1186,8 @@ mod tests {
 
     #[test]
     fn bare_upgrade_defaults_to_no_subcommand() {
-        // `uniclip upgrade` (no subcommand) is valid and means "show status".
-        let cli = Cli::try_parse_from(["uniclip", "upgrade"]).expect("bare upgrade must parse");
+        // `clip upgrade` (no subcommand) is valid and means "show status".
+        let cli = Cli::try_parse_from(["clip", "upgrade"]).expect("bare upgrade must parse");
         let Some(Commands::Upgrade { subcommand }) = cli.command else {
             panic!("expected Upgrade command");
         };
@@ -1208,8 +1196,7 @@ mod tests {
 
     #[test]
     fn upgrade_ack_parses_as_subcommand() {
-        let cli =
-            Cli::try_parse_from(["uniclip", "upgrade", "ack"]).expect("upgrade ack must parse");
+        let cli = Cli::try_parse_from(["clip", "upgrade", "ack"]).expect("upgrade ack must parse");
         let Some(Commands::Upgrade { subcommand }) = cli.command else {
             panic!("expected Upgrade command");
         };
@@ -1221,14 +1208,14 @@ mod tests {
 
     #[test]
     fn members_probe_flag_parses_and_defaults_off() {
-        let bare = Cli::try_parse_from(["uniclip", "members"]).expect("bare members must parse");
+        let bare = Cli::try_parse_from(["clip", "members"]).expect("bare members must parse");
         let Some(Commands::Members { probe }) = bare.command else {
             panic!("expected Members command");
         };
         assert!(!probe, "probe must default off");
 
         let probed =
-            Cli::try_parse_from(["uniclip", "members", "--probe"]).expect("members --probe parses");
+            Cli::try_parse_from(["clip", "members", "--probe"]).expect("members --probe parses");
         let Some(Commands::Members { probe }) = probed.command else {
             panic!("expected Members command");
         };
@@ -1239,7 +1226,7 @@ mod tests {
     #[test]
     fn dev_capture_files_parses_repeated_paths_and_cap_overrides() {
         let parsed = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "dev",
             "capture-files",
             "--path",
@@ -1272,14 +1259,14 @@ mod tests {
     #[test]
     fn devices_is_an_alias_for_members() {
         // The former `devices` command is now a hidden alias of `members`.
-        let cli = Cli::try_parse_from(["uniclip", "devices"]).expect("devices alias must parse");
+        let cli = Cli::try_parse_from(["clip", "devices"]).expect("devices alias must parse");
         assert!(matches!(cli.command, Some(Commands::Members { .. })));
     }
 
     #[test]
     fn mobile_is_the_primary_command_name() {
         // `mobile` 是新的主命令名(显示在 --help 里)。锁住外部契约。
-        let cli = Cli::try_parse_from(["uniclip", "mobile", "status"])
+        let cli = Cli::try_parse_from(["clip", "mobile", "status"])
             .expect("expected `mobile status` to parse");
         assert!(matches!(cli.command, Some(Commands::Mobile { .. })));
     }
@@ -1289,7 +1276,7 @@ mod tests {
         // `mobile-sync` 保留为隐藏的弃用别名 —— 仍能解析(已发布脚本不
         // 失效),但映射到独立的 `MobileSync` 变体,runtime 会打印弃用提示
         // 再走与 `mobile` 相同的逻辑。(用 `status` 这个稳定读命令做探针。)
-        let cli = Cli::try_parse_from(["uniclip", "mobile-sync", "status"])
+        let cli = Cli::try_parse_from(["clip", "mobile-sync", "status"])
             .expect("expected `mobile-sync status` to still parse");
         assert!(matches!(cli.command, Some(Commands::MobileSync { .. })));
     }
@@ -1299,7 +1286,7 @@ mod tests {
         // `network set` 必须强制给出一个广告目标 —— iPhone 客户端需要一个
         // 具体可达的地址写进 install URL;daemon 自己始终绑 0.0.0.0,与
         // advertise 无关。两种形态二选一(`advertise_target` ArgGroup)。
-        let result = Cli::try_parse_from(["uniclip", "mobile-sync", "network", "set"]);
+        let result = Cli::try_parse_from(["clip", "mobile-sync", "network", "set"]);
         assert!(
             result.is_err(),
             "expected `network set` to require --ip or --url"
@@ -1310,7 +1297,7 @@ mod tests {
     fn mobile_sync_network_set_accepts_url() {
         // 反代形态:`--url` 单独给出即可满足 advertise_target 组。
         let result = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "mobile-sync",
             "network",
             "set",
@@ -1325,7 +1312,7 @@ mod tests {
     fn mobile_sync_network_set_rejects_both_forms() {
         // 互斥:同时给 --ip 和 --url 必须被 ArgGroup 拒绝。
         let result = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "mobile-sync",
             "network",
             "set",
@@ -1344,9 +1331,9 @@ mod tests {
     #[test]
     fn mobile_sync_network_off_and_interfaces_parse() {
         // `network off` / `network interfaces` 是无参子命令,锁住解析契约。
-        let off = Cli::try_parse_from(["uniclip", "mobile-sync", "network", "off"]);
+        let off = Cli::try_parse_from(["clip", "mobile-sync", "network", "off"]);
         assert!(off.is_ok(), "expected `network off` to parse");
-        let ifaces = Cli::try_parse_from(["uniclip", "mobile-sync", "network", "interfaces"]);
+        let ifaces = Cli::try_parse_from(["clip", "mobile-sync", "network", "interfaces"]);
         assert!(ifaces.is_ok(), "expected `network interfaces` to parse");
     }
 
@@ -1354,9 +1341,9 @@ mod tests {
     fn mobile_sync_add_requires_label() {
         // 顶层 `add`(原 `devices add`)—— `--label` 必填,否则 register
         // flow 拿不到设备名。
-        let missing = Cli::try_parse_from(["uniclip", "mobile-sync", "add"]);
+        let missing = Cli::try_parse_from(["clip", "mobile-sync", "add"]);
         assert!(missing.is_err(), "expected `add` to require --label");
-        let ok = Cli::try_parse_from(["uniclip", "mobile-sync", "add", "--label", "My iPhone"]);
+        let ok = Cli::try_parse_from(["clip", "mobile-sync", "add", "--label", "My iPhone"]);
         assert!(ok.is_ok(), "expected `add --label` to parse");
     }
 
@@ -1364,27 +1351,27 @@ mod tests {
     fn mobile_sync_revoke_id_optional() {
         // 顶层 `revoke` device_id 可选(无 id 走交互式选)。clap 解析层应
         // 允许两种形态。
-        let r1 = Cli::try_parse_from(["uniclip", "mobile-sync", "revoke"]);
+        let r1 = Cli::try_parse_from(["clip", "mobile-sync", "revoke"]);
         assert!(r1.is_ok(), "expected `revoke` (no id) to parse");
-        let r2 = Cli::try_parse_from(["uniclip", "mobile-sync", "revoke", "did_abc"]);
+        let r2 = Cli::try_parse_from(["clip", "mobile-sync", "revoke", "did_abc"]);
         assert!(r2.is_ok(), "expected `revoke <id>` to parse");
     }
 
     #[test]
     fn member_remove_requires_peer_id() {
         // `member remove` 的 peer_id 必填 —— 没有它无法记录移除意图。
-        let missing = Cli::try_parse_from(["uniclip", "member", "remove"]);
+        let missing = Cli::try_parse_from(["clip", "member", "remove"]);
         assert!(
             missing.is_err(),
             "expected `member remove` to require a peer ID"
         );
-        let ok = Cli::try_parse_from(["uniclip", "member", "remove", "peer_abc"]);
+        let ok = Cli::try_parse_from(["clip", "member", "remove", "peer_abc"]);
         assert!(ok.is_ok(), "expected `member remove <peer-id>` to parse");
     }
 
     #[test]
     fn retired_member_removal_status_is_rejected() {
-        let result = Cli::try_parse_from(["uniclip", "member", "removal-status"]);
+        let result = Cli::try_parse_from(["clip", "member", "removal-status"]);
         assert!(result.is_err(), "retired removal status must not parse");
     }
 
@@ -1394,13 +1381,13 @@ mod tests {
         // `settings` 已不再解析 —— 改用 `network` / 顶层 `add`·`revoke` /
         // `status`。
         for args in [
-            vec!["uniclip", "mobile-sync", "lan", "list-interfaces"],
-            vec!["uniclip", "mobile-sync", "lan", "enable"],
-            vec!["uniclip", "mobile-sync", "lan", "disable"],
-            vec!["uniclip", "mobile-sync", "devices", "list"],
-            vec!["uniclip", "mobile-sync", "devices", "add", "--label", "X"],
-            vec!["uniclip", "mobile-sync", "devices", "revoke", "did_abc"],
-            vec!["uniclip", "mobile-sync", "settings", "show"],
+            vec!["clip", "mobile-sync", "lan", "list-interfaces"],
+            vec!["clip", "mobile-sync", "lan", "enable"],
+            vec!["clip", "mobile-sync", "lan", "disable"],
+            vec!["clip", "mobile-sync", "devices", "list"],
+            vec!["clip", "mobile-sync", "devices", "add", "--label", "X"],
+            vec!["clip", "mobile-sync", "devices", "revoke", "did_abc"],
+            vec!["clip", "mobile-sync", "settings", "show"],
         ] {
             let pretty = args.join(" ");
             assert!(
@@ -1415,7 +1402,7 @@ mod tests {
         // 拓扑重组:`shortcut add` 已搬到 `add` / `devices add`,老路径
         // 直接删除(无 deprecation 周期)。
         let result =
-            Cli::try_parse_from(["uniclip", "mobile-sync", "shortcut", "add", "--label", "X"]);
+            Cli::try_parse_from(["clip", "mobile-sync", "shortcut", "add", "--label", "X"]);
         assert!(
             result.is_err(),
             "expected `shortcut` subcommand to be removed"
@@ -1425,7 +1412,7 @@ mod tests {
     #[test]
     fn mobile_sync_enable_subcommand_is_removed() {
         // 拓扑重组:顶层 `enable` 与 `setup` / `network set` 重叠, 已删除。
-        let result = Cli::try_parse_from(["uniclip", "mobile-sync", "enable"]);
+        let result = Cli::try_parse_from(["clip", "mobile-sync", "enable"]);
         assert!(
             result.is_err(),
             "expected `enable` subcommand to be removed"
@@ -1435,7 +1422,7 @@ mod tests {
     #[test]
     fn mobile_sync_status_parses() {
         // Step 4/5: 新增 `status` 综合视图(读命令)。
-        let r = Cli::try_parse_from(["uniclip", "mobile-sync", "status"]);
+        let r = Cli::try_parse_from(["clip", "mobile-sync", "status"]);
         assert!(r.is_ok(), "expected `status` to parse");
     }
 
@@ -1444,10 +1431,10 @@ mod tests {
     fn mobile_sync_debug_subcommands_parse() {
         // P5a.9 引入的 4 个 debug 子命令解析契约。
         for args in [
-            vec!["uniclip", "mobile-sync", "debug", "put-text", "hello"],
-            vec!["uniclip", "mobile-sync", "debug", "put-file", "/tmp/x.png"],
-            vec!["uniclip", "mobile-sync", "debug", "get-doc"],
-            vec!["uniclip", "mobile-sync", "debug", "get-file", "photo.png"],
+            vec!["clip", "mobile-sync", "debug", "put-text", "hello"],
+            vec!["clip", "mobile-sync", "debug", "put-file", "/tmp/x.png"],
+            vec!["clip", "mobile-sync", "debug", "get-doc"],
+            vec!["clip", "mobile-sync", "debug", "get-file", "photo.png"],
         ] {
             let result = Cli::try_parse_from(args.clone());
             assert!(result.is_ok(), "expected `{args:?}` to parse");
@@ -1458,7 +1445,7 @@ mod tests {
     #[test]
     fn mobile_sync_debug_put_text_requires_text() {
         // put-text 必须带 TEXT 位置参数,否则 facade 拿不到内容。
-        let result = Cli::try_parse_from(["uniclip", "mobile-sync", "debug", "put-text"]);
+        let result = Cli::try_parse_from(["clip", "mobile-sync", "debug", "put-text"]);
         assert!(result.is_err(), "expected `put-text` to require <TEXT>");
     }
 
@@ -1466,7 +1453,7 @@ mod tests {
     #[test]
     fn mobile_sync_debug_put_file_requires_path() {
         // put-file 必须带 PATH;mime 是可选的。
-        let result = Cli::try_parse_from(["uniclip", "mobile-sync", "debug", "put-file"]);
+        let result = Cli::try_parse_from(["clip", "mobile-sync", "debug", "put-file"]);
         assert!(result.is_err(), "expected `put-file` to require <PATH>");
     }
 
@@ -1474,7 +1461,7 @@ mod tests {
     #[test]
     fn mobile_sync_debug_get_file_requires_data_name() {
         // get-file 必须带 DATANAME 位置参数。
-        let result = Cli::try_parse_from(["uniclip", "mobile-sync", "debug", "get-file"]);
+        let result = Cli::try_parse_from(["clip", "mobile-sync", "debug", "get-file"]);
         assert!(result.is_err(), "expected `get-file` to require <DATANAME>");
     }
 
@@ -1484,7 +1471,7 @@ mod tests {
         // `--non-interactive` / `--json` 决定是否要求 --label /
         // --accept-network-risk(--ip 已降级为可选高级覆盖);clap 解析层
         // 不下结论。
-        let r = Cli::try_parse_from(["uniclip", "mobile-sync", "setup"]);
+        let r = Cli::try_parse_from(["clip", "mobile-sync", "setup"]);
         assert!(r.is_ok(), "expected `setup` to parse with no args");
     }
 
@@ -1492,7 +1479,7 @@ mod tests {
     fn mobile_sync_setup_accepts_full_non_interactive_flags() {
         // CI 友好的全 flag 形态。
         let r = Cli::try_parse_from([
-            "uniclip",
+            "clip",
             "mobile-sync",
             "setup",
             "--non-interactive",
@@ -1515,15 +1502,8 @@ mod tests {
     fn dev_pairing_manual_address_commands_parse() {
         // 隐藏开发入口用于手动选择配对地址,不进入公开 help 契约。
         for args in [
-            vec!["uniclip", "dev", "pairing", "addrs"],
-            vec![
-                "uniclip",
-                "dev",
-                "pairing",
-                "issue",
-                "--addr",
-                "100.79.191.42",
-            ],
+            vec!["clip", "dev", "pairing", "addrs"],
+            vec!["clip", "dev", "pairing", "issue", "--addr", "100.79.191.42"],
         ] {
             let result = Cli::try_parse_from(args.clone());
             assert!(result.is_ok(), "expected `{args:?}` to parse");
@@ -1537,9 +1517,9 @@ mod tests {
         // 锁住新路径的解析契约 —— e2e 脚本依赖 `dev seed-clipboard` /
         // `dev dump-clipboard`。
         for args in [
-            vec!["uniclip", "dev", "seed-clipboard", "--text", "hello"],
-            vec!["uniclip", "dev", "dump-clipboard"],
-            vec!["uniclip", "dev", "dump-clipboard", "--limit", "5"],
+            vec!["clip", "dev", "seed-clipboard", "--text", "hello"],
+            vec!["clip", "dev", "dump-clipboard"],
+            vec!["clip", "dev", "dump-clipboard", "--limit", "5"],
         ] {
             let result = Cli::try_parse_from(args.clone());
             assert!(result.is_ok(), "expected `{args:?}` to parse");
@@ -1552,8 +1532,8 @@ mod tests {
         // 迁移到 `dev` 组后,顶层路径必须消失,避免两套入口并存,
         // 也确保它们不再出现在公开 help 契约里。
         for args in [
-            vec!["uniclip", "seed-clipboard", "--text", "hello"],
-            vec!["uniclip", "dump-clipboard"],
+            vec!["clip", "seed-clipboard", "--text", "hello"],
+            vec!["clip", "dump-clipboard"],
         ] {
             let result = Cli::try_parse_from(args.clone());
             assert!(
@@ -1565,15 +1545,15 @@ mod tests {
 
     #[test]
     fn send_accepts_positional_text() {
-        // 历史契约:`uniclip send hello` 必须继续工作。
-        let r = Cli::try_parse_from(["uniclip", "send", "hello"]);
+        // 历史契约:`clip send hello` 必须继续工作。
+        let r = Cli::try_parse_from(["clip", "send", "hello"]);
         assert!(r.is_ok(), "expected `send hello` to parse");
     }
 
     #[test]
     fn send_accepts_no_args_for_stdin_mode() {
-        // `echo … | uniclip send` 链路 —— 不带 text 也不带 --resend 必须能解析。
-        let r = Cli::try_parse_from(["uniclip", "send"]);
+        // `echo … | clip send` 链路 —— 不带 text 也不带 --resend 必须能解析。
+        let r = Cli::try_parse_from(["clip", "send"]);
         assert!(
             r.is_ok(),
             "expected `send` with no args to parse (stdin mode)"
@@ -1582,14 +1562,14 @@ mod tests {
 
     #[test]
     fn send_resend_alone_parses() {
-        let r = Cli::try_parse_from(["uniclip", "send", "--resend", "ent-123"]);
+        let r = Cli::try_parse_from(["clip", "send", "--resend", "ent-123"]);
         assert!(r.is_ok(), "expected `send --resend <id>` to parse");
     }
 
     #[test]
     fn send_resend_with_text_is_mutually_exclusive() {
         // 互斥规则:`--resend` 不能与 positional text 同时出现。
-        let r = Cli::try_parse_from(["uniclip", "send", "hello", "--resend", "ent-123"]);
+        let r = Cli::try_parse_from(["clip", "send", "hello", "--resend", "ent-123"]);
         assert!(
             r.is_err(),
             "expected `send <text> --resend <id>` to fail at clap layer"
@@ -1600,38 +1580,38 @@ mod tests {
     fn send_accepts_multiple_peers() {
         // `--peer` 可重复出现;两种 mode 都允许。
         let r1 = Cli::try_parse_from([
-            "uniclip", "send", "hello", "--peer", "dev-a", "--peer", "dev-b",
+            "clip", "send", "hello", "--peer", "dev-a", "--peer", "dev-b",
         ]);
         assert!(
             r1.is_ok(),
             "expected new-entry mode with multiple --peer to parse"
         );
-        let r2 = Cli::try_parse_from(["uniclip", "send", "--resend", "ent-1", "--peer", "dev-a"]);
+        let r2 = Cli::try_parse_from(["clip", "send", "--resend", "ent-1", "--peer", "dev-a"]);
         assert!(r2.is_ok(), "expected resend mode with --peer to parse");
     }
 
     #[test]
     fn get_parses_with_no_args() {
-        // `uniclip get` 默认取最新一条 —— 不带任何 selector 必须能解析。
-        let r = Cli::try_parse_from(["uniclip", "get"]);
+        // `clip get` 默认取最新一条 —— 不带任何 selector 必须能解析。
+        let r = Cli::try_parse_from(["clip", "get"]);
         assert!(r.is_ok(), "expected bare `get` to parse");
     }
 
     #[test]
     fn get_accepts_type_selector() {
         for kind in ["image", "file", "text", "link"] {
-            let r = Cli::try_parse_from(["uniclip", "get", "--type", kind]);
+            let r = Cli::try_parse_from(["clip", "get", "--type", kind]);
             assert!(r.is_ok(), "expected `get --type {kind}` to parse");
         }
         // 非法 kind 必须被 value_enum 拒绝。
-        let bad = Cli::try_parse_from(["uniclip", "get", "--type", "video"]);
+        let bad = Cli::try_parse_from(["clip", "get", "--type", "video"]);
         assert!(bad.is_err(), "expected `get --type video` to be rejected");
     }
 
     #[test]
     fn get_type_and_id_are_mutually_exclusive() {
         // 选最新某类型 与 选指定 id 互斥 —— 两者语义冲突。
-        let r = Cli::try_parse_from(["uniclip", "get", "--type", "image", "--id", "ent-1"]);
+        let r = Cli::try_parse_from(["clip", "get", "--type", "image", "--id", "ent-1"]);
         assert!(
             r.is_err(),
             "expected `get --type … --id …` to be rejected by clap"
@@ -1641,10 +1621,10 @@ mod tests {
     #[test]
     fn get_list_conflicts_with_selectors() {
         // `--list` 只列出, 不能同时带 selector。
-        assert!(Cli::try_parse_from(["uniclip", "get", "--list", "--type", "image"]).is_err());
-        assert!(Cli::try_parse_from(["uniclip", "get", "--list", "--id", "ent-1"]).is_err());
+        assert!(Cli::try_parse_from(["clip", "get", "--list", "--type", "image"]).is_err());
+        assert!(Cli::try_parse_from(["clip", "get", "--list", "--id", "ent-1"]).is_err());
         assert!(
-            Cli::try_parse_from(["uniclip", "get", "--list"]).is_ok(),
+            Cli::try_parse_from(["clip", "get", "--list"]).is_ok(),
             "expected bare `get --list` to parse"
         );
     }
@@ -1652,14 +1632,14 @@ mod tests {
     #[test]
     fn get_accepts_out_dash_for_stdout() {
         // `--out -` 是把二进制导到 stdout 的契约。
-        let r = Cli::try_parse_from(["uniclip", "get", "--type", "image", "--out", "-"]);
+        let r = Cli::try_parse_from(["clip", "get", "--type", "image", "--out", "-"]);
         assert!(r.is_ok(), "expected `get --type image --out -` to parse");
     }
 
     #[test]
     fn start_accepts_server_flag() {
-        // `uniclip start --server` 是无头节点的启动契约 —— 部署脚本依赖它。
-        let cli = Cli::try_parse_from(["uniclip", "start", "--server"])
+        // `clip start --server` 是无头节点的启动契约 —— 部署脚本依赖它。
+        let cli = Cli::try_parse_from(["clip", "start", "--server"])
             .expect("expected `start --server` to parse");
         match cli.command {
             Some(super::Commands::Start { foreground, server }) => {
@@ -1673,7 +1653,7 @@ mod tests {
     #[test]
     fn start_defaults_to_non_server() {
         // 不带 --server 时默认普通 daemon（保留真实系统剪贴板行为）。
-        let cli = Cli::try_parse_from(["uniclip", "start"]).expect("expected `start` to parse");
+        let cli = Cli::try_parse_from(["clip", "start"]).expect("expected `start` to parse");
         match cli.command {
             Some(super::Commands::Start { server, .. }) => {
                 assert!(!server, "plain `start` must not enable server mode");
@@ -1685,7 +1665,7 @@ mod tests {
     #[test]
     fn start_server_with_foreground_parses() {
         // `--server` 与 `--foreground` 可叠加（调试时前台跑 server）。
-        let cli = Cli::try_parse_from(["uniclip", "start", "--server", "--foreground"])
+        let cli = Cli::try_parse_from(["clip", "start", "--server", "--foreground"])
             .expect("expected `start --server --foreground` to parse");
         match cli.command {
             Some(super::Commands::Start { foreground, server }) => {

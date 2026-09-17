@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 #
-# Headless UniClipboard server node for VPS deployment (ADR-007).
+# Headless Clipboard server node for VPS deployment (ADR-007).
 #
 # Two stages:
-#   1. builder  — compiles the `uniclip` + `uniclipd` binaries as static musl
-#                 executables. `uniclip start` spawns `uniclipd` as a child
+#   1. builder  — compiles the `clip` + `clipd` binaries as static musl
+#                 executables. `clip start` spawns `clipd` as a child
 #                 process even in `--foreground` mode, so both must be present.
 #   2. runtime  — minimal Alpine image that runs the binary as a non-root
 #                 user with HOME=/data anchoring all state on a mounted volume.
@@ -59,8 +59,8 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     esac; \
     rustup target add "$TARGET"; \
     cargo build --locked --release -p uc-cli -p uc-daemon --target "$TARGET"; \
-    cp "target/$TARGET/release/uniclip" /uniclip; \
-    cp "target/$TARGET/release/uniclipd" /uniclipd
+    cp "target/$TARGET/release/clip" /clip; \
+    cp "target/$TARGET/release/clipd" /clipd
 
 # ── runtime ──────────────────────────────────────────────────────────────────
 FROM alpine:3.20 AS runtime
@@ -68,24 +68,24 @@ FROM alpine:3.20 AS runtime
 # ca-certificates: TLS roots for outbound HTTPS (pairing rendezvous, etc.).
 # busybox `wget` backs the compose healthcheck against the daemon control port.
 RUN apk add --no-cache ca-certificates \
- && adduser -D -u 10001 -h /data uniclip \
+ && adduser -D -u 10001 -h /data clip \
  && mkdir -p /data \
- && chown uniclip:uniclip /data
+ && chown clip:clip /data
 
-COPY --from=builder /uniclip /usr/local/bin/uniclip
-COPY --from=builder /uniclipd /usr/local/bin/uniclipd
+COPY --from=builder /clip /usr/local/bin/clip
+COPY --from=builder /clipd /usr/local/bin/clipd
 
 # HOME=/data anchors ALL persistent state under the mounted volume — iroh
 # identity, vault/keyslot, file-based KEK, sqlite db, blob cache and settings —
 # so the node never needs re-pairing across restarts. See deploy/vps/README.md.
 ENV HOME=/data
-USER uniclip
+USER clip
 WORKDIR /data
 
 # Default: run the headless server daemon in the foreground as the container's
 # main process. `start --server` sets UC_DAEMON_RUN_MODE=server (no system
 # clipboard, no watcher); `--foreground` keeps it attached. The compose `app`
 # service overrides this explicitly, and one-off provisioning commands replace
-# it entirely (e.g. `docker compose run --rm app uniclip join`). No ENTRYPOINT
-# so `docker compose run app uniclip <cmd>` works without arg duplication.
-CMD ["uniclip", "start", "--server", "--foreground"]
+# it entirely (e.g. `docker compose run --rm app clip join`). No ENTRYPOINT
+# so `docker compose run app clip <cmd>` works without arg duplication.
+CMD ["clip", "start", "--server", "--foreground"]

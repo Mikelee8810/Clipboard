@@ -19,7 +19,7 @@ The fix is straightforward: add binary-serving HTTP endpoints to the daemon (`GE
 
 ### uc:// Protocol Registration
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/src/main.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/src/main.rs`
 
 Registration at line 347:
 
@@ -37,7 +37,7 @@ Routing at `resolve_uc_request()` → `resolve_uc_blob_request()` or `resolve_uc
 
 Both handlers access `AppRuntime` via `app_handle.try_state::<Arc<AppRuntime>>()` and call `runtime.usecases().resolve_blob_resource()` or `runtime.usecases().resolve_thumbnail_resource()`. These use cases use `AppRuntime`'s own `BlobStorePort` which wraps an `EncryptedBlobStore` backed by `AppRuntime`'s `InMemoryEncryptionSessionPort` — NOT the daemon's.
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-tauri/src/protocol.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-tauri/src/protocol.rs`
 
 `UcRoute` enum with `Blob { blob_id }` and `Thumbnail { representation_id }`.
 
@@ -49,18 +49,18 @@ URL format handling:
 
 ### URL Generation in Use Cases
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-app/src/usecases/clipboard/get_entry_resource.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-app/src/usecases/clipboard/get_entry_resource.rs`
 
 Line 104: `url: Some(format!("uc://blob/{}", blob_id_clone))`
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-app/src/usecases/clipboard/list_entry_projections/list_entry_projections.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-app/src/usecases/clipboard/list_entry_projections/list_entry_projections.rs`
 
 Line 267: `Some(format!("uc://thumbnail/{}", preview_rep_id))`
 Line 466: `Some(format!("uc://thumbnail/{}", preview_rep_id))` (duplicate in `execute_single`)
 
 ### Frontend URL Resolution
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src/lib/protocol.ts`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src/lib/protocol.ts`
 
 `resolveUcUrl(ucUrl)` converts `uc://blob/<id>` → `uc://localhost/blob/<id>` (macOS/Linux) or `http://uc.localhost/blob/<id>` (Windows).
 
@@ -85,7 +85,7 @@ Both are accessible via `CoreUseCases::resolve_blob_resource()` and `CoreUseCase
 
 ### Existing Architecture
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-daemon/src/api/routes.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-daemon/src/api/routes.rs`
 
 Router tiers:
 
@@ -96,14 +96,14 @@ All L2+ routes protected by `auth_extractor_middleware` + `rate_limit_middleware
 
 ### CRITICAL: Auth Middleware Already Supports `?auth=` Query Parameter
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-daemon/src/security/middleware.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-daemon/src/security/middleware.rs`
 
 Lines 85-91 show the middleware already accepts the session JWT from either:
 
 1. `Authorization: Session <token>` header, OR
 2. `?auth=Session%20<token>` query parameter
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src/api/daemon/client.ts`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src/api/daemon/client.ts`
 
 `DaemonClient.sendRequest()` at line 209-211 **already** sets the `?auth=Session ${token}` query param on every request URL:
 
@@ -117,7 +117,7 @@ This means `daemonClient.request('/clipboard/blobs/{id}')` already works with th
 
 ### CORS Support
 
-**File:** `/Volumes/ExternalSSD/myprojects/uniclipboard-desktop/src-tauri/crates/uc-daemon/src/api/server.rs`
+**File:** `/Volumes/ExternalSSD/myprojects/clipboard-desktop/src-tauri/crates/uc-daemon/src/api/server.rs`
 
 `cors_middleware` allows: `tauri://localhost`, `http://tauri.localhost`, `http://localhost:*`, `http://127.0.0.1:*`, `http://[::1]:*`.
 

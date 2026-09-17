@@ -2,7 +2,7 @@
 
 ## 定位
 
-`uc-daemon-process` 是 **本地 `uniclipd` daemon 进程管理的瘦原语层**——只关心「怎么
+`uc-daemon-process` 是 **本地 `clipd` daemon 进程管理的瘦原语层**——只关心「怎么
 找到 / 拉起 / 标识这个进程」，不含任何业务、网络、GUI 或数据库逻辑。
 
 ADR-008 P5-0 从 `uc-daemon-local` 抽出，目的是切断一条污染依赖边：
@@ -28,7 +28,7 @@ ADR-008 P5-0 从 `uc-daemon-local` 抽出，目的是切断一条污染依赖边
 |---|---|
 | `process_metadata` | PID 文件读写 + `DaemonProcessMode` |
 | `socket` | `daemon.conn` 连接文件（路径解析 / read / 原子写，ADR-011）；`DEFAULT_HTTP_HOST` |
-| `spawn` | `uniclipd` detached spawn（`setsid` / `DETACHED_PROCESS`）+ 二进制解析 |
+| `spawn` | `clipd` detached spawn（`setsid` / `DETACHED_PROCESS`）+ 二进制解析 |
 | `spawn_contract` | CLI→daemon run-mode / unattended-unlock 环境契约 |
 | `app_data_root`（私有） | 自洽的 app-data-root 路径解析，供 `process_metadata` / `socket` 用 |
 

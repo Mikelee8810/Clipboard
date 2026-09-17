@@ -8,7 +8,7 @@ requires:
   - phase: 28
     provides: FileTransferMessage binary codec, file classification fix, settings model
 provides:
-  - ProtocolId::FileTransfer variant (/uniclipboard/file-transfer/1.0.0)
+  - ProtocolId::FileTransfer variant (/clipboard/file-transfer/1.0.0)
   - FileTransportPort trait with send/receive/cancel methods
   - NoopFileTransportPort stub for compilation
   - NetworkEvent file transfer lifecycle variants (Started/Completed/Failed/Cancelled)
@@ -64,7 +64,7 @@ completed: 2026-03-13
 
 ## Accomplishments
 
-- Registered FileTransfer protocol ID with canonical path /uniclipboard/file-transfer/1.0.0
+- Registered FileTransfer protocol ID with canonical path /clipboard/file-transfer/1.0.0
 - Defined FileTransportPort trait with send_file_announce/data/complete and cancel_transfer methods plus NoopFileTransportPort stub
 - Extended NetworkEvent with FileTransferStarted/Completed/Failed/Cancelled lifecycle variants
 - Added PlatformEvent::FileCopied for file copy detection from system clipboard

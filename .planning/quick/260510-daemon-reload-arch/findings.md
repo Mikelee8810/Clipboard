@@ -2,7 +2,7 @@
 
 ## 1. Sentry panic 根因
 
-**Issue**: `UNICLIPBOARD-RUST-4` — `panic: JoinHandle polled after completion`，
+**Issue**: `CLIPBOARD-RUST-4` — `panic: JoinHandle polled after completion`，
 Windows 上 3 次重现，release `uc-bootstrap@0.7.0`。
 
 **直接原因**: 同一个 `JoinHandle` 被 poll 了两次。

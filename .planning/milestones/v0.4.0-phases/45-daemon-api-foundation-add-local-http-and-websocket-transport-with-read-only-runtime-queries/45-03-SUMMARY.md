@@ -36,7 +36,7 @@ key-decisions:
   - 'Tauri stores daemon connection info only in memory and emits it through a single `daemon://connection-info` event after the main webview reaches `PageLoadEvent::Finished`.'
 patterns-established:
   - 'CLI daemon reads: transport/auth concerns live in one shared client module, command files only map output and exit semantics.'
-  - 'Daemon shell bootstrap: probe `/health`, spawn `uniclipboard-daemon` if needed, cache connection info in managed state, then emit after page readiness.'
+  - 'Daemon shell bootstrap: probe `/health`, spawn `clipboard-daemon` if needed, cache connection info in managed state, then emit after page readiness.'
 requirements-completed: [PH45-05, PH45-06]
 duration: 18min
 completed: 2026-03-19

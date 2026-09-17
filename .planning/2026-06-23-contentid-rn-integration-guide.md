@@ -1,6 +1,6 @@
 # contentId 去重 · 移动端 (RN) 对接指南
 
-面向 `uniclipboard-android`(RN/Expo,iOS + Android 共用 TS) 团队。
+面向 `clipboard-android`(RN/Expo,iOS + Android 共用 TS) 团队。
 对应 Rust core 变更：本仓库 commit `feat(mobile-sync): dedup re-encoded content by stable contentId`。
 配套设计：`.planning/2026-06-23-contentid-mobile-dedup-design.md`(§11 为落地状态)。
 

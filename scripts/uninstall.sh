@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# UniClipboard 一键卸载脚本（Linux / macOS）
+# Clipboard 一键卸载脚本（Linux / macOS）
 #
 # 用法：
 #   curl -fsSL https://raw.githubusercontent.com/UniClipboard/UniClipboard/main/scripts/uninstall.sh | bash
@@ -15,14 +15,14 @@
 #   --yes          跳过 3 秒倒计时
 #
 # 自动探测：会同时清理 deb / rpm / AppImage 三种 Linux 安装路径，以及 macOS 的
-# /Applications 和 ~/Applications 下的 UniClipboard.app。
+# /Applications 和 ~/Applications 下的 Clipboard.app。
 
 set -euo pipefail
 
 REPO="UniClipboard/UniClipboard"
-APP_NAME="UniClipboard"
-APP_BIN="uniclipboard"
-APP_ID="app.uniclipboard.desktop"
+APP_NAME="Clipboard"
+APP_BIN="clipboard"
+APP_ID="app.clipboard.desktop"
 
 PURGE=0
 DRY=0
@@ -31,7 +31,7 @@ PREFIX="${UC_PREFIX:-}"
 
 usage() {
   cat <<'EOF'
-UniClipboard uninstaller (Linux / macOS)
+Clipboard uninstaller (Linux / macOS)
 
 Usage:
   uninstall.sh [--purge] [--dry-run] [--yes] [--prefix DIR]
@@ -116,12 +116,12 @@ collect_macos() {
 
   # brew 装的 cask 走 brew 卸载更稳
   if command -v brew >/dev/null 2>&1 \
-     && brew list --cask uniclipboard >/dev/null 2>&1; then
-    add_cmd 0 "brew uninstall --cask uniclipboard"
+     && brew list --cask clipboard >/dev/null 2>&1; then
+    add_cmd 0 "brew uninstall --cask clipboard"
   fi
   if command -v brew >/dev/null 2>&1 \
-     && brew list --formula uniclipboard >/dev/null 2>&1; then
-    add_cmd 0 "brew uninstall --formula uniclipboard"
+     && brew list --formula clipboard >/dev/null 2>&1; then
+    add_cmd 0 "brew uninstall --formula clipboard"
   fi
 
   if [[ "$PURGE" -eq 1 ]]; then

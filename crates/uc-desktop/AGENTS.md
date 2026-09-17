@@ -2,10 +2,10 @@
 
 ## 定位
 
-`uc-desktop` 是 UniClipboard 的 **桌面宿主层（desktop host layer）**，
+`uc-desktop` 是 Clipboard 的 **桌面宿主层（desktop host layer）**，
 不是业务层，**也不是任何特定 GUI 框架的实现**。
 
-它负责把 UniClipboard 的 app runtime（`uc-application`）跑在桌面环境
+它负责把 Clipboard 的 app runtime（`uc-application`）跑在桌面环境
 里：接入系统能力、后台任务、HTTP/IPC、桌面事件源、daemon 进程协调。
 **核心业务规则不在这里，特定 GUI 框架代码也不在这里。**
 
@@ -84,7 +84,7 @@ shell crate。如果在 desktop 里需要写 `if cfg!(feature = "tauri")` 或
 - 涉及外部进程/UI 框架的扩展点（如 daemon spawn、托盘渲染、autostart 写入），
   desktop 提供 trait + 默认协调逻辑，shell 注入具体实现。
 - daemon runtime + host entry points 全部住在 `uc-daemon`（ADR-008 P1+P2），
-  产出 `uniclipd` 独立二进制。本 crate **不依赖 `uc-daemon`**：`src/daemon/`
+  产出 `clipd` 独立二进制。本 crate **不依赖 `uc-daemon`**：`src/daemon/`
   只拥有 GUI 端的 `DaemonOwnership` 标记，不再 re-export daemon runtime。
 
 ## 当前落地边界
@@ -108,17 +108,17 @@ shell crate。如果在 desktop 里需要写 `if cfg!(feature = "tauri")` 或
   GUI 框架**，仅承载 PID 文件、socket 路径、auth token、健康探测、
   错误契约等纯协调工具。ADR-008 P3-3 (B2'-3) 起 GUI 是外部 daemon 的纯
   客户端：探测到没有 daemon 时，`daemon_probe::bootstrap_daemon_in_process`
-  调 `uc_daemon_local::spawn::spawn_detached_daemon` detached 拉起 `uniclipd`
+  调 `uc_daemon_local::spawn::spawn_detached_daemon` detached 拉起 `clipd`
   外部进程 (GUI 与 CLI 共用同一 spawn 原语),再 poll `/health`。不再有
   in-process daemon。
 - `uc-tauri` 是 desktop 的 **Tauri shell 适配器**，不是 desktop 的子集，
   也不是与 desktop 平级的层。它消费 `uc-desktop` 的能力，提供 Tauri 框架
   特定的 builder / commands / tray / quick_panel。新增 Tauri-only 能力放
   这里，新增"未来 native shell 也会用到的"能力放 `uc-desktop`。
-- `uc-daemon`（[ADR-008](../../../docs/architecture/adr-008-uniclipd-split-gui-as-client.md) P1+P2 已落地）：
+- `uc-daemon`（[ADR-008](../../../docs/architecture/adr-008-clipd-split-gui-as-client.md) P1+P2 已落地）：
     承载 **GUI-agnostic daemon runtime 全部构件**（run_mode、后台 worker / 服务、
     装配链、main loop、startup recovery、process bootstrap、host entry points）+
-    `uniclipd` 独立二进制。不依赖 GUI 框架、**不反依赖 `uc-desktop`**。
+    `clipd` 独立二进制。不依赖 GUI 框架、**不反依赖 `uc-desktop`**。
     ADR-008 P3-3 (B2'-3) 已落地：GUI 永久转纯 client，删除 in-process
     daemon 旧拉起入口及 `ProcessRuntimeHandles` re-export shim 已移除；
     当前由 daemon 内部的 `DaemonProcessRuntime::start` 独占装配。`GuiInProcess` run-mode 变体作为死代码在后续 cleanup

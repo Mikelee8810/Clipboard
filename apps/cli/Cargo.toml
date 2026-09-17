@@ -3,10 +3,10 @@ name = "uc-cli"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Command-line interface for UniClipboard"
+description = "Command-line interface for Clipboard"
 
 [[bin]]
-name = "uniclip"
+name = "clip"
 path = "src/main.rs"
 
 [features]

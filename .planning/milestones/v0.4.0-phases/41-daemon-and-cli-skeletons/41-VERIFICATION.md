@@ -5,13 +5,13 @@ status: passed
 score: 9/9 must-haves verified
 gaps: []
 human_verification:
-  - test: 'Start uniclipboard-daemon, send JSON-RPC ping via Unix socket, verify pong response'
+  - test: 'Start clipboard-daemon, send JSON-RPC ping via Unix socket, verify pong response'
     expected: 'Daemon responds with {"jsonrpc":"2.0","result":"pong","id":0}'
     why_human: 'End-to-end RPC test requires running daemon process and live socket connection'
-  - test: 'Start uniclipboard-daemon, send status RPC, then SIGTERM, verify socket file removed'
+  - test: 'Start clipboard-daemon, send status RPC, then SIGTERM, verify socket file removed'
     expected: 'Exit code 0, socket file absent after shutdown'
     why_human: 'Graceful shutdown and socket cleanup require process execution'
-  - test: 'Run uniclipboard-cli status with daemon running, verify output format'
+  - test: 'Run clipboard-cli status with daemon running, verify output format'
     expected: 'Human-readable output shows Status: running, Uptime, Version, Workers, Connected peers'
     why_human: 'Requires both daemon and CLI binary running concurrently'
 ---
@@ -36,8 +36,8 @@ human_verification:
 | 5   | RuntimeState tracks uptime_seconds and worker health (snapshot only, no worker ownership)                                      | VERIFIED | `src-tauri/crates/uc-daemon/src/state.rs` — struct has `start_time: Instant` + `worker_statuses: Vec<WorkerStatus>`, no `DaemonWorker` trait objects          |
 | 6   | Shared RPC types (RpcRequest, RpcResponse, StatusResponse) are defined and exported from uc-daemon library                     | VERIFIED | `src-tauri/crates/uc-daemon/src/rpc/types.rs` — all four types with serde derives and `RpcResponse::success()/error()` helpers                                |
 | 7   | Daemon starts, initializes via uc-bootstrap, binds RPC socket, accepts ping/status, shuts down gracefully                      | VERIFIED | `app.rs` full lifecycle present; `main.rs` calls `build_daemon_app()` and `DaemonApp::run()`; `server.rs` has `run_rpc_accept_loop` with JoinSet drain        |
-| 8   | uniclipboard-cli binary with clap parsing, dual dispatch (RPC for status, direct for devices/space-status), --json, exit codes | VERIFIED | `main.rs` has `#[derive(Parser)]` with global `--json` flag and three subcommands; status uses UnixStream RPC; devices/space-status use `build_cli_context()` |
-| 9   | uniclipboard-cli status returns exit code 5 when daemon is not running                                                         | VERIFIED | `status.rs` line 67: returns `exit_codes::EXIT_DAEMON_UNREACHABLE` (=5) on connection failure                                                                 |
+| 8   | clipboard-cli binary with clap parsing, dual dispatch (RPC for status, direct for devices/space-status), --json, exit codes | VERIFIED | `main.rs` has `#[derive(Parser)]` with global `--json` flag and three subcommands; status uses UnixStream RPC; devices/space-status use `build_cli_context()` |
+| 9   | clipboard-cli status returns exit code 5 when daemon is not running                                                         | VERIFIED | `status.rs` line 67: returns `exit_codes::EXIT_DAEMON_UNREACHABLE` (=5) on connection failure                                                                 |
 
 **Score:** 9/9 truths verified
 
@@ -106,19 +106,19 @@ The "placeholder" log messages in `clipboard_watcher.rs` and `peer_discovery.rs`
 
 #### 1. Daemon RPC End-to-End Ping Test
 
-**Test:** Start `uniclipboard-daemon` in background, connect to socket with `echo '{"jsonrpc":"2.0","method":"ping","id":0}' | nc -U /path/to/socket`, check response.
+**Test:** Start `clipboard-daemon` in background, connect to socket with `echo '{"jsonrpc":"2.0","method":"ping","id":0}' | nc -U /path/to/socket`, check response.
 **Expected:** Response line contains `"result":"pong"` with exit code 0 from daemon.
 **Why human:** Requires live process, real Unix socket, database initialization at startup.
 
 #### 2. Daemon Graceful Shutdown Test
 
 **Test:** Start daemon, send SIGTERM (`kill -TERM <pid>`), verify socket file is removed, verify exit code 0.
-**Expected:** No socket file remains, daemon logs "uniclipboard-daemon stopped", clean exit.
+**Expected:** No socket file remains, daemon logs "clipboard-daemon stopped", clean exit.
 **Why human:** Requires process lifecycle management, cannot automate without integration test harness.
 
 #### 3. CLI Status with Live Daemon
 
-**Test:** Start daemon, run `uniclipboard-cli status`, verify human-readable output format.
+**Test:** Start daemon, run `clipboard-cli status`, verify human-readable output format.
 **Expected:** Output shows "Status: running", "Uptime: Xs", "Version: 0.1.0", "Workers: 2/2 healthy", "Connected peers: unknown".
 **Why human:** Both binaries must run concurrently; output format validation is human-readable.
 

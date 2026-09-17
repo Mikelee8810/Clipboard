@@ -47,9 +47,9 @@ This plan introduced a runtime theme preset engine with explicit light/dark toke
 
 **Files:**
 
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/lib/theme-engine.ts
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/lib/**tests**/theme-engine.test.ts
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/constants/theme.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/lib/theme-engine.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/lib/**tests**/theme-engine.test.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/constants/theme.ts
 
 Changes:
 
@@ -85,10 +85,10 @@ Tests (`theme-engine.test.ts`):
 
 **Files:**
 
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/contexts/SettingContext.tsx
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/styles/globals.css
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/contexts/**tests**/SettingContext.theme.test.tsx
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/styles/**tests**/theme-migration.test.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/contexts/SettingContext.tsx
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/styles/globals.css
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/contexts/**tests**/SettingContext.theme.test.tsx
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/styles/**tests**/theme-migration.test.ts
 
 #### SettingProvider runtime theme injection
 

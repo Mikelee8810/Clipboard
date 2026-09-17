@@ -4,7 +4,7 @@ version = "0.0.0"
 license = "AGPL-3.0-only"
 edition = "2021"
 publish = false
-description = "Black-box CLI end-to-end tests for uniclip + uniclipd"
+description = "Black-box CLI end-to-end tests for clip + clipd"
 
 [[bin]]
 name = "prepare-legacy-release"

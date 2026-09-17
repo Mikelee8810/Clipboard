@@ -85,7 +85,7 @@ Each task was committed atomically:
 - `src-tauri/crates/uc-platform/src/adapters/file_transfer/protocol.rs` - Chunked protocol: announce/accept/chunk/complete with Blake3 hash, atomic rename
 - `src-tauri/crates/uc-platform/src/adapters/file_transfer/framing.rs` - Binary framing with FileMessageType tags and length-prefixed payloads
 - `src-tauri/crates/uc-platform/src/adapters/file_transfer/mod.rs` - Module declarations and re-exports
-- `src-tauri/crates/uc-core/src/network/protocol_ids.rs` - ProtocolId::FileTransfer variant with /uniclipboard/file-transfer/1.0.0
+- `src-tauri/crates/uc-core/src/network/protocol_ids.rs` - ProtocolId::FileTransfer variant with /clipboard/file-transfer/1.0.0
 - `src-tauri/crates/uc-platform/Cargo.toml` - blake3 dependency added
 - `src-tauri/crates/uc-platform/src/adapters/mod.rs` - file_transfer module declaration
 

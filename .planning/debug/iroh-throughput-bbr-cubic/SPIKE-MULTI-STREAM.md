@@ -207,7 +207,7 @@ file sync), splitting the **sender** into 2 independent `Endpoint`s
 **doubles throughput** with no code change to iroh, noq, or iroh-blobs —
 purely an application-layer pattern.
 
-What "do this in production" would look like for uniclipboard:
+What "do this in production" would look like for clipboard:
 - The current sender process binds one `Endpoint` (via `uc-infra/network/iroh/node.rs`)
   and one `BlobsProtocol` instance shared across all transfers
 - The proposed change: when serving a large blob, bind a 2nd ephemeral

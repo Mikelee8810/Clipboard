@@ -12,8 +12,8 @@ dependency_graph:
     - uc-cli/local_daemon.rs (ensure_local_daemon_running, resolve_daemon_binary_path)
     - uc-daemon/process_metadata.rs (read_pid_file)
   provides:
-    - uniclipboard-cli start (background + foreground modes)
-    - uniclipboard-cli stop (SIGTERM + polling)
+    - clipboard-cli start (background + foreground modes)
+    - clipboard-cli stop (SIGTERM + polling)
   affects:
     - CLI command surface (two new top-level subcommands)
 tech_stack:
@@ -46,20 +46,20 @@ metrics:
 
 # Phase 70 Plan 01: CLI start/stop Commands for Daemon Lifecycle Management Summary
 
-**One-liner:** `uniclipboard-cli start/stop` commands with background/foreground modes, SIGTERM-based stop polling, and injectable closure testing pattern.
+**One-liner:** `clipboard-cli start/stop` commands with background/foreground modes, SIGTERM-based stop polling, and injectable closure testing pattern.
 
 ## What Was Built
 
 Two new top-level CLI subcommands for daemon lifecycle management:
 
-### `uniclipboard-cli start`
+### `clipboard-cli start`
 
 - **Background mode** (default): Reuses `ensure_local_daemon_running()` to probe-spawn-poll. Returns `{"status": "started", "pid": N}` or `{"status": "already_running", "pid": N}`.
 - **Foreground mode** (`--foreground` / `-f`): Checks for already-running first, then spawns daemon with `Stdio::inherit()` for log streaming. Blocks until daemon exits.
 - **Idempotent**: Already-running daemon returns exit 0.
 - `StartOutput` struct with `#[derive(Serialize)]` and `impl fmt::Display`.
 
-### `uniclipboard-cli stop`
+### `clipboard-cli stop`
 
 - Reads PID via `uc_daemon::process_metadata::read_pid_file()`.
 - Stale PID guard: `libc::kill(pid, 0)` check before sending SIGTERM.

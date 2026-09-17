@@ -6,7 +6,7 @@ description: Create your first encrypted space and sync your first clip.
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-UniClipboard syncs through a **space** — a private, end-to-end encrypted
+Clipboard syncs through a **space** — a private, end-to-end encrypted
 group your devices belong to. The first device creates the space; every
 other device joins it with a short-lived invite code. There is no cloud
 account and no email — the space _is_ the account.
@@ -16,7 +16,7 @@ synced paste.
 
 ## What you'll need
 
-- UniClipboard installed on **at least two devices**. See
+- Clipboard installed on **at least two devices**. See
   [Install](./install) for downloads.
 - A passphrase you'll remember. It protects every clip in the space and
   cannot be recovered if you lose it — that is the design, not a bug.
@@ -39,7 +39,7 @@ synced paste.
 ### Launch the app and pick **This is my first device**
 
 On first launch you'll see two options: **This is my first device** and
-**I already use UniClipboard elsewhere**. Pick the first.
+**I already use Clipboard elsewhere**. Pick the first.
 
 </Step>
 
@@ -72,7 +72,7 @@ joins.
 Have both devices in front of you — one to generate the invite, one to
 enter it.
 
-<Tabs items={['Desktop app', 'CLI (uniclip)']}>
+<Tabs items={['Desktop app', 'CLI (clip)']}>
 
 <Tab value="Desktop app">
 
@@ -90,7 +90,7 @@ open **Devices** and select **Generate invite code**. The code is short-lived
 
 <Step>
 
-### On the **new** device → **I already use UniClipboard elsewhere**
+### On the **new** device → **I already use Clipboard elsewhere**
 
 Enter the invite code together with the same passphrase you set on the
 first device. The passphrase is verified locally — a wrong passphrase
@@ -112,27 +112,27 @@ an online indicator.
 
 </Tab>
 
-<Tab value="CLI (uniclip)">
+<Tab value="CLI (clip)">
 
 The CLI mirrors the GUI flow and is useful for headless servers, SSH
 sessions, and tmux-driven workflows.
 
 ```bash
 # On the first device — skip if you already created the space in the GUI
-uniclip space init
+clip space init
 
 # Generate a short-lived invite code
-uniclip space invite
+clip space invite
 
 # On the new device, paste the code from the previous step
-uniclip space join <code>
+clip space join <code>
 
 # Confirm both peers see each other
-uniclip members
+clip members
 ```
 
-The daemon starts automatically. Use `uniclip space status` to inspect it, or
-`uniclip start` / `uniclip stop` to control it explicitly.
+The daemon starts automatically. Use `clip space status` to inspect it, or
+`clip start` / `clip stop` to control it explicitly.
 
 </Tab>
 
@@ -150,7 +150,7 @@ hole-punching, encrypted relay fallback) and how to debug a stuck peer.
 
 ## Add a phone (optional)
 
-UniClipboard also supports an **experimental HTTP companion** for
+Clipboard also supports an **experimental HTTP companion** for
 phones, useful for pasting between desktop and mobile. Mobile uses a
 different pairing path than desktops — it doesn't join the space's
 iroh trust mesh and doesn't get a node ID. It reaches the desktop on
@@ -161,14 +161,14 @@ install the mobile app and pair it as a regular device instead.
 1. On the desktop, click the **phone icon beside Invite device → Regular sync**, confirm enabling it if needed, and pick a label. To join the space with an invitation code instead, switch to **Device connection (Experimental)** in the same dialog.
 2. The credentials modal has two tabs, split by onboarding method:
    - **Scan to add** — a connect-URI QR. Scan it from the
-     UniClipboard iOS app (or any SyncClipboard-protocol client,
+     Clipboard iOS app (or any SyncClipboard-protocol client,
      including community Android apps) to auto-fill the base URL,
      username, and password.
    - **Install Shortcut** — when the user doesn't have the
-     UniClipboard iOS app, scan this QR to install the
-     `UniClipboard.shortcut`, then manually paste the base URL,
+     Clipboard iOS app, scan this QR to install the
+     `Clipboard.shortcut`, then manually paste the base URL,
      username, and password from the modal into its fields.
-   - For Android specifically, install the **UniClipboard Android
+   - For Android specifically, install the **Clipboard Android
      client** at
      [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip),
      with APKs in
@@ -191,7 +191,7 @@ and [Mobile LAN API](../reference/mobile-api).
   fast keyboard-driven access to recent clips — text, links, images,
   code, and files.
 - **Switch spaces.** From the **Devices** page or by running
-  `uniclip space join --switch` with another sponsor's invitation, e.g. to
+  `clip space join --switch` with another sponsor's invitation, e.g. to
   keep personal and work machines in separate spaces. Local history is
   re-encrypted under the new space's key during the switch.
 - **Sync with a phone (experimental).** See

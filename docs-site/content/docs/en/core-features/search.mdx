@@ -3,7 +3,7 @@ title: Full-text search
 description: Where to query encrypted history, what syntax it accepts, and how the index is managed.
 ---
 
-UniClipboard keeps an **encrypted full-text index** of local clipboard
+Clipboard keeps an **encrypted full-text index** of local clipboard
 history, so "stored locally" and "stored safely" hold at the same
 time. The index is encrypted at rest and shares its key material with
 the history database — see
@@ -15,7 +15,7 @@ the history database — see
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | History page         | **Primary in-app surface.** The History view is the landing page; its search box mixes free text with content-type / source-device / time filters, all wired to the query service described below. |
 | Quick Panel          | Global hotkey, keyboard-first quick access. Live filtering with composite filter chips. See [Quick Panel](./quick-panel#filtering)                                                                 |
-| `uniclip search` CLI | Scripts, SSH, remote sessions. See [CLI — Search](../cli/reference#search)                                                                                                                         |
+| `clip search` CLI | Scripts, SSH, remote sessions. See [CLI — Search](../cli/reference#search)                                                                                                                         |
 
 ## Query syntax
 
@@ -23,7 +23,7 @@ The Quick Panel's advanced search and the History search box share one
 token syntax, and the CLI runs the same queries through equivalent flags —
 so the filters below work on all three surfaces: as `type:` / `ext:` / `#`
 tokens in the two GUI boxes, and as `--type` / `--ext` / `--tag` (etc.)
-flags in `uniclip search`.
+flags in `clip search`.
 
 ### Substring matching
 
@@ -70,7 +70,7 @@ days / This month / …). In the CLI, pass millisecond timestamps to
 `--from-ms` / `--to-ms`:
 
 ```bash
-uniclip search "report" \
+clip search "report" \
     --from-ms 1710000000000 \
     --to-ms 1710100000000
 ```
@@ -81,7 +81,7 @@ Narrow results to clips that arrived from one device — a paired computer
 or a mobile-sync phone. In the History search box or the Quick Panel, pick
 a device from the filter bar or type `from:` and choose from the list. In
 the CLI, pass `--source-device` with a device name (case-insensitive) or a
-device id; repeat it to match several devices. Run `uniclip members` to see
+device id; repeat it to match several devices. Run `clip members` to see
 the available device names.
 
 ### Tag filter `#`
@@ -95,7 +95,7 @@ automatically as items are indexed:
 
 The History search box and the Quick Panel both support `#` tags — type
 `#` and pick a tag from the list. The CLI exposes the same tags via
-`uniclip search --tag`.
+`clip search --tag`.
 
 ### What's **not** supported
 
@@ -126,7 +126,7 @@ The index may be in a "rebuilding" state.
 - **GUI**: **Settings → Storage → Search index** shows the current
   status (Ready / Rebuilding / Unavailable), the last rebuild
   timestamp, and a `Rebuild` button.
-- **CLI**: `uniclip search status` reports the same fields.
+- **CLI**: `clip search status` reports the same fields.
 
 ### Manual rebuild
 
@@ -140,7 +140,7 @@ restart.
 
 - **GUI**: that `Rebuild` button. After clicking, the state shifts to
   "Rebuilding" and the UI polls every 2 s until completion.
-- **CLI**: `uniclip search rebuild` is synchronous — it doesn't return
+- **CLI**: `clip search rebuild` is synchronous — it doesn't return
   until the rebuild finishes, which is convenient for snapshot
   scripts.
 
@@ -181,4 +181,4 @@ Most likely first:
    [Devices — Content-type allowlist](./devices#content-type-allowlist)
    on the **sender** side.
 5. The index isn't ready. Look at the GUI status pill or run
-   `uniclip search status`.
+   `clip search status`.

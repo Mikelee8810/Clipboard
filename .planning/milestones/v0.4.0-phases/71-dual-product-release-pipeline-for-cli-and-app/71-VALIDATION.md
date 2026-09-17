@@ -60,7 +60,7 @@ _Existing infrastructure covers all phase requirements._
 
 | Behavior                           | Requirement       | Why Manual                         | Test Instructions                                            |
 | ---------------------------------- | ----------------- | ---------------------------------- | ------------------------------------------------------------ |
-| CLI binary runs on target platform | Cross-platform    | Requires actual platform execution | Build CLI, run `uniclipboard-cli --version` on each platform |
+| CLI binary runs on target platform | Cross-platform    | Requires actual platform execution | Build CLI, run `clipboard-cli --version` on each platform |
 | GitHub Release shows both products | Release integrity | Requires actual GitHub Release     | Trigger alpha build, verify artifacts in Release page        |
 
 ---

@@ -48,7 +48,7 @@ Mac 上相关单元、升级集成与进程中断检查通过；全 workspace、
 
 首次直接通过 SSH 启动后台程序，Windows 返回 `ERROR_NO_SUCH_LOGON_SESSION`，
 系统凭据访问失败。随后使用临时计划任务，在已登录的桌面会话实际启动
-`UniClipboard.exe`，确认日志为 `Using system secure storage`，排除了 SSH 会话限制。
+`Clipboard.exe`，确认日志为 `Using system secure storage`，排除了 SSH 会话限制。
 
 桌面会话的后台程序仍于 `2026-09-09T15:07:18.981Z` 失败：
 `upgrade_action=prepare_source`、`error_kind=security`。失败发生在打开旧数据库之前，
@@ -68,7 +68,7 @@ Mac 上相关单元、升级集成与进程中断检查通过；全 workspace、
 构建日志确认 Desktop `8748b851a` 使用 Engine `2a298a2c`。
 [下载产物](https://github.com/UniClipboard/UniClipboard/actions/runs/34364343056/artifacts/10109730767) 已实际下载，便携包完整性检查通过，桌面程序与后台程序均为 Windows x64。
 
-安装文件为 `release/bundle/nsis/UniClipboard_1.0.0-alpha.8_x64-setup.exe`，SHA-256：
+安装文件为 `release/bundle/nsis/Clipboard_1.0.0-alpha.8_x64-setup.exe`，SHA-256：
 
 ```text
 7b2f78e7afc1d2c1805a1824bf645aa6e54bb1ebeeccc1ccbe45d2e981914e06

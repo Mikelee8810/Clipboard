@@ -121,7 +121,7 @@ bb-browser close
 **Reference implementations (code study):**
 ```bash
 # If porting from an existing implementation:
-find /Users/mark/MyProjects/iOSApp/UniClipboard -name "*.swift" | \
+find /Users/mark/MyProjects/iOSApp/Clipboard -name "*.swift" | \
   xargs grep -l "sheet\|presentation" 2>/dev/null
 
 # Read the reference implementation

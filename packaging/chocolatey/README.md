@@ -2,7 +2,7 @@
 
 本目录是提交到 [Chocolatey Community Repository](https://community.chocolatey.org) 的包源：
 
-- `uniclipboard.nuspec` — 包元数据
+- `clipboard.nuspec` — 包元数据
 - `tools/chocolateyInstall.ps1` — 下载 NSIS 安装器并静默安装（`/S`）
 - `tools/chocolateyUninstall.ps1` — 静默卸载
 - `tools/VERIFICATION.txt` — 来源与校验说明
@@ -11,7 +11,7 @@
 
 Repology 抓取 Chocolatey（源名 `chocolatey`），合并后徽章 +1 行。安装方式：
 ```powershell
-choco install uniclipboard
+choco install clipboard
 ```
 
 > 提醒：Chocolatey community repo 有 **人工 moderation**，新包从提交到上架通常要数天到一两周，比 nixpkgs/Scoop 慢。元数据不全或 checksum 不对会被打回。
@@ -22,7 +22,7 @@ choco install uniclipboard
 
    从 release 的 `SHA256SUMS.txt`（minisign 签名）取，或：
    ```powershell
-   Get-RemoteChecksum https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/UniClipboard_0.15.0_x64-setup.exe
+   Get-RemoteChecksum https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/Clipboard_0.15.0_x64-setup.exe
    ```
    > 不要用本仓库环境产出的 hash——沙箱输出不可信。
 
@@ -30,15 +30,15 @@ choco install uniclipboard
    ```powershell
    cd packaging\chocolatey
    choco pack
-   choco install uniclipboard --source . --yes   # 装、起、托盘、配对同步
-   choco uninstall uniclipboard --yes             # 验证卸载干净
+   choco install clipboard --source . --yes   # 装、起、托盘、配对同步
+   choco uninstall clipboard --yes             # 验证卸载干净
    ```
 
 3. **推送到 community repo**
    ```powershell
    # 先在 community.chocolatey.org 注册账号，拿 API key
    choco apikey --key <YOUR_API_KEY> --source https://push.chocolatey.org/
-   choco push uniclipboard.0.15.0.nupkg --source https://push.chocolatey.org/
+   choco push clipboard.0.15.0.nupkg --source https://push.chocolatey.org/
    ```
 
 4. **等 moderation**：自动校验（virus scan、安装测试）+ 人工 review。按 moderator 反馈改，直到 Approved。

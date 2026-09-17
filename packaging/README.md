@@ -1,17 +1,17 @@
 # 打包与分发渠道总览
 
-本目录汇集 UniClipboard 各分发渠道的打包定义源。真正生效的副本在各渠道自己的仓库里（nixpkgs、Scoop Extras、homebrew-cask 等），这里保存源 + 提交指引，与 `packaging/aur/` 的惯例一致。
+本目录汇集 Clipboard 各分发渠道的打包定义源。真正生效的副本在各渠道自己的仓库里（nixpkgs、Scoop Extras、homebrew-cask 等），这里保存源 + 提交指引，与 `packaging/aur/` 的惯例一致。
 
 ## 渠道全景
 
-「Repology」列指该渠道是否被 [repology.org](https://repology.org/project/uniclipboard/versions) 抓取——即是否能让 packaging-status 徽章多一行。**Snap / COPR / 自建 Homebrew tap / npm / winget / Flathub 都不被 Repology 抓取**（已用 7zip 的完整源列表交叉验证）。
+「Repology」列指该渠道是否被 [repology.org](https://repology.org/project/clipboard/versions) 抓取——即是否能让 packaging-status 徽章多一行。**Snap / COPR / 自建 Homebrew tap / npm / winget / Flathub 都不被 Repology 抓取**（已用 7zip 的完整源列表交叉验证）。
 
 | 渠道 | 目录 | Repology | 状态 |
 | --- | --- | --- | --- |
-| AUR (`uniclipboard-git`) | `packaging/aur/` | ✅ 抓 | CI 自动同步（`aur.yml`） |
-| COPR (Fedora/RHEL) | `packaging/uniclipboard.spec` | ❌ 不抓 | CI 自动发布（`copr.yml`） |
+| AUR (`clipboard-git`) | `packaging/aur/` | ✅ 抓 | CI 自动同步（`aur.yml`） |
+| COPR (Fedora/RHEL) | `packaging/clipboard.spec` | ❌ 不抓 | CI 自动发布（`copr.yml`） |
 | Snap Store | `snap/snapcraft.yaml` | ❌ 不抓 | CI 自动发布（`snap.yml`） |
-| Homebrew tap（自建） | 外部 `UniClipboard/homebrew-tap` | ❌ 不抓 | CI 自动更新（`homebrew-tap.yml`） |
+| Homebrew tap（自建） | 外部 `Clipboard/homebrew-tap` | ❌ 不抓 | CI 自动更新（`homebrew-tap.yml`） |
 | npm CLI | `npm/` | ❌ 不抓 | CI 自动发布（`npm-publish.yml`） |
 | **nixpkgs** | `packaging/nix/` | ✅ 抓（+7 行） | **本次新增，待提交** |
 | **Scoop Extras** | `packaging/scoop/` | ✅ 抓 | **本次新增，待提交** |

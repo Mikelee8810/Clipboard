@@ -8,7 +8,7 @@
 
 This phase adds layered security middleware to the daemon HTTP API (axum 0.7) to harden it for direct frontend access. The system introduces short-lived JWT session tokens (5min TTL, HS256) that replace raw bearer token usage for normal API calls, a PID whitelist for local process verification, sliding-window rate limiting (100 req/min per client), and L1-L4 permission level enforcement on all endpoints.
 
-The implementation lives entirely in `uc-daemon/src/security/` and is wired into `DaemonApiState`. The existing bearer token at `~/.config/uniclipboard/daemon.token` remains the root of trust for the `/auth/connect` exchange only.
+The implementation lives entirely in `uc-daemon/src/security/` and is wired into `DaemonApiState`. The existing bearer token at `~/.config/clipboard/daemon.token` remains the root of trust for the `/auth/connect` exchange only.
 
 **Primary recommendation:** Build a `SecurityState` struct (owned by `DaemonApiState`) holding the JWT secret, PID whitelist, and rate limiter. Implement middleware as axum `Layer` wrappers that compose cleanly. Use tower `FromRequestLayers` for typed middleware state injection.
 
@@ -159,7 +159,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SessionTokenClaims {
-    /// Issuer: "uniclipboard-daemon"
+    /// Issuer: "clipboard-daemon"
     pub iss: String,
     /// Subject: "frontend"
     pub sub: String,
@@ -180,7 +180,7 @@ pub struct SessionTokenClaims {
 }
 
 impl SessionTokenClaims {
-    pub const ISSUER: &'static str = "uniclipboard-daemon";
+    pub const ISSUER: &'static str = "clipboard-daemon";
     pub const SUBJECT: &'static str = "frontend";
     pub const TTL_SECS: i64 = 300; // 5 minutes
 
@@ -562,7 +562,7 @@ pub async fn auth_extractor_middleware(
     };
 
     let mut validation = Validation::new(Algorithm::HS256);
-    validation.set_issuer(&["uniclipboard-daemon"]);
+    validation.set_issuer(&["clipboard-daemon"]);
     validation.set_subject(&["frontend"]);
 
     let key = DecodingKey::from_direct_bytes(&*security.jwt_secret)
@@ -715,7 +715,7 @@ let token = encode(&header, &claims, &EncodingKey::from_direct_bytes(&secret)?)?
 
 // Verify
 let mut validation = Validation::new(Algorithm::HS256);
-validation.set_issuer(&["uniclipboard-daemon"]);
+validation.set_issuer(&["clipboard-daemon"]);
 let token_data = decode::<SessionTokenClaims>(&token, &DecodingKey::from_direct_bytes(&secret)?, &validation)?;
 ```
 

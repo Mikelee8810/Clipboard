@@ -315,7 +315,7 @@ build_daemon_lifecycle(deps, storage_paths, config) -> DaemonLifecycle
    blob/spool worker 必须挂在进程级 registry。要确认 daemon 内的其他
    worker (clipboard sync / presence / keepalive) **不依赖** 这两条
    blob/spool worker 的 cancel token 顺序。
-2. **standalone binary 路径**: `uniclipboard-daemon` 二进制无 GUI shell,
+2. **standalone binary 路径**: `clipboard-daemon` 二进制无 GUI shell,
    `build_process_runtime` 后还要自己装 task_registry + spawn workers,
    再跑 daemon-lifecycle。`daemon::run` 入口要重写。
 

@@ -506,9 +506,9 @@ let result = rt.block_on(async { ... });
 
 **How to avoid:** The CONTEXT.md is explicit: "uc-tauri RETAINS uc-platform dependency for Tauri-specific adapters" and "MAY retain residual uc-infra dependency." Do NOT remove these from uc-tauri's Cargo.toml in this phase. The goal is that uc-tauri no longer uses uc-infra/uc-platform FOR COMPOSITION (assembly) — they remain for their other uses.
 
-### Pitfall 6: Root uniclipboard Cargo.toml also needs updating
+### Pitfall 6: Root clipboard Cargo.toml also needs updating
 
-**What goes wrong:** The root `src-tauri/Cargo.toml` (the `uniclipboard` binary package) currently lists `uc-infra`, `uc-platform` as direct deps. After this phase, if main.rs calls `uc_bootstrap::build_gui_app()` instead of manually wiring, the root may no longer need its own uc-infra/uc-platform deps (it gets them transitively via uc-tauri → uc-bootstrap). However, main.rs still imports specific types from uc-infra and uc-platform directly (see `use uc_infra::fs::key_slot_store::...` and `use uc_platform::...` at the top of main.rs). Plan for updating root Cargo.toml based on what remains in main.rs after simplification.
+**What goes wrong:** The root `src-tauri/Cargo.toml` (the `clipboard` binary package) currently lists `uc-infra`, `uc-platform` as direct deps. After this phase, if main.rs calls `uc_bootstrap::build_gui_app()` instead of manually wiring, the root may no longer need its own uc-infra/uc-platform deps (it gets them transitively via uc-tauri → uc-bootstrap). However, main.rs still imports specific types from uc-infra and uc-platform directly (see `use uc_infra::fs::key_slot_store::...` and `use uc_platform::...` at the top of main.rs). Plan for updating root Cargo.toml based on what remains in main.rs after simplification.
 
 **Warning signs:** "unused dependency" warnings, or conversely "unresolved import" if direct dep is removed prematurely.
 

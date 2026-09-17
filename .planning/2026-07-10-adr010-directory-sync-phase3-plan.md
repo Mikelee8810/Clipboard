@@ -3,7 +3,7 @@
 Status: draft (2026-07-10)
 Issue: #875 · ADR: `docs/architecture/adr-010-directory-sync-as-file-set-manifest.md`
 Phase 1: PR #1290 (merged 2026-07-10) · Phase 2: PR #1313 + #1314 (merged 2026-07-10)
-前序规划: `.planning/2026-07-10-adr010-directory-sync-phase2-plan.md`
+前序规划：`.planning/2026-07-10-adr010-directory-sync-phase2-plan.md`
 
 ## 1. 现状盘点（阶段 1+2 落地了什么）
 
@@ -44,7 +44,7 @@ ADR 开放问题 #3 提示阶段 3 可能大到需要拆。**决策：拆 3a / 3
 
 排序理由（沿用 ADR）：
 
-- **3a 同步遍历可先行**：限额护栏（阶段 2）已把成员数/总量压在 2000 / 1 GiB，同步遍历+哈希
+- **3a 同步遍历可先行**：限额护栏（阶段 2）已把成员数/总量压在 2000 / 1 GiB，同步遍历 + 哈希
   时延有界（秒级），不必先做异步化就能让目录进本地历史并为阶段 4 准备结构化身份。
 - **异步化是独立大改动**：延迟身份就绪 = 捕获流水线异步化 + 就绪前不广播 + 漂移复核，与
   遍历/身份逻辑正交，拆到 3b 独立验证，避免 3a 面过大。
@@ -63,14 +63,14 @@ content-digest 平集相同 → `file-content|` 身份相同 → 接收端建重
 
 落地记录：迁移 `2026-07-10-000001_encrypt_entry_file_set_paths`（DELETE 存量 →
 `original_text` 改 `original_text_ct BLOB` + 预留 `root_index`/`relative_path_ct`/
-`kind_tag`）；`EntryFileSetPathCipher`（UCFS 信封,XChaCha20-Poly1305,AAD=
+`kind_tag`）；`EntryFileSetPathCipher`（UCFS 信封，XChaCha20-Poly1305,AAD=
 `for_file_set_line(entry_id,line_index)`）；repo 持 `DeriveSpaceSubkeyPort`+
-`CurrentProfilePort`,per-op 派生子密钥（`info=uniclipboard-file-set/v1`,salt=profile）;
+`CurrentProfilePort`,per-op 派生子密钥（`info=clipboard-file-set/v1`,salt=profile）;
 因密钥依赖 `platform`,repo 构造移到 space-access 之后（`InfraLayer` 暴露 `db_executor`）。
 测试 18 绿（10 codec + 8 repo:往返/密文非明文/锁定报错/chunk 边界/FK CASCADE）。
 
 1. **密文化迁移**：`entry_file_set` 表 2026-07-03 建、捕获写入今日才合并，**几乎无存量
-   数据**——迁移直接 DROP+重建带密文列，无需 app 侧回填（用 MasterKey 不可在 Diesel
+   数据**——迁移直接 DROP+ 重建带密文列，无需 app 侧回填（用 MasterKey 不可在 Diesel
    迁移期取得，回填方案不成立；无存量数据使这一点无关紧要）。
    - `original_text` TEXT → `original_text_ct BLOB`（AEAD 密文）。
    - 预留三列 `root_index BIGINT NULL` / `relative_path_ct BLOB NULL`（密文）/
@@ -79,7 +79,7 @@ content-digest 平集相同 → `file-content|` 身份相同 → 接收端建重
 2. **AEAD codec**：新增 `FileSetPathCodec`（`uc-infra/src/db/...` 或 `security/`），复刻
    `search/render_payload.rs::RenderPayloadCodec` 模式——`v1_aead::{encrypt,decrypt}
    _xchacha_raw`，per-session 子密钥经 `DeriveSpaceSubkeyPort::derive_subkey`（IKM=
-   MasterKey，HKDF-SHA256，独立 `info` 标签 `b"uniclipboard-file-set/v1"`），
+   MasterKey，HKDF-SHA256，独立 `info` 标签 `b"clipboard-file-set/v1"`），
    **AAD 绑定 `entry_id ‖ line_index`**（防跨行/跨 entry 密文搬运）。
 3. **repo 穿线**：`DieselEntryFileSetRepository::new` 增加 key-derivation 依赖
    （`wire.rs:571`）；`encode_line` 密封 `original_text`、`decode_row` 解封。
@@ -98,7 +98,7 @@ content-digest 平集相同 → `file-content|` 身份相同 → 接收端建重
    `kind_tag` = f/x。目录成员行：`root_index` = 所属目录 root 的序号、`relative_path` =
    相对该 root 的路径。建议抽 `FileSetMemberLocation` 值对象承载三者。
 2. **遍历**（`build_entry_file_set`）：LocalFile/uri-list 成员若为目录 → 遍历展开为逐叶子
-   文件行。遍历在 caps 命中时**早停**（避免遍历超大目录树；阶段 2 的
+   文件行。遍历在 caps 命中时 **早停**（避免遍历超大目录树；阶段 2 的
    `file_set_exceeds_caps` 需接上目录展开的成员流，而非只数顶层条目）。
 3. **成员边界**（ADR 连带决策 4）：
    - symlink 与特殊文件（FIFO/socket/设备节点）→ **整个目录判 Sync-ineligible**
@@ -106,14 +106,14 @@ content-digest 平集相同 → `file-content|` 身份相同 → 接收端建重
    - 隐藏文件包含；硬链接当独立文件；除 exec bit 外权限/xattr/时间戳不保留。
    - `relative_path` 经 NFC 归一化、`/` 分隔；`kind_tag` = `f`/`x`（可执行）/`d`（空目录）。
 4. **身份安全阀（关键）**：含目录结构的 entry，本 PR **一律回退路径文本身份**——遍历出的
-   叶子 content digests **不**喂进 `file_content_digests`（等价于存在 `Excluded` 行的
+   叶子 content digests **不** 喂进 `file_content_digests`（等价于存在 `Excluded` 行的
    处理）。既避免 §3 的内容碰撞，也不需要 PR-C 先落地。目录本地去重靠路径文本（复制同一
    目录两次 → 同路径 → 同身份），够用。
 5. **dispatch 门控**：`resolve_outbound_file_set`（`clipboard_outbound/mod.rs:581`）检测
    manifest 含目录结构（`kind_tag=d` 或 `relative_path` 跨层 / `root_index` 语义）→
    `Skipped { reason: "directory_not_yet_syncable" }`（可观测，不静默）。旧接收端在阶段 4
    之前不认识目录成员，含目录 entry 一律不出站。
-6. **测试**：单目录展开（叶子行的 root/relative_path/kind_tag）/ 混合选择（文件+目录）/
+6. **测试**：单目录展开（叶子行的 root/relative_path/kind_tag）/ 混合选择（文件 + 目录）/
    空目录（kind_tag=d）/ 隐藏文件包含 / symlink 或特殊文件 → 整目录 Sync-ineligible /
    可执行位 → kind_tag=x / caps 在遍历中早停（panic-on-hash 证明超限跳哈希）/ 含目录
    entry 身份走路径文本回退（`content_digest_contribution` 空）/ dispatch 门控 Skipped。

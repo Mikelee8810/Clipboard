@@ -4,15 +4,15 @@
 
 ## OVERVIEW
 
-桌面 Rust 工作区以根目录 `Cargo.toml` 为入口：系统适配器和守护进程库位于 `crates/`，`uniclip` 与 `uniclipd` 位于 `apps/`，Tauri 打包位于 `src-tauri/`。可移植引擎由独立的 `UniClipboard/Engine` 仓库拥有，本仓通过一个固定发布标签使用它。GUI 和 CLI 都通过本机 HTTP 与 WebSocket 访问独立守护进程。
+桌面 Rust 工作区以根目录 `Cargo.toml` 为入口：系统适配器和守护进程库位于 `crates/`，`clip` 与 `clipd` 位于 `apps/`，Tauri 打包位于 `src-tauri/`。可移植引擎由独立的 `Clipboard/Engine` 仓库拥有，本仓通过一个固定发布标签使用它。GUI 和 CLI 都通过本机 HTTP 与 WebSocket 访问独立守护进程。
 
 ## STRUCTURE
 
 ```text
 .                        # repo root = cargo workspace
 |- apps/                 # Runnable binaries
-|  |- cli/                 # `uniclip` CLI (daemon client; heavy deps feature-gated)
-|  |- daemon/              # GUI-agnostic daemon runtime; hosts the `uniclipd` binary
+|  |- cli/                 # `clip` CLI (daemon client; heavy deps feature-gated)
+|  |- daemon/              # GUI-agnostic daemon runtime; hosts the `clipd` binary
 |- crates/               # Library crates (12)
 |  # -- Desktop host adapters --
 |  |- uc-platform/      # OS adapters: clipboard, secure storage, autostart
@@ -41,7 +41,7 @@
 | ------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------- |
 | Tauri run loop & setup    | `src-tauri/crates/uc-tauri/src/run.rs`               | `run()` (line ~200); window/lifecycle, `.manage(...)`, `.setup(...)`    |
 | IPC command registration  | `src-tauri/crates/uc-tauri/src/specta_builder.rs`    | tauri-specta single source of truth (runtime invoke + codegen)          |
-| Engine 发布版本           | `Cargo.toml`                                         | 所有使用方共享一个固定的 `UniClipboard/Engine` 发布标签                 |
+| Engine 发布版本           | `Cargo.toml`                                         | 所有使用方共享一个固定的 `Clipboard/Engine` 发布标签                 |
 | Desktop host preparation  | `crates/uc-bootstrap/src/wiring/`                    | Desktop paths, secure storage and clipboard selection                   |
 | Runtime/usecase accessors | `src-tauri/crates/uc-tauri/src/bootstrap/runtime.rs` | `AppRuntime`, `usecases()` factory                                      |
 | Tauri commands            | `src-tauri/crates/uc-tauri/src/commands/`            | Commands call app-layer usecases (or daemon HTTP since ADR-008)         |
@@ -60,7 +60,7 @@
 ## CONVENTIONS (PROJECT-SPECIFIC)
 
 - Rust commands run from the repo root (the cargo workspace root); stop if `Cargo.toml` absent.
-- Portable engine, protocol, persistence, migration, and binding changes belong in `UniClipboard/Engine`; never recreate those packages here.
+- Portable engine, protocol, persistence, migration, and binding changes belong in `Clipboard/Engine`; never recreate those packages here.
 - 升级引擎时，只修改根目录 `Cargo.toml` 中唯一的固定发布标签，并同步更新 `Cargo.lock`。
 - Desktop-only capability flow: platform adapter -> `uc-bootstrap/src/wiring/` -> `HostCapabilities` -> `Engine::start`.
 - Tauri command pattern: command -> `runtime.usecases().x()`; avoid direct `deps` access from command layer.
@@ -75,7 +75,7 @@
 ## ANTI-PATTERNS (THIS PROJECT)
 
 - Copying core source, migrations, bindings, or LAN protocol packages back into desktop.
-- 对 `UniClipboard/Engine` 拥有的包使用本地路径、分支或非发布标签。
+- 对 `Clipboard/Engine` 拥有的包使用本地路径、分支或非发布标签。
 - Depending on core implementation packages from desktop production code instead of `uc-engine`.
 - Adding business logic inside `uc-tauri` command handlers or platform adapters.
 - Reintroducing code under any `src-legacy/` path.
@@ -116,10 +116,10 @@ bun run test:coverage
 - `src-legacy/` was removed on 2026-02-26; treat any references as historical context only.
 - Root `AGENTS.md` is the navigation index; this file is the Rust-workspace knowledge base covering `crates/`, `apps/`, and `src-tauri/`. Tauri packaging details live in `src-tauri/AGENTS.md`.
 - Any change touching `crates/uc-platform/src/clipboard/` (especially the Linux X11/Wayland adapters) should run the package's focused validation before merge.
-- Engine and LAN compatibility releases are produced only by `UniClipboard/Engine`; desktop keeps no mobile binding source or release workflow.
-- Log files live in the platform-conventional log location (separate from the data root since the logs split). Single source of truth: `uc_app_paths::app_log_dir()`. Per-role files `uniclipboard-{gui,daemon,cli}.json.<date>`, daily rotation, 7-day retention (older pruned on start).
-- macOS: `~/Library/Logs/app.uniclipboard.desktop[-<profile>]/`
-- Linux: `~/.local/state/app.uniclipboard.desktop[-<profile>]/logs/`
-- Windows: `%LOCALAPPDATA%\app.uniclipboard.desktop[-<profile>]\logs\`
+- Engine and LAN compatibility releases are produced only by `Clipboard/Engine`; desktop keeps no mobile binding source or release workflow.
+- Log files live in the platform-conventional log location (separate from the data root since the logs split). Single source of truth: `uc_app_paths::app_log_dir()`. Per-role files `clipboard-{gui,daemon,cli}.json.<date>`, daily rotation, 7-day retention (older pruned on start).
+- macOS: `~/Library/Logs/app.clipboard.desktop[-<profile>]/`
+- Linux: `~/.local/state/app.clipboard.desktop[-<profile>]/logs/`
+- Windows: `%LOCALAPPDATA%\app.clipboard.desktop[-<profile>]\logs\`
 - Portable ("green") builds keep logs under `<exe>/data/logs/`.
 - Older legacy app-data roots may still exist from previous builds, but they are not the current default.

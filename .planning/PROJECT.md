@@ -1,4 +1,4 @@
-# UniClipboard Desktop
+# Clipboard Desktop
 
 ## What This Is
 

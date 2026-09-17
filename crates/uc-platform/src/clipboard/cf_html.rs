@@ -56,7 +56,7 @@ pub(crate) fn strip_cf_html_wrapper(html: &str) -> &str {
 /// multi-byte UTF-8 characters. When the offset lands inside such a character
 /// `std`'s `str` indexing aborts the process — see the production panic
 /// reproduced in `cf_html_endhtml_panic_repro` below and Sentry issue
-/// UNICLIPBOARD-RUST-1V.
+/// CLIPBOARD-RUST-1V.
 ///
 /// This function reproduces the same intent — return the byte range
 /// `[StartHTML, EndHTML)` of the CF_HTML buffer as a `String` — but works
@@ -189,10 +189,10 @@ mod tests {
     fn preserves_meta_and_attributes_inside_fragment() {
         // Matches the user's reproduction: a meta tag with attributes lives
         // inside the innermost fragment and must survive normalization.
-        let html = "<html>\r\n<body>\r\n<!--StartFragment--><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">UniClipboard is the open-source clipboard.<!--EndFragment-->\r\n</body>\r\n</html>";
+        let html = "<html>\r\n<body>\r\n<!--StartFragment--><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">Clipboard is the open-source clipboard.<!--EndFragment-->\r\n</body>\r\n</html>";
         assert_eq!(
             strip_cf_html_wrapper(html),
-            "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">UniClipboard is the open-source clipboard."
+            "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">Clipboard is the open-source clipboard."
         );
     }
 
@@ -203,7 +203,7 @@ mod tests {
     }
 
     // Reproduction tests for the upstream `clipboard_rs` panic observed in
-    // production (Sentry issue UNICLIPBOARD-RUST-1V, events
+    // production (Sentry issue CLIPBOARD-RUST-1V, events
     // `bffcf352449d47c8a903d5cafd16a08e` and `29c606eab66b49fea65ef4471562c431`).
     //
     // `clipboard_rs::platform::win::extract_html_from_clipboard_data` (win.rs:632)
@@ -321,7 +321,7 @@ mod tests {
 
         #[test]
         fn byte_safe_reader_does_not_panic_on_bad_endhtml_offset() {
-            // Regression gate for Sentry UNICLIPBOARD-RUST-1V: the byte-safe
+            // Regression gate for Sentry CLIPBOARD-RUST-1V: the byte-safe
             // path must accept the same buffer that aborts the std string
             // slicer and return *some* String (even if the broken codepoint
             // becomes a U+FFFD).

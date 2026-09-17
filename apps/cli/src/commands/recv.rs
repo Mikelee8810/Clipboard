@@ -1,4 +1,4 @@
-//! `uniclip recv` — single-shot inbound file receiver (daemon-client).
+//! `clip recv` — single-shot inbound file receiver (daemon-client).
 //!
 //! ADR-008 P5-1b: `recv` is a pure daemon client. It connects to a running
 //! compatible daemon (or spawns a transient Oneshot one), holds a control
@@ -247,7 +247,7 @@ fn sanitize_filename(name: &str) -> String {
         .filter(|c| !matches!(c, '/' | '\\' | '\0'))
         .collect();
     if stripped.is_empty() || stripped == "." || stripped == ".." {
-        "uniclip-recv.bin".to_string()
+        "clip-recv.bin".to_string()
     } else {
         stripped
     }

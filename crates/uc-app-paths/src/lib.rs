@@ -1,6 +1,6 @@
 //! # uc-app-paths — directory-layout authority
 //!
-//! This crate is the **single source of truth** for *where* UniClipboard's
+//! This crate is the **single source of truth** for *where* Clipboard's
 //! application data and cache directories live. It owns the path-resolution
 //! *policy* — the app directory name, the `UC_PROFILE` suffix, the portable
 //! ("green") redirect, and the per-platform base directories — and exposes them
@@ -37,8 +37,8 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 /// Application directory name. The data/cache roots are
-/// `<base>/app.uniclipboard.desktop[-<profile>]`.
-pub const APP_DIR_NAME: &str = "app.uniclipboard.desktop";
+/// `<base>/app.clipboard.desktop[-<profile>]`.
+pub const APP_DIR_NAME: &str = "app.clipboard.desktop";
 
 /// Marker file placed next to the executable inside the portable zip. Its mere
 /// presence flips the running binary into portable mode.
@@ -287,7 +287,7 @@ mod tests {
 
     #[test]
     fn env_override_forces_portable_root() {
-        let exe_dir = Path::new("/opt/UniClipboard");
+        let exe_dir = Path::new("/opt/Clipboard");
         assert_eq!(
             resolve_portable_root(exe_dir, true),
             Some(exe_dir.join(PORTABLE_DATA_SUBDIR))
@@ -310,7 +310,7 @@ mod tests {
 
     #[test]
     fn env_truthy_values_are_parsed_case_insensitively() {
-        let exe_dir = Path::new("/opt/UniClipboard");
+        let exe_dir = Path::new("/opt/Clipboard");
         // env_forced=true short-circuits the marker check regardless of dir.
         for forced in [true] {
             assert!(resolve_portable_root(exe_dir, forced).is_some());
@@ -401,7 +401,7 @@ mod tests {
             };
             assert_eq!(
                 app_dir.and_then(|name| name.to_str()),
-                Some("app.uniclipboard.desktop-e2e-isolated")
+                Some("app.clipboard.desktop-e2e-isolated")
             );
         }
     }

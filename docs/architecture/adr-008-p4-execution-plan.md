@@ -1,9 +1,9 @@
 # ADR-008 P4 执行计划：轻量模式 + 保活 + 可观测性
 
-- **承接**：[ADR-008](./adr-008-uniclipd-split-gui-as-client.md) §4 P4 + D3 / D9 / D10 / D17 / D19 / D20，及评审新增 D21 / D22 的 P4 残余。
+- **承接**：[ADR-008](./adr-008-clipd-split-gui-as-client.md) §4 P4 + D3 / D9 / D10 / D17 / D19 / D20，及评审新增 D21 / D22 的 P4 残余。
 - **日期**：2026-06-03
 - **性质**：**功能交付阶段**（ADR §4：行为变化在 P3 集中、功能交付在 P4）。本阶段正式落地动机 4「轻量模式」。与 P1/P2 的「纯结构 / 等价替换」不同，P4 引入用户可见的新行为，故每切片须独立可发布、revert-safe、带行为门禁。
-- **前提**：P1（抽库）/ P2（`uniclipd` 二进制 + CLI 解耦）/ P3（GUI 转纯 client，D2+D5 切换）均已落地（HEAD `c6b2cf68`）。`cargo check --workspace` 干净。
+- **前提**：P1（抽库）/ P2（`clipd` 二进制 + CLI 解耦）/ P3（GUI 转纯 client，D2+D5 切换）均已落地（HEAD `c6b2cf68`）。`cargo check --workspace` 干净。
 - **方法**：3-agent 逐子系统勘探（进程生命周期 / autostart / 多 profile+ 可观测性）+ 枢纽点人工逐行核实（D9/D21/D22 真实完成度）。
 
 ## 0. 净效果（P4 终态边界）
@@ -12,11 +12,11 @@
 关窗  (CloseRequested)      → 隐藏到托盘，Tauri 进程留，daemon 留           [P3 已成立]
 轻量  (托盘 / 显式)         → GUI 进程整体退出（无托盘无快捷键），daemon 留   [P4 新建：一次性通知 + 自愈标志]
 彻底退出 (托盘 / 显式)      → GUI 退 + 停「本 GUI spawn 的」daemon            [P4 新建：ownership 分类 + 复用 graceful stop]
-重开 app                   → 冷启动 → probe attach 既有 uniclipd → resync   [P3 框架已就绪，P4 收尾]
+重开 app                   → 冷启动 → probe attach 既有 clipd → resync   [P3 框架已就绪，P4 收尾]
 ```
 
-- ~~登录自启目标从 GUI 切为 `uniclipd`~~ **修订（2026-06-04）：自启目标保持 GUI，daemon 由 GUI 拉起**（见 ADR D10/D17 修订）；自启 = settings 派生投影到 `tauri-plugin-autostart` login item，不自建 OS 原生 daemon 载体。轻量模式仅在当前会话有效，下次登录 GUI 照常自启。
-- 多 profile = N 个独立 `uniclipd`（数据/端口/keychain/iroh 已隔离），**仅作开发期测试手段**；**产品对用户只暴露单一 profile**（决策 2026-06-04），故 per-profile 自启隔离 P4-7 显式延后（见 §P4-7 ①）。
+- ~~登录自启目标从 GUI 切为 `clipd`~~ **修订（2026-06-04）：自启目标保持 GUI，daemon 由 GUI 拉起**（见 ADR D10/D17 修订）；自启 = settings 派生投影到 `tauri-plugin-autostart` login item，不自建 OS 原生 daemon 载体。轻量模式仅在当前会话有效，下次登录 GUI 照常自启。
+- 多 profile = N 个独立 `clipd`（数据/端口/keychain/iroh 已隔离），**仅作开发期测试手段**；**产品对用户只暴露单一 profile**（决策 2026-06-04），故 per-profile 自启隔离 P4-7 显式延后（见 §P4-7 ①）。
 - 每进程独立日志文件 + daemon 为 product analytics 唯一权威发送方。
 - 崩溃可见性靠「启动写 start marker、graceful 清除、残留 = 上次异常退出」反向模式。
 
@@ -34,7 +34,7 @@
 | **D10** autostart 投影 | P4 | 🟢 **决策反转后近乎就绪**（2026-06-04：自启=GUI，见 ADR D10 修订）。现有 `tauri-plugin-autostart` 包 GUI 正是新方向；P4-4 只需确认"冷启动 attach 失败→spawn daemon"闭环 + per-profile 标识 + 删 daemon-side reconcile 计划。已砍 `StartupIntegrationProvider` / 三平台原生投影 | `uc-platform/src/ports/autostart.rs`、`uc-tauri/src/adapters/autostart.rs`、`uc-tauri/src/commands/autostart.rs:34`、`uc-tauri/src/run.rs:247,377` |
 | **D17** 崩溃可见性 | P4 | ⬜ 未做（**已缩水**，2026-06-04）。仅需 start marker / clean-shutdown sentinel + 下次 GUI 红条；已砍 systemd OnFailure / launchd 节流 / 常驻通知 | — |
 | **D19** 多 profile | P4 | 🟡 隔离 85% 就绪（端口/数据目录/keychain/iroh identity 全 per-profile）。缺：跨进程 BIND（D22 锁已补）、GUI 运行期切 profile 语义、per-profile 自启默认 | `uc-daemon-local/src/socket.rs:77`、`uc-platform/src/app_dirs.rs:24`、`uc-platform/src/system_secure_storage.rs:72` |
-| **D20** 日志/analytics 单源 | P4 | 🟡 日志名固定 `uniclipboard.json`（无角色前缀），但 `ScopeContext.device_role` 已有；`POST /analytics/capture` 已落地，但 GUI 仍残留进程内 sink（update_telemetry/updater 直发） | `uc-observability/src/init.rs:90`、`uc-observability/src/scope.rs:38`、`uc-webserver/src/api/analytics.rs`、`uc-tauri/src/run.rs:617`、`uc-tauri/src/commands/update_telemetry.rs:258` |
+| **D20** 日志/analytics 单源 | P4 | 🟡 日志名固定 `clipboard.json`（无角色前缀），但 `ScopeContext.device_role` 已有；`POST /analytics/capture` 已落地，但 GUI 仍残留进程内 sink（update_telemetry/updater 直发） | `uc-observability/src/init.rs:90`、`uc-observability/src/scope.rs:38`、`uc-webserver/src/api/analytics.rs`、`uc-tauri/src/run.rs:617`、`uc-tauri/src/commands/update_telemetry.rs:258` |
 
 **已收敛 OQ（落地照办）**：~~OQ-windows（Task Scheduler `schtasks` + `StartupIntegrationProvider`）~~ **2026-06-04 取消，自启=GUI 回归 `tauri-plugin-autostart`（见 §3）**、OQ-lightweight-discoverability（`tauri-plugin-notification` 一次性 + `app_data_root` 自愈 JSON 标志 + per-profile + 中英双文案）、OQ-migration（`DaemonProcessMode::InProcess` 保留 legacy-read-only）。
 
@@ -43,14 +43,14 @@
 > 依赖序：P4-0 独立先行；功能核心链 **P4-1 → P4-2 → P4-3**；保活链 **P4-2 → P4-4 → P4-5**；P4-6 可任意时点并行；P4-7 收尾。
 
 ### P4-0 · 可观测性地基（无用户可见行为变化） `refactor:`
-- D20 日志按角色前缀：`uc-observability/src/init.rs:90` 的 `rolling::daily(logs_dir, "uniclipboard.json")` 改为从 `ScopeContext.device_role` 取前缀 → `uniclipboard-{gui|daemon|cli}.json.<date>`。消除两进程 append 同一文件的竞争（轻量模式让 daemon 长期 detached，此为后续调试前提）。
+- D20 日志按角色前缀：`uc-observability/src/init.rs:90` 的 `rolling::daily(logs_dir, "clipboard.json")` 改为从 `ScopeContext.device_role` 取前缀 → `clipboard-{gui|daemon|cli}.json.<date>`。消除两进程 append 同一文件的竞争（轻量模式让 daemon 长期 detached，此为后续调试前提）。
 - D22 残余：补 `UC_DISABLE_DAEMON_SINGLE_INSTANCE` 逃生阀（对齐 GUI 侧 `UC_DISABLE_SINGLE_INSTANCE`）。
 - 确认 D21 shutdown 序列对在途 transfer/sync 的排空覆盖面（`app.rs:417` 已 flush delivery 记录，核实 iroh endpoint / `BIND_LOCK` 释放在 cancel cascade 内）。
 - **gate**：`cargo check --workspace` + 起两进程（GUI+daemon）确认产出两份角色日志文件；clippy clean。
 
 ### P4-1 · ownership 分类数据面（无 UX 变化） `feat:` ✅ 已落地
 - `DaemonPidMetadata` 加 `spawned_by: DaemonSpawnOrigin`（`Gui` / `Cli` / `Unknown`），随 `write_current_pid_with_mode` 写入；旧 PID 文件缺字段 → `Unknown`（serde default，向后兼容 OQ-migration）。
-- `spawn_detached_daemon(origin)` 经 env `UC_DAEMON_SPAWN_ORIGIN` 透传给被拉起的 `uniclipd`，daemon 写 PID 时 `DaemonSpawnOrigin::from_env()` 自检回填（与 `UC_HOST_ROLE` 同款，无 app.rs 改动）；GUI spawn → `Gui`、`cli start` → `Cli`。
+- `spawn_detached_daemon(origin)` 经 env `UC_DAEMON_SPAWN_ORIGIN` 透传给被拉起的 `clipd`，daemon 写 PID 时 `DaemonSpawnOrigin::from_env()` 自检回填（与 `UC_HOST_ROLE` 同款，无 app.rs 改动）；GUI spawn → `Gui`、`cli start` → `Cli`。
 - 分类 predicate `DaemonPidMetadata::is_gui_spawned()`。
 - **`DaemonOwnership` 枚举重设计移至 P4-3**（与其消费者「彻底退出→停」同切片落地，避免一个用不上的中间态枚举）；P4-1 只做持久数据面与分类原语。
 - **gate（已过）**：`cargo check --workspace` clean；clippy clean（changed crate）；`uc-daemon-local` process_metadata 6/6（含 spawned_by round-trip / serde default / env 解析）、daemon_probe 16/16、stop 5/5。行为不变。
@@ -78,7 +78,7 @@
 > **核实结论（2026-06-04）**：P3-3 已建好全部核心链路，本切片无新功能代码——① 自启目标=GUI（`tauri-plugin-autostart` 注册当前 exe，`run.rs:248`/`adapters/autostart.rs:28`）；② settings 派生 + GUI 侧投影（`commands/autostart.rs:63-70` 先写 daemon settings(HTTP) 再 `reconcile_autostart`）；③ 启动期 reconcile 自愈陈旧项（`run.rs:378-386`）；④ GUI 冷启动必拉 daemon（`bootstrap_daemon_in_process` 三分支无绕过，`daemon_probe.rs:201-238`）；⑤ daemon 侧零 autostart 代码，无需 reconcile。
 > **本切片实际改动**：清理 stale "留待 P4" 注释（`run.rs` setup + `daemon_probe.rs` spawn doc）+ 在 plugin init 处显式标注 per-profile 自启缺口（空 launch args，留 P4-7）。`cargo check -p uc-tauri -p uc-desktop` 绿。
 > **唯一真实 gap → 留 P4-7**：`tauri_plugin_autostart::init(..., Some(vec![]))` 空 args + autolaunch 固定 bundle id → 非主 profile 自启不带 `UC_PROFILE`、会污染主 profile login item。D19 默认仅主 profile 注册自启，对主 profile 无害。
-- **保留 `tauri-plugin-autostart` 自启 GUI**：目标二进制 = GUI（非 `uniclipd`），无 `--unattended`。确认 GUI 冷启动路径在 attach 不到本 profile 活跃 daemon 时一定 detached 拉起一个（复用 `daemon_probe` spawn，P3 已就绪）——这是"自启 GUI 即等于后台同步起来"的闭环，需补一条启动期断言/测试。
+- **保留 `tauri-plugin-autostart` 自启 GUI**：目标二进制 = GUI（非 `clipd`），无 `--unattended`。确认 GUI 冷启动路径在 attach 不到本 profile 活跃 daemon 时一定 detached 拉起一个（复用 `daemon_probe` spawn，P3 已就绪）——这是"自启 GUI 即等于后台同步起来"的闭环，需补一条启动期断言/测试。
 - settings 派生投影仍成立，载体回到 `tauri-plugin-autostart`：改 `general.auto_start` → 同步注册/删除 login item；关 → 删（杜绝幽灵自启）。投影由 **GUI 侧** 执行（autostart 是 `gui-side` 副作用，ADR D12/§D10 line149；插件 API 只能在 Tauri 进程调用）——无需 daemon-side reconcile（原计划那条是为"daemon 独立自启"准备的，本决策下取消）。
 - **取消项**：原"autostart 单元 ExecStart 固定带 `UC_DAEMON_UNATTENDED=1`"（P4-2 遗留）随之取消——自启 GUI=attended，daemon 经 GUI spawn 走 attended 路径尊重 `auto_unlock`（P4-2 已落地）。strict-unattended 仅 headless server + `cli start` 触发，无自启单元消费者。
 - per-profile：自启项标识带 profile（D19），默认仅主 profile 注册。
@@ -110,16 +110,16 @@
 - **① per-profile 自启 → 延后（不做）**：真实用户只有一个 profile，主 profile 自启用固定标识本就正确工作；「非主 profile 污染主 profile login item」只在开发者多开 daemon 测试时出现，非产品需求。仅把 `uc-tauri/src/run.rs` 那条「per-profile 留 P4-7」的注释改成「单 profile 产品，per-profile 自启延后」，并记下未来开放多 profile 时的接法（`Builder` + per-profile `app_name` + `--profile` 启动参数）。`tauri_plugin_autostart::init(..., Some(vec![]))` 保持不变。
 - **② GUI 运行期切 profile → moot（仅文档）**：代码库目前没有任何切 profile 的入口/UI，单 profile 产品下也不会有。冷启动决策（见 §3 OQ-gui-profile-switch）作为「未来若开放多 profile 时的方向」保留记录，本期无可接落点、无代码。
 - **③ 降级回滚收敛（OQ-downgrade-rollback）→ ✅ 安全核心已落地**（commit `67fe9bb4`）：GUI 冷启动唯一会终止 daemon 的路径（`bootstrap_daemon_in_process` 的 `Incompatible` 臂）原先把任何版本不匹配都 SIGTERM 后替换 → 低版本 client（手动降级 / 自动更新回滚）会静默杀掉正在跑的高版本 daemon。现加方向性 semver 闸（`running_daemon_is_strictly_newer`，纯函数）：**proven 更新** 的 daemon → 拒绝接管（incumbent 胜），返回 `DaemonBootstrapError::RefusedNewerDaemon`，连接不填充 → GUI 走现有「未连接」UX + error 日志，**绝不 SIGTERM**；版本缺失/无法解析 → 维持原 takeover 行为（爆炸半径仅 proven-newer）。**红条 UX 延后**（前端目前无 daemon 异常 banner 机制，净新增；人确认本期只做安全核心）。与 profile 无关，单 profile 用户同样受保护。
-- **卸载清理（OQ-uninstall-cleanup）**：承 D10 修订已简化 —— 无自建 service unit，残留收敛为「`tauri-plugin-autostart` login item + crash marker」，卸载 GUI 即清 login item + daemon 启动自愈 marker；`uniclipd --uninstall-cleanup` 降级为可选（仅清 marker）。单 profile 下无额外动作，沿用既有机制。
+- **卸载清理（OQ-uninstall-cleanup）**：承 D10 修订已简化 —— 无自建 service unit，残留收敛为「`tauri-plugin-autostart` login item + crash marker」，卸载 GUI 即清 login item + daemon 启动自愈 marker；`clipd --uninstall-cleanup` 降级为可选（仅清 marker）。单 profile 下无额外动作，沿用既有机制。
 - **gate**：`cargo check --workspace` ✅；`uc-daemon-local` contract + `uc-desktop` daemon_probe 单测 ✅（含 3 个方向性闸真值表测试）；changed crates clippy clean ✅。**真机 UAT（待用户）**：跑一个更高版本 daemon + 一个更低版本 GUI client → client 拒启不误杀、走「未连接」状态。
 
 ## 3. Open Question 收口（落地决策）
 
 | OQ | 状态 | 落地结论（推荐） |
 |---|---|---|
-| **OQ-uninstall-cleanup** | 开放 → 收口（**2026-06-04 简化**） | 自启回归 GUI 后无自建 service unit，残留收敛为「`tauri-plugin-autostart` login item + crash marker」：① 卸载 GUI 即清 login item（插件标准行为）；② crash marker 由 daemon 启动自愈/卸载脚本清；③ `uniclipd --uninstall-cleanup` 降级为可选（仅清 marker，无 service unit 可删）。原"删 service unit + 三平台卸载器 hook"整段不再需要。 |
+| **OQ-uninstall-cleanup** | 开放 → 收口（**2026-06-04 简化**） | 自启回归 GUI 后无自建 service unit，残留收敛为「`tauri-plugin-autostart` login item + crash marker」：① 卸载 GUI 即清 login item（插件标准行为）；② crash marker 由 daemon 启动自愈/卸载脚本清；③ `clipd --uninstall-cleanup` 降级为可选（仅清 marker，无 service unit 可删）。原"删 service unit + 三平台卸载器 hook"整段不再需要。 |
 | **OQ-downgrade-rollback** | 开放 → **✅ 安全核心已落地（2026-06-04，commit `67fe9bb4`）** | ① 收敛方向：**incumbent 运行中 daemon 默认胜**；磁盘低版本 client **不得杀** 更高版本运行 daemon——已落地：`bootstrap_daemon_in_process` 终止前过方向性 semver 闸，proven-newer → `RefusedNewerDaemon`（拒接管、绝不 SIGTERM、走现有未连接 UX + error 日志）；版本缺失/不可解析维持既有 takeover。唯一 sanctioned takeover 仍是 older-or-equal 替换。**红条 UX 延后**（前端无 daemon 异常 banner，净新增；人确认只做安全核心）。② `schema_version` 前向不兼容降级（daemon 读到更高 schema 拒启 + 机器可读状态 + 红条）**未在本期范围**，留后续。 |
-| **OQ-gui-profile-switch** | 开放 → 收口（**2026-06-04：单 profile 产品下 moot**） | 方向已定 **强制冷启动**：GUI 内切 profile = 重启 GUI 进程并以新 `UC_PROFILE` 起来（必要时拉起目标 profile 的 `uniclipd`），不做热切换（与 ADR 反对的「运行中热迁移」同源）。但 **产品对用户只暴露单一 profile，目前无任何切 profile 入口/UI** → 本决策作为「未来若开放多 profile 时的方向」保留记录，P4-7 无可接落点、不落代码。 |
+| **OQ-gui-profile-switch** | 开放 → 收口（**2026-06-04：单 profile 产品下 moot**） | 方向已定 **强制冷启动**：GUI 内切 profile = 重启 GUI 进程并以新 `UC_PROFILE` 起来（必要时拉起目标 profile 的 `clipd`），不做热切换（与 ADR 反对的「运行中热迁移」同源）。但 **产品对用户只暴露单一 profile，目前无任何切 profile 入口/UI** → 本决策作为「未来若开放多 profile 时的方向」保留记录，P4-7 无可接落点、不落代码。 |
 | OQ-windows | 已收敛 → **2026-06-04 取消** | 原 Task Scheduler `schtasks` + `StartupIntegrationProvider` 方案随"自启=GUI"决策取消；Windows 自启回归 `tauri-plugin-autostart`（注册表 Run），无 daemon 原生载体、无保活降级问题。 |
 | OQ-lightweight-discoverability | 已收敛 | `tauri-plugin-notification` 一次性 + 自愈 JSON 标志（per-profile）。落地于 P4-3。 |
 | OQ-multiprofile-person | 开放 → 收口（**2026-06-04**） | **各 profile 独立 distinct_id**（人确认）。核实：`resolved_app_dir_name()` 给整个 `app_data_root` 套 `-<profile>` 后缀，`analytics/` 子目录天然 per-profile，各 profile 已有独立 `anonymous_user_id`/`space_person_id`。**无需代码改动**。后果：同一台机器多 profile 在 PostHog 计为多设备（接受）。收口于 P4-6。 |

@@ -1,6 +1,6 @@
 //! # uc-tauri
 //!
-//! Tauri adapter layer for UniClipboard.
+//! Tauri adapter layer for Clipboard.
 //!
 //! This crate contains the Tauri shell, application bootstrap, and command handlers.
 

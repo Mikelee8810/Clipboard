@@ -14,7 +14,7 @@ next_action: Implement 5-step plan from implementation_plan
 
 ## Symptoms
 
-expected: CLI commands like `uniclipboard-cli space-status` should only output the command result
+expected: CLI commands like `clipboard-cli space-status` should only output the command result
 actual: Output is mixed with tracing logs (INFO, DEBUG), eprintln messages like "Sentry DSN not set", database/migration logs
 errors: Not an error - log noise pollution in CLI output
 reproduction: Run any CLI command

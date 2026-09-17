@@ -1,12 +1,12 @@
 ---
 title: Install
-description: Install UniClipboard on macOS, Windows, or Linux.
+description: Install Clipboard on macOS, Windows, or Linux.
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-UniClipboard ships a desktop app and a `uniclip` CLI for Windows,
+Clipboard ships a desktop app and a `clip` CLI for Windows,
 macOS, and Linux. Pick the path for your platform — every installer
 below points at the same release artefacts on
 [GitHub Releases](https://github.com/UniClipboard/UniClipboard/releases).
@@ -25,8 +25,8 @@ curl -fsSL https://uniclipboard.app/install.sh | bash
 
 What it does:
 
-- **macOS** — downloads `.app.tar.gz`, extracts it, and moves `UniClipboard.app` into `/Applications` (escalates with `sudo` if needed; pass `--prefix "$HOME/Applications"` for a user-level install).
-- **Linux** — the quick-install script uses `snap` only on Ubuntu 20.04 (the `core22` runtime bundles GTK + WebKit, so the `.deb`'s `libwebkit2gtk-4.1` requirement is avoided; `snapd` is auto-installed via `apt` if missing). Other Debian-family distros default to the `.deb` via `apt`; the Snap section below is an alternative manual path. `dnf`-based distros (Fedora/RHEL/openSUSE) enable the [`mkdir700/uniclipboard`](https://copr.fedorainfracloud.org/coprs/mkdir700/uniclipboard/) COPR repo and `dnf install uniclipboard`, so `dnf upgrade` keeps tracking new releases — pass `--version vX.Y.Z` to fall back to a one-shot `.rpm` download instead. Without root, the script falls back to AppImage in `~/.local/bin` with a `.desktop` entry.
+- **macOS** — downloads `.app.tar.gz`, extracts it, and moves `Clipboard.app` into `/Applications` (escalates with `sudo` if needed; pass `--prefix "$HOME/Applications"` for a user-level install).
+- **Linux** — the quick-install script uses `snap` only on Ubuntu 20.04 (the `core22` runtime bundles GTK + WebKit, so the `.deb`'s `libwebkit2gtk-4.1` requirement is avoided; `snapd` is auto-installed via `apt` if missing). Other Debian-family distros default to the `.deb` via `apt`; the Snap section below is an alternative manual path. `dnf`-based distros (Fedora/RHEL/openSUSE) enable the [`mkdir700/clipboard`](https://copr.fedorainfracloud.org/coprs/mkdir700/clipboard/) COPR repo and `dnf install clipboard`, so `dnf upgrade` keeps tracking new releases — pass `--version vX.Y.Z` to fall back to a one-shot `.rpm` download instead. Without root, the script falls back to AppImage in `~/.local/bin` with a `.desktop` entry.
 
 Common flags:
 
@@ -61,30 +61,30 @@ curl -fsSL https://raw.githubusercontent.com/UniClipboard/UniClipboard/main/scri
 The easiest path on macOS is the official Homebrew tap.
 
 ```bash
-brew tap UniClipboard/tap
+brew tap Clipboard/tap
 
 # Homebrew 6.0+ requires trusting third-party taps before it loads their
 # formulae/casks — otherwise you'll see "Refusing to load ... from
 # untrusted tap". This only needs to run once.
-brew trust UniClipboard/tap
+brew trust Clipboard/tap
 
 # Desktop app (the .app bundle)
-brew install --cask uniclipboard
+brew install --cask clipboard
 
-# Or, just the CLI — installs the `uniclip` command
-brew install uniclipboard
+# Or, just the CLI — installs the `clip` command
+brew install clipboard
 ```
 
 Or install in a single command without tapping first (still trust the tap once):
 
 ```bash
-brew trust UniClipboard/tap                          # Homebrew 6.0+, one-time
-brew install --cask UniClipboard/tap/uniclipboard    # GUI
-brew install UniClipboard/tap/uniclipboard           # CLI
+brew trust Clipboard/tap                          # Homebrew 6.0+, one-time
+brew install --cask Clipboard/tap/clipboard    # GUI
+brew install Clipboard/tap/clipboard           # CLI
 ```
 
 The cask and the formula can coexist — install both if you want the GUI
-plus the `uniclip` command for terminal flows.
+plus the `clip` command for terminal flows.
 
 Prefer to download the installer manually? Grab the latest `.dmg` from
 the [Releases](https://github.com/UniClipboard/UniClipboard/releases)
@@ -92,12 +92,12 @@ page and drag the app into `/Applications`.
 
 ### First-launch permissions
 
-macOS may ask for **Input Monitoring** when UniClipboard registers the global Quick Panel
+macOS may ask for **Input Monitoring** when Clipboard registers the global Quick Panel
 shortcut. Grant it under **System Settings → Privacy & Security → Input Monitoring**, then quit and
 reopen the app.
 
 **Accessibility** is separate and optional: it is required only when you enable the Quick Panel's
-modifier double-tap trigger. UniClipboard does not request it in the background. The setting shows
+modifier double-tap trigger. Clipboard does not request it in the background. The setting shows
 an explicit button that opens **Privacy & Security → Accessibility**; grant access there, then
 return to the app. Clipboard sync itself does not require Accessibility.
 
@@ -111,7 +111,7 @@ and `arm64` (Windows on ARM).
 
 ### Installer (NSIS)
 
-Download `UniClipboard_<version>_<arch>-setup.exe` (`<arch>` is `x64` or
+Download `Clipboard_<version>_<arch>-setup.exe` (`<arch>` is `x64` or
 `arm64`) and click through the standard flow. It places Start Menu shortcuts
 and registers an entry under **Settings → Apps** for clean uninstall.
 
@@ -126,24 +126,24 @@ The installer is code-signed.
 ### Portable build
 
 Want to skip installation or carry the app on a USB stick? Use the portable
-build. Download `UniClipboard_<version>_<arch>-portable.zip`, unzip it, and
-double-click `UniClipboard.exe` — no install, no registry writes, no traces in
+build. Download `Clipboard_<version>_<arch>-portable.zip`, unzip it, and
+double-click `Clipboard.exe` — no install, no registry writes, no traces in
 the system directories.
 
 - **Data lives next to the app.** Everything (encrypted database, keys, search
   index, logs) is stored in a `data` folder created next to
-  `UniClipboard.exe`. Move the whole folder (exe + `portable.dat` + `data`) to
+  `Clipboard.exe`. Move the whole folder (exe + `portable.dat` + `data`) to
   carry your setup; delete `data` to reset.
 - **`portable.dat` is the switch.** This marker file in the zip is what enables
   portable mode. Remove it and the app reverts to storing data under
-  `%LOCALAPPDATA%\app.uniclipboard.desktop\` like the installed version.
+  `%LOCALAPPDATA%\app.clipboard.desktop\` like the installed version.
 - **Pick the right arch.** The `arm64` zip is for Windows on ARM devices (e.g.
   Surface Pro X); the `x64` zip is for regular Intel/AMD PCs.
 
 <Callout type="info">
   The portable build does **not** self-update (the in-app updater runs the NSIS installer, which
   would install into Program Files). **Check for updates** points you to the release page to
-  download a newer `*-portable.zip`; replace `UniClipboard.exe` and your `data` folder is preserved.
+  download a newer `*-portable.zip`; replace `Clipboard.exe` and your `data` folder is preserved.
   It still needs the Microsoft Edge WebView2 Runtime (preinstalled on current Windows).
 </Callout>
 
@@ -169,12 +169,12 @@ Install via [Fedora COPR](https://copr.fedorainfracloud.org/coprs/mkdir700/) and
 
 ```bash
 # Alpha channel (includes pre-releases, updated more often)
-sudo dnf copr enable mkdir700/uniclipboard-alpha
-sudo dnf install uniclipboard
+sudo dnf copr enable mkdir700/clipboard-alpha
+sudo dnf install clipboard
 
 # Stable channel (final releases only)
-sudo dnf copr enable mkdir700/uniclipboard
-sudo dnf install uniclipboard
+sudo dnf copr enable mkdir700/clipboard
+sudo dnf install clipboard
 ```
 
 See the [COPR deployment notes](https://github.com/UniClipboard/UniClipboard/blob/main/docs/packaging/COPR.md) for project setup details.
@@ -185,16 +185,16 @@ The Snap is built with strict confinement on `core22` and bundles its own GTK + 
 
 ```bash
 # Stable channel (final releases, amd64 + arm64)
-sudo snap install uniclipboard
+sudo snap install clipboard
 
 # Edge channel (includes pre-releases, updated more often)
-sudo snap install uniclipboard --edge
+sudo snap install clipboard --edge
 ```
 
 After installing, grant the snap permission to read/write the system keyring (GNOME Keyring / KWallet), so the daemon can store its long-lived identity key there:
 
 ```bash
-sudo snap connect uniclipboard:password-manager-service
+sudo snap connect clipboard:password-manager-service
 ```
 
 Skipping this step is not fatal — the daemon falls back to a file-based Key Encryption Key under the snap's data directory and will start either way (look for `System secure storage probe failed; falling back to file-based KEK` in the logs). Connecting the plug just moves the KEK into the OS-managed keyring, which is what other system applications already use.
@@ -208,8 +208,8 @@ Don't have `snapd`? See the [Snapcraft install guide](https://snapcraft.io/docs/
 An AppImage is also published with each release. Download it from the [Releases](https://github.com/UniClipboard/UniClipboard/releases) page, mark it executable, and run it:
 
 ```bash
-chmod +x UniClipboard_<version>_amd64.AppImage
-./UniClipboard_<version>_amd64.AppImage
+chmod +x Clipboard_<version>_amd64.AppImage
+./Clipboard_<version>_amd64.AppImage
 ```
 
 AppImage is the only Linux format the in-app updater supports — packages installed via COPR / Snap / dpkg do not auto-update from inside the app; use your package manager instead.
@@ -220,16 +220,16 @@ Prefer not to add a repo? Download a single package from Releases:
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i uniclipboard_<version>_amd64.deb
+sudo dpkg -i clipboard_<version>_amd64.deb
 sudo apt-get install -f                                 # resolve missing deps if any
 
 # Fedora / RHEL / openSUSE (one-shot, no COPR)
-sudo dnf install ./UniClipboard-<version>-1.x86_64.rpm
+sudo dnf install ./Clipboard-<version>-1.x86_64.rpm
 ```
 
 ### Headless / server install (CLI only)
 
-For servers, SSH sessions, or anything without a desktop, install just the `uniclip` CLI from Releases — look for the `uniclip-<version>-<arch>` artefact (statically linked against musl). The CLI runs the daemon in-process, so no GUI is required.
+For servers, SSH sessions, or anything without a desktop, install just the `clip` CLI from Releases — look for the `clip-<version>-<arch>` artefact (statically linked against musl). The CLI runs the daemon in-process, so no GUI is required.
 
 </Tab>
 
@@ -248,7 +248,7 @@ You'll need [Bun](https://bun.sh) and a Rust toolchain
 
 ```bash
 git clone https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard
+cd Clipboard
 ```
 
 </Step>
@@ -285,7 +285,7 @@ for branch / commit / PR conventions.
 
 ## Android App
 
-The **UniClipboard Android client** lives at
+The **Clipboard Android client** lives at
 [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip)
 — one client for both iOS and Android. Because the desktop listener
 speaks the SyncClipboard protocol, any other SyncClipboard-compatible
@@ -311,7 +311,7 @@ path; see the [Mobile sync guide → Android](../core-features/mobile-sync#andro
 
 ## iOS App (public beta)
 
-The **UniClipboard iOS App** is currently distributed through
+The **Clipboard iOS App** is currently distributed through
 **TestFlight** as a public beta. Invite link:
 
 [https://testflight.apple.com/join/nyNQ8dQe](https://testflight.apple.com/join/nyNQ8dQe)
@@ -324,7 +324,7 @@ The **UniClipboard iOS App** is currently distributed through
 
 On your iPhone, open the **App Store**, search for **TestFlight**,
 and install it. TestFlight is Apple's official beta-distribution
-app and is required for the UniClipboard beta build.
+app and is required for the Clipboard beta build.
 
 </Step>
 
@@ -334,7 +334,7 @@ app and is required for the UniClipboard beta build.
 
 Tap the TestFlight invite link above on the iPhone. iOS hands it
 off to TestFlight; tap **Accept**, then **Install**, and
-UniClipboard is added to the Home Screen.
+Clipboard is added to the Home Screen.
 
 </Step>
 
@@ -374,31 +374,31 @@ untampered. The signing public key and step-by-step instructions live in the
 After installing, confirm the CLI is on your `PATH`:
 
 ```bash
-uniclip --version
+clip --version
 ```
 
 For the GUI, launching it should open the **This is my first device** /
-**I already use UniClipboard elsewhere** screen on first run. If a previous
+**I already use Clipboard elsewhere** screen on first run. If a previous
 installation already created a space, the dashboard opens directly.
 
 ## Where data lives
 
-UniClipboard stores its encrypted database, search index, and logs in
+Clipboard stores its encrypted database, search index, and logs in
 the platform's standard application-data directory under
-`app.uniclipboard.desktop`:
+`app.clipboard.desktop`:
 
 | Platform | Path                                                      |
 | -------- | --------------------------------------------------------- |
-| macOS    | `~/Library/Application Support/app.uniclipboard.desktop/` |
-| Linux    | `~/.local/share/app.uniclipboard.desktop/`                |
-| Windows  | `%LOCALAPPDATA%\app.uniclipboard.desktop\`                |
+| macOS    | `~/Library/Application Support/app.clipboard.desktop/` |
+| Linux    | `~/.local/share/app.clipboard.desktop/`                |
+| Windows  | `%LOCALAPPDATA%\app.clipboard.desktop\`                |
 
 Logs sit under a `logs/` subdirectory. If you set the `UC_PROFILE` env
 var (e.g. `UC_PROFILE=dev`), the directory name is suffixed (e.g.
-`app.uniclipboard.desktop-dev`) so dev and prod can run side by side.
+`app.clipboard.desktop-dev`) so dev and prod can run side by side.
 
 The Windows **portable** build is the exception: it keeps all of the above in a
-`data\` folder next to `UniClipboard.exe` instead of `%LOCALAPPDATA%`. See the
+`data\` folder next to `Clipboard.exe` instead of `%LOCALAPPDATA%`. See the
 "Portable build" section under the Windows tab above.
 
 ## Next

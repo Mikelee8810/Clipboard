@@ -54,7 +54,7 @@ When macOS users toggle the auto-unlock switch ON in UnlockPage, display a modal
 <specifics>
 ## Specific Ideas
 
-- The Modal should clearly communicate that the Keychain popup is a macOS system dialog, not part of UniClipboard
+- The Modal should clearly communicate that the Keychain popup is a macOS system dialog, not part of Clipboard
 - The "已勾选始终允许" button should feel like a confirmation action, not a primary action
 - Verification should feel instant — no unnecessary loading if the keychain read is fast
 
@@ -75,7 +75,7 @@ When macOS users toggle the auto-unlock switch ON in UnlockPage, display a modal
 
 - `handleAutoUnlockChange` in UnlockPage: Current handler that directly updates setting — needs to be intercepted on macOS
 - Tauri command pattern: `runtime.usecases().xxx()` accessor pattern for new commands
-- `SystemSecureStorage` uses `keyring` crate with service name "UniClipboard" for Keychain access
+- `SystemSecureStorage` uses `keyring` crate with service name "Clipboard" for Keychain access
 - `KeyMaterialPort.load_kek()`: Existing port for reading KEK from keychain — verification target
 
 ### Integration Points

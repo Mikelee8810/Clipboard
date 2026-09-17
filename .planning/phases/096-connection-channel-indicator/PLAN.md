@@ -69,7 +69,7 @@
 - `src/components/device/__tests__/ConnectionChannelBadge.test.tsx`：truth-table 10 用例覆盖 5 态合成 + 渲染断言
 
 ### 7. uc-tauri — Tray
-- `tray.rs::TrayState::init(app, lang, lan_only_active)`：新增 status 状态行（不可交互）+ tooltip 后缀（"UniClipboard — LAN-only Mode is ON"）；中英双语；`set_language` 同步刷新状态文案 + tooltip
+- `tray.rs::TrayState::init(app, lang, lan_only_active)`：新增 status 状态行（不可交互）+ tooltip 后缀（"Clipboard — LAN-only Mode is ON"）；中英双语；`set_language` 同步刷新状态文案 + tooltip
 - `run.rs`：startup 加载 settings 时附带读 `network.allow_relay_fallback`，反向命名翻译 `lan_only_active = !allow_relay_fallback`，喂给 tray init
 
 ---
@@ -89,9 +89,9 @@
 ## UAT（用户人工验收）
 
 P96-UAT-1 设备列表 hover Relay 徽章看到 "加密中继，元数据可见" 文案；
-P96-UAT-2 切换 LAN-only Mode = ON + 重启后,跨网段设备徽章变灰 "Out of LAN",同网段设备保持 "局域网"；
-P96-UAT-3 system tray hover 看到 "UniClipboard — LAN-only Mode is ON" tooltip,展开菜单看到状态行 "LAN-only Mode: ON"；
-P96-UAT-4 关闭 LAN-only + 重启,徽章 / tray 状态恢复未开启文案。
+P96-UAT-2 切换 LAN-only Mode = ON + 重启后，跨网段设备徽章变灰 "Out of LAN",同网段设备保持 "局域网"；
+P96-UAT-3 system tray hover 看到 "Clipboard — LAN-only Mode is ON" tooltip，展开菜单看到状态行 "LAN-only Mode: ON"；
+P96-UAT-4 关闭 LAN-only + 重启，徽章 / tray 状态恢复未开启文案。
 
 ---
 

@@ -29,7 +29,7 @@ function createFileItem(overrides: Partial<DisplayClipboardItem> = {}): DisplayC
     type: 'file',
     activeTime: Date.now(),
     content: {
-      file_names: ['uniclipboard-aarch64-apple-darwin.zip'],
+      file_names: ['clipboard-aarch64-apple-darwin.zip'],
       file_sizes: [64 * 1024 * 1024],
     },
     ...overrides,
@@ -48,7 +48,7 @@ describe('useClipboardPreviewState', () => {
       entryId: 'entry-file',
       contentType: 'file',
       sizeBytes: 64 * 1024 * 1024,
-      fileNames: ['uniclipboard-aarch64-apple-darwin.zip'],
+      fileNames: ['clipboard-aarch64-apple-darwin.zip'],
     } satisfies ClipboardPreviewData)
 
     const { result } = renderHook(() => useClipboardPreviewState(item))

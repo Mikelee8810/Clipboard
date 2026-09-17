@@ -1,4 +1,4 @@
-//! Legacy logging configuration for UniClipboard (tauri-plugin-log)
+//! Legacy logging configuration for Clipboard (tauri-plugin-log)
 //!
 //! This module provides the `log::*` macro output configuration via
 //! `tauri-plugin-log`. File logging is now handled by the tracing system
@@ -10,7 +10,7 @@
 //! ## Note
 //!
 //! Structured file logging (JSON) is provided by `uc-observability` through
-//! the tracing subscriber. The `uniclipboard.log` plain-text file is no
+//! the tracing subscriber. The `clipboard.log` plain-text file is no
 //! longer produced. See `docs/architecture/logging-architecture.md`.
 
 use log::LevelFilter;
@@ -65,7 +65,7 @@ pub fn get_builder() -> tauri_plugin_log::Builder {
             }
         })
         .format(move |out, message, record| {
-            // Format: 2025-12-29 10:30:45.123 INFO [main.rs:34] [uniclipboard] Self device already exists
+            // Format: 2025-12-29 10:30:45.123 INFO [main.rs:34] [clipboard] Self device already exists
             let uses_ansi = !is_dev;
             let (level_color, reset) = if uses_ansi {
                 (

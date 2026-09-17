@@ -10,7 +10,7 @@ const oldDirectory = process.argv[2]
 const currentDirectory = path.resolve(process.argv[3] ?? 'target/debug')
 if (!oldDirectory) throw new Error('Pass the verified alpha.5 binary directory')
 const profile = `dev-upgrade-alpha5-replay-${randomUUID()}`
-const root = path.join(os.homedir(), 'Library/Application Support', `app.uniclipboard.desktop-${profile}`)
+const root = path.join(os.homedir(), 'Library/Application Support', `app.clipboard.desktop-${profile}`)
 const reportDirectory = path.resolve('.planning/alpha5-upgrade', profile)
 fs.mkdirSync(reportDirectory, { recursive: true })
 const manifest = JSON.parse(fs.readFileSync(path.join(fixture, 'manifest.json')))
@@ -26,7 +26,7 @@ for (const file of manifest.files) {
 }
 fs.cpSync(path.join(stage, 'data'), root, { recursive: true, errorOnExist: true, force: false })
 fs.rmSync(stage, { recursive: true })
-const env = { ...process.env, UC_PROFILE: profile, UNICLIPBOARD_ENV: 'development', UC_DAEMON_RUN_MODE: 'server', RUST_LOG: 'info' }
+const env = { ...process.env, UC_PROFILE: profile, CLIPBOARD_ENV: 'development', UC_DAEMON_RUN_MODE: 'server', RUST_LOG: 'info' }
 const results = []
 let active
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -34,7 +34,7 @@ function start(directory, label, clipboard = false) {
   const fd = fs.openSync(path.join(reportDirectory, `${label}.log`), 'w')
   const childEnv = { ...env }
   if (clipboard) delete childEnv.UC_DAEMON_RUN_MODE
-  active = spawn(path.join(directory, 'uniclipd'), [], { env: childEnv, stdio: ['ignore', fd, fd] })
+  active = spawn(path.join(directory, 'clipd'), [], { env: childEnv, stdio: ['ignore', fd, fd] })
   fs.closeSync(fd)
   return active
 }
@@ -56,7 +56,7 @@ async function oldRun(label, clipboard = false) {
     await pause(100)
   }
   await pause(1000)
-  const cli = path.join(oldDirectory, 'uniclip')
+  const cli = path.join(oldDirectory, 'clip')
   const list = JSON.parse(execFileSync(cli, ['--json', 'get', '--list'], { env, timeout: 15000, encoding: 'utf8' }))
   if (list.length !== expected.entries.length) throw new Error('Unexpected history count')
   for (const entry of expected.entries) {

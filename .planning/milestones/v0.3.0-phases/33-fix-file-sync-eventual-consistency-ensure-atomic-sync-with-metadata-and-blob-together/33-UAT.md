@@ -14,14 +14,14 @@ updated: 2026-03-15T05:12:00Z
 
 ### 1. Cold Start Smoke Test
 
-expected: Kill any running UniClipboard instance. Start the application from scratch with `bun tauri dev`. App boots without errors in terminal, main window appears, and clipboard list loads normally.
+expected: Kill any running Clipboard instance. Start the application from scratch with `bun tauri dev`. App boots without errors in terminal, main window appears, and clipboard list loads normally.
 result: pass
 
 ### 2. File Entry Status Badges in List
 
 expected: Send a file from another device to this machine. While the file is being received, the clipboard list should show a status badge on the file entry — a clock icon for pending, or a spinner for transferring. After transfer completes, the badge disappears or shows as completed.
 result: issue
-reported: "没有显示其他图标,就只实现了最终图标"
+reported: "没有显示其他图标，就只实现了最终图标"
 severity: major
 
 ### 3. File Entry Status in Preview Panel
@@ -35,28 +35,28 @@ severity: blocker
 
 expected: Copy action disabled for pending/transferring file entries in context menu, action bar, and keyboard shortcut.
 result: issue
-reported: "相同问题 - Tooltip崩溃导致无法测试"
+reported: "相同问题 - Tooltip 崩溃导致无法测试"
 severity: blocker
 
 ### 5. Delete Available for All Transfer States
 
 expected: Delete option available and functional for pending/transferring file entries.
 result: issue
-reported: "Tooltip崩溃导致无法测试"
+reported: "Tooltip 崩溃导致无法测试"
 severity: blocker
 
 ### 6. Failed Transfer Display
 
 expected: Failed file transfer shows failure badge and reason in preview panel.
 result: issue
-reported: "Tooltip崩溃导致无法测试"
+reported: "Tooltip 崩溃导致无法测试"
 severity: blocker
 
 ### 7. Status Persistence After Restart
 
 expected: File transfer statuses visible immediately after app restart with no delay or flicker.
 result: issue
-reported: "Tooltip崩溃导致无法测试"
+reported: "Tooltip 崩溃导致无法测试"
 severity: blocker
 
 ## Summary
@@ -71,7 +71,7 @@ skipped: 0
 
 - truth: "File entries show distinct pending/transferring/failed status badges in clipboard list"
   status: failed
-  reason: "User reported: 没有显示其他图标,就只实现了最终图标"
+  reason: "User reported: 没有显示其他图标，就只实现了最终图标"
   severity: major
   test: 2
   artifacts: []

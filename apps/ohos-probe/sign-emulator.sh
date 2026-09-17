@@ -34,7 +34,7 @@ signed_profile="$signing_dir/profile.p7b"
 app_certificate="$signing_dir/application.cer"
 
 jq \
-  --arg bundle_name "app.uniclipboard.engineprobe" \
+  --arg bundle_name "app.clipboard.engineprobe" \
   --argjson not_before "$not_before" \
   --argjson not_after "$not_after" \
   '.validity["not-before"] = $not_before

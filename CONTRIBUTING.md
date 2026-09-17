@@ -1,6 +1,6 @@
-# Contributing to UniClipboard
+# Contributing to Clipboard
 
-Thanks for your interest in contributing to UniClipboard! This document explains how to set up the project, the workflow we follow, and the conventions we expect contributions to respect.
+Thanks for your interest in contributing to Clipboard! This document explains how to set up the project, the workflow we follow, and the conventions we expect contributions to respect.
 
 > A Chinese version is available — see [`CONTRIBUTING_ZH.md`](./CONTRIBUTING_ZH.md).
 
@@ -49,13 +49,13 @@ Before opening a new issue, please:
 
 When filing a bug, include:
 
-- **Environment** — OS and version, UniClipboard version, install method (DMG, AppImage, MSI, Homebrew, source build).
+- **Environment** — OS and version, Clipboard version, install method (DMG, AppImage, MSI, Homebrew, source build).
 - **Steps to reproduce** — short, deterministic, numbered.
 - **Expected vs actual behavior**.
 - **Logs** — relevant excerpts from the log directory:
-  - macOS: `~/Library/Application Support/app.uniclipboard.desktop[-<profile>]/logs/`
-  - Linux: `~/.local/share/app.uniclipboard.desktop[-<profile>]/logs/`
-  - Windows: `%LOCALAPPDATA%\app.uniclipboard.desktop[-<profile>]\logs\`
+  - macOS: `~/Library/Application Support/app.clipboard.desktop[-<profile>]/logs/`
+  - Linux: `~/.local/share/app.clipboard.desktop[-<profile>]/logs/`
+  - Windows: `%LOCALAPPDATA%\app.clipboard.desktop[-<profile>]\logs\`
 - **Screenshots or recordings** for UI issues.
 
 Strip personal data from logs and clipboard payloads before posting.
@@ -95,7 +95,7 @@ Optional but useful:
 # `--recurse-submodules` pulls our `iroh-blobs` fork under
 # `src-tauri/vendor/iroh-blobs/`; without it `cargo build` fails.
 git clone --recurse-submodules https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard
+cd Clipboard
 bun install
 ```
 
@@ -110,7 +110,7 @@ git submodule update --init --recursive
 ### Run the Desktop App in Development Mode
 
 ```bash
-# Single instance, dev profile (data lives under app.uniclipboard.desktop-dev)
+# Single instance, dev profile (data lives under app.clipboard.desktop-dev)
 bun tauri:dev
 ```
 
@@ -367,8 +367,8 @@ If your change should appear in the user-facing changelog, mention it in your PR
 
 ## License
 
-By contributing to UniClipboard, you agree that your contributions will be licensed under the [AGPL-3.0](./LICENSE) license, the same license that covers the rest of the project. If you incorporate third-party code, ensure its license is compatible and document the source in the PR.
+By contributing to Clipboard, you agree that your contributions will be licensed under the [AGPL-3.0](./LICENSE) license, the same license that covers the rest of the project. If you incorporate third-party code, ensure its license is compatible and document the source in the PR.
 
 ---
 
-Thanks again for helping make UniClipboard better. If anything in this guide is unclear or out of date, open an issue or PR — improving the contributor experience is itself a valuable contribution.
+Thanks again for helping make Clipboard better. If anything in this guide is unclear or out of date, open an issue or PR — improving the contributor experience is itself a valuable contribution.

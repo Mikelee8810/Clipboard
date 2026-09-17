@@ -58,14 +58,14 @@ const serveDir = join(workDir, 'serve') // holds the manifest + update artifact
 const stateFile = join(workDir, 'state.json')
 
 // Keys live outside target/ so `cargo clean` does not wipe them.
-const keyDir = process.env.UC_DEV_UPDATER_KEY_DIR || join(homedir(), '.uniclip-dev-updater')
+const keyDir = process.env.UC_DEV_UPDATER_KEY_DIR || join(homedir(), '.clip-dev-updater')
 const privKeyFile = join(keyDir, 'dev.key')
 const pubKeyFile = join(keyDir, 'dev.key.pub')
 const passwordFile = join(keyDir, 'password.txt')
 
 // Isolated identity so the test build never touches the real install's data.
-const IDENTIFIER = 'app.uniclipboard.desktop.dev'
-const PRODUCT_NAME = 'UniClipboard Dev'
+const IDENTIFIER = 'app.clipboard.desktop.dev'
+const PRODUCT_NAME = 'Clipboard Dev'
 const RUN_PROFILE = process.env.UC_DEV_UPDATER_PROFILE || 'updtest'
 const MANIFEST_NAME = 'update.json'
 const DEFAULT_PORT = Number(process.env.UC_DEV_UPDATER_PORT || 8723)
@@ -147,13 +147,13 @@ function parseFlags(argv) {
   return flags
 }
 
-// Stage the `uniclipd` daemon sidecar (debug) unless already present.
+// Stage the `clipd` daemon sidecar (debug) unless already present.
 function ensureSidecar(flags) {
   const triple = spawnSync('rustc', ['--print', 'host-tuple'], {
     cwd: repoRoot,
     encoding: 'utf8',
   }).stdout?.trim()
-  const staged = triple && existsSync(join(srcTauri, 'binaries', `uniclipd-${triple}`))
+  const staged = triple && existsSync(join(srcTauri, 'binaries', `clipd-${triple}`))
   if (staged && !flags['rebuild-sidecar']) {
     log(`sidecar already staged for ${triple} (pass --rebuild-sidecar to force)`)
     return
@@ -262,7 +262,7 @@ function cmdBuildUpdate(flags) {
 
   // Clean, space-free filename for the served URL (bytes unchanged → sig valid).
   const arch = process.arch === 'arm64' ? 'aarch64' : 'x86_64'
-  const artifactName = `UniClipboardDev_${version}_${arch}.app.tar.gz`
+  const artifactName = `ClipboardDev_${version}_${arch}.app.tar.gz`
 
   rmSync(serveDir, { recursive: true, force: true })
   mkdirSync(serveDir, { recursive: true })
@@ -344,7 +344,7 @@ function cmdRun(flags) {
   const appBundle = findNewest(runDir, n => n.endsWith('.app'))
   if (!appBundle) die(`no base app in ${runDir} — run build-base first`)
   const macosDir = join(appBundle, 'Contents', 'MacOS')
-  // Contents/MacOS holds BOTH the GUI binary and the bundled `uniclipd`
+  // Contents/MacOS holds BOTH the GUI binary and the bundled `clipd`
   // sidecar, so pick the GUI binary via the bundle's CFBundleExecutable
   // rather than guessing by directory order (`defaults` reads XML + binary
   // plists). Fall back to the only non-sidecar binary if that lookup fails.
@@ -354,7 +354,7 @@ function cmdRun(flags) {
     { encoding: 'utf8' }
   ).stdout?.trim()
   const exeName =
-    fromPlist || readdirSync(macosDir).find(n => !n.startsWith('.') && n !== 'uniclipd')
+    fromPlist || readdirSync(macosDir).find(n => !n.startsWith('.') && n !== 'clipd')
   if (!exeName) die(`could not resolve the GUI binary in ${macosDir}`)
   const exe = join(macosDir, exeName)
   const port = Number(flags.port || DEFAULT_PORT)
@@ -417,10 +417,10 @@ Commands:
   info            Print resolved paths, versions, and the override env vars.
 
 Shared options:
-  --rebuild-sidecar   force-rebuild the uniclipd daemon sidecar before a build
+  --rebuild-sidecar   force-rebuild the clipd daemon sidecar before a build
 
 Env overrides:
-  UC_DEV_UPDATER_KEY_DIR        key location (default ~/.uniclip-dev-updater)
+  UC_DEV_UPDATER_KEY_DIR        key location (default ~/.clip-dev-updater)
   UC_DEV_UPDATER_KEY_PASSWORD   key password (default empty)
   UC_DEV_UPDATER_PROFILE        UC_PROFILE for the run (default ${RUN_PROFILE})
   UC_DEV_UPDATER_PORT           default port (default ${DEFAULT_PORT})

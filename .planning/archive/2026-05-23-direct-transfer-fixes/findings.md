@@ -139,7 +139,7 @@ mac sender 复制 `archboot-...-ARCH-local-aarch64.iso` (实际 ~950MB)，win re
 - `mac.file_transfer`：**空**（sender 不创建 projection 行）
 - `win.clipboard_entry`：entry `f780b8df` total_size=1009166（与 mac 不同 entry_id，receiver 自己 mint）
 - `win.file_transfer`：transfer_id=`f780b8df` status=completed，**file_size=115443**（115KB PNG），filename=NULL
-- `win` 端 sqlite 用 **WAL 模式**：`uniclipboard.db-wal` 2.1MB 包含全部新数据；只读主文件会看到两天前的旧状态（坑：dual-side-debug 调研时必须连 wal+shm 一起 cp，否则误判 "win 没收到 entry"）
+- `win` 端 sqlite 用 **WAL 模式**：`clipboard.db-wal` 2.1MB 包含全部新数据；只读主文件会看到两天前的旧状态（坑：dual-side-debug 调研时必须连 wal+shm 一起 cp，否则误判 "win 没收到 entry"）
 
 ### 根因 1：sender 端 UI "提前显示完成"
 
@@ -269,7 +269,7 @@ apply_inbound 在 `(false, Some(materializer))` 分支收到 `PartialOnCancel`�
 
 选项：
 
-A. **URI scheme `uniclip-missing://`**：rep_bytes 是 `text/uri-list`，把 missing 文件写成 `uniclip-missing:///{filename}?reason=cancelled&size=950000000`，前端解析时识别这个 scheme 渲染 missing 态。
+A. **URI scheme `clip-missing://`**：rep_bytes 是 `text/uri-list`，把 missing 文件写成 `clip-missing:///{filename}?reason=cancelled&size=950000000`，前端解析时识别这个 scheme 渲染 missing 态。
 - 优点：无 schema 变更，向前/向后兼容旧 DB；frontend 渲染时按 URI scheme 分支
 - 缺点：合约语义重，需要前端解析逻辑
 
@@ -286,13 +286,13 @@ D. **representation 上加 `missing_blobs: Option<Vec<MissingBlobMeta>>` 元数�
 - 优点：domain model 表达力更强；DB 序列化时可以走 representations 现有 blob column
 - 缺点：domain model 改动
 
-**倾向 A**：实施成本最低，schema 不动，跨进程跨设备语义清晰。前端把 `uniclip-missing://` 与 `file://` 一起识别，渲染时区分。
+**倾向 A**：实施成本最低，schema 不动，跨进程跨设备语义清晰。前端把 `clip-missing://` 与 `file://` 一起识别，渲染时区分。
 
 #### 前端
 
 - `useTransferProgress.ts:104-110` cancelled 分支：先 `dispatch(removePendingEntry(entryId))`，再做现有 transfer state 更新
 - 等 `clipboard.new_content` 到达走正常 entry 渲染流程
-- `ClipboardItemRow` / `FilePreview` / `FileContextMenu` 解析 `uniclip-missing://`：灰色 icon + "文件已丢失" 文案 + 复制 / 打开 / 拖出 disabled
+- `ClipboardItemRow` / `FilePreview` / `FileContextMenu` 解析 `clip-missing://`：灰色 icon + "文件已丢失" 文案 + 复制 / 打开 / 拖出 disabled
 - i18n：`clipboard.fileMissing.cancelled` 等
 
 ### 边界情况

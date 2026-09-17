@@ -1,11 +1,11 @@
-//! TestCli — ergonomic command builder for `uniclip` with profile isolation.
+//! TestCli — ergonomic command builder for `clip` with profile isolation.
 
 use std::path::PathBuf;
 use std::process::{Command, Output};
 
 use crate::{NodeBinarySet, TestProfile};
 
-/// Builder for running `uniclip` commands against a specific test profile.
+/// Builder for running `clip` commands against a specific test profile.
 pub struct TestCli {
     binary: PathBuf,
     pub profile_name: String,
@@ -24,28 +24,28 @@ impl TestCli {
         }
     }
 
-    /// Path to the `uniclip` binary.
+    /// Path to the `clip` binary.
     pub fn binary_path(&self) -> &std::path::Path {
         &self.binary
     }
 
-    /// Run a uniclip command with the test profile automatically set.
+    /// Run a clip command with the test profile automatically set.
     /// Returns the raw Output for assertions.
     pub fn run(&self, args: &[&str]) -> std::io::Result<Output> {
         Command::new(&self.binary)
             .env("UC_PROFILE", &self.profile_name)
-            .env("UNICLIPBOARD_ENV", "development")
+            .env("CLIPBOARD_ENV", "development")
             .args(args)
             .output()
     }
 
     /// Run a command and assert it succeeded (exit code 0), returning stdout.
     pub fn run_ok(&self, args: &[&str]) -> String {
-        let output = self.run(args).expect("failed to execute uniclip");
+        let output = self.run(args).expect("failed to execute clip");
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             panic!(
-                "uniclip {:?} failed (exit={:?}):\nstderr: {}",
+                "clip {:?} failed (exit={:?}):\nstderr: {}",
                 args,
                 output.status.code(),
                 stderr
@@ -56,7 +56,7 @@ impl TestCli {
 
     /// Run a command and return exit code + stdout + stderr without asserting.
     pub fn run_capture(&self, args: &[&str]) -> CapturedOutput {
-        let output = self.run(args).expect("failed to execute uniclip");
+        let output = self.run(args).expect("failed to execute clip");
         CapturedOutput {
             exit_code: output.status.code().unwrap_or(-1),
             stdout: String::from_utf8_lossy(&output.stdout).to_string(),

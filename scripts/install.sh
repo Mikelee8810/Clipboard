@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# UniClipboard one-shot installer (Linux / macOS)
+# Clipboard one-shot installer (Linux / macOS)
 #
 # Usage (pick one):
 #   curl -fsSL https://uniclipboard.app/install.sh | bash
@@ -15,7 +15,7 @@
 #                      - macOS (app)      defaults to /Applications
 #                      - Linux (appimage) defaults to $HOME/.local
 #   UC_REPO          GitHub repo, defaults to UniClipboard/UniClipboard
-#   UC_COPR_PROJECT  COPR project (defaults to mkdir700/uniclipboard)
+#   UC_COPR_PROJECT  COPR project (defaults to mkdir700/clipboard)
 #   GITHUB_TOKEN     Optional, sidesteps the GitHub API rate limit
 #
 # Auto-detection:
@@ -25,15 +25,15 @@
 #                   → COPR (so `dnf upgrade` keeps tracking releases);
 #                   dnf-based + --version → local .rpm; otherwise AppImage
 #
-# Note: on macOS you can also use Homebrew — brew install --cask uniclipboard
+# Note: on macOS you can also use Homebrew — brew install --cask clipboard
 
 set -euo pipefail
 
 REPO="${UC_REPO:-UniClipboard/UniClipboard}"
-APP_NAME="UniClipboard"
-APP_BIN="uniclipboard"
-APP_ID="app.uniclipboard.desktop"
-COPR_PROJECT="${UC_COPR_PROJECT:-mkdir700/uniclipboard}"
+APP_NAME="Clipboard"
+APP_BIN="clipboard"
+APP_ID="app.clipboard.desktop"
+COPR_PROJECT="${UC_COPR_PROJECT:-mkdir700/clipboard}"
 
 VERSION="${UC_VERSION:-}"
 FORMAT="${UC_FORMAT:-}"
@@ -47,7 +47,7 @@ VERSION_EXPLICIT=""
 
 usage() {
   cat <<'EOF'
-UniClipboard installer (Linux / macOS)
+Clipboard installer (Linux / macOS)
 
 Usage:
   install.sh [--version vX.Y.Z] [--format deb|rpm|copr|snap|appimage|app] [--prefix DIR]
@@ -166,7 +166,7 @@ choose_format() {
     if command -v dpkg >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then echo deb; return; fi
     if command -v rpm >/dev/null 2>&1 \
        && { command -v dnf >/dev/null 2>&1 || command -v yum >/dev/null 2>&1; }; then
-      # On dnf-based distros, prefer the COPR repo (mkdir700/uniclipboard)
+      # On dnf-based distros, prefer the COPR repo (mkdir700/clipboard)
       # so that `dnf upgrade` keeps tracking new releases. Fall back to
       # the local .rpm path only when the user pinned a specific version,
       # since COPR can't pin arbitrary versions.
@@ -297,7 +297,7 @@ install_snap() {
 }
 
 # ---- Linux: COPR (preferred on Fedora / RHEL / openSUSE) --------------------
-# Enables the mkdir700/uniclipboard COPR repo, then `dnf install uniclipboard`,
+# Enables the mkdir700/clipboard COPR repo, then `dnf install clipboard`,
 # so that later `dnf upgrade` automatically tracks new releases. Trade-off
 # vs. the local-rpm path: COPR can't pin a specific version, so when the
 # user passes --version we fall through to install_rpm() instead (handled
@@ -411,15 +411,15 @@ case "$FORMAT" in
 esac
 case "$FORMAT" in
   app)
-    info "Run: search for UniClipboard in Launchpad/Spotlight, or 'open -a UniClipboard'"
+    info "Run: search for Clipboard in Launchpad/Spotlight, or 'open -a Clipboard'"
     ;;
   appimage)
-    info "Run: ${PREFIX}/bin/${APP_NAME}.AppImage    or search UniClipboard in your app menu"
+    info "Run: ${PREFIX}/bin/${APP_NAME}.AppImage    or search Clipboard in your app menu"
     ;;
   snap)
-    info "Run: search for UniClipboard in your app menu, or 'snap run ${APP_BIN}'"
+    info "Run: search for Clipboard in your app menu, or 'snap run ${APP_BIN}'"
     ;;
   *)
-    info "Run: search for UniClipboard in your app menu, or the '${APP_BIN}' command"
+    info "Run: search for Clipboard in your app menu, or the '${APP_BIN}' command"
     ;;
 esac

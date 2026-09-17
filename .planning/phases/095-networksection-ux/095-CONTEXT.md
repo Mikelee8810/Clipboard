@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-用户在 Settings → Network 分类下能看到并切换 "LAN-only Mode" 开关；切换后立即看到**持久 inline 重启通知**（专用 RestartBanner 组件，贴在 Switch 上方），含「立即重启」按钮触发 `app.restart()`（Tauri 整个 GUI 进程退出 + relaunch，daemon 子系统随之重启）；info icon 旁 Popover 披露开启后仍走外网的 4 类请求；前端 store 内部状态名 `allowRelayFallback`（驼峰），`NetworkSection.tsx` 占位组件 + `settings.sections.network.placeholder` i18n key 已替换、无残留。
+用户在 Settings → Network 分类下能看到并切换 "LAN-only Mode" 开关；切换后立即看到 **持久 inline 重启通知**（专用 RestartBanner 组件，贴在 Switch 上方），含「立即重启」按钮触发 `app.restart()`（Tauri 整个 GUI 进程退出 + relaunch，daemon 子系统随之重启）；info icon 旁 Popover 披露开启后仍走外网的 4 类请求；前端 store 内部状态名 `allowRelayFallback`（驼峰），`NetworkSection.tsx` 占位组件 + `settings.sections.network.placeholder` i18n key 已替换、无残留。
 
 **交付范围：**
 - TypeScript Settings 类型 + daemon API 客户端补 `network.allowRelayFallback`（与 Phase 94 wire 对齐）
@@ -19,7 +19,7 @@
 - i18n 文案（zh-CN + en-US）含 4 类外网请求清单 + Banner 文案
 
 **不在本 phase 范围：**
-- daemon-only CLI 模式（`uniclip daemon`）的「立即重启」UX —— 整里程碑显式排除（用户自己 systemctl/launchd），daemon 不暴露 admin/restart HTTP
+- daemon-only CLI 模式（`clip daemon`）的「立即重启」UX —— 整里程碑显式排除（用户自己 systemctl/launchd），daemon 不暴露 admin/restart HTTP
 - system tray icon LAN-only 状态 —— Phase 96
 - 设备列表「连接通道」徽章 —— Phase 96
 - onboarding tip + `docs/lan-only.md` 文档化 + changelog —— Phase 97
@@ -32,26 +32,26 @@
 
 ### A. 重启 UX 形态
 
-- **D-A1：** 持久 inline 重启通知用**专用 RestartBanner 组件**（`src/components/setting/RestartBanner.tsx`）。
+- **D-A1：** 持久 inline 重启通知用 **专用 RestartBanner 组件**（`src/components/setting/RestartBanner.tsx`）。
   - 不复用 shadcn `Alert`：RestartBanner 需独立样式控制（pending 强调色、"立即重启" 主按钮、loading 状态）；后续 Phase 96/97 若需重启提示可复用本组件。
   - 不用 sonner toast：即便 `duration:Infinity` 在用户心智里仍是"右上角浮动短提示"，违反 ROADMAP「持久 inline」语义。
 - **D-A2：** RestartBanner 贴在 **NetworkSection 内部、LAN-only Switch SettingRow 上方**（不在 Settings 页全局顶部，不在 App layout 全局）。
   - 用户切到其它 Settings 分类时 Banner 不可见 —— 接受这一代价；v0.7.0 的全局可见性由 Phase 96 system tray icon 状态徽章兜底。
   - 不动 Settings 页 layout，Phase 95 改动局限在 NetworkSection 文件树。
-- **D-A3：** 三态视觉**只靠 RestartBanner 出现/消失**表达，Switch 本身不动样式。
+- **D-A3：** 三态视觉 **只靠 RestartBanner 出现/消失** 表达，Switch 本身不动样式。
   - applied OFF: Switch=OFF + 无 Banner
   - applied ON: Switch=ON + 无 Banner
   - pending change: Switch=用户的选择 + Banner 出现
-  - **不**在 Switch 右侧加 "Pending" Badge —— Banner 已表达完整 pending 信号；额外 Badge 增加 SettingRow 视觉密度且与 Phase 96 通道徽章混淆。
+  - **不** 在 Switch 右侧加 "Pending" Badge —— Banner 已表达完整 pending 信号；额外 Badge 增加 SettingRow 视觉密度且与 Phase 96 通道徽章混淆。
 
 ### B. 「立即重启」工程范围 + 实现
 
-- **D-B1：** Phase 95 **只 cover Tauri GUI 模式**。`uniclip daemon` CLI 模式不在 Phase 95 范围。
-  - 物理意义：GUI 模式下 daemon 是 in-process（`uc-desktop/src/daemon/handle.rs::start_in_process`），所以"daemon graceful shutdown + relaunch" ≡ Tauri **整个 GUI 进程**退出 + 重新拉起。daemon 子系统随 Tauri 进程一起重启 → 新进程读 settings.json → `IrohNodeBuilder::bind` 用新 `disable_relays` 值（OnceCell 守护在新进程下重置）。
+- **D-B1：** Phase 95 **只 cover Tauri GUI 模式**。`clip daemon` CLI 模式不在 Phase 95 范围。
+  - 物理意义：GUI 模式下 daemon 是 in-process（`uc-desktop/src/daemon/handle.rs::start_in_process`），所以"daemon graceful shutdown + relaunch" ≡ Tauri **整个 GUI 进程** 退出 + 重新拉起。daemon 子系统随 Tauri 进程一起重启 → 新进程读 settings.json → `IrohNodeBuilder::bind` 用新 `disable_relays` 值（OnceCell 守护在新进程下重置）。
   - 这是唯一干净路径：iroh `RelayMode` 是 endpoint bind 时常量；Phase 94 plan 06 已用 `OnceCell`（`#[cfg(not(test))]`）阻断进程内二次 bind（Pitfall 3 防御）。
 - **D-B2：** Tauri command 复用 `app.restart()`（与 `uc-tauri/src/commands/updater.rs:301` 同一调用模式）。
   - 新增 Tauri command（命名由 planner 定，建议 `restart_app` 或 `restart_for_settings`，含 trace metadata 走 `record_trace_fields` helper）。
-  - 调用前**不**显式做 daemon graceful shutdown：Tauri 进程退出会触发 task cancel cascade（`task_registry.rs::shutdown`），daemon 子系统随之 graceful 关闭 —— 复用现有生命周期治理。
+  - 调用前 **不** 显式做 daemon graceful shutdown：Tauri 进程退出会触发 task cancel cascade（`task_registry.rs::shutdown`），daemon 子系统随之 graceful 关闭 —— 复用现有生命周期治理。
 - **D-B3：** 重启失败兜底：`app.restart()` 失败时显示 inline error（在 RestartBanner 内 inline 渲染错误信息 + 提示用户手动重启），不抛 toast。
 
 ### C. 4 类外网请求披露形态
@@ -72,7 +72,7 @@
     - `settings_mtime`: `std::fs::metadata(settings_path).modified()` 实时读 millis since epoch；settings_path 通过 `TauriAppRuntime` 暴露的 settings dir helper 拿（沿用现有 path helper，由 planner 找）。
   - 前端 NetworkSection mount 时调一次 `get_restart_state`：若 `settings_mtime > process_started_at` 且 `settings.network.allowRelayFallback ≠ daemon 当前 bind 值` ⇒ 显示 RestartBanner。
   - **简化**：Phase 95 不需要"daemon 当前 bind 值"反查 —— 只要 `settings_mtime > process_started_at`（说明本进程启动后 settings.json 改过）即可推断 pending。bind 值反查留给 Phase 96「连接通道指示器」（INDIC-01 那边的 `ConnectionChannelPort` 已经会反映真实 bind 状态）。
-- **D-D2：** 切换开关后**乐观 pending**：Switch onCheckedChange 立即把 in-memory `setting.network.allowRelayFallback` 改掉 + Banner 显示，不等 PUT 返回；PUT 完成后再决定是否要刷新 banner 状态（如果 PUT 返回 `restart_required: true` 且 mtime 已更新，banner 维持）。
+- **D-D2：** 切换开关后 **乐观 pending**：Switch onCheckedChange 立即把 in-memory `setting.network.allowRelayFallback` 改掉 + Banner 显示，不等 PUT 返回；PUT 完成后再决定是否要刷新 banner 状态（如果 PUT 返回 `restart_required: true` 且 mtime 已更新，banner 维持）。
 - **D-D3：** debounce 用现有 `useDebounce(value, 500)` hook（`src/hooks/useDebounce.ts`）。语义：用户连击切换时，UI 即时反映最后一次状态 + Banner 即时出现，但 PUT /settings 仅在停止切换 500ms 后发一次（最后值）。**注意**：Banner 显示和 PUT 写盘解耦 —— Banner 在用户切的瞬间出现，PUT 落盘是后续事件。
 
 ### Claude's Discretion
@@ -126,7 +126,7 @@
 - `src-tauri/crates/uc-daemon-contract/src/api/dto/settings.rs:208-209` `NetworkSettingsDto`（wire 形态：`allowRelayFallback: bool`）
 - `src-tauri/crates/uc-daemon-contract/src/api/dto/settings.rs:318-319` `NetworkSettingsPatchDto`
 - `src-tauri/crates/uc-webserver/src/api/settings.rs:69-93` `update_settings_handler` —— `UpdateSettingsResponse` 含 `restart_required: bool`，前端 PUT 后必须读这字段
-- `src-tauri/crates/uc-tauri/src/commands/updater.rs:300-301` — `app.restart()` 现有调用模式（Phase 95 「立即重启」复用）
+- `src-tauri/crates/uc-tauri/src/commands/updater.rs:300-301` — `app.restart()` 现有调用模式（Phase 95「立即重启」复用）
 - `src-tauri/crates/uc-tauri/src/commands/mod.rs:1-44` — Tauri commands 注册 + `record_trace_fields` helper（Phase 95 新增 commands 注册到此）
 - `src-tauri/crates/uc-desktop/src/daemon/handle.rs:1-30` — daemon in-process 启动 / `DaemonHandle::shutdown` 语义（理解"为什么 GUI 模式 = 整进程重启"）
 - `src-tauri/crates/uc-bootstrap/src/task_registry.rs:74` — `TaskRegistry::shutdown` cancel cascade（进程退出时 daemon 子系统 graceful 关闭依赖）
@@ -148,7 +148,7 @@
 - **`Switch` / `Badge` / `Popover` / `Alert` / `Button` / `Tooltip`**（`src/components/ui/`）—— shadcn 完整套件已就位。Phase 95 用 `Switch` + `Popover` + 自写 `RestartBanner`。
 - **`SettingGroup` / `SettingRow`**（`src/components/setting/`）—— Section 容器 + 行布局 primitive，所有现有 Section 都用；NetworkSection 跟随同模式。
 - **`useSetting` hook + SettingContext**（`src/contexts/SettingContext.tsx`）—— 现有 `updateGeneralSetting` / `updateSyncSetting` / `updateFileSyncSetting` 同形 helper 模式；新增 `updateNetworkSetting` 完全可镜像。
-- **`saveSetting` 函数**（`SettingContext.tsx:46-64`）—— 当前实现把 PUT 响应**忽略**了；Phase 95 需扩展使其捕获 `restart_required` 信号 + 暴露给 NetworkSection（建议 saveSetting 改为返回 `Promise<{ restartRequired: boolean }>`，所有调用方继续 ignore 也无妨；NetworkSection 的 updateNetworkSetting 读这个字段）。
+- **`saveSetting` 函数**（`SettingContext.tsx:46-64`）—— 当前实现把 PUT 响应 **忽略** 了；Phase 95 需扩展使其捕获 `restart_required` 信号 + 暴露给 NetworkSection（建议 saveSetting 改为返回 `Promise<{ restartRequired: boolean }>`，所有调用方继续 ignore 也无妨；NetworkSection 的 updateNetworkSetting 读这个字段）。
 - **`updateSettings` API**（`src/api/daemon/settings.ts:201-207`）—— 当前丢弃响应 body；Phase 95 改返回 `{ success, restartRequired }`，向上传递。
 - **lucide-react `Wifi` icon** —— `settings-config.ts:9` 已 import，作为 network 分类图标，不动。
 - **`app.restart()` 调用模式** —— `uc-tauri/src/commands/updater.rs:301` 是现成参考；Phase 95 新 command 复用同 API。
@@ -213,7 +213,7 @@
   2. **OTLP 遥测** —— 由 General → 遥测开关独立控制，与 LAN-only 无关；如需关闭请到 General 分类
   3. **pkarr DHT NodeId 解析** —— 跨网段连接通过 pkarr 公网 DHT 解析对端 NodeId，性质类似 DNS，关闭会导致跨网段连接率从 ~90% 跌到接近 0
   4. **auto-update GitHub 检查** —— 由 General → 自动更新开关独立控制，访问 GitHub release API 检查新版本
-  - 措辞**禁用**："fully offline / 完全离线 / 绝对私有 / no internet / private mode / encrypted-and-local"
+  - 措辞 **禁用**："fully offline / 完全离线 / 绝对私有 / no internet / private mode / encrypted-and-local"
 - **info icon 选 lucide-react `Info`** —— 与 settings-config.ts about 分类一致；planner 可换 `HelpCircle`，但同一文件内保持单选。
 - **三态 → 实际只是二态布尔** —— 提醒 planner：实现时 `pending: boolean` 即可，不需要 `RestartState = 'applied-off' | 'applied-on' | 'pending'` 这种 enum；状态来自「当前 setting 值 + mtime > process_started_at」推导。
 - **PUT /settings 调用顺序与 banner 显示**：
@@ -229,7 +229,7 @@
 <deferred>
 ## Deferred Ideas
 
-- **daemon-only CLI 模式（`uniclip daemon`）的「立即重启」UX** —— 整里程碑显式排除（PROJECT.md §Out of Scope）。CLI 用户走 systemctl/launchd/手动 kill+restart。如果 v0.7.x 用户反馈 daemon 模式 pending 提示缺失，再考虑暴露 `POST /admin/restart` HTTP 端点 + tracing::warn! 提示。
+- **daemon-only CLI 模式（`clip daemon`）的「立即重启」UX** —— 整里程碑显式排除（PROJECT.md §Out of Scope）。CLI 用户走 systemctl/launchd/手动 kill+restart。如果 v0.7.x 用户反馈 daemon 模式 pending 提示缺失，再考虑暴露 `POST /admin/restart` HTTP 端点 + tracing::warn! 提示。
 - **`bind_started_at` 通过 daemon HTTP 暴露** —— 仅限 v0.7.x daemon-only 模式 pending 提示需要时再做；Phase 95 不动 daemon HTTP 契约。
 - **Phase 96 system tray icon LAN-only 状态徽章** —— INDIC-04，独立 phase。Phase 95 不做 tray 形态。
 - **Phase 97 `docs/lan-only.md` / `docs/terminology.md` / changelog** —— DOC-01/02/03，独立 phase。Phase 95 把 4 类请求文案最终敲定供 Phase 97 复制粘贴；reviewer checklist + PR 模板 Pitfall 5 守护放 Phase 97。

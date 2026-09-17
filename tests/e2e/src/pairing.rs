@@ -1,6 +1,6 @@
 //! Pairing helpers shared by multi-node E2E tests.
 //!
-//! `uniclip invite` blocks until a joiner completes (or the invitation
+//! `clip invite` blocks until a joiner completes (or the invitation
 //! expires), printing `INVITATION_CODE=<code>` early on. [`InviteSession`]
 //! wraps that lifecycle: spawn with piped stdout, capture the code line,
 //! and make sure the process is reaped or killed when the round ends.
@@ -39,7 +39,7 @@ pub async fn setup_initialized_node(
     (daemon, cli)
 }
 
-/// A live `uniclip invite` process whose pairing code has been captured.
+/// A live `clip invite` process whose pairing code has been captured.
 ///
 /// Dropping the session kills the process if it is still running, so a
 /// panicking test never leaks an orphaned `invite`.
@@ -48,12 +48,12 @@ pub struct InviteSession {
 }
 
 impl InviteSession {
-    /// Spawn `uniclip invite` for the given CLI profile and block until the
+    /// Spawn `clip invite` for the given CLI profile and block until the
     /// `INVITATION_CODE=` line appears on its stdout (30s deadline).
     pub async fn start(cli: &TestCli) -> (Self, String) {
         let mut child = Command::new(cli.binary_path())
             .env("UC_PROFILE", &cli.profile_name)
-            .env("UNICLIPBOARD_ENV", "development")
+            .env("CLIPBOARD_ENV", "development")
             .args(["invite"])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

@@ -17,7 +17,7 @@ gaps:
       代码层面 restart_app Tauri command 实装正确（`app.restart()` 复用 updater.rs:301 同模式），
       但用户在 dev 模式（`pnpm tauri:dev` / bun + Tauri 2 + macOS 25）执行 UAT 时观察到：
         - 「立即重启」按钮点击后 Tauri 主进程退出（daemon log 末行 `INFO uc_tauri::run Application exiting`）
-        - 退出之后 Vite/Tauri dev watcher 在本组合下没有 respawn binary（无 uniclipboard 进程、端口 1420 无监听）
+        - 退出之后 Vite/Tauri dev watcher 在本组合下没有 respawn binary（无 clipboard 进程、端口 1420 无监听）
         - 新窗口打开但白屏；用户必须手动 `pnpm tauri:dev` 重启
       settings.json 已成功写入 `allow_relay_fallback: false`，证明 PUT /settings 链路 OK；
       仅 `app.restart()` 在 dev 模式下产生退出+无 respawn 的半状态。
@@ -78,7 +78,7 @@ human_verification:
 | Pitfall 5 边界 fence — 无 daemon HTTP / telemetry / OTLP / pkarr / auto-update 引用 | `grep -nE "daemon_client\|admin/restart\|telemetry_enabled\|otlp" restart.rs` 0 匹配 | ✓ VERIFIED |
 | 6/6 单元测试 PASS（5 helper + 1 fence） | `cargo test -p uc-tauri --lib commands::restart::tests` 6 passed | ✓ VERIFIED |
 
-### Plan 95.03 — i18n（zh-CN + en-US）
+### Plan 95.03 — i18n (zh-CN + en-US)
 
 | Must-have | 验证 | 结果 |
 |---|---|---|
@@ -105,7 +105,7 @@ human_verification:
 | Must-have | 验证 | 结果 |
 |---|---|---|
 | RestartBanner visible=false 时不渲染（`if (!visible) return null`） | `RestartBanner.tsx:34` | ✓ VERIFIED |
-| RestartBanner role=status + aria-live=polite + RefreshCw + 「立即重启」 Button | `RestartBanner.tsx:37-66` | ✓ VERIFIED |
+| RestartBanner role=status + aria-live=polite + RefreshCw + 「立即重启」Button | `RestartBanner.tsx:37-66` | ✓ VERIFIED |
 | RestartBanner error sub-state 渲染 role=alert + 重试 + dismiss X | `RestartBanner.tsx:47-87` | ✓ VERIFIED |
 | LanOnlyDisclosure trigger `<button>` + aria-haspopup="dialog" | `LanOnlyDisclosure.tsx:22-29` | ✓ VERIFIED |
 | LanOnlyDisclosure 4 类外网请求 PopoverContent 完整渲染 | `LanOnlyDisclosure.tsx:14, 42-51` `DISCLOSURE_KEYS = ['rendezvous', 'otlp', 'pkarr', 'autoUpdate']` | ✓ VERIFIED |
@@ -185,7 +185,7 @@ human_verification:
 
 > "重启循环 (UAT #4) — 点「立即重启」后窗口打开但是白屏的；root cause 诊断：
 > - daemon log 最后一行 `INFO uc_tauri::run Application exiting`，之后再无日志
-> - 当前没有 uniclipboard/vite 进程，端口 1420 无监听
+> - 当前没有 clipboard/vite 进程，端口 1420 无监听
 > - settings.json 已写入 `allow_relay_fallback: false`，证明 PUT /settings 链路 OK
 > - 结论：`app.restart()` 触发了进程退出（如设计），但 `tauri:dev` watcher 在本项目 macOS + bun + Tauri 2 组合下没有 respawn binary。dev 模式下 restart 循环不可用。"
 
@@ -203,10 +203,10 @@ human_verification:
 
 **Root cause analysis:**
 
-Plan 02 设计锁定走 `app.restart()`（与 `uc-tauri/src/commands/updater.rs:301` 同模式）。该方法行为依赖 Tauri 运行时:
+Plan 02 设计锁定走 `app.restart()`（与 `uc-tauri/src/commands/updater.rs:301` 同模式）。该方法行为依赖 Tauri 运行时：
 
 - **Prod bundle (`tauri build` 产出 .app/.dmg)**: Tauri 自带 launcher binary 监听 SIGCHLD，进程退出后由 launcher 自动 relaunch 主 binary。预期 PASS（更新场景已 ship 用此模式 — updater.rs:300-301 在 prod 路径下已 sustained validated）。
-- **Dev mode (`pnpm tauri:dev`)**: Tauri dev 路径走 cargo + Vite watcher 双进程。`app.restart()` 让主 binary exit；但 Vite/Tauri 2 dev orchestrator 在 **macOS 25 + bun + Tauri 2** 组合下没有 watcher respawn binary 的逻辑（确认 by 用户 root-cause 诊断 — 端口 1420 无监听、无 uniclipboard 进程）。
+- **Dev mode (`pnpm tauri:dev`)**: Tauri dev 路径走 cargo + Vite watcher 双进程。`app.restart()` 让主 binary exit；但 Vite/Tauri 2 dev orchestrator 在 **macOS 25 + bun + Tauri 2** 组合下没有 watcher respawn binary 的逻辑（确认 by 用户 root-cause 诊断 — 端口 1420 无监听、无 clipboard 进程）。
 
 Plan 02 设计未提前发现此 dev-mode 限制。Plan 02 SUMMARY 中未列入此为 known limitation；Plan 06 Task 4 UAT 脚本期望 dev 模式可端到端验证（验收 #4 `1-2 秒内 Tauri 整 GUI 进程退出 + 自动 relaunch`）。
 
@@ -217,13 +217,13 @@ Plan 02 设计未提前发现此 dev-mode 限制。Plan 02 SUMMARY 中未列入�
 
 **Suggested fix direction（任选一或组合）：**
 
-**Option A (Minimal — dev mode 提示):** 让 `restart_app` command 检测 dev 模式（`#[cfg(debug_assertions)]` 或 `tauri::is_dev()`），在 dev 模式下不调 `app.restart()`，转而返回特殊错误码让前端显示 inline 提示 "dev 模式不支持自动重启 — 请手动 quit 后重新 `pnpm tauri:dev`"。修改面: `restart.rs` + `RestartBanner` error sub-state 文案。
+**Option A (Minimal — dev mode 提示):** 让 `restart_app` command 检测 dev 模式（`#[cfg(debug_assertions)]` 或 `tauri::is_dev()`），在 dev 模式下不调 `app.restart()`，转而返回特殊错误码让前端显示 inline 提示 "dev 模式不支持自动重启 — 请手动 quit 后重新 `pnpm tauri:dev`"。修改面：`restart.rs` + `RestartBanner` error sub-state 文案。
 
-**Option B (Prod-only validation):** 接受 dev 模式 restart 不可用为 known limitation，文档化并要求 UAT 在 prod bundle 中验证（`pnpm tauri build` → 安装 .app → 测试）。修改面: SUMMARY 加 known-limitation 段 + Phase 95 VERIFICATION 转为 human_needed prod bundle 验证。
+**Option B (Prod-only validation):** 接受 dev 模式 restart 不可用为 known limitation，文档化并要求 UAT 在 prod bundle 中验证（`pnpm tauri build` → 安装 .app → 测试）。修改面：SUMMARY 加 known-limitation 段 + Phase 95 VERIFICATION 转为 human_needed prod bundle 验证。
 
 **Option C (Tauri dev mode workaround):** 在 dev 模式下用 `app.exit(0)` + 在外层 shell wrapper 自己 relaunch（脱离 Tauri dev orchestrator 控制）。修改面较大、涉及外层脚本，不推荐 v0.7.0 范围。
 
-**推荐:** Option A + Option B 组合 — dev 模式给清晰失败兜底文案 + prod bundle 走 human_verification PASS 完成 Phase 95 closing-loop。
+**推荐：** Option A + Option B 组合 — dev 模式给清晰失败兜底文案 + prod bundle 走 human_verification PASS 完成 Phase 95 closing-loop。
 
 **Influence on requirements:**
 
@@ -237,21 +237,21 @@ Plan 02 设计未提前发现此 dev-mode 限制。Plan 02 SUMMARY 中未列入�
 
 ### DEF-95-03-01 — README.md:222 "fully offline" Pitfall 5 营销语违规
 
-**位置:** `README.md:222` `**Does it work fully offline / LAN-only?**`
+**位置：** `README.md:222` `**Does it work fully offline / LAN-only?**`
 
 **为何不算本 phase 的 gap:**
 
-- Phase 95 ROADMAP §Phase 95 vs §Phase 97 边界明示: README/docs 文案改写归 Phase 97（DOC-01 `docs/lan-only.md` + DOC-03 changelog）；Phase 95 Plan 03 frontmatter `<files_modified>` 严格限定 `src/i18n/locales/{zh-CN,en-US}.json`
+- Phase 95 ROADMAP §Phase 95 vs §Phase 97 边界明示：README/docs 文案改写归 Phase 97（DOC-01 `docs/lan-only.md` + DOC-03 changelog）；Phase 95 Plan 03 frontmatter `<files_modified>` 严格限定 `src/i18n/locales/{zh-CN,en-US}.json`
 - Plan 03 Task 3 audit 显式记入 deferred-items.md DEF-95-03-01，转交 Phase 97 实施者（Phase 97 plan 必须含 README.md:222 改写子任务）
 - ROADMAP traceability 表 NETSET-04/05/06 仅映射 Phase 95；DOC-01/02/03 映射 Phase 97 — 边界清晰
 
-**Phase 97 行动项:**
+**Phase 97 行动项：**
 
 1. 用 Phase 95 i18n（`settings.sections.network.lanOnly.disclosure.*`）作为 canonical wording 改写 README.md:222 FAQ
 2. 把 "Does it work fully offline / LAN-only?" 改为不含禁词的措辞（具体由 Phase 97 reviewer-checklist gate 决定）
 3. "Yes." 开头改为引用 4 类外网请求披露的边界透明回答
 
-**追踪文件:** `.planning/phases/095-networksection-ux/deferred-items.md` DEF-95-03-01
+**追踪文件：** `.planning/phases/095-networksection-ux/deferred-items.md` DEF-95-03-01
 
 ---
 
@@ -277,7 +277,7 @@ Plan 02 设计未提前发现此 dev-mode 限制。Plan 02 SUMMARY 中未列入�
 
 Phase 95 自动化路径完整交付，所有 6 个 plan 的 SUMMARY 列出的 must_haves 在代码层都对应实装；54/54 自动化测试 PASS；6 类 Pitfall fence 全工程 0 命中；3 条 ROADMAP success criteria #1 / #3 / #4 完成。
 
-**唯一阻塞:** ROADMAP success criteria #2（"用户点「立即重启」按钮，daemon 走优雅 shutdown + relaunch"）的 closing-loop 在 dev 模式下不可端到端验证；用户明确选择走 gap closure 不接受 dev 模式 restart 行为。需要 `/gsd-plan-phase 95 --gaps` 决定补丁方案（推荐 Option A dev mode 提示 + Option B prod bundle 人工验证）。
+**唯一阻塞：** ROADMAP success criteria #2（"用户点「立即重启」按钮，daemon 走优雅 shutdown + relaunch"）的 closing-loop 在 dev 模式下不可端到端验证；用户明确选择走 gap closure 不接受 dev 模式 restart 行为。需要 `/gsd-plan-phase 95 --gaps` 决定补丁方案（推荐 Option A dev mode 提示 + Option B prod bundle 人工验证）。
 
 ROADMAP success criteria #2 在 prod bundle 路径下预期可工作（updater.rs:300-301 同模式已 sustained validated 在 prod 更新场景），但本 phase 未做 prod bundle UAT；human_verification 段已记录该项，由用户决定是否在 gap closure plan 中加 prod bundle 验证步骤。
 

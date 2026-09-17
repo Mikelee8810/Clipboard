@@ -1,7 +1,7 @@
 {
   app: {
-    bundleName: 'app.uniclipboard.engineprobe',
-    vendor: 'UniClipboard',
+    bundleName: 'app.clipboard.engineprobe',
+    vendor: 'Clipboard',
     versionCode: 1000000,
     versionName: '0.1.0',
     icon: '$media:app_icon',

@@ -55,7 +55,7 @@ pub async fn run(foreground: bool, server: bool, json: bool, verbose: bool) -> i
 fn configure_run_mode(server: bool) {
     if server {
         // Translate the user's `--server` flag into the daemon spawn
-        // contract. The spawned `uniclipd` child inherits this process's
+        // contract. The spawned `clipd` child inherits this process's
         // env (same pattern as `--profile` / `UC_PROFILE`); the daemon
         // resolves it via `run_standalone_from_env`. The CLI deliberately
         // does NOT resolve the run mode or touch clipboard switches here —
@@ -106,8 +106,8 @@ async fn check_setup_complete(json: bool) -> Option<i32> {
         );
     } else {
         ui::error(
-            "setup not complete. Run `uniclip space init` (new Space) or \
-             `uniclip space join` (existing Space) first, then retry `start`.",
+            "setup not complete. Run `clip space init` (new Space) or \
+             `clip space join` (existing Space) first, then retry `start`.",
         );
     }
     Some(exit_codes::EXIT_ERROR)

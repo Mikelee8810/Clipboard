@@ -1,4 +1,4 @@
-//! `uniclip get` — one-shot reader for already-synced clipboard entries.
+//! `clip get` — one-shot reader for already-synced clipboard entries.
 //!
 //! Unlike `recv` (which subscribes and BLOCKS waiting for the *next* inbound
 //! file), `get` reads what is *already* in the daemon's history and returns
@@ -81,7 +81,7 @@ impl Category {
 pub struct GetArgs {
     /// Restrict selection to the newest entry of this kind.
     pub kind: Option<GetKind>,
-    /// Select a specific entry by id (from `uniclip search`).
+    /// Select a specific entry by id (from `clip search`).
     pub id: Option<String>,
     /// List recent entries instead of materializing one.
     pub list: bool,
@@ -152,7 +152,7 @@ fn select_target<'a>(
             None => {
                 ui::error(&format!(
                     "No entry with id {} in the latest {} entries. It may be older — \
-                     raise --limit, or find it with `uniclip search`.",
+                     raise --limit, or find it with `clip search`.",
                     short_hash(id),
                     entries.len()
                 ));
@@ -231,7 +231,7 @@ async fn emit_text(
         // Raw content to stdout. When stdout is an interactive terminal, append
         // a trailing newline (if absent) so the shell prompt starts on its own
         // line. When piped/redirected, keep the bytes verbatim so callers like
-        // `uniclip get | xclip` or `$(uniclip get)` capture the exact content.
+        // `clip get | xclip` or `$(clip get)` capture the exact content.
         print!("{}", detail.content);
         if std::io::stdout().is_terminal() && !detail.content.ends_with('\n') {
             println!();
@@ -486,23 +486,20 @@ fn resolve_out_dir(out: Option<&str>) -> Result<PathBuf, String> {
         .map_err(|err| format!("Failed to canonicalize output directory: {err}"))
 }
 
-/// Default landing directory: `$XDG_CACHE_HOME/uniclip/get`, else
-/// `$HOME/.cache/uniclip/get`, else a temp-dir fallback.
+/// Default landing directory: `$XDG_CACHE_HOME/clip/get`, else
+/// `$HOME/.cache/clip/get`, else a temp-dir fallback.
 fn default_out_dir() -> PathBuf {
     if let Ok(xdg) = std::env::var("XDG_CACHE_HOME") {
         if !xdg.is_empty() {
-            return PathBuf::from(xdg).join("uniclip").join("get");
+            return PathBuf::from(xdg).join("clip").join("get");
         }
     }
     if let Ok(home) = std::env::var("HOME") {
         if !home.is_empty() {
-            return PathBuf::from(home)
-                .join(".cache")
-                .join("uniclip")
-                .join("get");
+            return PathBuf::from(home).join(".cache").join("clip").join("get");
         }
     }
-    std::env::temp_dir().join("uniclip-get")
+    std::env::temp_dir().join("clip-get")
 }
 
 /// Strip path separators a malicious sender might inject. Never trust the
@@ -513,7 +510,7 @@ fn sanitize_filename(name: &str) -> String {
         .filter(|c| !matches!(c, '/' | '\\') && !c.is_control())
         .collect();
     if stripped.is_empty() || stripped == "." || stripped == ".." {
-        "uniclip-get.bin".to_string()
+        "clip-get.bin".to_string()
     } else {
         stripped
     }
@@ -687,8 +684,8 @@ mod tests {
     fn sanitize_filename_strips_separators() {
         assert_eq!(sanitize_filename("../../etc/passwd"), "....etcpasswd");
         assert_eq!(sanitize_filename("a/b\\c"), "abc");
-        assert_eq!(sanitize_filename(""), "uniclip-get.bin");
-        assert_eq!(sanitize_filename(".."), "uniclip-get.bin");
+        assert_eq!(sanitize_filename(""), "clip-get.bin");
+        assert_eq!(sanitize_filename(".."), "clip-get.bin");
         assert_eq!(sanitize_filename("photo.png"), "photo.png");
     }
 

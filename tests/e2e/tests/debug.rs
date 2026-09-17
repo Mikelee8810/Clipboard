@@ -1,4 +1,4 @@
-//! E2E tests for the `uniclip debug` command group.
+//! E2E tests for the `clip debug` command group.
 //!
 //! Covers the persistent debug-mode flag (`status` / `on` / `off`) and the
 //! `export-logs` archive, exercising the full CLI -> daemon HTTP -> facade path.

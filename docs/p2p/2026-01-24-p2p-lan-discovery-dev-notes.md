@@ -2,7 +2,7 @@
 
 ## Scope
 
-- Worktree: /Users/mark/MyProjects/uniclipboard-desktop/.worktrees/p2p-lan-discovery
+- Worktree: /Users/mark/MyProjects/clipboard-desktop/.worktrees/p2p-lan-discovery
 - Branch: p2p-lan-discovery
 - Goal: mDNS-only LAN discovery + event semantics + wiring
 

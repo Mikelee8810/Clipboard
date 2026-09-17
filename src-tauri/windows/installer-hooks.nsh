@@ -1,8 +1,8 @@
-; NSIS installer hooks for UniClipboard (Tauri `bundle.windows.nsis.installerHooks`).
+; NSIS installer hooks for Clipboard (Tauri `bundle.windows.nsis.installerHooks`).
 ;
 ; Why this exists:
-;   Since ADR-008 the clipboard engine ships as a standalone `uniclipd.exe`
-;   sidecar (bundled via `externalBin`). The GUI (`UniClipboard.exe`) spawns it
+;   Since ADR-008 the clipboard engine ships as a standalone `clipd.exe`
+;   sidecar (bundled via `externalBin`). The GUI (`Clipboard.exe`) spawns it
 ;   as a detached process. A manual `setup.exe` run over a live install must
 ;   stop BOTH before file extraction, otherwise NSIS hits a file lock and raises
 ;   the "file in use — Abort/Retry/Ignore" dialog (aborting then freezes the
@@ -12,7 +12,7 @@
 ; Two things must happen, in order:
 ;   1. Kill the GUI FIRST. It is the daemon's parent/supervisor; killing only
 ;      the daemon leaves the GUI able to respawn it, and the GUI can also hold
-;      OS handles that keep `uniclipd.exe` locked even after the daemon process
+;      OS handles that keep `clipd.exe` locked even after the daemon process
 ;      is gone from Task Manager.
 ;   2. Kill the daemon, then WAIT until its binary is actually writable. A
 ;      force-killed (taskkill /F → TerminateProcess) process releases its
@@ -27,24 +27,24 @@
 ; inserted more than once in the same script (PREINSTALL + PREUNINSTALL) would
 ; otherwise raise "label already defined".
 !macro UC_STOP_AND_WAIT UNIQ
-  DetailPrint "Stopping UniClipboard (GUI + daemon) before install..."
+  DetailPrint "Stopping Clipboard (GUI + daemon) before install..."
   ; 1) GUI first (taskkill image match is case-insensitive, so this also
-  ;    covers an exe named uniclipboard.exe).
-  nsExec::Exec 'taskkill /F /T /IM UniClipboard.exe'
+  ;    covers an exe named clipboard.exe).
+  nsExec::Exec 'taskkill /F /T /IM Clipboard.exe'
   Pop $0
   ; 2) Daemon.
-  nsExec::Exec 'taskkill /F /T /IM uniclipd.exe'
+  nsExec::Exec 'taskkill /F /T /IM clipd.exe'
   Pop $0
 
   ; 3) Wait until the existing daemon binary is unlocked. Skip on a fresh
   ;    install where the file is absent.
   Push $0
   Push $R0
-  IfFileExists "$INSTDIR\uniclipd.exe" 0 uc_unlock_done_${UNIQ}
+  IfFileExists "$INSTDIR\clipd.exe" 0 uc_unlock_done_${UNIQ}
   StrCpy $R0 0
   uc_wait_unlock_${UNIQ}:
     ClearErrors
-    FileOpen $0 "$INSTDIR\uniclipd.exe" a
+    FileOpen $0 "$INSTDIR\clipd.exe" a
     IfErrors uc_locked_${UNIQ}
     FileClose $0
     Goto uc_unlock_done_${UNIQ}

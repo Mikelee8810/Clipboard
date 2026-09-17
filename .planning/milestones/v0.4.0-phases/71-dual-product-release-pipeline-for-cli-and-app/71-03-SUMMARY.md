@@ -9,7 +9,7 @@ requires:
   - phase: 71-01
     provides: release.yml with validate/build/create-release job structure
   - phase: 71-02
-    provides: build-cli.yml workflow that produces uniclipboard-cli-*.tar.gz and *.zip artifacts
+    provides: build-cli.yml workflow that produces clipboard-cli-*.tar.gz and *.zip artifacts
 provides:
   - release.yml calls build-cli.yml in parallel with build.yml
   - CLI archives collected from artifacts/ into release-assets/ before GitHub Release creation
@@ -36,7 +36,7 @@ key-files:
 key-decisions:
   - 'CLI artifact collection uses separate find loop after app artifacts — CLI archives have unique names so no collision handling needed'
   - 'App Installation section renamed from Installation in template to distinguish from CLI Downloads'
-  - 'buildCliInstallerLines() detects CLI artifacts by uniclipboard-cli- prefix + target triple in filename'
+  - 'buildCliInstallerLines() detects CLI artifacts by clipboard-cli- prefix + target triple in filename'
 
 patterns-established:
   - 'Parallel product builds: both build and build-cli run in parallel, gated by validate, before create-release'
@@ -63,7 +63,7 @@ completed: 2026-03-28
 ## Accomplishments
 
 - release.yml calls build-cli.yml as a parallel job alongside build.yml, both gated by validate
-- CLI archives (uniclipboard-cli-_.tar.gz and _.zip) are collected from artifacts/ into release-assets/ before GitHub Release creation, with verification step
+- CLI archives (clipboard-cli-_.tar.gz and _.zip) are collected from artifacts/ into release-assets/ before GitHub Release creation, with verification step
 - Release notes template split into "App Installation" and "CLI Downloads" sections with per-platform placeholders
 - buildCliInstallerLines() added to generate-release-notes.js to detect and link CLI artifacts by filename pattern
 - Tests updated to cover CLI download link generation (3 tests passing)
@@ -86,7 +86,7 @@ completed: 2026-03-28
 
 - CLI artifact collection uses a separate find loop with no collision handling — CLI archives have unique names (version + target triple in filename)
 - App Installation section renamed from Installation in template to clearly distinguish from CLI Downloads
-- buildCliInstallerLines() detects artifacts by uniclipboard-cli- prefix + target triple patterns (aarch64-apple-darwin, x86_64-apple-darwin, linux-gnu, windows-msvc)
+- buildCliInstallerLines() detects artifacts by clipboard-cli- prefix + target triple patterns (aarch64-apple-darwin, x86_64-apple-darwin, linux-gnu, windows-msvc)
 
 ## Deviations from Plan
 

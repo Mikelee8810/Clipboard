@@ -1,4 +1,4 @@
-name: 'Publish to AUR (uniclipboard-git)'
+name: 'Publish to AUR (clipboard-git)'
 run-name: "aur-git-${{ github.run_number }}"
 
 # 触发场景：
@@ -15,7 +15,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packaging/aur/uniclipboard-git/**'
+      - 'packaging/aur/clipboard-git/**'
       - '.github/workflows/aur.yml'
   workflow_dispatch:
     inputs:
@@ -28,7 +28,7 @@ on:
 # AUR 是单分支 git remote，并发 push 会互踩。串行执行；cancel-in-progress=false
 # 让前一次跑完再排队，避免半道丢失 commit。
 concurrency:
-  group: aur-uniclipboard-git
+  group: aur-clipboard-git
   cancel-in-progress: false
 
 jobs:
@@ -75,7 +75,7 @@ jobs:
           # namcap 对 PKGBUILD 阶段只能给 warning（看不到实际产物），但 fail-fast
           # 抓 typo 还是值得的。这里不 fail on warning —— 有些条目（比如
           # AGPL-3.0-only SPDX）namcap 老版本会误报。
-          namcap src/packaging/aur/uniclipboard-git/PKGBUILD || true
+          namcap src/packaging/aur/clipboard-git/PKGBUILD || true
 
       - name: Setup SSH for AUR
         env:
@@ -84,7 +84,7 @@ jobs:
         run: |
           if [ -z "${AUR_SSH_PRIVATE_KEY:-}" ]; then
             echo "::error::AUR_SSH_PRIVATE_KEY secret missing."
-            echo "::error::Generate with: ssh-keygen -t ed25519 -C aur-uniclipboard -f aur"
+            echo "::error::Generate with: ssh-keygen -t ed25519 -C aur-clipboard -f aur"
             echo "::error::Then upload aur.pub at https://aur.archlinux.org/account/<user>/edit/"
             echo "::error::And put the private key (aur) into repo secret AUR_SSH_PRIVATE_KEY."
             exit 1
@@ -149,7 +149,7 @@ jobs:
           # AUR 的设计：clone 一个未注册的包名会成功（拿到空 repo），首次 push
           # 时后端校验 PKGBUILD 并注册新包名。所以 clone 失败 = SSH 配置或账号问题，
           # 不是"包名未注册"。直接 fail-fast。
-          sudo -u builder git clone ssh://aur@aur.archlinux.org/uniclipboard-git.git /home/builder/aur
+          sudo -u builder git clone ssh://aur@aur.archlinux.org/clipboard-git.git /home/builder/aur
 
       - name: Render PKGBUILD with current pkgver snapshot
         shell: bash
@@ -167,7 +167,7 @@ jobs:
           echo "PKGVER=$PKGVER" >> "$GITHUB_ENV"
 
           install -m644 -o builder -g builder \
-            packaging/aur/uniclipboard-git/PKGBUILD /home/builder/aur/PKGBUILD
+            packaging/aur/clipboard-git/PKGBUILD /home/builder/aur/PKGBUILD
           # sed 替换 pkgver= 那一行；用 # 作分隔符避免 $PKGVER 内任何 / 干扰。
           sudo -u builder sed -i "s#^pkgver=.*#pkgver=$PKGVER#" /home/builder/aur/PKGBUILD
 
@@ -184,7 +184,7 @@ jobs:
         run: |
           cd /home/builder/aur
           sudo -u builder git config user.email "aur@uniclipboard.app"
-          sudo -u builder git config user.name "UniClipboard Bot"
+          sudo -u builder git config user.name "Clipboard Bot"
           sudo -u builder git add PKGBUILD .SRCINFO
           if sudo -u builder git diff --cached --quiet; then
             echo "No changes to push."
@@ -209,7 +209,7 @@ jobs:
         # 不管推没推都上传，方便人工 review / dry_run 时下载。
         uses: actions/upload-artifact@v4
         with:
-          name: aur-uniclipboard-git
+          name: aur-clipboard-git
           path: |
             /home/builder/aur/PKGBUILD
             /home/builder/aur/.SRCINFO
@@ -220,12 +220,12 @@ jobs:
         shell: bash
         run: |
           {
-            echo "## AUR sync — uniclipboard-git :package:"
+            echo "## AUR sync — clipboard-git :package:"
             echo ""
             echo "- **pkgver**: \`${PKGVER}\`"
             echo "- **Source commit**: \`${GITHUB_SHA::7}\`"
             echo "- **Changed**: ${{ steps.diff.outputs.changed }}"
             echo "- **Pushed**: ${{ steps.diff.outputs.changed == 'true' && inputs.dry_run != true }}"
             echo ""
-            echo "AUR page: https://aur.archlinux.org/packages/uniclipboard-git"
+            echo "AUR page: https://aur.archlinux.org/packages/clipboard-git"
           } >> "$GITHUB_STEP_SUMMARY"

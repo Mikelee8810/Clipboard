@@ -6,7 +6,7 @@ description: 创建第一个加密空间，同步第一条剪贴。
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-UniClipboard 通过 **空间（Space）** 进行同步 —— 一个由你的设备共同组成的、端到端加密的私有群组。第一台设备创建空间，之后每台设备都通过短期邀请码加入这个空间。没有云账号、没有邮箱 —— **空间本身就是账号**。
+Clipboard 通过 **空间（Space）** 进行同步 —— 一个由你的设备共同组成的、端到端加密的私有群组。第一台设备创建空间，之后每台设备都通过短期邀请码加入这个空间。没有云账号、没有邮箱 —— **空间本身就是账号**。
 
 本页带你从两台机器全新安装走到第一次成功跨设备粘贴。
 
@@ -56,7 +56,7 @@ UniClipboard 通过 **空间（Space）** 进行同步 —— 一个由你的设
 
 把两台设备都准备在手边 —— 一台生成邀请码，一台输入邀请码。
 
-<Tabs items={['桌面端', '命令行（uniclip）']}>
+<Tabs items={['桌面端', '命令行（clip）']}>
 
 <Tab value="桌面端">
 
@@ -91,25 +91,25 @@ UniClipboard 通过 **空间（Space）** 进行同步 —— 一个由你的设
 
 </Tab>
 
-<Tab value="命令行（uniclip）">
+<Tab value="命令行（clip）">
 
 CLI 与 GUI 流程完全一致，适用于无桌面环境（如服务器、SSH 会话、tmux 工作流）。
 
 ```bash
 # 在第一台设备上（已在 GUI 创建过空间则跳过 init）
-uniclip space init
+clip space init
 
 # 生成短期邀请码
-uniclip space invite
+clip space invite
 
 # 在新设备上输入上一步生成的邀请码
-uniclip space join <code>
+clip space join <code>
 
 # 确认双方互相看见
-uniclip members
+clip members
 ```
 
-守护进程会自动启动。可用 `uniclip space status` 查看状态，或 `uniclip start` / `uniclip stop` 显式控制。
+守护进程会自动启动。可用 `clip space status` 查看状态，或 `clip start` / `clip stop` 显式控制。
 
 </Tab>
 
@@ -124,7 +124,7 @@ uniclip members
 
 ## 添加手机（可选）
 
-UniClipboard 还提供一种 **实验性的 HTTP 伴侣** 模式，用于在桌面与手机
+Clipboard 还提供一种 **实验性的 HTTP 伴侣** 模式，用于在桌面与手机
 之间互相粘贴。移动端走的是和桌面 **不同** 的配对路径 —— 它不加入空间的
 iroh 信任网络、不分配 node ID。默认在 LAN 下与桌面互通，需要跨网络时
 可经自建 server 节点或 Tailscale。该 LAN 通道正在被弃用：推荐改为安装
@@ -133,12 +133,12 @@ iroh 信任网络、不分配 node ID。默认在 LAN 下与桌面互通，需�
 1. 在桌面端点击 **设备 → 邀请按钮旁的手机图标 → 常规同步**，按需确认开启，然后给这台设备起一个标签。若希望使用邀请码加入空间，可在同一弹窗切换到 **设备直连（实验性）**。
 2. 凭据弹窗里按 **接入方式** 拆成两个 tab：
    - **扫码接入（Scan to add）** —— 一个 connect-URI 二维码。在
-     UniClipboard iOS App（或任意兼容 SyncClipboard 协议的客户端，
+     Clipboard iOS App（或任意兼容 SyncClipboard 协议的客户端，
      含社区维护的安卓 App）里扫一下，base URL、用户名、密码自动填好。
-   - **安装快捷指令（Install Shortcut）** —— 在用户没装 UniClipboard
-     iOS App 时走这条：扫码安装 `UniClipboard.shortcut`，再 **手动** 把
+   - **安装快捷指令（Install Shortcut）** —— 在用户没装 Clipboard
+     iOS App 时走这条：扫码安装 `Clipboard.shortcut`，再 **手动** 把
      弹窗里的 base URL、用户名、密码粘贴到快捷指令的对应字段。
-   - 安卓侧装 **UniClipboard Android 客户端**：
+   - 安卓侧装 **Clipboard Android 客户端**：
      [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip)，
      APK 在
      [releases 页](https://github.com/UniClipboard/UniClip/releases/latest)
@@ -155,7 +155,7 @@ iroh 信任网络、不分配 node ID。默认在 LAN 下与桌面互通，需�
 
 - **添加更多设备。** 在每台你想加入空间的机器上重复"添加第二台设备"。每个邀请码都是一次性的。
 - **试试快捷面板。** 用配置的快捷键唤出，键盘流即时取用最近的剪贴 —— 文本、链接、图片、代码与文件。
-- **切换空间。** 在 **设备** 页或带上另一个 sponsor 的邀请码运行 `uniclip space join --switch` 切换，例如把个人机和工作机分到不同的空间。切换时本地历史会用新空间的密钥重新加密。
+- **切换空间。** 在 **设备** 页或带上另一个 sponsor 的邀请码运行 `clip space join --switch` 切换，例如把个人机和工作机分到不同的空间。切换时本地历史会用新空间的密钥重新加密。
 - **接入手机（实验性）。** 端到端流程见
   [移动端同步](../core-features/mobile-sync)。
 

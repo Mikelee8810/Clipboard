@@ -2,7 +2,7 @@
 
 ## 定位
 
-`uc-cli` 是 UniClipboard 的终端入口 crate，构建出的二进制名是 `uniclip`。
+`uc-cli` 是 Clipboard 的终端入口 crate，构建出的二进制名是 `clip`。
 
 它只负责命令行参数、终端输出、交互输入、进程退出码，以及把用户动作转交给应用层。不要在 CLI 层重新实现业务规则。
 
@@ -13,7 +13,7 @@
 - `start` / `stop` 可以处理本机 daemon 生命周期；隐藏的 `daemon` 子命令只供 `start` 内部拉起后台进程，不是公开用户接口。
 - 独立业务命令和 daemon 使用同一 profile 时可能冲突；保持现有的 daemon 探测和拒绝策略，不要为了方便绕开。
 - CLI 不写系统剪贴板；诊断命令可以观察、发送或打印 payload，但系统剪贴板写入属于 daemon / 应用流程职责。
-  - 唯一例外：隐藏的 `uniclip probe` 子命令组（替代旧的 `clipboard-probe` 二进制），仅供开发与 E2E 调试使用，`probe restore` 会直接写系统剪贴板。新增公开命令时不要引用这个例外作为理由。
+  - 唯一例外：隐藏的 `clip probe` 子命令组（替代旧的 `clipboard-probe` 二进制），仅供开发与 E2E 调试使用，`probe restore` 会直接写系统剪贴板。新增公开命令时不要引用这个例外作为理由。
 - 新增命令时先确认它是用户命令、诊断命令还是内部命令，并在 `README.md` 中放到对应区域。
 
 ## 输出约定
@@ -41,11 +41,11 @@
 | 错误 | `✗` | red | `ui::error` |
 | 信息 / 子项 | `│` | dim | `ui::info` / `ui::bar` / `ui::verification_code` |
 | 交互提示（live） | `?` | yellow | `ui::confirm` / `ui::input` / `ui::password` 内部 |
-| 交互完成（resolved） | `✓` | green | `UniclipTheme::format_*_selection` 内部 |
+| 交互完成（resolved） | `✓` | green | `ClipTheme::format_*_selection` 内部 |
 
-dialoguer 的 `Confirm` / `Input` / `Password` 必须用 `ui::confirm` / `ui::input` / `ui::password`，它们已经绑定了 `UniclipTheme` 与 `Term::stderr()`，不要直接构造 dialoguer 组件或换用 `dialoguer::theme::ColorfulTheme`。新增交互 prompt 时按以下要求写：
+dialoguer 的 `Confirm` / `Input` / `Password` 必须用 `ui::confirm` / `ui::input` / `ui::password`，它们已经绑定了 `ClipTheme` 与 `Term::stderr()`，不要直接构造 dialoguer 组件或换用 `dialoguer::theme::ColorfulTheme`。新增交互 prompt 时按以下要求写：
 
-- prompt 文本不要以 `:` 结尾——`UniclipTheme` 会自动接 `[y/N]` / `[default]` 等后缀。
+- prompt 文本不要以 `:` 结尾——`ClipTheme` 会自动接 `[y/N]` / `[default]` 等后缀。
 - 想给"按 Enter 走默认值"的语义，prompt 末尾用 `[Enter for auto]` 之类的人类提示，并把 `allow_empty=true` 传给 `ui::input`。
 - 必填字段 `allow_empty=false`，由 dialoguer 自动重读；不要在外层手写"空 → 报错退出"的旧逻辑。
 

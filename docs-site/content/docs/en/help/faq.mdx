@@ -19,7 +19,7 @@ derived from the space MasterKey, **independent of the transport**.
 Traffic may go direct or through an encrypted relay — the relay only
 ever sees source / destination node IDs and ciphertext, never content.
 
-### Does UniClipboard run servers?
+### Does Clipboard run servers?
 
 Only discovery (rendezvous) and an encrypted relay. Neither decrypts
 or persists your content:
@@ -37,9 +37,9 @@ debugging and product reliability analysis. They do not carry clipboard
 content. See [Privacy & data collection](../core-features/privacy) for the full
 field list.
 
-### What diagnostics or usage data does UniClipboard collect?
+### What diagnostics or usage data does Clipboard collect?
 
-By default, UniClipboard collects two opt-out data categories:
+By default, Clipboard collects two opt-out data categories:
 diagnostics (crashes, errors, anonymous logs, performance traces, and
 frontend diagnostics) and usage analytics (first-open, pairing funnel,
 and sync reliability events). They do not include clipboard content,
@@ -122,7 +122,7 @@ passphrase — no third-party identity provider involved. See
 
 ### Can I self-host rendezvous / relay?
 
-UniClipboard exposes custom iroh **relay** URLs in
+Clipboard exposes custom iroh **relay** URLs in
 **Settings → Network → Custom relay nodes**. Leave the list empty to
 use the default iroh relays, or enter one relay URL per line to use
 only your own relay nodes. Restart the daemon after changing the list.
@@ -130,7 +130,7 @@ For an end-to-end walkthrough of standing up a relay, see
 [Self-hosting an iroh relay](../guides/self-host-relay).
 
 Custom rendezvous discovery is still not exposed. First-time pairing
-continues to use UniClipboard's rendezvous service, and cross-network
+continues to use Clipboard's rendezvous service, and cross-network
 NodeId discovery still uses the configured iroh discovery path unless
 LAN-only mode is enabled.
 
@@ -147,7 +147,7 @@ treated as a trusted peer by every other device in the space.
 
 ### Can one device join multiple spaces?
 
-Yes, but **only one is active at a time**. Running `uniclip space join
+Yes, but **only one is active at a time**. Running `clip space join
 --switch` with another sponsor's invitation (or the GUI's Devices page)
 re-encrypts local history under the new space's MasterKey before
 completing the switch — there is no plaintext window during the handoff.
@@ -214,7 +214,7 @@ whatever config is on the target, so it works on a fresh install or an
 in-use one (it overwrites it). For the full steps and the "move" semantics, see
 [Export & import config](../guides/config-migration).
 
-Under the hood the hidden `uniclip dev dump-clipboard --limit N` still exists
+Under the hood the hidden `clip dev dump-clipboard --limit N` still exists
 for development purposes and may change. Plain-copying the data directory for a
 mirror backup is **unreliable**: the database is encrypted, key storage differs
 across install forms, and copying files won't carry the identity — for a
@@ -224,7 +224,7 @@ cross-machine restore use the export / import above.
 
 ### Is there a mobile app?
 
-On iOS, the **UniClipboard iOS App is now in TestFlight public
+On iOS, the **Clipboard iOS App is now in TestFlight public
 beta**. Invite link:
 [testflight.apple.com/join/nyNQ8dQe](https://testflight.apple.com/join/nyNQ8dQe)
 — install **TestFlight** from the App Store, then open the link to
@@ -232,7 +232,7 @@ accept and install the beta build (full walkthrough plus the
 proxy/VPN gotchas is in
 [Mobile sync — Pair an iPhone](../core-features/mobile-sync#pair-an-iphone)).
 
-On Android, install the **UniClipboard Android client** at
+On Android, install the **Clipboard Android client** at
 [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip),
 with APKs published in
 [releases](https://github.com/UniClipboard/UniClip/releases/latest)
@@ -273,14 +273,14 @@ get a wake-up when the system clipboard changes, and silent background
 polling would be killed by the scheduler (and would also trip the
 system `pasted from <app>` banner every time).
 
-What this means in practice for the UniClipboard iOS app:
+What this means in practice for the Clipboard iOS app:
 
 - **Foreground only on the receive path.** New clips from desktop
   arrive in the app once you bring it to the foreground (or via a
   notification tap when one is delivered). There is no truly silent
   always-on sync the way desktops do it.
 - **Sending requires user intent.** Copies made in other iOS apps do
-  not stream out automatically — you open UniClipboard (or the iOS
+  not stream out automatically — you open Clipboard (or the iOS
   Shortcut) to push the current pasteboard.
 - **Even big vendors hit the same wall.** WeChat's keyboard, for
   example, can only sync clipboard at the moment the keyboard is
@@ -288,7 +288,7 @@ What this means in practice for the UniClipboard iOS app:
   the app.
 
 A possible future direction is a **keyboard / input-panel style
-companion** — switching to UniClipboard's panel would give iOS a
+companion** — switching to Clipboard's panel would give iOS a
 legitimate window to read and push clipboard content. This is being
 explored but not committed; it would not turn into "silent always-on
 background sync" either, because the underlying OS constraint
@@ -319,10 +319,10 @@ per-content-type toggles. Configured in the GUI Devices page today;
 CLI equivalents are on the roadmap. See
 [Per-device sync toggles](../core-features/sync#per-device-sync-gates).
 
-### Can I script against UniClipboard?
+### Can I script against Clipboard?
 
-Yes. `uniclip` supports `--json` on every subcommand, exit codes are
-stable, and stdin works (`echo ... | uniclip send`). See
+Yes. `clip` supports `--json` on every subcommand, exit codes are
+stable, and stdin works (`echo ... | clip send`). See
 [CLI reference](../cli/getting-started).
 
 ## Feedback & disclosure
@@ -330,7 +330,7 @@ stable, and stdin works (`echo ... | uniclip send`). See
 ### How do I report a bug?
 
 [github.com/UniClipboard/UniClipboard/issues](https://github.com/UniClipboard/UniClipboard/issues), with
-`uniclip --version`, `uniclip space status --json`, repro steps, and the log
+`clip --version`, `clip space status --json`, repro steps, and the log
 slice for the relevant time window.
 
 ### How do I report a security issue?

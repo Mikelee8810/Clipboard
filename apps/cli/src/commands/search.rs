@@ -13,7 +13,7 @@ use uc_daemon_contract::api::dto::search::{
     SearchQueryResultDto, SearchResultDto, SearchStatusData,
 };
 
-/// Query arguments accepted directly on `uniclip search <query>`.
+/// Query arguments accepted directly on `clip search <query>`.
 #[derive(Args, Debug)]
 pub struct SearchQueryArgs {
     /// Free-text query string
@@ -41,7 +41,7 @@ pub struct SearchQueryArgs {
     extensions: Vec<String>,
     /// Filter by source device — the device a clip arrived from. Accepts a
     /// device name (case-insensitive) or a device id; repeatable. Run
-    /// `uniclip members` to see paired device names.
+    /// `clip members` to see paired device names.
     #[arg(long = "source-device")]
     source_devices: Vec<String>,
     /// Maximum results to return
@@ -100,7 +100,7 @@ pub async fn run(
                 None if has_filter => String::new(),
                 None => {
                     ui::error(
-                        "Missing search query. Run `uniclip search <query>`, narrow with `--tag`/`--type`/`--ext`, or `search status` / `search rebuild`.",
+                        "Missing search query. Run `clip search <query>`, narrow with `--tag`/`--type`/`--ext`, or `search status` / `search rebuild`.",
                     );
                     return exit_codes::EXIT_ERROR;
                 }
@@ -217,7 +217,7 @@ fn render_search_error(action: &str, err: anyhow::Error, json: bool) -> i32 {
 }
 
 fn render_rebuild_locked_message() -> &'static str {
-    "Search is unavailable while the encryption session is locked. Unlock first, or run `uniclip space status` to inspect application state."
+    "Search is unavailable while the encryption session is locked. Unlock first, or run `clip space status` to inspect application state."
 }
 
 /// A device that clips can arrive from: its display name and the canonical id
@@ -360,7 +360,7 @@ async fn resolve_source_devices(
 /// unknown `--source-device` value.
 fn render_available_sources(directory: &[SourceDeviceEntry]) {
     if directory.is_empty() {
-        ui::info("devices", "no known source devices; run `uniclip members`");
+        ui::info("devices", "no known source devices; run `clip members`");
         return;
     }
     ui::info("devices", "available source devices (name → id):");

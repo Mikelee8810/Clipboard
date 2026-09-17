@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn legacy_identity_fallback_does_not_repeat_profile_suffix_or_create_directories() {
         let temporary = tempfile::tempdir().unwrap();
-        let profiled_app_data_root = temporary.path().join("app.uniclipboard.desktop-a");
+        let profiled_app_data_root = temporary.path().join("app.clipboard.desktop-a");
         let primary: Arc<dyn SecureStorageProvider> = Arc::new(EmptySecureStorage);
 
         let _storage = build_legacy_identity_fallback(primary, &profiled_app_data_root);
@@ -88,7 +88,7 @@ mod tests {
     #[test]
     fn legacy_identity_fallback_migrates_from_unmodified_directory_name() {
         let temporary = tempfile::tempdir().unwrap();
-        let profiled_app_data_root = temporary.path().join("app.uniclipboard.desktop-a");
+        let profiled_app_data_root = temporary.path().join("app.clipboard.desktop-a");
         let legacy_identity_dir = profiled_app_data_root.join("iroh-identity");
         std::fs::create_dir_all(&legacy_identity_dir).unwrap();
         let legacy_identity_file = legacy_identity_dir.join("69726f682d6964656e746974793a7631.bin");

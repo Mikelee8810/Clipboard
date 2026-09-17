@@ -12,8 +12,8 @@ run-name: >-
 # push a draft that might get discarded.
 #
 # Layout (esbuild/biome pattern): 5 platform packages
-# (@uniclipboard/cli-{platform}-{arch}, each shipping uniclip + uniclipd) and
-# one main package (uniclipboard) whose JS launcher picks the matching one via
+# (@clipboard/cli-{platform}-{arch}, each shipping clip + clipd) and
+# one main package (clipboard) whose JS launcher picks the matching one via
 # optionalDependencies. Assembly lives in scripts/build-npm-packages.mjs.
 #
 # Channel mapping (same pattern as snap.yml / copr.yml): alpha releases are
@@ -123,7 +123,7 @@ jobs:
         run: |
           gh release download "v${VERSION}" \
             --repo "${{ github.repository }}" \
-            --pattern 'uniclipboard-cli-*' \
+            --pattern 'clipboard-cli-*' \
             --pattern 'SHA256SUMS.txt' \
             --dir release-assets
           ls -la release-assets
@@ -137,7 +137,7 @@ jobs:
           # --ignore-missing exits 0 even when NOTHING matched; make sure the
           # CLI archives were actually verified.
           VERIFIED=$(sha256sum -c --ignore-missing SHA256SUMS.txt 2>/dev/null | grep -c ': OK$')
-          EXPECTED=$(ls uniclipboard-cli-* | wc -l)
+          EXPECTED=$(ls clipboard-cli-* | wc -l)
           if [ "$VERIFIED" -ne "$EXPECTED" ]; then
             echo "Only $VERIFIED of $EXPECTED CLI archives are covered by SHA256SUMS.txt" >&2
             exit 1
@@ -159,8 +159,8 @@ jobs:
         run: |
           # The linux-x64 binary is a static (non-PIE) musl ELF, so it runs on
           # the glibc runner directly.
-          REPORTED=$(./npm-dist/cli-linux-x64/bin/uniclip --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?' | head -1)
-          echo "uniclip --version reports: $REPORTED (expected: $VERSION)"
+          REPORTED=$(./npm-dist/cli-linux-x64/bin/clip --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?' | head -1)
+          echo "clip --version reports: $REPORTED (expected: $VERSION)"
           if [ "$REPORTED" != "$VERSION" ]; then
             echo "Binary version does not match release version" >&2
             exit 1
@@ -179,7 +179,7 @@ jobs:
           VERSION: ${{ steps.resolve.outputs.version }}
         run: |
           # Platform packages first, main package last (publish-order.txt),
-          # so `npm install @uniclipboard/cli` never sees missing optional deps.
+          # so `npm install @clipboard/cli` never sees missing optional deps.
           while IFS= read -r dir; do
             NAME=$(node -p "require('./npm-dist/${dir}/package.json').name")
             if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
@@ -205,8 +205,8 @@ jobs:
             echo "**dist-tag:** ${DIST_TAG}"
             echo ""
             echo "\`\`\`sh"
-            echo "npm install -g @uniclipboard/cli@${VERSION}"
+            echo "npm install -g @clipboard/cli@${VERSION}"
             echo "\`\`\`"
             echo ""
-            echo "https://www.npmjs.com/package/@uniclipboard/cli"
+            echo "https://www.npmjs.com/package/@clipboard/cli"
           } >> "$GITHUB_STEP_SUMMARY"

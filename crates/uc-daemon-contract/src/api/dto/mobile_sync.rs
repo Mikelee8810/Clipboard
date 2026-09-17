@@ -115,7 +115,7 @@ pub struct RegisterMobileDeviceResultDto {
     pub install_url: String,
     /// Base64 PNG of the iCloud shortcut-install URL.
     pub install_qr_code_png_base64: String,
-    /// `uniclipboard://connect?...` deep link (the main QR content).
+    /// `clipboard://connect?...` deep link (the main QR content).
     pub connect_uri: String,
     /// Base64 PNG encoding `connectUri`.
     pub qr_code_png_base64: String,

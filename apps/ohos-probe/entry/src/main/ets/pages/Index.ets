@@ -52,7 +52,7 @@ struct Index {
 
   build() {
     Column({ space: 16 }) {
-      Text('UniClipboard')
+      Text('Clipboard')
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
       Text('Unified core')

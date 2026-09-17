@@ -3,9 +3,9 @@ import { createLogger } from '@/lib/logger'
 
 const log = createLogger('ui-sound')
 
-export const UI_SOUND_STORAGE_KEY = 'uniclipboard.uiSoundEnabled'
+export const UI_SOUND_STORAGE_KEY = 'clipboard.uiSoundEnabled'
 export const DEFAULT_UI_SOUND_ENABLED = true
-const UI_SOUND_CHANGED_EVENT = 'uniclipboard:ui-sound-changed'
+const UI_SOUND_CHANGED_EVENT = 'clipboard:ui-sound-changed'
 
 const getStorage = (storage?: Storage | null): Storage | null => {
   if (storage !== undefined) {

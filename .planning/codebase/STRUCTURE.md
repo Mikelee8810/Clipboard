@@ -5,7 +5,7 @@
 ## Directory Layout
 
 ```
-UniClipboard/
+Clipboard/
 ├── src/                        # Frontend (React + TypeScript)
 │   ├── api/                    # Tauri command invoke wrappers
 │   ├── components/             # Reusable UI components
@@ -167,7 +167,7 @@ UniClipboard/
 
 **Rust Crates:**
 
-- All prefixed with `uc-` (UniClipboard): `uc-core`, `uc-app`, `uc-infra`, `uc-platform`, `uc-tauri`, `uc-observability`, `uc-clipboard-probe`
+- All prefixed with `uc-` (Clipboard): `uc-core`, `uc-app`, `uc-infra`, `uc-platform`, `uc-tauri`, `uc-observability`, `uc-clipboard-probe`
 
 **Redux Slices:**
 

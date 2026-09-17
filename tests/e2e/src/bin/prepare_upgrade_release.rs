@@ -65,7 +65,7 @@ fn parse_arguments(mut args: impl Iterator<Item = String>) -> Result<Arguments, 
 fn default_output_dir(tag: &str) -> Result<PathBuf, String> {
     dirs_next::cache_dir()
         .map(|root| {
-            root.join("uniclipboard/e2e/releases")
+            root.join("clipboard/e2e/releases")
                 .join(tag)
                 .join(format!(
                     "{}-{}",

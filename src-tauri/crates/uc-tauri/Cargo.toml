@@ -3,7 +3,7 @@ name = "uc-tauri"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Tauri adapter layer for UniClipboard"
+description = "Tauri adapter layer for Clipboard"
 
 [features]
 # Previously forwarded to uc-bootstrap/dev-profile -> uc-platform/dev-profile.

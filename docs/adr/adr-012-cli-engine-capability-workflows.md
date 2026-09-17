@@ -3,7 +3,7 @@
 - **状态**：已实施
 - **日期**：2026-08-18
 - **相关决策**：
-  - [`ADR-008`](docs/architecture/adr-008-uniclipd-split-gui-as-client.md)
+  - [`ADR-008`](docs/architecture/adr-008-clipd-split-gui-as-client.md)
   - [`ADR-011`](docs/adr/adr-011-offline-first-member-removal-integration.md)
 - **当前 Engine 基线**：`94b21aac9db2fa0fb89bc9027f0e05e545ecc1f5`
 - **实施日期**：2026-08-19
@@ -120,22 +120,22 @@ CLI 可以保留一个正在显示的快照，但每次状态刷新必须重新�
 用户入口为：
 
 ```text
-uniclip join [现有加入参数]
-uniclip join status
-uniclip join cancel
+clip join [现有加入参数]
+clip join status
+clip join cancel
 ```
 
-现有 `uniclip join --code ...`、交互输入和 `--switch` 用法保持不变。`status` 与 `cancel`
+现有 `clip join --code ...`、交互输入和 `--switch` 用法保持不变。`status` 与 `cancel`
 作为无加入参数的保留子命令；子命令和加入参数不能混用，避免一条命令同时表达“发起”和
 “查看或取消”两种意图。
 
-`uniclip join` 的默认行为是等待本次请求进入 `active` 或 `rejected`：
+`clip join` 的默认行为是等待本次请求进入 `active` 或 `rejected`：
 
 - 首次 `JoinSpace` 返回 `active`：立即报告完成。
 - 首次返回 `rejected`：报告拒绝原因并失败结束。
 - 首次返回 `pending`：持续读取 Engine 当前加入状态，直到完成、拒绝或用户停止等待。
 - 用户按 `Ctrl-C`：只停止当前 CLI 的等待，不取消 Engine 中的加入请求。
-- 用户显式执行 `uniclip join cancel`：取消当前等待中的加入请求。
+- 用户显式执行 `clip join cancel`：取消当前等待中的加入请求。
 - 自动化需要立即返回时使用 `--no-wait`；请求被 Engine 接受为 `pending` 后正常结束，并在
   输出中明确标记 `pending`。
 
@@ -143,15 +143,15 @@ uniclip join cancel
 `--no-wait` 后调用 `join status`。daemon 短暂重启或连接中断时，CLI 可以重新连接并继续
 读取同一个加入状态，但不能因此重新发起加入。
 
-等待期间只进行状态查询，不再次调用 `JoinSpace`。CLI 重启后，`uniclip join status` 继续
-读取 Engine 保存的当前状态。用户再次执行带加入输入的 `uniclip join` 是新的显式用户动作；
+等待期间只进行状态查询，不再次调用 `JoinSpace`。CLI 重启后，`clip join status` 继续
+读取 Engine 保存的当前状态。用户再次执行带加入输入的 `clip join` 是新的显式用户动作；
 CLI 仍只发起一次 `JoinSpace`，不在客户端拼接取消、重置或重试。
 
-`uniclip join cancel` 先读取当前加入状态，再使用其中的 `join_id` 发起取消。若没有等待中的
+`clip join cancel` 先读取当前加入状态，再使用其中的 `join_id` 发起取消。若没有等待中的
 加入，显示“当前没有需要取消的加入请求”并正常结束。取消请求与状态读取之间发生变化时，
 以 Engine 对 `join_id` 的校验结果为准，CLI 不尝试取消其他请求。
 
-`uniclip status` 只显示一行加入摘要；完整信息由 `uniclip join status` 提供，避免两个命令
+`clip status` 只显示一行加入摘要；完整信息由 `clip join status` 提供，避免两个命令
 分别定义状态含义。
 
 ### 3. 设备信任决定进入 `member trust` 命令组
@@ -159,9 +159,9 @@ CLI 仍只发起一次 `JoinSpace`，不在客户端拼接取消、重置或重�
 用户入口为：
 
 ```text
-uniclip member trust status
-uniclip member trust apply [--change <change_id>]
-uniclip member trust keep [--change <change_id>]
+clip member trust status
+clip member trust apply [--change <change_id>]
+clip member trust keep [--change <change_id>]
 ```
 
 - `status` 展示当前变化及其影响，不要求用户提供 `change_id`。
@@ -185,8 +185,8 @@ uniclip member trust keep [--change <change_id>]
 用户入口为：
 
 ```text
-uniclip member sync show <device>
-uniclip member sync set <device> \
+clip member sync show <device>
+clip member sync set <device> \
   [--send on|off] \
   [--receive on|off] \
   [--send-types <types>] \
@@ -235,9 +235,9 @@ JSON 模式每条命令只输出一个完整对象，不输出持续刷新的多
 ## 不变量
 
 1. Engine 是加入状态、设备信任状态和成员同步设置的唯一拥有者。
-2. 每次显式执行带加入输入的 `uniclip join` 只产生一次 `JoinSpace` 调用。
+2. 每次显式执行带加入输入的 `clip join` 只产生一次 `JoinSpace` 调用。
 3. 等待、重连、CLI 重启后继续查看均不产生新的加入动作。
-4. `Ctrl-C` 不等于取消；只有 `uniclip join cancel` 表达取消意图。
+4. `Ctrl-C` 不等于取消；只有 `clip join cancel` 表达取消意图。
 5. CLI 不实现 `cancel -> reset -> join`、本地重试编排或客户端状态持久化。
 6. GUI 与 CLI 可以有不同呈现，但必须读取同一份 Engine 状态并遵守同一动作语义。
 

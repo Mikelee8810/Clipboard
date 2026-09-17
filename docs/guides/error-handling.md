@@ -1,6 +1,6 @@
 # Error Handling Strategy
 
-This document defines the error handling strategy for UniClipboard, following the principle of **explicit error handling at appropriate boundaries**.
+This document defines the error handling strategy for Clipboard, following the principle of **explicit error handling at appropriate boundaries**.
 
 ## Core Principles
 

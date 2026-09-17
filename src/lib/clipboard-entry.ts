@@ -40,7 +40,7 @@ export interface ClipboardFileItem {
    * Per-file native local path, aligned with `file_names` by index. Decoded
    * from the projection's `file://` URIs (received files materialize under the
    * app cache dir). `null` for entries whose file URI couldn't be decoded or
-   * for `uniclip-missing://` placeholders. Absent for historical entries that
+   * for `clip-missing://` placeholders. Absent for historical entries that
    * predate this field. Backs the "open file location" action.
    */
   file_paths?: (string | null)[]

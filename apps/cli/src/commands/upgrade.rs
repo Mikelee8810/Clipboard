@@ -1,11 +1,11 @@
-//! `uniclip upgrade` — manual verification entry for the P1 thin upgrade
+//! `clip upgrade` — manual verification entry for the P1 thin upgrade
 //! detection module, routed through daemon HTTP endpoints.
 //!
 //! Subcommands:
 //!
 //! * `status` (default) — calls `GET /upgrade/status` on the daemon and prints
 //!   the structured outcome (FreshInstall / NoChange / Upgraded / Downgraded).
-//!   Bare `uniclip upgrade` runs this.
+//!   Bare `clip upgrade` runs this.
 //! * `ack` — calls `POST /upgrade/ack` to advance the cursor to the
 //!   daemon's current build version. Subsequent `status` runs report
 //!   `NoChange` until the binary version moves.
@@ -99,7 +99,7 @@ pub async fn run(subcommand: Option<UpgradeCommands>, json: bool, verbose: bool)
     };
     let upgrade = ctx.upgrade_client();
 
-    // Bare `uniclip upgrade` defaults to the read-only status check.
+    // Bare `clip upgrade` defaults to the read-only status check.
     match subcommand.unwrap_or(UpgradeCommands::Status) {
         UpgradeCommands::Status => match upgrade.status().await {
             Ok(dto) => {

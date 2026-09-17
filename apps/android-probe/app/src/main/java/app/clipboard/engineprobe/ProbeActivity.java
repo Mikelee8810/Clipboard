@@ -1,4 +1,4 @@
-package app.uniclipboard.engineprobe;
+package app.clipboard.engineprobe;
 
 import android.app.Activity;
 import android.content.Intent;

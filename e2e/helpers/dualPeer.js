@@ -162,7 +162,7 @@ export function daemonConnection(profile) {
 }
 
 export function readDaemonConnection(profile) {
-  const dataDir = `${process.env.HOME}/Library/Application Support/app.uniclipboard.desktop-${profile}`
+  const dataDir = `${process.env.HOME}/Library/Application Support/app.clipboard.desktop-${profile}`
   try {
     const conn = JSON.parse(readFileSync(`${dataDir}/daemon.conn`, 'utf8'))
     if (!conn.port || !conn.token || !conn.pid) return null

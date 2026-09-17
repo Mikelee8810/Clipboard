@@ -63,7 +63,7 @@ Plan 01 uses TDD (`tdd="true"`) — tests are created as part of the RED phase w
 | Behavior                            | Requirement | Why Manual              | Test Instructions                                                                             |
 | ----------------------------------- | ----------- | ----------------------- | --------------------------------------------------------------------------------------------- |
 | Pretty console output looks correct | LOG-01      | Visual formatting check | Run `bun tauri dev`, verify terminal shows human-readable colored output                      |
-| JSON file appears in log directory  | LOG-01      | File system side effect | Run app, check platform log dir for `uniclipboard.json.YYYY-MM-DD`                            |
+| JSON file appears in log directory  | LOG-01      | File system side effect | Run app, check platform log dir for `clipboard.json.YYYY-MM-DD`                            |
 | Profile switch via UC_LOG_PROFILE   | LOG-04      | Env var integration     | Run `UC_LOG_PROFILE=debug_clipboard bun tauri dev`, verify clipboard targets show trace-level |
 | Sentry layer receives events        | LOG-01      | Requires SENTRY_DSN     | Set SENTRY_DSN env var, run app, verify Sentry dashboard shows events (requires account)      |
 | Legacy log::\* outputs to Webview   | LOG-01      | Browser DevTools check  | Run `bun tauri dev`, open DevTools Console, verify log::\* macro output appears               |

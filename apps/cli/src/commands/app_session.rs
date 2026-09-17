@@ -63,7 +63,7 @@ pub async fn refuse_if_daemon_running() -> Result<(), i32> {
         Ok(ProbeOutcome::Compatible(_)) => {
             ui::error(
                 "A daemon is already running for this profile. Stop it first with \
-                 `uniclip stop`, or rerun under a different --profile.",
+                 `clip stop`, or rerun under a different --profile.",
             );
             Err(exit_codes::EXIT_DAEMON_UNREACHABLE)
         }
@@ -132,7 +132,7 @@ pub async fn connect_or_spawn_oneshot_daemon(verbose: bool) -> Result<Box<dyn Da
             Ok(_session) => match crate::setup_check::is_setup_complete().await {
                 Ok(true) => build_daemon_client_service(true),
                 Ok(false) => {
-                    ui::error("No space on this profile; run `uniclip space init` or `uniclip space join` first.");
+                    ui::error("No space on this profile; run `clip space init` or `clip space join` first.");
                     Err(exit_codes::EXIT_ERROR)
                 }
                 Err(error) => {

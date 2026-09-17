@@ -1,6 +1,6 @@
 # ADR-008 P1 执行计划：抽出 `uc-daemon` 库
 
-- **承接**：[ADR-008](./adr-008-uniclipd-split-gui-as-client.md) §4 P1（抽库）+ D1 + OQ-desktop-residue
+- **承接**：[ADR-008](./adr-008-clipd-split-gui-as-client.md) §4 P1（抽库）+ D1 + OQ-desktop-residue
 - **日期**：2026-05-30
 - **性质**：**纯结构迁移、零行为变化、revert-safe**。`GuiInProcess` 与 `Standalone` 两条路径全程行为不变；`DaemonRunMode::GuiInProcess` 迁入但 **不删**（D2 删除留到 P3）。
 - **方法**：9-agent 规划 workflow 逐文件分类 + consumer 引用面 + 反依赖风险分析。
@@ -21,7 +21,7 @@ uc-desktop ── host 胶水：host.rs(run/start_in_process/ProcessRuntimeHandl
 - **uc-daemon 依赖任何 uc-desktop 内容 = 0**（铁律，本计划的核心约束）。
 - **uc-cli 零改动、uc-tauri 零改动**：靠 uc-desktop `daemon/mod.rs` 的 re-export shim 保 `uc_desktop::daemon::*` 接口面逐字不变。
 - uc-cli 仍依赖 uc-desktop（CLI 解耦是 **P2** 的事，非 P1，见 OQ-1）。
-- `uniclipd` 二进制 **不在 P1 范围**（P1 只抽 lib，bin 是 P2）。
+- `clipd` 二进制 **不在 P1 范围**（P1 只抽 lib，bin 是 P2）。
 
 ## 1. uc-daemon Cargo.toml 依赖集
 
@@ -65,7 +65,7 @@ dev-deps：`tempfile`、`mockall`（迁移 mobile_lan_lifecycle / run_mode / ser
 | 7 | 迁 `app.rs` + `app_assembly.rs`；`build_daemon_app_instance`/`DaemonAppAssemblyInput` 设 pub 供 host.rs 用 | `cargo check -p uc-daemon` | ✓ |
 | 8 | 拆 `host.rs`：start_in_process/ProcessRuntimeHandles/run* 留 uc-desktop，内部 `use crate::daemon::{...}`→`use uc_daemon::daemon::{...}`；补齐 uc-daemon 侧 pub | `cargo check -p uc-desktop` | ✓ |
 | 9 | 定稿 uc-desktop `daemon/mod.rs` shim（见 §4）；核 daemon_probe 导入 | `cargo check -p uc-desktop && cargo test -p uc-desktop daemon_probe --no-run` | ✓ |
-| 10 | 全工作区验证 + 行为不变确认（GuiInProcess 经 uc-tauri、Standalone 经 uc-cli `uniclip daemon` 均编译；GuiInProcess variant 仍在；迁走的单测在新家跑） | `cargo check --workspace && cargo test -p uc-daemon && -p uc-desktop && cargo clippy --workspace -- -D warnings` | ✓ |
+| 10 | 全工作区验证 + 行为不变确认（GuiInProcess 经 uc-tauri、Standalone 经 uc-cli `clip daemon` 均编译；GuiInProcess variant 仍在；迁走的单测在新家跑） | `cargo check --workspace && cargo test -p uc-daemon && -p uc-desktop && cargo clippy --workspace -- -D warnings` | ✓ |
 
 ## 4. API shim（uc-desktop `daemon/mod.rs`，保接口面逐字不变）
 
@@ -101,5 +101,5 @@ pub(crate) use host::start_in_process;  // 本地留（daemon_probe）
 | **OQ-1**：P1 后 uc-cli 仍依赖 uc-desktop（`run_standalone_from_env`+`build_process_runtime` 留 uc-desktop），CLI 解耦推到 **P2**——可接受吗？ | **接受**。这与 ADR §4 phasing 一致（P2 才 CLI 解耦）；P1 保持纯结构、uc-cli 零改动。把 run* 迁 uc-daemon 需连 build_process_runtime + 一个非 DesktopRuntime 的轻量 process bootstrap 一起迁，超出"纯结构"。 |
 | **OQ-2**：`RUN_MODE_ENV`/`RUN_MODE_SERVER` 归属 | 留 uc-desktop（随 run*）。 |
 | **OQ-3**：uc-daemon API 形态 | 保留现有 ~9 个 `build_daemon_*` free function 调用形态（P1 不引入 `DaemonRuntimeBuilder`，降风险）。 |
-| **OQ-4**：crate 名 `uc-daemon`（lib `uc_daemon`）、`uniclipd` bin 出 P1 范围 | 确认。P1 只抽 lib，bin 是 P2。 |
+| **OQ-4**：crate 名 `uc-daemon`（lib `uc_daemon`）、`clipd` bin 出 P1 范围 | 确认。P1 只抽 lib，bin 是 P2。 |
 | **OQ-5**：mobile_lan_lifecycle 在 P1 整体迁（覆盖侦察初判的"stay-P3"） | 确认整体迁（无 GUI 耦合、app.rs 需要；部分拆买不到收益还多一道缝）。 |

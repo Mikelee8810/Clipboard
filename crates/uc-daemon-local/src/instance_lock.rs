@@ -84,7 +84,7 @@ impl DaemonInstanceLock {
     pub fn try_acquire(data_dir: &Path) -> Result<Self, InstanceLockError> {
         fs::create_dir_all(data_dir).map_err(InstanceLockError::Io)?;
 
-        let lock_path = data_dir.join(".uniclipd.lock");
+        let lock_path = data_dir.join(".clipd.lock");
 
         if single_instance_disabled() {
             tracing::warn!(
@@ -125,7 +125,7 @@ impl DaemonInstanceLock {
     /// dedicated blocking thread; the `DISABLE_ENV` escape valve is handled
     /// by the `try_acquire` fast path before this runs.
     fn acquire_blocking(data_dir: &Path) -> Result<Self, InstanceLockError> {
-        let lock_path = data_dir.join(".uniclipd.lock");
+        let lock_path = data_dir.join(".clipd.lock");
         let file = File::create(&lock_path).map_err(InstanceLockError::Io)?;
 
         #[cfg(unix)]
@@ -185,7 +185,7 @@ pub async fn acquire_with_deadline(
     // SIGTERM'd — escalating to SIGKILL — so the newcomer takes over
     // deterministically, instead of waiting out `deadline` and exiting
     // `AlreadyRunning` (the symptom users hit after an update: had to kill the
-    // leftover uniclipd by hand). An equal-or-newer holder is left untouched
+    // leftover clipd by hand). An equal-or-newer holder is left untouched
     // (downgrade protection) and we fall through to the cooperative wait below.
     // Eviction (below) may itself spend up to EVICT_SIGTERM_GRACE +
     // EVICT_SIGKILL_GRACE before falling through to the cooperative wait. Start
@@ -236,7 +236,7 @@ async fn block_acquire_within(
     let dir = data_dir.to_path_buf();
     let (tx, rx) = tokio::sync::oneshot::channel();
     std::thread::Builder::new()
-        .name("uniclipd-lock-wait".into())
+        .name("clipd-lock-wait".into())
         .spawn(move || {
             let _ = tx.send(DaemonInstanceLock::acquire_blocking(&dir));
         })
@@ -261,7 +261,7 @@ async fn block_acquire_within(
 /// I/O.
 ///
 /// Best-effort and conservative: an unreadable/absent holder PID file, a
-/// stale/foreign PID (D22 — not a live `uniclipd`), or an equal-or-newer holder
+/// stale/foreign PID (D22 — not a live `clipd`), or an equal-or-newer holder
 /// all yield `Ok(None)` WITHOUT signaling anyone.
 async fn try_evict_outranked_holder(
     data_dir: &Path,
@@ -296,7 +296,7 @@ async fn try_evict_outranked_holder(
         return Ok(None);
     }
 
-    // D22: never signal a PID that is not a live `uniclipd`. A stale PID means
+    // D22: never signal a PID that is not a live `clipd`. A stale PID means
     // the real holder already exited (the lock will free on its own); a foreign
     // PID is someone else's process. Either way, do not signal.
     if !matches!(verify_pid_identity(&holder), PidVerification::Active) {

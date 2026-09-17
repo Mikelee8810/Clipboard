@@ -3,7 +3,7 @@ name = "uc-desktop"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Desktop host for UniClipboard runtime, daemon mode, local API, and desktop event sources"
+description = "Desktop host for Clipboard runtime, daemon mode, local API, and desktop event sources"
 
 [lib]
 name = "uc_desktop"

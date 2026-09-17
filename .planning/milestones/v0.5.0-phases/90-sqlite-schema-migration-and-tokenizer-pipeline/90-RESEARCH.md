@@ -224,7 +224,7 @@ Recommended derivation shape:
 HKDF-SHA256(
   ikm = master_key.as_bytes(),
   salt = profile_id.as_bytes(),
-  info = b"uniclipboard-search-index/v1"
+  info = b"clipboard-search-index/v1"
 ) -> 32-byte SearchKey
 ```
 

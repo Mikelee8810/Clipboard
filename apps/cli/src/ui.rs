@@ -94,9 +94,9 @@ pub fn end(text: &str) {
 /// (leading space + glyph + double space + content). Active prompts use
 /// a yellow `?`; resolved prompts collapse to the canonical green `✓`
 /// line so the transcript stays consistent with `success` / `error`.
-struct UniclipTheme;
+struct ClipTheme;
 
-impl Theme for UniclipTheme {
+impl Theme for ClipTheme {
     fn format_confirm_prompt(
         &self,
         f: &mut dyn fmt::Write,
@@ -161,7 +161,7 @@ impl Theme for UniclipTheme {
 /// returned on bare `Enter`; pass `false` for "must explicitly opt in"
 /// flows (e.g. the LAN exposure warning).
 pub fn confirm(prompt: &str, default: bool) -> Result<bool, String> {
-    Confirm::with_theme(&UniclipTheme)
+    Confirm::with_theme(&ClipTheme)
         .with_prompt(prompt)
         .default(default)
         .interact_on(&Term::stderr())
@@ -172,7 +172,7 @@ pub fn confirm(prompt: &str, default: bool) -> Result<bool, String> {
 /// submission (used for `[Enter for auto]` flows); `false` re-prompts
 /// until the user types something non-empty.
 pub fn input(prompt: &str, allow_empty: bool) -> Result<String, String> {
-    Input::<String>::with_theme(&UniclipTheme)
+    Input::<String>::with_theme(&ClipTheme)
         .with_prompt(prompt)
         .allow_empty(allow_empty)
         .interact_text_on(&Term::stderr())

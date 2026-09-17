@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>app.uniclipboard.desktop</id>
+  <id>app.clipboard.desktop</id>
 
-  <name>UniClipboard</name>
+  <name>Clipboard</name>
   <summary>Encrypted peer-to-peer clipboard sync between your devices</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-only</project_license>
 
-  <developer id="app.uniclipboard">
-    <name>UniClipboard</name>
+  <developer id="app.clipboard">
+    <name>Clipboard</name>
   </developer>
 
   <description>
     <p>
-      UniClipboard syncs your clipboard securely across your devices on the
+      Clipboard syncs your clipboard securely across your devices on the
       local network. End-to-end encrypted and powered by iroh QUIC — no clouds,
       no accounts, no third-party servers, just direct peer-to-peer sync.
     </p>
@@ -25,13 +25,13 @@
     </p>
   </description>
 
-  <launchable type="desktop-id">app.uniclipboard.desktop.desktop</launchable>
+  <launchable type="desktop-id">app.clipboard.desktop.desktop</launchable>
 
   <!-- Flathub requires at least one screenshot. Replace with a real raw URL
        (e.g. an image committed to the repo) before submitting. -->
   <screenshots>
     <screenshot type="default">
-      <caption>UniClipboard main window</caption>
+      <caption>Clipboard main window</caption>
       <image>https://raw.githubusercontent.com/UniClipboard/UniClipboard/main/assets/screenshot-main.png</image>
     </screenshot>
   </screenshots>

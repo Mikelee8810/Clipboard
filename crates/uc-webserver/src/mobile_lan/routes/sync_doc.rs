@@ -1,6 +1,6 @@
 //! `/SyncClipboard.json` 当前剪贴板元数据入口。
 //!
-//! `GET` 真实读取 UniClipboard 当前最新剪贴板表示；`PUT` 真实写入现有移动
+//! `GET` 真实读取 Clipboard 当前最新剪贴板表示；`PUT` 真实写入现有移动
 //! 同步入站管线。当前没有剪贴板内容时，为兼容官方服务端返回空 Text profile。
 
 use axum::{

@@ -249,12 +249,12 @@ impl LogProfile {
 use tracing_appender::rolling;
 use tracing_appender::non_blocking;
 
-let daily_appender = rolling::daily(&paths.logs_dir, "uniclipboard.json");
+let daily_appender = rolling::daily(&paths.logs_dir, "clipboard.json");
 let (non_blocking_writer, guard) = non_blocking(daily_appender);
 // Store guard to keep writer alive for app lifetime
 ```
 
-**Note:** `rolling::daily()` appends `.YYYY-MM-DD` to the file name prefix. So `uniclipboard.json` produces `uniclipboard.json.2026-03-10`. Two guards now needed (console file guard if any, JSON file guard).
+**Note:** `rolling::daily()` appends `.YYYY-MM-DD` to the file name prefix. So `clipboard.json` produces `clipboard.json.2026-03-10`. Two guards now needed (console file guard if any, JSON file guard).
 
 ### Anti-Patterns to Avoid
 
@@ -313,8 +313,8 @@ let (non_blocking_writer, guard) = non_blocking(daily_appender);
 ### Pitfall 6: Two Log File Systems Coexisting
 
 **What goes wrong:** Confusion about which file has which format. Both tracing.rs and logging.rs write files in production.
-**Why it happens:** Legacy `tauri-plugin-log` writes `uniclipboard.log` (plain text from `log::*` macros). New JSON layer writes `uniclipboard.json.YYYY-MM-DD`.
-**How to avoid:** Document clearly: `uniclipboard.log` = legacy log macros, `uniclipboard.json.*` = structured tracing output. Keep both until `log::*` usage is fully removed.
+**Why it happens:** Legacy `tauri-plugin-log` writes `clipboard.log` (plain text from `log::*` macros). New JSON layer writes `clipboard.json.YYYY-MM-DD`.
+**How to avoid:** Document clearly: `clipboard.log` = legacy log macros, `clipboard.json.*` = structured tracing output. Keep both until `log::*` usage is fully removed.
 **Warning signs:** Developers looking for JSON in the wrong file.
 
 ## Code Examples
@@ -447,7 +447,7 @@ fn build_json_writer() -> anyhow::Result<(NonBlocking, WorkerGuard)> {
     let paths = AppPaths::from_app_dirs(&app_dirs);
     fs::create_dir_all(&paths.logs_dir)?;
 
-    let daily_appender = tracing_appender::rolling::daily(&paths.logs_dir, "uniclipboard.json");
+    let daily_appender = tracing_appender::rolling::daily(&paths.logs_dir, "clipboard.json");
     let (non_blocking, guard) = tracing_appender::non_blocking(daily_appender);
     Ok((non_blocking, guard))
 }

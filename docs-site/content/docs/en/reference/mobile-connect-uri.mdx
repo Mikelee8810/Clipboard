@@ -1,9 +1,9 @@
 ---
 title: Mobile sync connect URI
-description: uniclipboard://connect deep-link specification for onboarding mobile clients into LAN sync.
+description: clipboard://connect deep-link specification for onboarding mobile clients into LAN sync.
 ---
 
-The `uniclipboard://connect` URI is a single-QR deep link that carries every
+The `clipboard://connect` URI is a single-QR deep link that carries every
 piece of information a mobile client needs to join the desktop's LAN mobile-sync
 listener — base URL, username, plaintext one-time password, and extensible
 metadata.
@@ -13,7 +13,7 @@ when you are writing:
 
 - A new SyncClipboard-compatible client (Android, desktop, web, etc.).
 - An iOS shortcut, automation, or App that consumes the QR scanned from the
-  UniClipboard desktop credential panel.
+  Clipboard desktop credential panel.
 - Any other tool that needs to parse the QR produced by the desktop **Add
   device → Scan to add** flow.
 
@@ -26,12 +26,12 @@ when you are writing:
 ## URI shape
 
 ```
-uniclipboard://connect?v=1&svc=mobile-sync&p=<PAYLOAD>
+clipboard://connect?v=1&svc=mobile-sync&p=<PAYLOAD>
 ```
 
 | Component   | Value                                                                                         |
 | ----------- | --------------------------------------------------------------------------------------------- |
-| Scheme      | `uniclipboard` — the **only** accepted scheme                                                 |
+| Scheme      | `clipboard` — the **only** accepted scheme                                                 |
 | Host        | `connect`                                                                                     |
 | Query `v`   | URI envelope version. v1 = `1`.                                                               |
 | Query `svc` | Service identifier. v1 supports `mobile-sync` only.                                           |
@@ -95,7 +95,7 @@ unknown keys.** Encoders MUST NOT depend on any client recognizing a specific
 | --------- | ----------------- | ------------------------------------------------------------------------ |
 | `label`   | `"My iPhone"`     | Human-readable device name for client-side UI display.                   |
 | `did`     | `"did_0123abcd"`  | Server-assigned `device_id`, for diagnostics and log correlation.        |
-| `proto`   | `"syncclipboard"` | Protocol family hint. Future values may include `"uniclipboard-native"`. |
+| `proto`   | `"syncclipboard"` | Protocol family hint. Future values may include `"clipboard-native"`. |
 | `install` | `"shortcut-ex"`   | iOS Shortcut template hint, paired with the iCloud install URL constant. |
 
 Parsers should be lenient: read the keys above when present; ignore everything
@@ -134,7 +134,7 @@ flowchart TD
   scan --> trim[Trim whitespace]
   trim --> parseUri{Parse as URI}
   parseUri -->|fail| eScheme[INVALID_SCHEME]
-  parseUri --> checkScheme{scheme == uniclipboard?}
+  parseUri --> checkScheme{scheme == clipboard?}
   checkScheme -->|no| eScheme
   checkScheme --> checkHost{host == connect?}
   checkHost -->|no| eScheme
@@ -159,7 +159,7 @@ flowchart TD
 ```
 raw = trim(qr_text)
 uri = parse(raw)                              # may throw → INVALID_SCHEME
-require uri.scheme == "uniclipboard"          # else INVALID_SCHEME
+require uri.scheme == "clipboard"          # else INVALID_SCHEME
 require uri.host == "connect"                 # else INVALID_SCHEME
 
 v   = int(uri.query["v"])                     # missing/non-int → UNSUPPORTED_VERSION
@@ -191,7 +191,7 @@ foreach (k, v) in (payload.o or {}):
 
 | Code                    | Trigger                                              | UX hint                                |
 | ----------------------- | ---------------------------------------------------- | -------------------------------------- |
-| `INVALID_SCHEME`        | Scheme ≠ `uniclipboard` or host ≠ `connect`.         | "Not a UniClipboard QR."               |
+| `INVALID_SCHEME`        | Scheme ≠ `clipboard` or host ≠ `connect`.         | "Not a Clipboard QR."               |
 | `UNSUPPORTED_VERSION`   | URI `v` ≠ 1 or payload `v` ≠ 1.                      | "Please update your app."              |
 | `UNSUPPORTED_SERVICE`   | URI `svc` ≠ `mobile-sync`.                           | "Service not supported in this build." |
 | `PAYLOAD_DECODE_FAILED` | `p` missing, base64url malformed, or JSON malformed. | "QR is corrupted — regenerate it."     |
@@ -216,7 +216,7 @@ acceptable because:
 **Mandatory rules for any code path that handles the URI on the client side:**
 
 - MUST NOT log the full URI, the decoded payload, or the password. Log only
-  redacted views (e.g. `uniclipboard://connect?v=1&svc=mobile-sync&p=<…48 chars…>`).
+  redacted views (e.g. `clipboard://connect?v=1&svc=mobile-sync&p=<…48 chars…>`).
 - MUST NOT include the URI in analytics events, crash reports, or error
   attachments.
 - MUST NOT persist the URI to disk after the credential panel is dismissed — store
@@ -282,7 +282,7 @@ this vector.
 **Encoded URI:**
 
 ```
-uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
+clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
 ```
 
 ### Negative vectors
@@ -292,11 +292,11 @@ Each input below MUST produce the listed error code on parse:
 | #   | Input                                                                                                                      | Expected error          |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | 1   | `https://example.com/connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ`                                                             | `INVALID_SCHEME`        |
-| 2   | `uniclipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ`                                                                  | `UNSUPPORTED_VERSION`   |
-| 3   | `uniclipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ`                                                                        | `UNSUPPORTED_SERVICE`   |
-| 4   | `uniclipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#`                                                         | `PAYLOAD_DECODE_FAILED` |
-| 5   | `uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ` (no `pwd`)               | `MISSING_FIELD`         |
-| 6   | `uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ` (ftp scheme) | `INVALID_URL`           |
+| 2   | `clipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ`                                                                  | `UNSUPPORTED_VERSION`   |
+| 3   | `clipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ`                                                                        | `UNSUPPORTED_SERVICE`   |
+| 4   | `clipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#`                                                         | `PAYLOAD_DECODE_FAILED` |
+| 5   | `clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ` (no `pwd`)               | `MISSING_FIELD`         |
+| 6   | `clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ` (ftp scheme) | `INVALID_URL`           |
 
 ## End-to-end onboarding flow
 
@@ -322,9 +322,9 @@ sequenceDiagram
 ## Implementing a new client
 
 If you are building a third-party SyncClipboard-compatible client that wants
-to join UniClipboard via QR, your work is:
+to join Clipboard via QR, your work is:
 
-1. **Register a URL handler** for the `uniclipboard` scheme on your platform
+1. **Register a URL handler** for the `clipboard` scheme on your platform
    (Android Intent filter, iOS URL types, custom-protocol handler on desktop,
    etc.). Optionally also accept the URI from an in-app QR scanner.
 2. **Parse the URI** per [Parsing algorithm](#parsing-algorithm). Surface the
@@ -338,7 +338,7 @@ to join UniClipboard via QR, your work is:
 5. **Speak the HTTP API** documented in [Mobile LAN API](./mobile-api). The
    wire protocol is unchanged from v1 SyncClipboard semantics.
 
-No coordination with the UniClipboard team is required — the spec on this
+No coordination with the Clipboard team is required — the spec on this
 page is the contract.
 
 ## Forward compatibility

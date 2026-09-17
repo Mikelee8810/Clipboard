@@ -97,7 +97,7 @@ pub trait DaemonService: Send + Sync {
     /// List clipboard history entry projections, newest first, by calling
     /// `GET /clipboard/entries?limit&offset`. This is the real-time list view
     /// (NOT the search index), so it reliably reflects "the latest synced
-    /// entry" — the basis for `uniclip get` on a headless node.
+    /// entry" — the basis for `clip get` on a headless node.
     async fn list_entries(
         &self,
         limit: usize,

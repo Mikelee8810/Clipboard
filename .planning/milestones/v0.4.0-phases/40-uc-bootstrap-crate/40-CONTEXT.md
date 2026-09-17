@@ -47,7 +47,7 @@ Create `uc-bootstrap` as the sole composition root crate. Move Tauri-free assemb
 - uc-tauri REDUCES direct dependency on uc-infra and uc-platform for composition purposes (bulk composition moves to uc-bootstrap)
 - uc-tauri RETAINS uc-platform dependency for Tauri-specific adapters (TauriEventEmitter, PlatformRuntime)
 - uc-tauri MAY retain residual uc-infra dependency for types consumed by `AppUseCases` (e.g. `TransferPayloadEncryptorAdapter`) and `start_background_tasks()` (e.g. `KeySlotStore`). Full uc-infra decoupling from uc-tauri is explicitly deferred — the phase goal is to centralize the bulk composition root, not achieve zero-infra-coupling in uc-tauri
-- main.rs (uniclipboard binary) depends on uc-tauri (which transitively gets uc-bootstrap)
+- main.rs (clipboard binary) depends on uc-tauri (which transitively gets uc-bootstrap)
 - Future uc-daemon and uc-cli (Phase 41) depend on uc-bootstrap directly, NOT uc-tauri
 
 ### uc-tauri bootstrap/ module after extraction
@@ -59,7 +59,7 @@ Create `uc-bootstrap` as the sole composition root crate. Move Tauri-free assemb
 ### Claude's Discretion
 
 - Internal module organization within uc-bootstrap (single lib.rs vs sub-modules)
-- Import migration strategy: preferred approach is to add `uc-bootstrap` as a direct dependency in `src-tauri/Cargo.toml` (the root `uniclipboard` package) alongside `uc-tauri`, and update import paths directly. Alternative: use `pub use` re-exports in uc-tauri/bootstrap/mod.rs for backward compatibility. Either way, the root package Cargo.toml must be updated
+- Import migration strategy: preferred approach is to add `uc-bootstrap` as a direct dependency in `src-tauri/Cargo.toml` (the root `clipboard` package) alongside `uc-tauri`, and update import paths directly. Alternative: use `pub use` re-exports in uc-tauri/bootstrap/mod.rs for backward compatibility. Either way, the root package Cargo.toml must be updated
 - Exact Cargo.toml feature flags (if any) for uc-bootstrap
 - Whether build_gui_app internally calls wire_dependencies or replaces it with a new implementation (but it MUST return more than WiredDependencies — see builder API decision above)
 

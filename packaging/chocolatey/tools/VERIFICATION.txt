@@ -1,10 +1,10 @@
 VERIFICATION
 
-This package is maintained by the UniClipboard project (the software vendor).
+This package is maintained by the Clipboard project (the software vendor).
 
 The installer is downloaded at install time from the official GitHub Releases:
   https://github.com/UniClipboard/UniClipboard/releases/tag/v0.15.0
-  UniClipboard_0.15.0_x64-setup.exe
+  Clipboard_0.15.0_x64-setup.exe
 
 To verify the binary independently:
   1. Download the .exe from the release above.

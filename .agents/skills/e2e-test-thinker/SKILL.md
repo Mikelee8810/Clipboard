@@ -21,8 +21,8 @@ The harness lives at `tests/e2e/` and provides three building blocks:
 | Component | Purpose |
 |-----------|---------|
 | `TestProfile` | UUID-based profile isolation — each test gets its own data dir, socket, and identity |
-| `TestDaemon` | Spawn `uniclipd` with a test profile, wait for `/health` to return 200, kill on drop |
-| `TestCli` | Run `uniclip` subcommands against a test profile; `run_ok()`, `run_capture()` helpers |
+| `TestDaemon` | Spawn `clipd` with a test profile, wait for `/health` to return 200, kill on drop |
+| `TestCli` | Run `clip` subcommands against a test profile; `run_ok()`, `run_capture()` helpers |
 
 **Test pattern:** every test is `#[tokio::test] #[ignore]` and runs with `cargo test -p uc-e2e-tests -- --ignored`. Tests are black-box: they only interact via the CLI binary and HTTP health endpoint.
 

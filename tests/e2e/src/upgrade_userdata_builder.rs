@@ -130,11 +130,11 @@ pub async fn build_single_node_upgrade_fixture(
 }
 
 fn verify_database_present(data_root: &Path) -> Result<(), String> {
-    let database = data_root.join("uniclipboard.db");
+    let database = data_root.join("clipboard.db");
     let database_size = std::fs::metadata(&database)
         .map_err(|error| format!("inspect fixture database failed: {error}"))?
         .len();
-    let wal_size = std::fs::metadata(data_root.join("uniclipboard.db-wal"))
+    let wal_size = std::fs::metadata(data_root.join("clipboard.db-wal"))
         .map(|metadata| metadata.len())
         .unwrap_or(0);
     if database_size <= 4096 && wal_size == 0 {
@@ -169,8 +169,8 @@ fn collect_fixture_files(
 ) -> Result<Vec<(PathBuf, Vec<u8>)>, String> {
     let mut files = Vec::new();
     for path in [
-        "uniclipboard.db",
-        "uniclipboard.db-wal",
+        "clipboard.db",
+        "clipboard.db-wal",
         "settings.json",
         "upgrade-cursor.json",
         ".engine-upgrade-cursor.json",
@@ -205,7 +205,7 @@ fn collect_fixture_files(
     }
     files.sort_by(|left, right| left.0.cmp(&right.0));
     for required in [
-        "data/uniclipboard.db",
+        "data/clipboard.db",
         "data/settings.json",
         "data/vault/.setup_status",
         "data/vault/keyslot.json",

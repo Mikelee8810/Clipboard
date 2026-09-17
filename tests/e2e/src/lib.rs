@@ -1,7 +1,7 @@
-//! Black-box E2E test harness for UniClipboard.
+//! Black-box E2E test harness for Clipboard.
 //!
-//! Provides `TestDaemon` (lifecycle management for `uniclipd`) and `TestCli`
-//! (ergonomic command builder for `uniclip`) — both profile-isolated so tests
+//! Provides `TestDaemon` (lifecycle management for `clipd`) and `TestCli`
+//! (ergonomic command builder for `clip`) — both profile-isolated so tests
 //! can run in parallel without interference.
 
 mod auth;

@@ -35,7 +35,7 @@ No actual file transfer logic in this phase — only the contracts, types, and s
 
 ### Protocol Registration
 
-- New `ProtocolId::FileTransfer` variant for `/uniclipboard/file-transfer/1.0.0`
+- New `ProtocolId::FileTransfer` variant for `/clipboard/file-transfer/1.0.0`
 - Add to `uc-core/src/network/protocol_ids.rs`
 
 ### File Classification Fix (CRITICAL)

@@ -165,9 +165,9 @@ fn managed_log_date(name: &str) -> Option<NaiveDate> {
         return Some(date);
     }
     [
-        "uniclipboard-gui.json.",
-        "uniclipboard-daemon.json.",
-        "uniclipboard-cli.json.",
+        "clipboard-gui.json.",
+        "clipboard-daemon.json.",
+        "clipboard-cli.json.",
     ]
     .iter()
     .find_map(|prefix| {

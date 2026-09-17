@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ios-logs.sh — drive the UniClipboard iOS app in a simulator and read its
+# ios-logs.sh — drive the Clipboard iOS app in a simulator and read its
 # OSLog, so the agent can diagnose mobile-sync / reducer bugs without asking the
 # user to paste logs. See SKILL.md for the two-channel model and gotchas.
 #
@@ -17,9 +17,9 @@
 # CATEGORY (optional): sync | network | store | app | intents. Omit for all.
 set -uo pipefail
 
-SUBSYSTEM="app.uniclipboard"
-BUNDLE="app.uniclipboard.UniClipboard"
-APPGROUP="group.app.uniclipboard.UniClipboard"
+SUBSYSTEM="app.clipboard"
+BUNDLE="app.clipboard.Clipboard"
+APPGROUP="group.app.clipboard.Clipboard"
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
@@ -38,7 +38,7 @@ booted_device() {
 
 newest_app() {
   # Most recently built simulator .app product.
-  ls -dt "$HOME"/Library/Developer/Xcode/DerivedData/UniClipboard-*/Build/Products/Debug-iphonesimulator/UniClipboard.app 2>/dev/null | head -1
+  ls -dt "$HOME"/Library/Developer/Xcode/DerivedData/Clipboard-*/Build/Products/Debug-iphonesimulator/Clipboard.app 2>/dev/null | head -1
 }
 
 predicate() {
@@ -54,7 +54,7 @@ cmd_drive() {
   local url="${1:-http://127.0.0.1:59999}"
   local dev app
   dev=$(booted_device); echo "device: $dev"
-  app=$(newest_app); [ -n "$app" ] || die "no built UniClipboard.app — run xcodebuild first"
+  app=$(newest_app); [ -n "$app" ] || die "no built Clipboard.app — run xcodebuild first"
   echo "app: $app"
   xcrun simctl install "$dev" "$app" || die "install failed"
   xcrun simctl terminate "$dev" "$BUNDLE" >/dev/null 2>&1

@@ -14,10 +14,10 @@
 ## A. 协议与编解码（Rust 共享核心 · 字节关键）
 
 > ✅ M0/M1 完成 2026-06-12（`cargo test -p uc-mobile-proto`，140 测试全绿；4 区均经独立对抗 agent 逐字节核查）。下方 A1–A5 + B 区编解码项已由 Rust golden vector / 单测覆盖；🔗（真实 daemon）项属 M2、📱 项属 M6，仍留空。
-> ✅ **A1 connect-uri 📱 M6 真机验收通过 2026-06-15**：M6-0b 把 connect-uri 解析经 `ConnectURIRouter` 灰度到 Rust core（运行时 toggle）。真机（iPhone 16 Pro / iOS 27）翻开关扫码，Console 实测 `ConnectURIRouter: parsing connect URI via Rust core`（进程 UniClipboard，18:37:31），解析正常、与原生结果一致（iOS A/B 单测 `nativeAndRustAgreeOn*` + 真机日志双证）。
+> ✅ **A1 connect-uri 📱 M6 真机验收通过 2026-06-15**：M6-0b 把 connect-uri 解析经 `ConnectURIRouter` 灰度到 Rust core（运行时 toggle）。真机（iPhone 16 Pro / iOS 27）翻开关扫码，Console 实测 `ConnectURIRouter: parsing connect URI via Rust core`（进程 Clipboard，18:37:31），解析正常、与原生结果一致（iOS A/B 单测 `nativeAndRustAgreeOn*` + 真机日志双证）。
 
 ### A1. connect-uri
-- [x] 🧬🔴 解析 `uniclipboard://connect?v=1&svc=mobile-sync&p=<base64url>`，golden vector 与 iOS/桌面字节相等 — B0/B1 `connect_uri.rs`
+- [x] 🧬🔴 解析 `clipboard://connect?v=1&svc=mobile-sync&p=<base64url>`，golden vector 与 iOS/桌面字节相等 — B0/B1 `connect_uri.rs`
 - [x] 🧬🔴 base64url-no-pad：`-`↔`+`、`_`↔`/`，解码前补 `(4-len%4)%4` 个 `=` — `connect_uri.rs`
 - [x] 🔬 required 字段缺失/空/null → `missingField`；非 http(s) → `invalidURL`；svc≠mobile-sync → `unsupportedService`；v≠1 → `unsupportedVersion`
 - [x] 🔬 `urls` 缺省/全过滤后回落 `[url]`（回落属调用方，FFI 契约返回过滤后列表）；`o` 中未知字符串键保留、非字符串值丢弃；非 http(s) 与非字符串 urls 候选丢弃 — **M6 补齐**：proto `de_lenient_string_map`/`de_lenient_url_list`，测试 `parse_drops_non_string_o_values`/`parse_ignores_non_object_o`/`parse_filters_non_http_urls_candidates`/`parse_urls_all_non_http_becomes_empty`/`parse_drops_non_string_urls_entries` + iOS A/B `nativeAndRustAgreeOn*`。（M0/M1 误标已覆盖，实为 strict 解析与原生防御式行为不符；M6 tracer-bullet A/B 暴露并修复，保全零回归）

@@ -7,7 +7,7 @@ run-name: "snap-${{ inputs.channel || github.event.release.tag_name || 'edge' }}
 # 的用户群,详见 snap/snapcraft.yaml 顶部说明。
 #
 # 推送到 snap store 需要 SNAPCRAFT_STORE_CREDENTIALS secret(`snapcraft
-# export-login --snaps=uniclipboard --acls package_upload --expires <date>`
+# export-login --snaps=clipboard --acls package_upload --expires <date>`
 # 生成,详见 README/CONTRIBUTING)。secret 缺失时 publish 步骤跳过,只产
 # workflow artifact。
 on:
@@ -129,7 +129,7 @@ jobs:
         # (`snap install --dangerous file.snap`)。retention 7 天够用。
         uses: actions/upload-artifact@v7
         with:
-          name: uniclipboard-${{ matrix.arch }}-snap
+          name: clipboard-${{ matrix.arch }}-snap
           path: ${{ steps.build.outputs.snap }}
           retention-days: 7
           if-no-files-found: error
@@ -142,7 +142,7 @@ jobs:
         run: |
           if [ -z "${SNAPCRAFT_STORE_CREDENTIALS:-}" ]; then
             echo "::warning::SNAPCRAFT_STORE_CREDENTIALS secret missing — skipping publish."
-            echo "::warning::Run \`snapcraft export-login --snaps=uniclipboard --acls package_upload\` and add it to repo secrets to enable publishing."
+            echo "::warning::Run \`snapcraft export-login --snaps=clipboard --acls package_upload\` and add it to repo secrets to enable publishing."
             echo "publish=false" >> "$GITHUB_OUTPUT"
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"

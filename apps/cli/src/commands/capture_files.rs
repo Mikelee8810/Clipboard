@@ -190,7 +190,7 @@ async fn resume_session(bundle: &CliAppSession) -> Result<(), i32> {
         Ok(true) => Ok(()),
         Ok(false) => {
             ui::error(
-                "This device is not set up yet. Use `uniclip space init` or `uniclip space join` first.",
+                "This device is not set up yet. Use `clip space init` or `clip space join` first.",
             );
             Err(exit_codes::EXIT_ERROR)
         }

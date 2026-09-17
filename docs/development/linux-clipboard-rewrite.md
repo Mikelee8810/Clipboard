@@ -8,7 +8,7 @@
 
 ## 0. 文档目的
 
-UniClipboard Linux 剪贴板后端做了一次彻底的"脱离 `clipboard-rs`、原生绑两套 OS 协议（Wayland + X11）"的工程。**所有 5 个 Phase（1 / 2a / 2b / 3 / 4 / 5）已全部落地**。本文档为该项目的最终归档，记录了：
+Clipboard Linux 剪贴板后端做了一次彻底的"脱离 `clipboard-rs`、原生绑两套 OS 协议（Wayland + X11）"的工程。**所有 5 个 Phase（1 / 2a / 2b / 3 / 4 / 5）已全部落地**。本文档为该项目的最终归档，记录了：
 
 - 任务背景与起因
 - 目前的发现与决策
@@ -31,11 +31,11 @@ git log --oneline -10
 
 ### 1.1 起因
 
-用户在 Fedora 44 + niri 25.11（Wayland 会话）下运行 UniClipboard，发现"复制了文本但 daemon 监听不到、对端无任何反应"。
+用户在 Fedora 44 + niri 25.11（Wayland 会话）下运行 Clipboard，发现"复制了文本但 daemon 监听不到、对端无任何反应"。
 
 ### 1.2 根因
 
-UniClipboard Linux 平台层依赖 `clipboard-rs 0.3.3`：
+Clipboard Linux 平台层依赖 `clipboard-rs 0.3.3`：
 
 - `crates/uc-platform/src/clipboard/platform/linux.rs`：`LinuxClipboard` 用 `clipboard_rs::ClipboardContext` 读写
 - `crates/uc-desktop/src/daemon/workers/clipboard_watcher.rs:303`：worker 用 `clipboard_rs::ClipboardWatcherContext` 监听
@@ -113,7 +113,7 @@ UniClipboard Linux 平台层依赖 `clipboard-rs 0.3.3`：
 
 ### 3.3 性能 / 资源
 
-- 启动后 `top -p $(pgrep uniclipboard)`：CPU idle ≈ 0%（事件驱动应当无空转）
+- 启动后 `top -p $(pgrep clipboard)`：CPU idle ≈ 0%（事件驱动应当无空转）
 - `lsof -p ...`：每个 backend 1 个 wayland/X11 socket fd + 1 个 eventfd，无泄漏
 - 长时间跑 1h 不复制：内存平稳
 
@@ -477,7 +477,7 @@ crates/uc-platform/src/clipboard/platform/linux/x11/
 - `cargo check --workspace --all-targets` 通过，无新 warning。
 - `cargo test -p uc-platform --lib` 20 passed（mac/win-only 的 common.rs 测试自然被 cfg 过滤）。
 - `cargo test -p uc-cli` 31 passed、`cargo test -p uc-desktop --lib` 48 passed。
-- `uniclip probe watch --max-events 2` + 两次 `wl-copy`：两个 event 全部捕获、`max_events` 退出干净，event loop 线程 join 正常。
+- `clip probe watch --max-events 2` + 两次 `wl-copy`：两个 event 全部捕获、`max_events` 退出干净，event loop 线程 join 正常。
 
 CI / 打包：snap / Flatpak / deb 在 Linux target 上不再 vendor `clipboard-rs`，体积应该只减不增。本地无法验，建议 reviewer 在 PR 合并时盯 snap CI 的 stage-package 列表。
 
@@ -679,7 +679,7 @@ cargo tree -p uc-cli      --target aarch64-unknown-linux-gnu | grep -i clipboard
 cargo tree -p uc-desktop  --target aarch64-unknown-linux-gnu | grep -i clipboard-rs
 
 # probe 子命令仍能工作（走 build_event_loop，不再直接 use clipboard_rs）
-./target/debug/uniclip probe watch --max-events 2 &
+./target/debug/clip probe watch --max-events 2 &
 echo "phase4 probe ts=$(date +%s)" | wl-copy
 echo "phase4 probe 2 ts=$(date +%s)" | wl-copy
 # 等待 max-events 触发自然退出

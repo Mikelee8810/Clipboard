@@ -1,14 +1,14 @@
-# UniClipboard Tracing & Span 规范（v1）
+# Clipboard Tracing & Span 规范（v1）
 
 **状态**：Active
-**适用范围**：UniClipboard Desktop（Rust / Tauri / Hexagonal Architecture）
+**适用范围**：Clipboard Desktop（Rust / Tauri / Hexagonal Architecture）
 **最后更新**：v1
 
 ---
 
 ## 1. 背景与目标
 
-UniClipboard 是一个长期演进的跨平台应用，核心目标之一是 **可维护性与可演进性**。
+Clipboard 是一个长期演进的跨平台应用，核心目标之一是 **可维护性与可演进性**。
 为此，我们需要一套 **一致、低噪声、可聚合** 的可观测性规范。
 
 本规范用于统一项目中对 [`tracing`](https://docs.rs/tracing) 的使用方式，明确：
@@ -53,7 +53,7 @@ UniClipboard 是一个长期演进的跨平台应用，核心目标之一是 **�
 
 ## 3. 分层使用规范（强约束）
 
-UniClipboard 使用 **Hexagonal Architecture**，tracing 的职责按层严格划分。
+Clipboard 使用 **Hexagonal Architecture**，tracing 的职责按层严格划分。
 
 ---
 
@@ -269,7 +269,7 @@ result?;
 
 ## 10. 执行与约束
 
-- 新增 Use Case **必须**创建 span
+- 新增 Use Case **必须** 创建 span
 - Code Review 必查：
   - 是否越层创建 span
   - 是否记录高基数字段
@@ -279,4 +279,4 @@ result?;
 
 ## 11. 一句话总结
 
-> **Tracing 是 UniClipboard 的“业务时间线”，不是调试噪声。**
+> **Tracing 是 Clipboard 的“业务时间线”，不是调试噪声。**

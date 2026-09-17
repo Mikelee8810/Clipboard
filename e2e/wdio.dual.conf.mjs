@@ -10,7 +10,7 @@ const applicationPath =
     rootDir,
     'target',
     'debug',
-    process.platform === 'win32' ? 'uniclipboard.exe' : 'uniclipboard'
+    process.platform === 'win32' ? 'clipboard.exe' : 'clipboard'
   )
 
 function instance(profile, extraEnv = {}) {
@@ -25,7 +25,7 @@ function instance(profile, extraEnv = {}) {
         driverProvider: 'embedded',
         startTimeout: 120000,
         env: {
-          UNICLIPBOARD_ENV: process.env.UNICLIPBOARD_ENV ?? 'development',
+          CLIPBOARD_ENV: process.env.CLIPBOARD_ENV ?? 'development',
           UC_PROFILE: profile,
           UC_DISABLE_SINGLE_INSTANCE: '1',
           UC_CLIPBOARD_MODE: 'passive',

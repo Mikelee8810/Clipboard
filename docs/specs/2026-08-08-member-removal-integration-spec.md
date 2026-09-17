@@ -3,7 +3,7 @@
 - **状态**：已实施
 - **日期**：2026-08-11
 - **对应决策**：`docs/adr/adr-011-offline-first-member-removal-integration.md`
-- **上游**：UniClipboard/Engine PR #24，提交 `983fb2562f55fca3838a927f7831ae51eaadf885`
+- **上游**：Clipboard/Engine PR #24，提交 `983fb2562f55fca3838a927f7831ae51eaadf885`
 
 ## 完成定义
 
@@ -43,7 +43,7 @@ Workspace convergence 是 Engine 对当前 Space 的完整成员收敛快照。�
 bun run gen:api
 bun run build
 npx vitest run src/pages/device-status-utils.test.ts
-cargo check -p uc-daemon --bin uniclipd
+cargo check -p uc-daemon --bin clipd
 cargo test -p uc-webserver workspace_convergence_mapping_preserves_complete_engine_state
 cargo test -p uc-webserver workspace_convergence_changes_include_the_complete_engine_state
 ```

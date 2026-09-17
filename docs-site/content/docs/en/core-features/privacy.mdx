@@ -1,9 +1,9 @@
 ---
 title: Privacy & data collection
-description: What UniClipboard collects, why it is collected, what is never included, and how to turn it off.
+description: What Clipboard collects, why it is collected, what is never included, and how to turn it off.
 ---
 
-UniClipboard's main privacy boundary does not change: clipboard content only syncs between your paired devices, and it is end-to-end encrypted for the whole trip. Diagnostics and usage analytics are separate helper channels used to find crashes, debug sync failures, and understand which platforms and flows need attention first.
+Clipboard's main privacy boundary does not change: clipboard content only syncs between your paired devices, and it is end-to-end encrypted for the whole trip. Diagnostics and usage analytics are separate helper channels used to find crashes, debug sync failures, and understand which platforms and flows need attention first.
 
 <Callout type="info">
   Both channels are controlled under **Settings → General → Privacy**. They are on by default. The
@@ -88,7 +88,7 @@ Any new product event or field must continue to follow this privacy boundary and
 
 ## What Is Never Included
 
-UniClipboard does not put these values in diagnostics or usage analytics:
+Clipboard does not put these values in diagnostics or usage analytics:
 
 - Raw clipboard content: text, RTF, HTML, image pixels, or file bytes.
 - Raw file names, raw file paths, or home-directory paths.
@@ -98,7 +98,7 @@ UniClipboard does not put these values in diagnostics or usage analytics:
 - Raw `space_id` values or the business `DeviceId` used for pairing.
 - Exact payload sizes; product analytics uses size buckets. Successful sync latency in milliseconds may be uploaded for reliability percentile analysis.
 
-Any HTTPS service provider can see the source IP at the network layer. UniClipboard does not write IP addresses into diagnostic or usage analytics event fields, and it does not use them for product analysis.
+Any HTTPS service provider can see the source IP at the network layer. Clipboard does not write IP addresses into diagnostic or usage analytics event fields, and it does not use them for product analysis.
 
 ## How To Turn It Off
 

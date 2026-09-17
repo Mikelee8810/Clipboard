@@ -1,4 +1,4 @@
-//! `uniclip dev seed-clipboard` —— 调试 / E2E 测试用：往本地 SQLite 落一条
+//! `clip dev seed-clipboard` —— 调试 / E2E 测试用：往本地 SQLite 落一条
 //! 文本剪贴板条目（用当前 session master_key 加密）。
 //!
 //! 与生产路径 `CaptureClipboardUseCase` 不同——不走 normalization /
@@ -34,7 +34,7 @@ pub async fn run(args: SeedClipboardArgs, verbose: bool) -> i32 {
         Ok(true) => {}
         Ok(false) => {
             ui::error(
-                "This device is not set up yet. Use `uniclip space init` or `uniclip space join` first.",
+                "This device is not set up yet. Use `clip space init` or `clip space join` first.",
             );
             bundle.shutdown().await;
             return exit_codes::EXIT_ERROR;

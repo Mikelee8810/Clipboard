@@ -25,7 +25,7 @@ RN 交接指南（PR-C）：`.planning/2026-07-05-mobile-push-pull-sdk-rn-integr
 > 新测试直接验证 drift 场景），FFI 面变更详见 RN 交接指南 §3.1。
 
 范围：**只做移动端**（用户 2026-07-05 拍板）。桌面侧（`uc-application` 入站机器）不动。
-落点：**本仓 `crates/uc-mobile`**。RN 侧 `uniclipboard-android` 的接线属他仓，本设计只产出接口契约 + 交接指南。
+落点：**本仓 `crates/uc-mobile`**。RN 侧 `clipboard-android` 的接线属他仓，本设计只产出接口契约 + 交接指南。
 
 关联：
 - 现状机器：`crates/uc-mobile-proto/src/sync_engine.rs`（纯 reducer）、`crates/uc-mobile/src/client.rs`（reqwest 网络原语）、`crates/uc-mobile/src/reducer.rs`（reducer 的 FFI 镜像，逐函数导出、state 按值传入传出）。
@@ -291,7 +291,7 @@ M5（用户 2026-06-14）把「决策核（Rust）」与「执行外壳（native
 
 ## 10. 分 PR 计划（本仓 vs 他仓）
 
-**本仓（`uniclipboard`）——本设计的实现范围：**
+**本仓（`clipboard`）——本设计的实现范围：**
 - **PR-A**（uc-mobile）：`KeyValueStore` port + `MobileSyncEngine`（push/pull/apply_staged/set_server/handle_network_route_changed/set_settings/acknowledge_loop_detected）+ `SyncOutcome`/`PullTrigger`/`LocalContent`/`SyncedMeta` 类型；内部复用 reducer + client。含 Rust 单测（§9）。**同 PR 删** `is_content_available`/`compute_snapshot_hash` 两个 FFI（§12）。
 - **PR-B**（uc-mobile-proto + uc-webserver）：**原预期零改动的假设未成立**（2026-07-06
   追加实现，见文件头补丁说明）——`commit_push` 新增 `content_id: Option<&str>` 形参，
@@ -300,7 +300,7 @@ M5（用户 2026-06-14）把「决策核（Rust）」与「执行外壳（native
   drift 窗口（原 §6.4 遗留场景，测试驱动发现）。
 - **PR-C**（文档）：RN 交接指南，给出 `push`/`pull(trigger)`/`apply_staged` 调用序列、`KeyValueStore` 实现契约、从「逐函数驱动 reducer」迁移到「调 push/pull」的对照，并标注上一轮 content-availability 指南被取代。
 
-**他仓（`uniclipboard-android`）——本设计不实现，仅交接：**
+**他仓（`clipboard-android`）——本设计不实现，仅交接：**
 - RN 瘦身：删 TS 里的 reducer 驱动 + 手动 watermark 线程 + `getRecord` 存在性检查；`ClipboardMonitor` → `engine.push`；SSE 回调 → `engine.pull(SseHello/SseResync/SseUpdate)`；`Applied` 返回字节 → 写 UIPasteboard/Files；实现 `KeyValueStore`（App Group）；history 列表同步 + `HistoryStorage` 追加保持 TS（按 outcome 元数据）。
 
 ---

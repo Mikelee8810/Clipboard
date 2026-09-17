@@ -99,7 +99,7 @@ None. All phase goals are verifiable through static code analysis and compilatio
 `cargo check --workspace` output:
 
 ```
-Checking uniclipboard v0.1.0-alpha.4
+Checking clipboard v0.1.0-alpha.4
 Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.98s
 ```
 

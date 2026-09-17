@@ -41,10 +41,10 @@ The bearer token is stored in the daemon's data directory:
 
 ```bash
 # Find the token file
-find ~/Library/Application\ Support/app.uniclipboard.desktop -name "daemon.conn" 2>/dev/null
+find ~/Library/Application\ Support/app.clipboard.desktop -name "daemon.conn" 2>/dev/null
 
 # Read the token from daemon.conn (keep it private!)
-cat ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn
+cat ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn
 ```
 
 > **ADR-011 之后**：daemon 绑定 **ephemeral loopback 端口**，把 host/port/token/pid
@@ -58,10 +58,10 @@ The daemon binds an ephemeral port and publishes it in `daemon.conn`:
 
 ```bash
 # Read the published connection info
-cat ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn
+cat ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn
 
 # Or look for the HTTP server binding in logs
-grep -r "daemon HTTP API listening" ~/Library/Logs/app.uniclipboard.desktop/ 2>/dev/null | tail -5
+grep -r "daemon HTTP API listening" ~/Library/Logs/app.clipboard.desktop/ 2>/dev/null | tail -5
 ```
 
 ---
@@ -116,8 +116,8 @@ Requires a running daemon with valid credentials:
 
 ```bash
 DAEMON_BASE_URL=http://127.0.0.1:<port> \
-DAEMON_TOKEN=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["token"])' ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn) \
-DAEMON_PID=$(pgrep -f "uniclipboard" | head -1) \
+DAEMON_TOKEN=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["token"])' ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn) \
+DAEMON_PID=$(pgrep -f "clipboard" | head -1) \
 node scripts/verify-direct-daemon-ws.mjs --live
 ```
 
@@ -191,11 +191,11 @@ Evidence:
 ```bash
 # Regenerate token by restarting the daemon (the app does this automatically)
 # Check token file permissions
-ls -la ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn
+ls -la ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn
 # Should show: -rw------- (600)
 
 # Get fresh token
-cat ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn
+cat ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn
 ```
 
 ### Invalid Session Token (WS 401)
@@ -284,7 +284,7 @@ node scripts/verify-direct-daemon-ws.mjs --live 2>&1 | grep -i token
 # Send 101 rapid auth requests — the 101st should get 429
 for i in $(seq 1 101); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-    -H "Authorization: Bearer $(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["token"])' ~/Library/Application\ Support/app.uniclipboard.desktop/daemon.conn)" \
+    -H "Authorization: Bearer $(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["token"])' ~/Library/Application\ Support/app.clipboard.desktop/daemon.conn)" \
     -H "Content-Type: application/json" \
     -d '{"pid":1234,"clientType":"gui"}' \
     http://127.0.0.1:<port-from-daemon.conn>/auth/connect)

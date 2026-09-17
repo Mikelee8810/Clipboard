@@ -9,7 +9,7 @@
 - 读取了本仓库 workflow / Rust / architecture / src-tauri / uc-cli 规则，确认新增命令必须通过应用层 facade，不在 CLI 直接访问底层实现。
 - planning-with-files 的 `session-catchup.py` 在当前技能安装目录不存在；已使用现有 `task_plan.md` / `findings.md` / `progress.md` 继续。
 - 已先写红灯测试：
-  - CLI 解析 `uniclip dev pairing addrs` 和 `uniclip dev pairing issue --addr <IP>`。
+  - CLI 解析 `clip dev pairing addrs` 和 `clip dev pairing issue --addr <IP>`。
   - infra 限定 ticket 只保留选定 IP、选定 IP 不存在时报错、地址列表复用 ticket 过滤规则。
   - application 用例按选定 IP 签发后仍把邀请放入 holder。
 - 红灯结果已确认：

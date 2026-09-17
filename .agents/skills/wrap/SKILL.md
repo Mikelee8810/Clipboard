@@ -105,7 +105,7 @@ Build a structured state file. The state file has two parts:
 {
   "version": 1,
   "created_at": "2026-06-21T14:30:00Z",
-  "project": "/Users/mark/MyProjects/uniclipboard",
+  "project": "/Users/mark/MyProjects/clipboard",
   "branch": "active-clipboard-state",
   "pr": {
     "number": 1117,

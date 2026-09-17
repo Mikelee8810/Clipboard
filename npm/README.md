@@ -1,7 +1,7 @@
 # npm distribution
 
 Maintainer notes for the npm packages. End-user docs live in
-`uniclipboard/README.md` (shipped with the main package).
+`clipboard/README.md` (shipped with the main package).
 
 ## Layout
 
@@ -9,26 +9,26 @@ Six packages per release, following the esbuild/biome pattern:
 
 | Package | Contents |
 | --- | --- |
-| `@uniclipboard/cli` | JS launcher only (`launcher.mjs`); selects the platform package via `optionalDependencies` |
-| `@uniclipboard/cli-darwin-arm64` | `bin/uniclip` + `bin/uniclipd` (aarch64-apple-darwin) |
-| `@uniclipboard/cli-darwin-x64` | same (x86_64-apple-darwin) |
-| `@uniclipboard/cli-linux-arm64` | same (aarch64-unknown-linux-musl, static) |
-| `@uniclipboard/cli-linux-x64` | same (x86_64-unknown-linux-musl, static) |
-| `@uniclipboard/cli-win32-x64` | `bin/uniclip.exe` + `bin/uniclipd.exe` (x86_64-pc-windows-msvc) |
+| `@clipboard/cli` | JS launcher only (`launcher.mjs`); selects the platform package via `optionalDependencies` |
+| `@clipboard/cli-darwin-arm64` | `bin/clip` + `bin/clipd` (aarch64-apple-darwin) |
+| `@clipboard/cli-darwin-x64` | same (x86_64-apple-darwin) |
+| `@clipboard/cli-linux-arm64` | same (aarch64-unknown-linux-musl, static) |
+| `@clipboard/cli-linux-x64` | same (x86_64-unknown-linux-musl, static) |
+| `@clipboard/cli-win32-x64` | `bin/clip.exe` + `bin/clipd.exe` (x86_64-pc-windows-msvc) |
 
-The main package is scoped because the unscoped name `uniclipboard` is
+The main package is scoped because the unscoped name `clipboard` is
 permanently rejected by npm's typosquatting rule (E403: too similar to the
 existing `uni-clipboard` — names are compared with punctuation stripped).
 
-Only `npm/uniclipboard/` is checked in (with `0.0.0-dev` placeholders).
+Only `npm/clipboard/` is checked in (with `0.0.0-dev` placeholders).
 Platform packages are generated at publish time by
-`scripts/build-npm-packages.mjs` from the `uniclipboard-cli-*` release
+`scripts/build-npm-packages.mjs` from the `clipboard-cli-*` release
 archives — the binaries are byte-identical to the GitHub release assets and
 covered by the same signed `SHA256SUMS.txt`.
 
 Invariants the script enforces:
 
-- `uniclip` and `uniclipd` ship side by side in `bin/` — `uniclip start`
+- `clip` and `clipd` ship side by side in `bin/` — `clip start`
   resolves the daemon as a sibling of `current_exe()` (ADR-008 D13). This is
   also why the launcher spawns the binary by real path instead of letting npm
   symlink/shim it.
@@ -53,7 +53,7 @@ dead end: npm requires 2FA/OTP for token publishes and the granular-token
 
 Each of the six packages must have a Trusted Publisher configured at
 `https://www.npmjs.com/package/<name>/access`:
-Organization `UniClipboard`, repository `UniClipboard`, workflow
+Organization `Clipboard`, repository `Clipboard`, workflow
 `npm-publish.yml`, environment empty.
 
 Trusted publishing cannot create a package (npm/cli#8544), so the first

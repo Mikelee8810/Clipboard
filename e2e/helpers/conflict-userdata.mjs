@@ -15,7 +15,7 @@ export const profileDir = profile =>
   join(
     homedir(),
     'Library/Application Support',
-    `app.uniclipboard.desktop-${validateTestProfile(profile)}`
+    `app.clipboard.desktop-${validateTestProfile(profile)}`
   )
 const ephemeral = /^(daemon\.conn|\.daemon.*|.*\.lock|.*\.pid|.*-wal|.*-shm)$/
 async function validateSnapshot(source) {
@@ -122,7 +122,7 @@ async function requestOnce(connection, path, method, body) {
 async function ownsLiveDaemon(profile, pid) {
   const prefixes = [
     `n${profileDir(profile)}/`,
-    `n${join(homedir(), 'Library/Logs', `app.uniclipboard.desktop-${profile}`)}/`,
+    `n${join(homedir(), 'Library/Logs', `app.clipboard.desktop-${profile}`)}/`,
   ]
   let openFiles
   try {
@@ -147,7 +147,7 @@ async function ownsLiveDaemon(profile, pid) {
   } catch {
     return false
   }
-  const executable = resolve('target/debug/uniclipd')
+  const executable = resolve('target/debug/clipd')
   const expected = [executable, await realpath(executable)]
   if (!expected.some(path => command === path || command.startsWith(`${path} `)))
     throw new Error('Daemon executable ownership mismatch')
@@ -185,13 +185,13 @@ export async function stopProfile(profile, signal = 'SIGTERM') {
 export function testDaemons() {
   let pids
   try {
-    pids = execFileSync('pgrep', ['-x', 'uniclipd'], { encoding: 'utf8' }).trim().split(/\s+/)
+    pids = execFileSync('pgrep', ['-x', 'clipd'], { encoding: 'utf8' }).trim().split(/\s+/)
   } catch {
     return []
   }
   const result = []
   const prefixes = ['Library/Application Support', 'Library/Logs'].map(
-    directory => `n${join(homedir(), directory)}/app.uniclipboard.desktop-`
+    directory => `n${join(homedir(), directory)}/app.clipboard.desktop-`
   )
   for (const pid of pids) {
     let files
@@ -248,11 +248,11 @@ export async function stopRunProfiles(profiles) {
     throw new Error('Test daemon cleanup incomplete')
 }
 export async function startDaemon(profile) {
-  const child = spawn(resolve('target/debug/uniclipd'), [], {
+  const child = spawn(resolve('target/debug/clipd'), [], {
     env: {
       ...process.env,
       UC_PROFILE: validateTestProfile(profile),
-      UNICLIPBOARD_ENV: 'development',
+      CLIPBOARD_ENV: 'development',
       UC_DISABLE_SYSTEM_CLIPBOARD: '1',
       UC_DAEMON_RUN_MODE: 'server',
       RUST_LOG: 'error',

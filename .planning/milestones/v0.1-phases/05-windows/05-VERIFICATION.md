@@ -87,13 +87,13 @@ No blocker or warning-level anti-patterns found. Old buggy `read_image_windows()
 
 ### 1. Screenshot Capture (WIN-IMG-05)
 
-**Test:** On Windows, press Win+Shift+S, capture a screen area, then check the UniClipboard clipboard history.
+**Test:** On Windows, press Win+Shift+S, capture a screen area, then check the Clipboard clipboard history.
 **Expected:** An image entry appears with image/png content. Terminal logs show either "clipboard-rs" or "Windows native CF_DIB fallback" path.
 **Why human:** Requires Windows OS with GUI, snipping tool, and running application.
 
 ### 2. Browser Image Copy (WIN-IMG-06)
 
-**Test:** On Windows, open a browser, right-click an image, select "Copy Image", then check the UniClipboard clipboard history.
+**Test:** On Windows, open a browser, right-click an image, select "Copy Image", then check the Clipboard clipboard history.
 **Expected:** An image entry appears with image/png content.
 **Why human:** Requires Windows OS with browser and running application.
 

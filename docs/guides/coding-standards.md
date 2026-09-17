@@ -1,6 +1,6 @@
 # Coding Standards
 
-This document defines the coding standards for UniClipboard. It is extracted from [CLAUDE.md](../../CLAUDE.md) and serves as a quick reference for implementation and code review.
+This document defines the coding standards for Clipboard. It is extracted from [CLAUDE.md](../../CLAUDE.md) and serves as a quick reference for implementation and code review.
 
 ## Language-Specific Rules
 

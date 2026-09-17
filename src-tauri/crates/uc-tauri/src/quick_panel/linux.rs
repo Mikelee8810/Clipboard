@@ -249,7 +249,7 @@ impl Drop for DismissSurface {
 }
 
 impl DismissSurfaces {
-    const DATA_KEY: &'static str = "uniclipboard-layer-dismiss-surfaces";
+    const DATA_KEY: &'static str = "clipboard-layer-dismiss-surfaces";
 
     fn attach(panel: &gtk::Window) {
         let surfaces = Rc::new(Self::default());

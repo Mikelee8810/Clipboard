@@ -26,7 +26,7 @@ use crate::mobile_lan::core::MobileLanCore;
 
 /// `WWW-Authenticate` 响应头值。realm 指明这是 mobile sync 的鉴权域,
 /// 让客户端 / curl 在交互式场景能弹合适的密码框。
-const WWW_AUTH_VALUE: &str = "Basic realm=\"uniclipboard-mobile-sync\"";
+const WWW_AUTH_VALUE: &str = "Basic realm=\"clipboard-mobile-sync\"";
 
 /// axum middleware: 校验 Basic Auth 头并把已认证会话塞进 extensions。
 ///

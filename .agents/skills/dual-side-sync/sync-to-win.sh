@@ -30,7 +30,7 @@ CONFIG_FILE="${SYNC_CONFIG:-$SCRIPT_DIR/config.local.sh}"
 
 # --- defaults (overridable via config.local.sh or env) ---------------------
 
-MAC_REPO="${MAC_REPO:-/Volumes/ExternalSSD/superset/uniclipboard/slender-soybean}"
+MAC_REPO="${MAC_REPO:-/Volumes/ExternalSSD/superset/clipboard/slender-soybean}"
 WIN_HOST="${WIN_HOST:-}"
 WIN_PORT="${WIN_PORT:-22}"
 WIN_USER="${WIN_USER:-}"

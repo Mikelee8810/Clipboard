@@ -243,7 +243,7 @@ This is a clean acyclic dependency graph.
 name = "uc-daemon-client"
 version.workspace = true
 edition = "2021"
-description = "Daemon HTTP + WebSocket client for UniClipboard"
+description = "Daemon HTTP + WebSocket client for Clipboard"
 
 [lib]
 name = "uc_daemon_client"
@@ -285,7 +285,7 @@ tokio = { version = "1", features = ["full"] }
 ```rust
 //! # uc-daemon-client
 //!
-//! Daemon HTTP and WebSocket client for UniClipboard.
+//! Daemon HTTP and WebSocket client for Clipboard.
 //! Zero Tauri dependencies -- usable from any async context.
 
 pub mod connection;

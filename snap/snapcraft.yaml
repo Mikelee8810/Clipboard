@@ -1,10 +1,10 @@
-name: uniclipboard
+name: clipboard
 base: core22
-adopt-info: uniclipboard
+adopt-info: clipboard
 
 summary: Encrypted peer-to-peer clipboard sync between your devices
 description: |
-  UniClipboard syncs your clipboard securely across all your devices on
+  Clipboard syncs your clipboard securely across all your devices on
   the local network. End-to-end encrypted and powered by iroh QUIC —
   no clouds, no accounts, no third-party servers, just direct
   peer-to-peer sync.
@@ -36,11 +36,11 @@ architectures:
     build-for: arm64
 
 apps:
-  uniclipboard:
-    command: usr/bin/uniclipboard
+  clipboard:
+    command: usr/bin/clipboard
     extensions: [gnome]
-    desktop: usr/share/applications/uniclipboard.desktop
-    common-id: app.uniclipboard.desktop
+    desktop: usr/share/applications/clipboard.desktop
+    common-id: app.clipboard.desktop
     # plug 列表覆盖 GUI + 全局剪贴板 + LAN P2P 同步 + 本地配置/数据 +
     # 文件传输场景。剪贴板事件从 GTK clipboard API 取,strict snap 通过
     # wayland / x11 plug 拿到 host compositor selection;daemon 监听
@@ -49,7 +49,7 @@ apps:
     # `password-manager-service`: daemon 启动期通过 secret-service D-Bus
     # API (org.freedesktop.Secret.Service / GNOME Keyring / KWallet 等)
     # 取本地身份的 KEK。该 plug **不会** auto-connect,首装后需要 manual
-    # `snap connect uniclipboard:password-manager-service`;未连接时
+    # `snap connect clipboard:password-manager-service`;未连接时
     # uc-platform::capability 仍会探测到 desktop 然后走 system keyring,
     # DBus 被 AppArmor 拒后直接 daemon 启动失败 ——
     # uc-platform::secure_storage 的 file-based fallback 仅在 "no desktop
@@ -69,7 +69,7 @@ apps:
       - password-manager-service
 
 parts:
-  uniclipboard:
+  clipboard:
     plugin: nil
     source: .
     source-type: local
@@ -134,7 +134,7 @@ parts:
 
       # 2) 后端构建 —— 直接 cargo build,绕过 tauri-cli (不需要 .deb /
       # AppImage / updater signing 这些 snap 用不到的逻辑)。binary 名字
-      # 由 src-tauri/Cargo.toml 的 [package].name 决定 = "uniclipboard"。
+      # 由 src-tauri/Cargo.toml 的 [package].name 决定 = "clipboard"。
       #
       # `--features custom-protocol` 必传：开了 Tauri 才走 `tauri://localhost`
       # 协议从嵌入的 frontendDist 加载 webview;不开的话 release binary 仍
@@ -142,10 +142,10 @@ parts:
       # to localhost: Connection refused"。`bun run tauri build` 默认会开
       # 它,我们绕过 tauri-cli 所以必须手动加。
       #
-      # ADR-008 D13 给 tauri.conf.json 加了 externalBin: ["binaries/uniclipd"],
+      # ADR-008 D13 给 tauri.conf.json 加了 externalBin: ["binaries/clipd"],
       # build.rs 里的 tauri_build::build() 会在编 GUI 时强制要求
-      # src-tauri/binaries/uniclipd-<triple> 存在并把它拷进 bundle。但 snap 用
-      # 纯 cargo build(不走 tauri-cli bundling),且下面把 uniclipd 从
+      # src-tauri/binaries/clipd-<triple> 存在并把它拷进 bundle。但 snap 用
+      # 纯 cargo build(不走 tauri-cli bundling),且下面把 clipd 从
       # target/release 直接 install 到 usr/bin —— 根本不依赖 Tauri 的 sidecar
       # 暂存机制。用 TAURI_CONFIG 作 JSON Merge Patch 把 externalBin 清空(空数组
       # 替换整个列表),让 build script 既不要求也不拷贝它。与 coverage.yml /
@@ -154,19 +154,19 @@ parts:
       # build-environment 的 NOTE)。
       export TAURI_CONFIG='{"bundle":{"externalBin":[]}}'
       cd src-tauri
-      cargo build --release --locked --bin uniclipboard --features custom-protocol
-      # ADR-008 D13: also build the standalone `uniclipd` daemon, installed next
-      # to the GUI below so the GUI spawns it as a sibling ($SNAP/usr/bin/uniclipd).
+      cargo build --release --locked --bin clipboard --features custom-protocol
+      # ADR-008 D13: also build the standalone `clipd` daemon, installed next
+      # to the GUI below so the GUI spawns it as a sibling ($SNAP/usr/bin/clipd).
       # It needs no custom-protocol (no webview) and shares the GUI crate graph,
       # so this build is mostly incremental. build-packages already has cmake +
-      # clang for aws-lc-sys, which uniclipd pulls via iroh just like the GUI.
+      # clang for aws-lc-sys, which clipd pulls via iroh just like the GUI.
       #
-      # `-p uc-daemon` is REQUIRED: the `uniclipd` bin lives in the uc-daemon
-      # workspace member, not in the `uniclipboard` package we cd'd into above.
-      # Without it cargo errors "no bin target named `uniclipd` in default-run
+      # `-p uc-daemon` is REQUIRED: the `clipd` bin lives in the uc-daemon
+      # workspace member, not in the `clipboard` package we cd'd into above.
+      # Without it cargo errors "no bin target named `clipd` in default-run
       # packages". Matches scripts/prepare-daemon-sidecar.mjs (`cargo build -p
-      # uc-daemon --bin uniclipd`), the same invocation CI uses for the sidecar.
-      cargo build --release --locked -p uc-daemon --bin uniclipd
+      # uc-daemon --bin clipd`), the same invocation CI uses for the sidecar.
+      cargo build --release --locked -p uc-daemon --bin clipd
       cd ..
 
       # 3) 安装到 snap install 目录。strict snap 启动时 mount 这个目录
@@ -175,14 +175,14 @@ parts:
       # cargo workspace root to the repo root; `cd src-tauri` no longer creates
       # a nested target/). After the `cd ..` above we are at the repo root, so
       # the release binaries are at target/release/, NOT src-tauri/target/.
-      install -Dm755 target/release/uniclipboard \
-        "${CRAFT_PART_INSTALL}/usr/bin/uniclipboard"
+      install -Dm755 target/release/clipboard \
+        "${CRAFT_PART_INSTALL}/usr/bin/clipboard"
       # ADR-008 D13: ship the daemon next to the GUI so it spawns as a sibling.
-      install -Dm755 target/release/uniclipd \
-        "${CRAFT_PART_INSTALL}/usr/bin/uniclipd"
-      install -Dm644 snap/local/uniclipboard.desktop \
-        "${CRAFT_PART_INSTALL}/usr/share/applications/uniclipboard.desktop"
+      install -Dm755 target/release/clipd \
+        "${CRAFT_PART_INSTALL}/usr/bin/clipd"
+      install -Dm644 snap/local/clipboard.desktop \
+        "${CRAFT_PART_INSTALL}/usr/share/applications/clipboard.desktop"
       install -Dm644 src-tauri/icons/icon.png \
-        "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/uniclipboard.png"
+        "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/clipboard.png"
       install -Dm644 src-tauri/icons/128x128.png \
-        "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/128x128/apps/uniclipboard.png"
+        "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/128x128/apps/clipboard.png"

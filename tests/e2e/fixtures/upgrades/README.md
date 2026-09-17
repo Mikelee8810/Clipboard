@@ -1,6 +1,6 @@
 # 版本化升级 userdata 样本
 
-本目录保存会随仓库一起版本管理的旧版本开发资料，用于快速、稳定地重复执行升级测试。样本只由官方旧版本在 `UNICLIPBOARD_ENV=development` 下生成，不得放入任何真实用户资料或系统凭据。
+本目录保存会随仓库一起版本管理的旧版本开发资料，用于快速、稳定地重复执行升级测试。样本只由官方旧版本在 `CLIPBOARD_ENV=development` 下生成，不得放入任何真实用户资料或系统凭据。
 
 ## 目录结构
 
@@ -32,7 +32,7 @@ fixtures/upgrades/
 
 禁止保存：
 
-- `daemon.conn`、`.daemon-token`、`.daemon-pid`、`.uniclipd.lock`。
+- `daemon.conn`、`.daemon-token`、`.daemon-pid`、`.clipd.lock`。
 - `daemon-run.json`、`daemon-last-exit.json`、日志和崩溃现场。
 - SQLite `-shm`、临时文件和其他可重建运行状态。
 - 真实用户内容、真实设备身份、系统钥匙串内容、本机绝对路径和私人服务地址。

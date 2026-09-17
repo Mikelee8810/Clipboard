@@ -94,7 +94,7 @@ describe('custom-profile Tauri development command', () => {
     expect(invocation.command).toBe('bun')
     expect(invocation.env).toMatchObject({
       EXISTING_VALUE: 'kept',
-      UNICLIPBOARD_ENV: 'development',
+      CLIPBOARD_ENV: 'development',
       UC_PROFILE: 'alice',
     })
   })

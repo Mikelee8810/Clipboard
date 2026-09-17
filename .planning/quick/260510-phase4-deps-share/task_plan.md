@@ -184,7 +184,7 @@ HTTP listener / LAN listener 还在持端口，新进程 bind 会撞
   `BlobProcessingPorts` —— blob/spool worker 在 GUI shell `run()` 与
   standalone `daemon::run` 各自跑一次
 - [ ] daemon reload 前后 sqlite pool 地址稳定 (探针 / 测试钉死)
-- [ ] standalone `uniclipboard-daemon` 二进制能独立启动并响应健康检查
+- [ ] standalone `clipboard-daemon` 二进制能独立启动并响应健康检查
 - [ ] `cargo test --workspace` 干净通过
 - [ ] `pnpm exec vitest run` 干净通过
 - [ ] mobile_sync 重启路径手动复现成功 (零回归)

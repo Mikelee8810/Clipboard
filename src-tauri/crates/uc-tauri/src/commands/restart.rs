@@ -7,7 +7,7 @@
 //! - [`restart_daemon`]：仅重启 daemon 进程（network 等 bind-time 设置变更后
 //!   调用，GUI 保持不动）。
 //!
-//! D-B1: 仅 cover GUI mode。CLI daemon (`uniclip daemon`) 用户走
+//! D-B1: 仅 cover GUI mode。CLI daemon (`clip daemon`) 用户走
 //! systemctl/launchd (PROJECT.md §Out of Scope)。
 
 use std::time::Duration;
@@ -112,7 +112,7 @@ pub(crate) async fn perform_full_restart(app: &tauri::AppHandle) {
 
 // ── restart_daemon ─────────────────────────────────────────────────────
 
-/// Restart only the `uniclipd` daemon process without touching the GUI.
+/// Restart only the `clipd` daemon process without touching the GUI.
 ///
 /// 用于 network 等 bind-time 设置变更后：daemon 侧的 iroh endpoint 在进程
 /// 启动时绑定一次，运行时无法热更新，所以需要重启 daemon 进程让新配置生效。

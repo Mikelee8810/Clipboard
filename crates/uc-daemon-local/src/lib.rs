@@ -11,7 +11,7 @@
 //!   `uc-daemon-process`
 //! - [`process_metadata`]：PID 文件读写
 //! - [`socket`]：IPC / HTTP socket 路径解析
-//! - [`spawn`]：`uniclipd` 二进制的 detached spawn（CLI 与 GUI shell 共用）
+//! - [`spawn`]：`clipd` 二进制的 detached spawn（CLI 与 GUI shell 共用）
 
 pub mod auth;
 pub mod crash_marker;

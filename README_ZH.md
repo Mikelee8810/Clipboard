@@ -58,10 +58,10 @@
 >
 > 无需云账号，无需第三方服务器。你的剪贴板从未以任何人能读懂的形式离开过你的设备。
 
-UniClipboard 是一款以 **隐私优先** 为核心理念的跨设备剪贴板同步工具。它支持在多台设备之间无缝、安全地同步文本、图片和文件，无论设备处于同一 Wi-Fi 还是不同网络环境。数据在传输与本地存储阶段均保持加密，仅在用户设备本地解密，服务器与网络层永远无法访问明文。
+Clipboard 是一款以 **隐私优先** 为核心理念的跨设备剪贴板同步工具。它支持在多台设备之间无缝、安全地同步文本、图片和文件，无论设备处于同一 Wi-Fi 还是不同网络环境。数据在传输与本地存储阶段均保持加密，仅在用户设备本地解密，服务器与网络层永远无法访问明文。
 
 <p align="center">
-  <img width="990" height="660" alt="UniClipboard desktop screenshot" src="https://github.com/user-attachments/assets/5e1d75b0-3fed-40ee-ba47-99f5a87f2ec4" />
+  <img width="990" height="660" alt="Clipboard desktop screenshot" src="https://github.com/user-attachments/assets/5e1d75b0-3fed-40ee-ba47-99f5a87f2ec4" />
 </p>
 
 <p align="center">
@@ -78,7 +78,7 @@ UniClipboard 是一款以 **隐私优先** 为核心理念的跨设备剪贴板�
 </details>
 
 > [!WARNING]
-> UniClipboard 目前处于积极开发阶段，可能存在功能不稳定或缺失的情况。欢迎体验并提供反馈！
+> Clipboard 目前处于积极开发阶段，可能存在功能不稳定或缺失的情况。欢迎体验并提供反馈！
 
 ## 目录
 
@@ -108,12 +108,12 @@ UniClipboard 是一款以 **隐私优先** 为核心理念的跨设备剪贴板�
 
 - **跨平台支持**：Windows、macOS 和 Linux 当前已完整支持。现有 iOS 与 Android 版本仍使用下文的 LAN 兼容方式；目标架构会让桌面、iOS、Android、HarmonyOS 成为对等的 P2P 节点。
 - **跨网络同步**：桌面节点可在同一 Wi-Fi 或跨互联网同步，并自动进行 NAT 穿透与加密中继回落。移动产品可以额外提供由用户显式选择的 LAN HTTP 兼容通道；它不替代共享 P2P 核心，也不会在 P2P 失败后自动接管。
-- **移动端 App**：安装 **[UniClipboard 移动端 App](https://github.com/UniClipboard/UniClip)**，一个客户端覆盖 **iOS**（目前 [TestFlight beta 公测中](https://testflight.apple.com/join/nyNQ8dQe)）与 **Android**（[下载 APK](https://github.com/UniClipboard/UniClip/releases/latest)）。内置的 **iOS Shortcut** 作为独立版本的 LAN 兼容通道继续可用；完整 P2P 能力独立交付和验收。
+- **移动端 App**：安装 **[Clipboard 移动端 App](https://github.com/UniClipboard/UniClip)**，一个客户端覆盖 **iOS**（目前 [TestFlight beta 公测中](https://testflight.apple.com/join/nyNQ8dQe)）与 **Android**（[下载 APK](https://github.com/UniClipboard/UniClip/releases/latest)）。内置的 **iOS Shortcut** 作为独立版本的 LAN 兼容通道继续可用；完整 P2P 能力独立交付和验收。
 - **加密空间**: 设备通过邀请码 + 口令加入同一个"空间" —— 不需要云账号、不需要邮箱，只需要两台设备相互信任。
 - **本地加密全文搜索**: 在数万条历史中也能毫秒级检索，索引本身在磁盘上同样加密 —— "本地存储"不等于"安全存储"，"本地加密存储"才是。
 - **文本、图片、文件**: 在一台设备复制，在另一台设备粘贴。大文件采用流式传输，不需要先装进内存。
 - **快捷面板**: 通过键盘快捷键唤出，内嵌文本、链接、图片、代码与文件的预览 —— 像系统剪贴板的一部分，而不是一个需要上下文切换的独立应用。
-- **命令行工具**: `uniclip` CLI 与 GUI 流程一致并可在无桌面环境下使用 —— 为终端、SSH 会话、脚本、tmux 工作流而生。
+- **命令行工具**: `clip` CLI 与 GUI 流程一致并可在无桌面环境下使用 —— 为终端、SSH 会话、脚本、tmux 工作流而生。
 - **安全加密**: XChaCha20-Poly1305 AEAD 在传输与本地存储全程加密 —— 即便流量经过中继，中继也只能看到密文。
 - **多设备管理**: 管理已配对设备、在线状态与每台设备的同步偏好。设备丢了？在任何一台已配对的设备上吊销，后续同步会立即把它排除在外。
 
@@ -133,7 +133,7 @@ curl -fsSL https://uniclipboard.app/install.sh | bash
 
 脚本会自动识别系统与架构：
 
-- **macOS** —— 下载 `.app.tar.gz`，解压后搬到 `/Applications/UniClipboard.app`（写权限不足时自动调用 sudo；也可用 `--prefix "$HOME/Applications"` 走用户级安装）。
+- **macOS** —— 下载 `.app.tar.gz`，解压后搬到 `/Applications/Clipboard.app`（写权限不足时自动调用 sudo；也可用 `--prefix "$HOME/Applications"` 走用户级安装）。
 - **Linux** —— 有 sudo 时优先用 `apt`/`dnf`/`yum` 安装 `.deb` 或 `.rpm`；都不可用则回退到 AppImage（装到 `~/.local/bin` 并注册 `.desktop`，无需 root）。
 
 常用选项：
@@ -168,8 +168,8 @@ curl -fsSL https://raw.githubusercontent.com/UniClipboard/UniClipboard/main/scri
 **Fedora / RHEL / openSUSE — 推荐 COPR 仓库（自动跟随版本更新）**
 
 ```bash
-sudo dnf copr enable mkdir700/uniclipboard-alpha   # alpha 渠道；正式版请用 mkdir700/uniclipboard
-sudo dnf install uniclipboard
+sudo dnf copr enable mkdir700/clipboard-alpha   # alpha 渠道；正式版请用 mkdir700/clipboard
+sudo dnf install clipboard
 ```
 
 启用后 `sudo dnf upgrade` 会自动拉取新版本。
@@ -178,43 +178,43 @@ sudo dnf install uniclipboard
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i uniclipboard_<version>_amd64.deb
+sudo dpkg -i clipboard_<version>_amd64.deb
 sudo apt-get install -f                                 # 如有缺失依赖，由 apt 补齐
 
 # Fedora / RHEL / openSUSE（一次性手动安装）
-sudo dnf install ./UniClipboard-<version>-1.x86_64.rpm
+sudo dnf install ./Clipboard-<version>-1.x86_64.rpm
 
 # AppImage（任意发行版）
-chmod +x UniClipboard_<version>_amd64.AppImage
-./UniClipboard_<version>_amd64.AppImage
+chmod +x Clipboard_<version>_amd64.AppImage
+./Clipboard_<version>_amd64.AppImage
 ```
 
 > 经包管理器（COPR / dnf / apt）安装的版本不会通过 App 内的更新器自动升级，请用 `dnf upgrade` / `apt upgrade` 走系统包管理器。Linux 上 App 内更新器只对 AppImage 生效。
 
 ### Homebrew（macOS）
 
-macOS 用户可以通过官方 tap [`UniClipboard/homebrew-tap`](https://github.com/UniClipboard/homebrew-tap) 安装：
+macOS 用户可以通过官方 tap [`Clipboard/homebrew-tap`](https://github.com/UniClipboard/homebrew-tap) 安装：
 
 ```bash
-brew tap UniClipboard/tap
+brew tap Clipboard/tap
 
 # Homebrew 6.0+ 默认要求先信任第三方 tap 才会加载其 formula/cask，
 # 否则会报 “Refusing to load ... from untrusted tap”。该步骤只需执行一次。
-brew trust UniClipboard/tap
+brew trust Clipboard/tap
 
 # 桌面应用（.app）
-brew install --cask uniclipboard
+brew install --cask clipboard
 
-# 仅安装 CLI，命令名为 `uniclip`
-brew install uniclipboard
+# 仅安装 CLI，命令名为 `clip`
+brew install clipboard
 ```
 
 也可以省去 `brew tap`，一行直装（仍需先信任一次该 tap）：
 
 ```bash
-brew trust UniClipboard/tap                          # Homebrew 6.0+，一次性
-brew install --cask UniClipboard/tap/uniclipboard    # GUI
-brew install UniClipboard/tap/uniclipboard           # CLI
+brew trust Clipboard/tap                          # Homebrew 6.0+，一次性
+brew install --cask Clipboard/tap/clipboard    # GUI
+brew install Clipboard/tap/clipboard           # CLI
 ```
 
 GUI 和 CLI 互不冲突，需要的话两个都装即可。
@@ -225,7 +225,7 @@ GUI 和 CLI 互不冲突，需要的话两个都装即可。
 # 克隆仓库（`--recurse-submodules` 会同步拉取 src-tauri/vendor/iroh-blobs/
 # 下的 iroh-blobs fork，缺它 `cargo build` 会失败）
 git clone --recurse-submodules https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard
+cd Clipboard
 
 # 安装依赖
 bun install
@@ -251,17 +251,17 @@ bun tauri build
 2. 在新设备上启动应用，选择 **加入已有空间**，输入邀请码与空间口令
 3. 口令验证通过后，新设备完成加入并自动开始同步
 
-> 已经完成设置、想切换到另一个空间？在 **设备** 页使用 **切换空间**（或在 CLI 中运行 `uniclip join --switch`）—— 本地的剪贴板历史会被重新加密并迁移到新空间。不带 `--switch` 时，`uniclip join` 走非破坏性的赎回 / 重新配对分支，不会切换空间。
+> 已经完成设置、想切换到另一个空间？在 **设备** 页使用 **切换空间**（或在 CLI 中运行 `clip join --switch`）—— 本地的剪贴板历史会被重新加密并迁移到新空间。不带 `--switch` 时，`clip join` 走非破坏性的赎回 / 重新配对分支，不会切换空间。
 
 ### 配对手机（当前兼容方式） <a id="mobile-companion-lan"></a>
 
-**[UniClipboard 移动端 App](https://github.com/UniClipboard/UniClip)** 一个客户端同时覆盖 **iOS**（目前在 [TestFlight beta 公测](https://testflight.apple.com/join/nyNQ8dQe)）与 **Android**（APK 直接在 [releases 页](https://github.com/UniClipboard/UniClip/releases/latest)下载）。现有版本使用限期保留的 **HTTP 兼容方式**：桌面 daemon 暴露一个小型 HTTP 服务，手机直接读写它。该路径只接受安全、兼容与迁移修复；目标架构会让移动设备成为完整的 P2P 空间节点。
+**[Clipboard 移动端 App](https://github.com/UniClipboard/UniClip)** 一个客户端同时覆盖 **iOS**（目前在 [TestFlight beta 公测](https://testflight.apple.com/join/nyNQ8dQe)）与 **Android**（APK 直接在 [releases 页](https://github.com/UniClipboard/UniClip/releases/latest)下载）。现有版本使用限期保留的 **HTTP 兼容方式**：桌面 daemon 暴露一个小型 HTTP 服务，手机直接读写它。该路径只接受安全、兼容与迁移修复；目标架构会让移动设备成为完整的 P2P 空间节点。
 
 1. 桌面打开 **设备 → 移动端同步**，启用开关，并挑一块手机能拨通的 LAN IPv4 网卡（**别** 把 `0.0.0.0` / `Auto` 印到手机屏幕上）。
 2. 点 **Add device**，生成包含监听 URL、用户名与一次性密码的二维码。
-3. **iPhone** —— 推荐先在 **App Store** 装 **TestFlight**，再点开邀请链接 `https://testflight.apple.com/join/nyNQ8dQe` 接受邀请并安装 **UniClipboard iOS App**；App 里填入桌面给出的 URL 与凭据即可。也可以用相机扫码安装内置的 iOS Shortcut 作为备选。
+3. **iPhone** —— 推荐先在 **App Store** 装 **TestFlight**，再点开邀请链接 `https://testflight.apple.com/join/nyNQ8dQe` 接受邀请并安装 **Clipboard iOS App**；App 里填入桌面给出的 URL 与凭据即可。也可以用相机扫码安装内置的 iOS Shortcut 作为备选。
    > ⚠️ 如果 TestFlight 报证书错误，或卡在「无法连接 App Store Connect」上，**先临时关掉 Loon / Surge / Clash 等代理梯子**（含全局规则、TUN、HTTPS 解密），让 TestFlight 走直连；装好 App 后再开梯子即可。
-4. **Android** —— 装 [**UniClipboard 移动端 App**](https://github.com/UniClipboard/UniClip)（[APK 下载](https://github.com/UniClipboard/UniClip/releases/latest)），填同样的 URL 和凭证。
+4. **Android** —— 装 [**Clipboard 移动端 App**](https://github.com/UniClipboard/UniClip)（[APK 下载](https://github.com/UniClipboard/UniClip/releases/latest)），填同样的 URL 和凭证。
 5. 任意一端复制，另一端通过 Wi-Fi 收到。
 
 兼容方式的当前限制：
@@ -307,17 +307,17 @@ flowchart LR
 
 ### 命令行工具
 
-`uniclip` 命令行工具与 GUI 流程一致，并可在无桌面环境（如服务器）下使用：
+`clip` 命令行工具与 GUI 流程一致，并可在无桌面环境（如服务器）下使用：
 
 ```bash
-uniclip init                    # 在本机创建一个新的加密空间
-uniclip invite                  # 生成短期邀请码
-uniclip join <code>             # 通过邀请码加入空间（重新配对，非破坏性）
-uniclip join --switch <code>    # 切换到另一个空间（重新加密本地历史）
-uniclip members                 # 列出已配对设备及在线状态
-uniclip send "hello"            # 把内容发送到其他设备
-uniclip watch                   # 实时接收来自其他设备的剪贴板内容
-uniclip status / start / stop   # 守护进程生命周期
+clip init                    # 在本机创建一个新的加密空间
+clip invite                  # 生成短期邀请码
+clip join <code>             # 通过邀请码加入空间（重新配对，非破坏性）
+clip join --switch <code>    # 切换到另一个空间（重新加密本地历史）
+clip members                 # 列出已配对设备及在线状态
+clip send "hello"            # 把内容发送到其他设备
+clip watch                   # 实时接收来自其他设备的剪贴板内容
+clip status / start / stop   # 守护进程生命周期
 ```
 
 ### 隐私与安全
@@ -361,7 +361,7 @@ uniclip status / start / stop   # 守护进程生命周期
 <details>
   <summary><strong>为什么不用自托管的剪贴板同步（如 ClipCascade）？</strong></summary>
 
-自托管要求你部署服务器。UniClipboard 装完就能用 —— 优先 P2P 直连，打洞失败才走加密 relay。你永远不需要运维任何基础设施。
+自托管要求你部署服务器。Clipboard 装完就能用 —— 优先 P2P 直连，打洞失败才走加密 relay。你永远不需要运维任何基础设施。
 </details>
 
 <details>
@@ -373,13 +373,13 @@ uniclip status / start / stop   # 守护进程生命周期
 <details>
   <summary><strong>我的剪贴板历史到底存在哪里？</strong></summary>
 
-只在你自己的设备上。本地存储采用加密存盘，密钥从未离开过设备的系统密钥环。任何 UniClipboard 服务器都不会接收或保存你的剪贴板内容。
+只在你自己的设备上。本地存储采用加密存盘，密钥从未离开过设备的系统密钥环。任何 Clipboard 服务器都不会接收或保存你的剪贴板内容。
 </details>
 
 <details>
   <summary><strong>有移动端 App 吗？</strong></summary>
 
-有 —— **[UniClipboard 移动端 App](https://github.com/UniClipboard/UniClip)** 同时覆盖 iOS 与 Android。现有版本使用上文所述的限期 HTTP 兼容方式，可在 LAN 内使用，也可经 server 节点或 Tailscale 跨网络，但移动端自身暂不做 P2P 穿透。目标移动架构会使用与桌面、HarmonyOS 相同的完整 P2P 核心。当前设置方法见上文 [配对手机](#mobile-companion-lan)。
+有 —— **[Clipboard 移动端 App](https://github.com/UniClipboard/UniClip)** 同时覆盖 iOS 与 Android。现有版本使用上文所述的限期 HTTP 兼容方式，可在 LAN 内使用，也可经 server 节点或 Tailscale 跨网络，但移动端自身暂不做 P2P 穿透。目标移动架构会使用与桌面、HarmonyOS 相同的完整 P2P 核心。当前设置方法见上文 [配对手机](#mobile-companion-lan)。
 </details>
 
 ## 参与贡献
@@ -423,7 +423,7 @@ uniclip status / start / stop   # 守护进程生命周期
   <tr>
     <td align="center"><img src="./assets/qq-group-qrcode.jpg" alt="QQ 群二维码" width="250" /></td>
     <td align="center"><img src="./assets/wechat-group-qrcode.png" alt="微信群二维码" width="250" /></td>
-    <td align="center"><a href="https://t.me/uniclipboard"><img src="./assets/telegram-group-qrcode.jpg" alt="Telegram 群组二维码" width="250" /></a></td>
+    <td align="center"><a href="https://t.me/clipboard"><img src="./assets/telegram-group-qrcode.jpg" alt="Telegram 群组二维码" width="250" /></a></td>
   </tr>
 </table>
 

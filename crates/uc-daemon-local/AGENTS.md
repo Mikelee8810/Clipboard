@@ -13,7 +13,7 @@
 - daemon 进程元数据（PID 文件读写、`DaemonProcessMode`）
 - daemon 健康探测的纯协议契约（`ProbeOutcome` / `DaemonBootstrapError`）
 - 健康轮询 helpers（probe 等待健康 / 等待端点消失）
-- `uniclipd` 二进制的 **detached spawn**（`setsid` / `DETACHED_PROCESS`）—— CLI
+- `clipd` 二进制的 **detached spawn**（`setsid` / `DETACHED_PROCESS`）—— CLI
   与 GUI shell 共用（ADR-008 P3：GUI 转纯 client 后自己 spawn 外部 daemon）
 
 ## ⚠️ 硬约束：GUI-framework agnostic
@@ -30,7 +30,7 @@ sidecar 拉起编排准备的 `sidecar-lifecycle` feature 已经在 in-process
 
 `spawn` 模块用的是 `std::process::Command` + `setsid`（unix）/
 `DETACHED_PROCESS`（windows），**不** 触碰任何 GUI/窗口 API，仍满足硬约束。
-ADR-008 P3 起 GUI 转纯 client，自己 detached spawn 外部 `uniclipd`，所以
+ADR-008 P3 起 GUI 转纯 client，自己 detached spawn 外部 `clipd`，所以
 detached spawn 原语从 `uc-cli` 下沉到此处由 CLI 与 GUI shell 共用。
 
 ## 模块职责
@@ -51,7 +51,7 @@ detached spawn 原语从 `uc-cli` 下沉到此处由 CLI 与 GUI shell 共用。
 |---|---|
 | `process_metadata` | PID 文件读写 + `DaemonProcessMode` |
 | `socket` | `daemon.conn` 连接文件路径解析与读写（ADR-011，替代固定端口 hash 解析与 `.daemon-token`） |
-| `spawn` | `uniclipd` detached spawn + 二进制解析（`spawn_detached_daemon`、`resolve_daemon_exe_path`） |
+| `spawn` | `clipd` detached spawn + 二进制解析（`spawn_detached_daemon`、`resolve_daemon_exe_path`） |
 | `spawn_contract` | CLI→daemon run-mode / unattended-unlock 环境契约 |
 | `handover` | 跨进程受控重启交接存储（`HandoverRecord{target_mode,generation}` 落锁目录，read/write/clear；ADR-008 P5-L L7） |
 

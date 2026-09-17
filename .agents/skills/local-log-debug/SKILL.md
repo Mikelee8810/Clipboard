@@ -1,11 +1,11 @@
 ---
 name: local-log-debug
-description: Inspect and analyze uniclipboard's local JSONL logs on a SINGLE machine — query, filter, and time-merge the per-role (gui/daemon/cli) log files to answer "what just happened" or trace a symptom (pairing, sync, transfer, clipboard capture, daemon lifecycle) back through the logs. Use when the user asks to "check the logs", "why did X fail", "what did the daemon do", or describes a bug to diagnose from logs on this one host. NOT for cross-device peer debugging (use dual-side-debug) and NOT for writing/reviewing tracing code (use tracing-best-practices).
+description: Inspect and analyze clipboard's local JSONL logs on a SINGLE machine — query, filter, and time-merge the per-role (gui/daemon/cli) log files to answer "what just happened" or trace a symptom (pairing, sync, transfer, clipboard capture, daemon lifecycle) back through the logs. Use when the user asks to "check the logs", "why did X fail", "what did the daemon do", or describes a bug to diagnose from logs on this one host. NOT for cross-device peer debugging (use dual-side-debug) and NOT for writing/reviewing tracing code (use tracing-best-practices).
 ---
 
 # local-log-debug
 
-Read and reason over uniclipboard's local logs on **one** machine, across the
+Read and reason over clipboard's local logs on **one** machine, across the
 three process roles (gui / daemon / cli), using the current platform-conventional
 log layout.
 
@@ -22,7 +22,7 @@ genuinely can't express what you need.
 | "Check the logs on this machine", trace a symptom from local logs | **this skill** |
 | Cross-device: "Windows didn't receive…", "Mac sent but peer…" | `dual-side-debug` (two hosts, SMB-mounted peer) |
 | Writing / reviewing `#[instrument]`, `tracing::*`, subscriber setup | `tracing-best-practices` |
-| Bundling recent logs to hand off / attach to an issue | `uniclip debug export-logs` (CLI) — see below |
+| Bundling recent logs to hand off / attach to an issue | `clip debug export-logs` (CLI) — see below |
 | Build / cargo / typecheck failures | not these JSONL logs at all |
 | Daemon HTTP API behavior or sqlite state | logs are observability, not state |
 
@@ -32,15 +32,15 @@ Single source of truth for *where logs live* is `uc_app_paths::app_log_dir()`.
 Logs are **separate from the data root** (since the platform-log-dir split) and
 are written **per role** so co-resident processes never share a file.
 
-* Directory (`<app>` = `app.uniclipboard.desktop[-<UC_PROFILE>]`):
+* Directory (`<app>` = `app.clipboard.desktop[-<UC_PROFILE>]`):
   * **macOS**: `~/Library/Logs/<app>/`
   * **Linux**: `$XDG_STATE_HOME/<app>/logs/` (default `~/.local/state/...`; falls back to the data-local root)
   * **Windows**: `%LOCALAPPDATA%\<app>\logs\`
   * **portable build**: `<exe>/data/logs/`
 * Per-role files, daily rotation, **7-day retention** (older pruned on start):
-  * `uniclipboard-gui.json.<UTC-date>` — the Tauri GUI host (`uniclipboard`)
-  * `uniclipboard-daemon.json.<UTC-date>` — the detached `uniclipd` daemon
-  * `uniclipboard-cli.json.<UTC-date>` — the `uniclip` CLI
+  * `clipboard-gui.json.<UTC-date>` — the Tauri GUI host (`clipboard`)
+  * `clipboard-daemon.json.<UTC-date>` — the detached `clipd` daemon
+  * `clipboard-cli.json.<UTC-date>` — the `clip` CLI
 * Format: **JSON Lines**. Every line has `timestamp` (UTC ISO-8601, ends `Z`, and
   is always the **first** field), `level`, `target`, `message`, usually `span`
   and `device_id`, plus flattened span/event fields.
@@ -48,7 +48,7 @@ are written **per role** so co-resident processes never share a file.
   be the live one while it's still 2026-06-16 in your local evening.
 
 > ⚠️ Do not trust the older layout. The `dual-side-debug` skill and some legacy
-> data roots still reference `~/Library/Application Support/.../logs/uniclipboard.json`
+> data roots still reference `~/Library/Application Support/.../logs/clipboard.json`
 > (single file, no role). That is the **pre-split** layout — wrong for this skill.
 
 ### Profile resolution
@@ -56,7 +56,7 @@ are written **per role** so co-resident processes never share a file.
 The app dir gets a `-<profile>` suffix from `UC_PROFILE`. The local dev default
 is **`dev`** (`package.json`'s `tauri:dev` sets `UC_PROFILE=dev`), so the script
 assumes `dev`. Override with `--profile <name>`, or `--profile default` for the
-no-suffix `app.uniclipboard.desktop` dir.
+no-suffix `app.clipboard.desktop` dir.
 
 ### Escape hatch: `UC_LOG_DIR`
 
@@ -174,20 +174,20 @@ mute the worst of it; when scanning, prefer filtering to `uc_*` targets first.
 Local log **level** comes from `RUST_LOG` > `UC_LOG_PROFILE` > build type
 (debug→`Dev`, release→`Prod`). If a subsystem's lines are missing entirely, the
 profile may be filtering them — that's a *capture* problem, not a *reading*
-problem, and belongs to how the app was launched (e.g. `uniclip debug on`,
+problem, and belongs to how the app was launched (e.g. `clip debug on`,
 `UC_LOG_PROFILE=debug_clipboard`), not to this skill.
 
-## Relationship to `uniclip debug export-logs`
+## Relationship to `clip debug export-logs`
 
 The CLI can bundle recent logs for handoff:
 
 ```bash
-uniclip debug export-logs [--since-hours N]   # default 24h; writes a dir + manifest
+clip debug export-logs [--since-hours N]   # default 24h; writes a dir + manifest
 ```
 
 Use that when the goal is to **package** logs (attach to an issue, send to the
 user). Use **this skill** when the goal is to **read and reason** about them in
-place. Related: `uniclip debug status|on|off` shows/toggles the effective log
+place. Related: `clip debug status|on|off` shows/toggles the effective log
 profile.
 
 ## Things to avoid

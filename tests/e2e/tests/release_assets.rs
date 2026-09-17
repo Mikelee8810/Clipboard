@@ -55,7 +55,7 @@ fn upgrade_release_matrix_tracks_distinct_breaking_boundaries() {
     );
     assert_eq!(
         alpha2.macos_aarch64_asset.filename,
-        "uniclipboard-cli-0.20.0-alpha.2-aarch64-apple-darwin.tar.gz"
+        "clipboard-cli-0.20.0-alpha.2-aarch64-apple-darwin.tar.gz"
     );
     assert_eq!(
         alpha2.macos_aarch64_asset_sha256,
@@ -99,14 +99,14 @@ fn v0_19_1_release_asset_matches_supported_host_targets() {
     let mac = v0_19_1_release_asset("macos", "aarch64").expect("macOS ARM asset");
     assert_eq!(
         mac.filename,
-        "uniclipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz"
+        "clipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz"
     );
     assert_eq!(mac.format, ArchiveFormat::TarGz);
 
     let windows = v0_19_1_release_asset("windows", "x86_64").expect("Windows x64 asset");
     assert_eq!(
         windows.filename,
-        "uniclipboard-cli-0.19.1-x86_64-pc-windows-msvc.zip"
+        "clipboard-cli-0.19.1-x86_64-pc-windows-msvc.zip"
     );
     assert_eq!(windows.format, ArchiveFormat::Zip);
 }
@@ -116,33 +116,33 @@ fn legacy_release_asset_matches_supported_host_targets() {
     let mac = fixed_legacy_release_asset("macos", "aarch64").expect("macOS ARM asset");
     assert_eq!(
         mac.filename,
-        "uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz"
+        "clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz"
     );
     assert_eq!(mac.format, ArchiveFormat::TarGz);
 
     let mac_x64 = fixed_legacy_release_asset("macos", "x86_64").expect("macOS x64 asset");
     assert_eq!(
         mac_x64.filename,
-        "uniclipboard-cli-0.20.0-alpha.6-x86_64-apple-darwin.tar.gz"
+        "clipboard-cli-0.20.0-alpha.6-x86_64-apple-darwin.tar.gz"
     );
 
     let linux = fixed_legacy_release_asset("linux", "x86_64").expect("Linux x64 asset");
     assert_eq!(
         linux.filename,
-        "uniclipboard-cli-0.20.0-alpha.6-x86_64-unknown-linux-musl.tar.gz"
+        "clipboard-cli-0.20.0-alpha.6-x86_64-unknown-linux-musl.tar.gz"
     );
     assert_eq!(linux.format, ArchiveFormat::TarGz);
 
     let linux_arm = fixed_legacy_release_asset("linux", "aarch64").expect("Linux ARM asset");
     assert_eq!(
         linux_arm.filename,
-        "uniclipboard-cli-0.20.0-alpha.6-aarch64-unknown-linux-musl.tar.gz"
+        "clipboard-cli-0.20.0-alpha.6-aarch64-unknown-linux-musl.tar.gz"
     );
 
     let windows = fixed_legacy_release_asset("windows", "x86_64").expect("Windows x64 asset");
     assert_eq!(
         windows.filename,
-        "uniclipboard-cli-0.20.0-alpha.6-x86_64-pc-windows-msvc.zip"
+        "clipboard-cli-0.20.0-alpha.6-x86_64-pc-windows-msvc.zip"
     );
     assert_eq!(windows.format, ArchiveFormat::Zip);
 }
@@ -158,15 +158,15 @@ fn legacy_release_rejects_an_unpublished_target() {
 fn checksum_lookup_requires_an_exact_manifest_entry() {
     let manifest = concat!(
         "ffd37436526e817862727d18f215969acf631f04f0504909b69694c04f114323  ",
-        "uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz\n",
+        "clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz\n",
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  ",
-        "other-uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz\n",
+        "other-clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz\n",
     );
 
     assert_eq!(
         checksum_for_asset(
             manifest,
-            "uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz"
+            "clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz"
         )
         .expect("exact manifest entry"),
         "ffd37436526e817862727d18f215969acf631f04f0504909b69694c04f114323"
@@ -195,8 +195,8 @@ fn release_payload_verification_rejects_tampered_inputs() {
 
 #[test]
 fn tar_release_extracts_only_the_cli_pair() {
-    let cli = binary_name("uniclip");
-    let daemon = binary_name("uniclipd");
+    let cli = binary_name("clip");
+    let daemon = binary_name("clipd");
     let archive = tar_gz(&[
         (&cli, b"cli"),
         (&daemon, b"daemon"),
@@ -219,8 +219,8 @@ fn tar_release_extracts_only_the_cli_pair() {
 
 #[test]
 fn zip_release_extracts_only_the_cli_pair() {
-    let cli = binary_name("uniclip");
-    let daemon = binary_name("uniclipd");
+    let cli = binary_name("clip");
+    let daemon = binary_name("clipd");
     let archive = zip_archive(&[
         (&cli, b"cli"),
         (&daemon, b"daemon"),
@@ -244,19 +244,19 @@ fn zip_release_extracts_only_the_cli_pair() {
 #[test]
 fn fixed_release_dir_requires_both_binaries() {
     let output = tempfile::tempdir().expect("output tempdir");
-    std::fs::write(output.path().join(binary_name("uniclip")), b"cli").expect("write cli");
+    std::fs::write(output.path().join(binary_name("clip")), b"cli").expect("write cli");
 
     let error = NodeBinarySet::fixed_release_dir(LEGACY_RELEASE_VERSION, output.path())
         .expect_err("daemon binary is required");
-    assert!(error.contains("uniclipd"));
+    assert!(error.contains("clipd"));
 }
 
 #[tokio::test]
 async fn release_preparer_downloads_verifies_and_promotes_atomically() {
     let asset = fixed_legacy_release_asset(std::env::consts::OS, std::env::consts::ARCH)
         .expect("host release asset");
-    let cli = binary_name("uniclip");
-    let daemon = binary_name("uniclipd");
+    let cli = binary_name("clip");
+    let daemon = binary_name("clipd");
     let archive = match asset.format {
         ArchiveFormat::TarGz => tar_gz(&[(&cli, b"cli"), (&daemon, b"daemon")]),
         ArchiveFormat::Zip => zip_archive(&[(&cli, b"cli"), (&daemon, b"daemon")]),

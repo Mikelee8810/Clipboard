@@ -1,6 +1,6 @@
 
 <div align="center">
-  <h1>UniClipboard</h1>
+  <h1>Clipboard</h1>
   <a href="https://github.com/UniClipboard/UniClipboard/releases">
     <img
       alt="Windows"
@@ -59,11 +59,11 @@
 >
 > No cloud account. No third-party servers. Your clipboard never leaves your devices in a form anyone else can read.
 
-UniClipboard is a **privacy-first**, cross-device clipboard synchronization tool.
+Clipboard is a **privacy-first**, cross-device clipboard synchronization tool.
 It enables seamless and secure syncing of text, images, and files across multiple devices, whether on the same Wi-Fi or across different networks. Data is encrypted both in transit and at rest, and decrypted only on the user’s devices—neither servers nor the network layer can ever access plaintext data.
 
 <p align="center">
-  <img width="990" height="660" alt="UniClipboard desktop screenshot" src="https://github.com/user-attachments/assets/5e1d75b0-3fed-40ee-ba47-99f5a87f2ec4" />
+  <img width="990" height="660" alt="Clipboard desktop screenshot" src="https://github.com/user-attachments/assets/5e1d75b0-3fed-40ee-ba47-99f5a87f2ec4" />
 </p>
 
 <p align="center">
@@ -80,7 +80,7 @@ It enables seamless and secure syncing of text, images, and files across multipl
 </details>
 
 > [!WARNING]
-> UniClipboard is currently under active development and may have unstable or missing features. Feel free to try it out and provide feedback!
+> Clipboard is currently under active development and may have unstable or missing features. Feel free to try it out and provide feedback!
 
 ## Table of Contents
 
@@ -110,12 +110,12 @@ It enables seamless and secure syncing of text, images, and files across multipl
 
 - **Cross-platform**: First-class support on Windows, macOS, and Linux. The current iOS and Android releases connect through the compatibility mode described below; the target architecture makes desktop, iOS, Android, and HarmonyOS equal P2P peers.
 - **Cross-network sync**: Desktop peers sync on the same Wi-Fi or across the internet with automatic NAT traversal and encrypted relay fallback. Mobile products may also expose LAN HTTP as a separate, user-selected compatibility channel; it never replaces or automatically takes over from the shared P2P core.
-- **Mobile app**: Install the **[UniClipboard mobile app](https://github.com/UniClipboard/UniClip)** for **iOS** ([TestFlight public beta](https://testflight.apple.com/join/nyNQ8dQe)) and **Android** ([download APK](https://github.com/UniClipboard/UniClip/releases/latest)). The bundled **iOS Shortcut** remains available as part of the separately versioned LAN compatibility channel. Full P2P capability is delivered and validated independently.
+- **Mobile app**: Install the **[Clipboard mobile app](https://github.com/UniClipboard/UniClip)** for **iOS** ([TestFlight public beta](https://testflight.apple.com/join/nyNQ8dQe)) and **Android** ([download APK](https://github.com/UniClipboard/UniClip/releases/latest)). The bundled **iOS Shortcut** remains available as part of the separately versioned LAN compatibility channel. Full P2P capability is delivered and validated independently.
 - **Encrypted spaces**: Devices join a shared "space" with one invitation code + passphrase — no cloud account, no email, just two devices agreeing to trust each other.
 - **Local full-text search**: Search your full history in milliseconds, even with tens of thousands of entries — and the index itself stays encrypted on disk.
 - **Text, images, and files**: Copy on one device, paste on another. Large files use streaming transfer so they don't have to fit in memory.
 - **Quick Panel**: Keyboard-shortcut overlay with inline preview for text, links, images, code, and files — designed to feel like part of the OS clipboard, not a separate app you context-switch into.
-- **Command-line tool**: A `uniclip` CLI mirrors the GUI flow and works headlessly — built for terminals, SSH sessions, scripts, and tmux workflows.
+- **Command-line tool**: A `clip` CLI mirrors the GUI flow and works headlessly — built for terminals, SSH sessions, scripts, and tmux workflows.
 - **Secure encryption**: XChaCha20-Poly1305 AEAD keeps data encrypted in transit and at rest — even the relay only sees ciphertext.
 - **Multi-device management**: Manage paired devices, presence, and per-device sync preferences. Revoke a lost device from any other paired one — sync stops including it immediately.
 
@@ -135,7 +135,7 @@ curl -fsSL https://uniclipboard.app/install.sh | bash
 
 The script detects OS and CPU automatically:
 
-- **macOS** — downloads `.app.tar.gz`, extracts it, and moves `UniClipboard.app` into `/Applications` (escalates with `sudo` if the directory isn't writable; pass `--prefix "$HOME/Applications"` for a user-level install).
+- **macOS** — downloads `.app.tar.gz`, extracts it, and moves `Clipboard.app` into `/Applications` (escalates with `sudo` if the directory isn't writable; pass `--prefix "$HOME/Applications"` for a user-level install).
 - **Linux** — with sudo, installs `.deb` via `apt` or `.rpm` via `dnf`/`yum`; otherwise falls back to AppImage in `~/.local/bin` with a `.desktop` entry (no root needed).
 
 Common flags:
@@ -170,8 +170,8 @@ Each release ships `.deb`, `.rpm`, and `.AppImage` artifacts for both `x86_64` a
 **Fedora / RHEL / openSUSE — via COPR (recommended, auto-updating)**
 
 ```bash
-sudo dnf copr enable mkdir700/uniclipboard-alpha   # alpha channel; or mkdir700/uniclipboard for stable
-sudo dnf install uniclipboard
+sudo dnf copr enable mkdir700/clipboard-alpha   # alpha channel; or mkdir700/clipboard for stable
+sudo dnf install clipboard
 ```
 
 After enabling, `sudo dnf upgrade` will pick up new releases automatically.
@@ -180,47 +180,47 @@ After enabling, `sudo dnf upgrade` will pick up new releases automatically.
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i uniclipboard_<version>_amd64.deb
+sudo dpkg -i clipboard_<version>_amd64.deb
 sudo apt-get install -f                                 # resolve missing deps if any
 
 # Fedora / RHEL / openSUSE (one-shot, no COPR)
-sudo dnf install ./UniClipboard-<version>-1.x86_64.rpm
+sudo dnf install ./Clipboard-<version>-1.x86_64.rpm
 
 # AppImage (any distro)
-chmod +x UniClipboard_<version>_amd64.AppImage
-./UniClipboard_<version>_amd64.AppImage
+chmod +x Clipboard_<version>_amd64.AppImage
+./Clipboard_<version>_amd64.AppImage
 ```
 
 > Packaged installs (COPR / one-shot rpm / deb) do not auto-update from inside the app — use `dnf upgrade` / `apt upgrade` against your package source. The AppImage is what the in-app updater uses on Linux.
 
 ### Homebrew (macOS)
 
-On macOS, install via the official tap [`UniClipboard/homebrew-tap`](https://github.com/UniClipboard/homebrew-tap):
+On macOS, install via the official tap [`Clipboard/homebrew-tap`](https://github.com/UniClipboard/homebrew-tap):
 
 ```bash
-brew tap UniClipboard/tap
+brew tap Clipboard/tap
 
 # Homebrew 6.0+ requires you to trust third-party taps before it will load
 # their formulae/casks. Skip this and you'll hit
 # "Refusing to load ... from untrusted tap". It only needs to run once.
-brew trust UniClipboard/tap
+brew trust Clipboard/tap
 
 # Desktop app (.app bundle)
-brew install --cask uniclipboard
+brew install --cask clipboard
 
-# CLI only — installs the `uniclip` command
-brew install uniclipboard
+# CLI only — installs the `clip` command
+brew install clipboard
 ```
 
 Or install in a single command without tapping first (still trust the tap once):
 
 ```bash
-brew trust UniClipboard/tap                          # Homebrew 6.0+, one-time
-brew install --cask UniClipboard/tap/uniclipboard    # GUI
-brew install UniClipboard/tap/uniclipboard           # CLI
+brew trust Clipboard/tap                          # Homebrew 6.0+, one-time
+brew install --cask Clipboard/tap/clipboard    # GUI
+brew install Clipboard/tap/clipboard           # CLI
 ```
 
-The cask and the formula can coexist — install both if you want the GUI plus the `uniclip` command.
+The cask and the formula can coexist — install both if you want the GUI plus the `clip` command.
 
 ### Build from Source
 
@@ -228,7 +228,7 @@ The cask and the formula can coexist — install both if you want the GUI plus t
 # Clone the repository (`--recurse-submodules` pulls the iroh-blobs fork
 # under src-tauri/vendor/iroh-blobs/; without it `cargo build` fails).
 git clone --recurse-submodules https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard
+cd Clipboard
 
 # Install dependencies
 bun install
@@ -254,17 +254,17 @@ bun tauri build
 2. On the new device, choose **Join an existing space**, enter the invitation code together with the space passphrase
 3. Once verified, the device joins and syncing starts automatically.
 
-> Already set up and want to move to another space? Use **Switch space** from the Devices page (or run `uniclip join --switch` from the CLI) — your local clipboard history is re-encrypted and migrated. Without `--switch`, `uniclip join` takes the non-destructive redeem / re-pair path and does not switch spaces.
+> Already set up and want to move to another space? Use **Switch space** from the Devices page (or run `clip join --switch` from the CLI) — your local clipboard history is re-encrypted and migrated. Without `--switch`, `clip join` takes the non-destructive redeem / re-pair path and does not switch spaces.
 
 ### Pair a Mobile Device (current compatibility mode) <a id="mobile-companion-lan"></a>
 
-The **[UniClipboard mobile app](https://github.com/UniClipboard/UniClip)** is a single client for both **iOS** (now in [TestFlight public beta](https://testflight.apple.com/join/nyNQ8dQe)) and **Android** (APKs in [releases](https://github.com/UniClipboard/UniClip/releases/latest)). Current releases use a time-limited **HTTP compatibility mode**: the desktop daemon exposes a small HTTP service, and the phone reads/writes the clipboard against it. This path receives only security, compatibility, and migration fixes; the target architecture makes mobile devices full P2P space peers.
+The **[Clipboard mobile app](https://github.com/UniClipboard/UniClip)** is a single client for both **iOS** (now in [TestFlight public beta](https://testflight.apple.com/join/nyNQ8dQe)) and **Android** (APKs in [releases](https://github.com/UniClipboard/UniClip/releases/latest)). Current releases use a time-limited **HTTP compatibility mode**: the desktop daemon exposes a small HTTP service, and the phone reads/writes the clipboard against it. This path receives only security, compatibility, and migration fixes; the target architecture makes mobile devices full P2P space peers.
 
 1. On the desktop, open **Devices → Mobile sync**, enable it, and pick the LAN IPv4 the phone will reach (don't print `0.0.0.0` / `Auto` onto a phone screen).
 2. Click **Add device** to generate a QR code with the listener URL, username, and one-time password.
-3. **iPhone** — install **TestFlight** from the App Store, then open `https://testflight.apple.com/join/nyNQ8dQe` to accept the invite and install the **UniClipboard iOS App**; enter the desktop's URL + credentials in the app. The bundled iOS Shortcut (installed by scanning the QR) still works as a fallback.
+3. **iPhone** — install **TestFlight** from the App Store, then open `https://testflight.apple.com/join/nyNQ8dQe` to accept the invite and install the **Clipboard iOS App**; enter the desktop's URL + credentials in the app. The bundled iOS Shortcut (installed by scanning the QR) still works as a fallback.
    > ⚠️ If TestFlight shows a certificate error, or the **Install** button spins because TestFlight can't reach App Store Connect, **temporarily disable your proxy / VPN client** (Loon, Surge, Clash, etc. — including global rules, TUN, HTTPS decryption / MitM) so TestFlight goes direct. Re-enable it after the app is installed.
-4. **Android** — install the [**UniClipboard mobile app**](https://github.com/UniClipboard/UniClip) (APK in [releases](https://github.com/UniClipboard/UniClip/releases/latest)) and enter the same URL and credentials.
+4. **Android** — install the [**Clipboard mobile app**](https://github.com/UniClipboard/UniClip) (APK in [releases](https://github.com/UniClipboard/UniClip/releases/latest)) and enter the same URL and credentials.
 5. Copy on either side; the other side picks it up over Wi-Fi.
 
 Compatibility-mode limitations:
@@ -310,17 +310,17 @@ flowchart LR
 
 ### Command-line Tool
 
-The `uniclip` CLI mirrors the GUI flow and works headlessly (e.g. on servers):
+The `clip` CLI mirrors the GUI flow and works headlessly (e.g. on servers):
 
 ```bash
-uniclip init                    # Create a new encrypted space on this device
-uniclip invite                  # Generate a short-lived invitation code
-uniclip join <code>             # Join a space (re-pair, non-destructive)
-uniclip join --switch <code>    # Switch to another space (re-encrypts local history)
-uniclip members                 # List paired devices and presence
-uniclip send "hello"            # Send clipboard content to other devices
-uniclip watch                   # Stream incoming clipboard events
-uniclip status / start / stop   # Daemon lifecycle
+clip init                    # Create a new encrypted space on this device
+clip invite                  # Generate a short-lived invitation code
+clip join <code>             # Join a space (re-pair, non-destructive)
+clip join --switch <code>    # Switch to another space (re-encrypts local history)
+clip members                 # List paired devices and presence
+clip send "hello"            # Send clipboard content to other devices
+clip watch                   # Stream incoming clipboard events
+clip status / start / stop   # Daemon lifecycle
 ```
 
 ### Privacy & Security
@@ -364,7 +364,7 @@ If you only use Apple devices, don't need history, and fully trust Apple's close
 <details>
   <summary><strong>Why not a self-hosted clipboard sync (e.g. ClipCascade)?</strong></summary>
 
-Self-hosted means you have to run a server. UniClipboard works out of the box — direct P2P first, encrypted relay only as a fallback. You never have to operate any infrastructure.
+Self-hosted means you have to run a server. Clipboard works out of the box — direct P2P first, encrypted relay only as a fallback. You never have to operate any infrastructure.
 </details>
 
 <details>
@@ -376,13 +376,13 @@ Yes. Devices on the same Wi-Fi connect directly without going through the relay.
 <details>
   <summary><strong>Where does my clipboard history actually live?</strong></summary>
 
-Only on your devices. Local storage is encrypted at rest with a key that never leaves the device's system keyring. No UniClipboard server ever receives or stores your clipboard content.
+Only on your devices. Local storage is encrypted at rest with a key that never leaves the device's system keyring. No Clipboard server ever receives or stores your clipboard content.
 </details>
 
 <details>
   <summary><strong>Is there a mobile app?</strong></summary>
 
-Yes — the **[UniClipboard mobile app](https://github.com/UniClipboard/UniClip)** covers both iOS and Android. Current releases use the time-limited HTTP compatibility mode described above; they work on the LAN or through a server node/Tailscale, but do not perform P2P NAT traversal themselves. The target mobile architecture uses the same full P2P core as desktop and HarmonyOS. See [Pair a Mobile Device](#mobile-companion-lan) for the current setup flow.
+Yes — the **[Clipboard mobile app](https://github.com/UniClipboard/UniClip)** covers both iOS and Android. Current releases use the time-limited HTTP compatibility mode described above; they work on the LAN or through a server node/Tailscale, but do not perform P2P NAT traversal themselves. The target mobile architecture uses the same full P2P core as desktop and HarmonyOS. See [Pair a Mobile Device](#mobile-companion-lan) for the current setup flow.
 </details>
 
 ## Contributing
@@ -426,7 +426,7 @@ Join us to chat with other users and the dev team:
   <tr>
     <td align="center"><img src="./assets/qq-group-qrcode.jpg" alt="QQ Group QR Code" width="250" /></td>
     <td align="center"><img src="./assets/wechat-group-qrcode.png" alt="WeChat Group QR Code" width="250" /></td>
-    <td align="center"><a href="https://t.me/uniclipboard"><img src="./assets/telegram-group-qrcode.jpg" alt="Telegram Group QR Code" width="250" /></a></td>
+    <td align="center"><a href="https://t.me/clipboard"><img src="./assets/telegram-group-qrcode.jpg" alt="Telegram Group QR Code" width="250" /></a></td>
   </tr>
 </table>
 

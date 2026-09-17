@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Clipboard stress test — hammer uniclipd with clipboard writes
+# Clipboard stress test — hammer clipd with clipboard writes
 # and collect per-second CPU / RSS snapshots + leak trend analysis.
 #
 # Payload mix:
@@ -44,15 +44,15 @@ LOG="$OUT_DIR/bench.log"
 SUMMARY="$OUT_DIR/summary.txt"
 
 # ---------- locate daemon PID ----------
-DAEMON_PID=$(pgrep -xf '.*uniclipd.*' 2>/dev/null | head -1 || true)
+DAEMON_PID=$(pgrep -xf '.*clipd.*' 2>/dev/null | head -1 || true)
 if [[ -z "$DAEMON_PID" ]]; then
-  DAEMON_PID=$(pgrep -f '/uniclipd( |$)' 2>/dev/null | head -1 || true)
+  DAEMON_PID=$(pgrep -f '/clipd( |$)' 2>/dev/null | head -1 || true)
 fi
 if [[ -z "$DAEMON_PID" ]]; then
-  echo "ERROR: uniclipd is not running. Start the daemon first." >&2
+  echo "ERROR: clipd is not running. Start the daemon first." >&2
   exit 1
 fi
-echo "Found uniclipd PID: $DAEMON_PID" | tee "$LOG"
+echo "Found clipd PID: $DAEMON_PID" | tee "$LOG"
 
 # ---------- generate ~2 MB test PNG (random pixels, resists compression) ----------
 TEST_IMG=$(mktemp /tmp/bench_clip_XXXXXX.png)

@@ -119,8 +119,8 @@ entry_id: ea3d16c2-...    (与 bob 端一致 → 同一条 transfer)
   - `fetch_blob_to_path` (流式 fetch，会注册到 inflight registry 当带 transfer_context)
   - `dispatch_clipboard_snapshot_with_blob_refs` (V3 envelope + 尾部 blob refs)
 - facade module 暴露 `FetchTransferContext`、`decode_v3_bytes_to_snapshot_and_blob_refs`
-- `uniclip send -f <path>`: publish_blob_path → 构造 file-uri-list rep + 单个 free-file V3BlobRef → dispatch_with_blob_refs → 等 Ctrl-C 保持 iroh router 活着
-- `uniclip recv [--out <dir>]`: 新命令，默认 cwd,subscribe inbound notices，跳过无 file blob 的 envelope，挑第一个 free-file blob,fetch_blob_to_path with FetchTransferContext + Ctrl-C → cancel_inbound_transfer(LocalUser),失败/取消时删 partial 文件
+- `clip send -f <path>`: publish_blob_path → 构造 file-uri-list rep + 单个 free-file V3BlobRef → dispatch_with_blob_refs → 等 Ctrl-C 保持 iroh router 活着
+- `clip recv [--out <dir>]`: 新命令，默认 cwd,subscribe inbound notices，跳过无 file blob 的 envelope，挑第一个 free-file blob,fetch_blob_to_path with FetchTransferContext + Ctrl-C → cancel_inbound_transfer(LocalUser),失败/取消时删 partial 文件
 - recv **不写** 系统剪贴板，与 `start` 形成对照
 
 ### 关键设计选择
@@ -132,8 +132,8 @@ entry_id: ea3d16c2-...    (与 bob 端一致 → 同一条 transfer)
 ### 验证
 - `cargo check --workspace` ok
 - `cargo test -p uc-cli` 32 tests ok
-- `uniclip send --help` / `uniclip recv --help` 输出正确
-- 仍待真机双 profile E2E:`uniclip send -f big.bin` 一端 + `uniclip recv --out /tmp/inbox` 另一端 + Ctrl-C 触发 cancel，观察 receiver 端 fetch task 是否真正退出
+- `clip send --help` / `clip recv --help` 输出正确
+- 仍待真机双 profile E2E:`clip send -f big.bin` 一端 + `clip recv --out /tmp/inbox` 另一端 + Ctrl-C 触发 cancel，观察 receiver 端 fetch task 是否真正退出
 
 ## 2026-05-22 session 3 — P1-6
 
@@ -195,7 +195,7 @@ RUST_LOG='info,uc_application=trace,uc_application::usecases::clipboard_history:
 
 **复现步骤**：
 1. 双端 dev 配对（参考现有 `scripts/test_clipboard_e2e.sh` 走法 / 或用 `dual-side-sync` skill 把 macOS 改动推到 win 跑）
-2. alice 端 `uniclip send -f big.bin`（≥500MB，参考 `scripts/test_file_send_recv_cancel.sh:BIG_SIZE_MB`）
+2. alice 端 `clip send -f big.bin`（≥500MB，参考 `scripts/test_file_send_recv_cancel.sh:BIG_SIZE_MB`）
 3. bob 端用 GUI（pnpm tauri dev）发现新条目，在 transfer 进行到 ~30% 时从 UI 点删除
 4. 观察 bob 端：
    - HTTP DELETE 在 daemon 日志里有没有看到响应日志？
@@ -324,9 +324,9 @@ task_plan.md 把 P1-6 标记为 ⏸ 待做，于是按规划走了一遍实施�
 
 ### 倾向方案（待 advisor 复核）
 - 后端:materializer 返回 `MaterializeOutcome::Complete | PartialOnCancel`,partial 分支继续走 capture
-- Missing 表达：`uniclip-missing://` URI scheme 写入 file-list rep，前端解析 (候选 A，无 schema 变更)
+- Missing 表达：`clip-missing://` URI scheme 写入 file-list rep，前端解析 (候选 A，无 schema 变更)
 - 前端：`useTransferProgress.ts` cancelled 分支主动 `removePendingEntry`,等 `clipboard.new_content` 渲染真 entry
-- UI:`uniclip-missing://` URI 渲染灰色"文件已丢失",复制/打开 disabled
+- UI:`clip-missing://` URI 渲染灰色"文件已丢失",复制/打开 disabled
 
 ### Advisor 复核结果
 Advisor 提了 4 个关键点，事实核实后落进 task_plan.md "P5 设计要点 (advisor 复核后修订版)":
@@ -355,7 +355,7 @@ Advisor 提了 4 个关键点，事实核实后落进 task_plan.md "P5 设计要
 
 前端 (4):
 - `useTransferProgress.ts` — cancelled 分支兜底 `dispatch(removePendingEntry(entryId))`
-- `clipboard-utils.ts` — UNICLIP_MISSING_SCHEME 常量 + `isUniclipMissingUri` + `parseFileItemsFromUriList` + `summarizeFileMissing`
+- `clipboard-utils.ts` — CLIP_MISSING_SCHEME 常量 + `isClipMissingUri` + `parseFileItemsFromUriList` + `summarizeFileMissing`
 - `clipboard-transform.ts` — 用 parseFileItemsFromUriList 填充 ClipboardFileItem.file_missing
 - `clipboardItems.ts` — `ClipboardFileItem.file_missing?: boolean[]`
 - `FileContextMenu.tsx` — 加 hasMissingFiles prop;copy/open file location 在 hasMissingFiles=true 时 disable;**删除按钮始终保留**(用户约束)

@@ -11,7 +11,7 @@
 | 2 | `ArcSwapOption<XxxFacade>` 还需要吗？| 🔴 **不需要** —— swap_in 全进程只调一次，swap_out 实际触发时进程已经在退出。`SearchFacade::clear_coordinator` 物理零调用点。回到 `OnceCell<Arc<X>>` 或 `Option<Arc<X>>` (boot 时填入) 即可 |
 | 3 | `build_daemon_lifecycle` vs `build_process_runtime` 拆分还有价值？| 🟢 **保留** —— 不是因为 reload, 而是因为 `build_daemon_lifecycle` 是 async (iroh bind 必须在 tokio runtime), `build_process_runtime` 是同步。物理上必须拆 |
 | 4 | `ProcessRuntimeHandles` 结构体 | 🟡 **可简化** —— 它的真正功能是"把 GUI 已装好的进程级 deps 透传给 daemon-lifecycle 装配，避免 daemon 自己再 wire 一份"。问题在字段数偏多，且 `clipboard_write_coordinator` / `file_transfer_lifecycle` 已经在 `wired.deps` 链路里能找到，重复存放 |
-| 5 | standalone daemon binary 是否还在生产路径？| 🟢 **是** —— `uniclip start` 子命令 detached-spawn `uniclip daemon` (`uc-cli/src/main.rs:244`), 走 `uc_desktop::daemon::run(Standalone)`。"GUI shell 与 standalone binary 共用进程级装配"的理由仍站得住 |
+| 5 | standalone daemon binary 是否还在生产路径？| 🟢 **是** —— `clip start` 子命令 detached-spawn `clip daemon` (`uc-cli/src/main.rs:244`), 走 `uc_desktop::daemon::run(Standalone)`。"GUI shell 与 standalone binary 共用进程级装配"的理由仍站得住 |
 
 ## 🔴 必删 / 必改 (确定为死代码或死路径)
 
@@ -110,7 +110,7 @@
 **部分变冗余，但物理拆分本身仍然有价值**:
 
 1. **ArcSwapOption 是真冗余** (R1+R2+G2): swap_out 实际无意义路径，应回退到 OnceCell 风格。这部分是 Phase A/B/C 为了 reload 准备的"半成品", 决策 C 之后没用上。约 100-150 行可删 / 简化
-2. **`build_process_runtime` / `build_daemon_lifecycle` 拆分仍然合理** (G1): 但理由变了 —— 不是 "为了 reload 复用进程级 deps", 而是 "async/sync 边界 + standalone binary 与 GUI shell 共享同一套同步装配链路"。standalone binary 走 `uniclip daemon` 仍在生产路径，"共用"论据成立
+2. **`build_process_runtime` / `build_daemon_lifecycle` 拆分仍然合理** (G1): 但理由变了 —— 不是 "为了 reload 复用进程级 deps", 而是 "async/sync 边界 + standalone binary 与 GUI shell 共享同一套同步装配链路"。standalone binary 走 `clip daemon` 仍在生产路径，"共用"论据成立
 3. **`Clone` derive 不必删，但注释要改** (Y1): clone 调用点都是"启动期一次性 fan-out", 没有 reload 调用方。Clone 没有功能性损失，但 doc string 里说的 "daemon reload 时 clone" 是过期叙事
 4. **`ProcessRuntimeHandles` 是合理透传容器**, 但有 2 个字段重复 (Y3), 可以再精简一层
 5. **死代码 R3** (`.manage(process_handles.clone())`) 不属于 Phase A/B/C 冗余，是独立的清理项
@@ -129,7 +129,7 @@
 
 ### standalone binary 路径确认
 
-`uniclip` CLI 的 `daemon` subcommand 在 `uc-cli/src/main.rs:244` 调 `uc_desktop::daemon::run(DaemonRunMode::Standalone)`, 由 `uniclip start` 子命令 detached-spawn (`uc-cli/src/local_daemon.rs:212-226`)。standalone binary 内部自己跑一次 `build_process_runtime` (`uc-desktop/src/daemon/host.rs:82`) + `start_in_process`, **复用 GUI shell 同一套进程级装配代码**。Phase A rename `build_gui_app` → `build_process_runtime` 的最大产出就是这个共用 —— 没死，仍在生产。
+`clip` CLI 的 `daemon` subcommand 在 `uc-cli/src/main.rs:244` 调 `uc_desktop::daemon::run(DaemonRunMode::Standalone)`, 由 `clip start` 子命令 detached-spawn (`uc-cli/src/local_daemon.rs:212-226`)。standalone binary 内部自己跑一次 `build_process_runtime` (`uc-desktop/src/daemon/host.rs:82`) + `start_in_process`, **复用 GUI shell 同一套进程级装配代码**。Phase A rename `build_gui_app` → `build_process_runtime` 的最大产出就是这个共用 —— 没死，仍在生产。
 
 ### 决策 C 收尾度验证
 

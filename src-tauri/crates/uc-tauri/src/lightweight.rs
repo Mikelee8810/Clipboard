@@ -1,6 +1,6 @@
 //! ADR-008 D3 (P4-3): lightweight mode + the quit / daemon-teardown decision.
 //!
-//! The external `uniclipd` is always a separate process. Four exit behaviors,
+//! The external `clipd` is always a separate process. Four exit behaviors,
 //! distinguished here and in `run.rs`'s `RunEvent` handlers:
 //!
 //! - **关窗** (window close) → the window is destroyed (freeing its webview;

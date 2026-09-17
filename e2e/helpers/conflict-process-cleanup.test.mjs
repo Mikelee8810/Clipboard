@@ -17,7 +17,7 @@ it.each(['workspace', 'canonical', 'foreign'])(
   'checks the exact executable identity for a live %s process',
   async kind => {
     const profile = 'conflict-e2e-cleanup-a'
-    const executable = resolve('target/debug/uniclipd')
+    const executable = resolve('target/debug/clipd')
     const command =
       kind === 'canonical'
         ? await realpath(executable)
@@ -51,7 +51,7 @@ it.each(['workspace', 'canonical', 'foreign'])(
 )
 vi.mock('node:fs/promises', async original => {
   const actual = await original()
-  const resolveExecutable = async () => '/test/canonical/uniclipd'
+  const resolveExecutable = async () => '/test/canonical/clipd'
   return {
     ...actual,
     readFile: read,
@@ -72,7 +72,7 @@ it('does not signal a process that exited after its test files were observed', a
     }
     if (command === 'lsof') return `p4242\nn${profileDir(profile)}/control.sqlite\n`
     if (command === 'ps' && args.includes('stat=')) return 'Z\n'
-    if (command === 'ps') return '(uniclipd)\n'
+    if (command === 'ps') return '(clipd)\n'
     throw new Error('unexpected process query')
   })
   vi.spyOn(Date, 'now').mockReturnValueOnce(0).mockReturnValue(4000)

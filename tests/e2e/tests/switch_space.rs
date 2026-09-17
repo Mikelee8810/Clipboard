@@ -1,6 +1,6 @@
 //! E2E test for the merged `join` switch path.
 //!
-//! `uniclip join --switch` opts into the switch-space migration (re-encrypting
+//! `clip join --switch` opts into the switch-space migration (re-encrypting
 //! local history under the new sponsor's master key). This test verifies the
 //! *routing + happy path*: an already-initialized Bob runs `join --switch
 //! --yes` against Alice's invitation and ends up a member of Alice's space.

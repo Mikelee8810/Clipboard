@@ -134,7 +134,7 @@ Key details:
 - All git operations use `github-actions[bot]` identity
   </action>
   <verify>
-    <automated>cd /home/wuy6/myprojects/UniClipboard.auto-pr-for-release && cat .github/workflows/prepare-release.yml | head -5 && python3 -c "import yaml; yaml.safe_load(open('.github/workflows/prepare-release.yml'))" && echo "YAML valid"</automated>
+    <automated>cd /home/wuy6/myprojects/Clipboard.auto-pr-for-release && cat .github/workflows/prepare-release.yml | head -5 && python3 -c "import yaml; yaml.safe_load(open('.github/workflows/prepare-release.yml'))" && echo "YAML valid"</automated>
   </verify>
   <done>prepare-release.yml exists, is valid YAML, has workflow_dispatch trigger with version/bump/channel inputs, uses REPO_BOT_TOKEN, calls bump-version.js, has codex polish step, creates PR via gh CLI</done>
 </task>
@@ -190,7 +190,7 @@ Key details:
 - Branch cleanup is best-effort (continue-on-error)
   </action>
   <verify>
-    <automated>cd /home/wuy6/myprojects/UniClipboard.auto-pr-for-release && cat .github/workflows/tag-on-merge.yml | head -5 && python3 -c "import yaml; yaml.safe_load(open('.github/workflows/tag-on-merge.yml'))" && echo "YAML valid"</automated>
+    <automated>cd /home/wuy6/myprojects/Clipboard.auto-pr-for-release && cat .github/workflows/tag-on-merge.yml | head -5 && python3 -c "import yaml; yaml.safe_load(open('.github/workflows/tag-on-merge.yml'))" && echo "YAML valid"</automated>
   </verify>
   <done>tag-on-merge.yml exists, is valid YAML, triggers on pull_request closed, has job-level if for merged release/* PRs, extracts version from branch name, creates annotated tag, pushes with REPO_BOT_TOKEN, deletes release branch</done>
 </task>

@@ -256,7 +256,7 @@ async fn run_daemon_surfaces(
         ));
     }
 
-    info!(?residency, "uniclipboard daemon running on shared engine");
+    info!(?residency, "clipboard daemon running on shared engine");
     let mut http_completed = false;
     let mut controlled_oneshot_exit = false;
     tokio::select! {

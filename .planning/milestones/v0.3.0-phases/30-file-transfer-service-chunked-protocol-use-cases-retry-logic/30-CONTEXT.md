@@ -19,7 +19,7 @@ Implement the actual file transfer engine: FileTransferService (libp2p stream ha
 ### FileTransferService
 
 - New libp2p stream service following `PairingStreamService` pattern (600+ LoC template)
-- Registers protocol `/uniclipboard/file-transfer/1.0.0`
+- Registers protocol `/clipboard/file-transfer/1.0.0`
 - Handles incoming file transfer streams
 - Manages outbound file transfer initiation
 - Concurrency limit: max 2 concurrent file transfers per peer (semaphore-based, PairingStreamService pattern)
@@ -59,7 +59,7 @@ Implement the actual file transfer engine: FileTransferService (libp2p stream ha
 
 - Auto-retry with exponential backoff on network interruption
 - Fail after max retries with user notification
-- No断点续传 in V1 — retry from current chunk, not from byte offset
+- No 断点续传 in V1 — retry from current chunk, not from byte offset
 - Sender disconnect during transfer: receiver waits for timeout, deletes temp file, marks "transfer failed"
 
 ### Receiver Clipboard Write

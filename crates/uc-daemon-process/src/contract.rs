@@ -30,7 +30,7 @@ pub enum DaemonBootstrapError {
          — restart to converge, or re-upgrade the client"
     )]
     RefusedNewerDaemon { observed: String, expected: String },
-    #[error("failed to spawn uniclipboard-daemon: {0}")]
+    #[error("failed to spawn clipboard-daemon: {0}")]
     Spawn(anyhow::Error),
     #[error("daemon startup timed out after {timeout_ms}ms")]
     StartupTimeout { timeout_ms: u64 },

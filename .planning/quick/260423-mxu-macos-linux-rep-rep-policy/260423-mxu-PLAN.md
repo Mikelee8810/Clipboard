@@ -48,7 +48,7 @@ must_haves:
 ---
 
 <objective>
-为 macOS 补齐真正的**原子多 representation** 写入能力，消除 `common.rs::write_snapshot_multi` 中 `#[cfg(not(target_os = "windows"))]` 分支下"所有非 Windows 平台统一降级为单 rep"的掩盖式实现。Linux 在本次**显式保留降级**（本 phase 的 scope 精神：单个 quick 任务只处理 macOS；Linux 的 Wayland / X11 data source 留到独立 phase）。
+为 macOS 补齐真正的 **原子多 representation** 写入能力，消除 `common.rs::write_snapshot_multi` 中 `#[cfg(not(target_os = "windows"))]` 分支下"所有非 Windows 平台统一降级为单 rep"的掩盖式实现。Linux 在本次 **显式保留降级**（本 phase 的 scope 精神：单个 quick 任务只处理 macOS；Linux 的 Wayland / X11 data source 留到独立 phase）。
 
 **目的**：与 260423-9do-windows-rep 的 Windows 能力对齐 —— 让从浏览器复制的富文本同步到 macOS 后，粘贴到纯文本目的地（终端 / 纯文本 TextEdit）仍能拿到 `text/plain`，粘贴到富文本目的地仍能拿到 `text/html`。当前 macOS 下多 rep snapshot 会被 `SelectRepresentationPolicyV1` 砍成一条（paste-priority 通常是 html），纯文本目的地粘贴内容可能是 HTML 源码而不是 plain text。
 
@@ -58,7 +58,7 @@ must_haves:
 3. `common.rs::write_snapshot_multi` 的 `#[cfg(not(target_os = "windows"))]` 分支拆成两支：macOS 委派新函数；Linux 保留既有 V1-policy 降级 + 更新 doc comment / 添加 FIXME 指向下一个 phase。
 
 **非目标**（严格不做）：
-- 不动 `windows.rs`（Windows 路径 260423-9do 已完成，本次**零改动**）。
+- 不动 `windows.rs`（Windows 路径 260423-9do 已完成，本次 **零改动**）。
 - 不动 `apply_inbound.rs` / `narrow_to_primary`（主流量接线留给未来）。
 - 不新增 image / rtf / files 的多 rep 写入（保持与 Windows 任务 MVP 一致；`write_snapshot_multi_macos` 遇到非 text/plain / 非 text/html 的 rep 走 debug 跳过，与 `write_snapshot_multi_windows` 语义对齐）。
 - 不改 `SystemClipboardPort` 签名。
@@ -88,7 +88,7 @@ must_haves:
 
 ## A. 现有 `common.rs` 的多 rep 分流骨架（任务 3 要拆的那块）
 
-```/Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/crates/uc-platform/src/clipboard/common.rs#L741-786
+```/Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/crates/uc-platform/src/clipboard/common.rs#L741-786
 #[cfg(not(target_os = "windows"))]
 {
     // macOS / Linux：显式降级（§9.3 不允许静默降级）。
@@ -162,7 +162,7 @@ pub struct ObservedClipboardRepresentation {
 - `objc2-app-kit = "0.3.2"`（已被 arboard/tauri 等 transitively 引入）
 - `objc2-foundation = "0.3.2"`
 
-这些版本随 `arboard 3.4` 间接进入 workspace，直接添加到 `uc-platform` 的依赖图时会自动复用同一套解析。**不要**凭记忆写 `objc2 0.5.x / objc2-app-kit 0.2.x`（scope_guidance 里给的是过时参考版本）。
+这些版本随 `arboard 3.4` 间接进入 workspace，直接添加到 `uc-platform` 的依赖图时会自动复用同一套解析。**不要** 凭记忆写 `objc2 0.5.x / objc2-app-kit 0.2.x`（scope_guidance 里给的是过时参考版本）。
 
 **API 核实清单**（执行者必须在写代码前确认每一项；源文件已定位在 `~/.cargo/registry/src/index.crates.io-*/objc2-app-kit-0.3.2/src/generated/NSPasteboard.rs` 与 `NSPasteboardItem.rs`）：
 
@@ -214,7 +214,7 @@ let arr: Retained<NSArray<ProtocolObject<dyn NSPasteboardWriting>>> =
 let ok_write = unsafe { pb.writeObjects(&arr) };
 ```
 
-> **再次强调**：以上伪代码是**方向性**描述。`NSData::with_bytes` 的具体名（可能是 `NSData::from_vec(Vec<u8>)` / `NSData::with_bytes(&[u8])` / `NSData::dataWithBytes_length(...)` 其中之一）、`NSArray::from_retained_slice` 的具体名、`ProtocolObject::from_retained` 的具体名 —— 这些在 `objc2 0.6.x` / `objc2-foundation 0.3.x` 里的 API 与旧版本差别很大。**必须**在实现前用以下命令核实：
+> **再次强调**：以上伪代码是 **方向性** 描述。`NSData::with_bytes` 的具体名（可能是 `NSData::from_vec(Vec<u8>)` / `NSData::with_bytes(&[u8])` / `NSData::dataWithBytes_length(...)` 其中之一）、`NSArray::from_retained_slice` 的具体名、`ProtocolObject::from_retained` 的具体名 —— 这些在 `objc2 0.6.x` / `objc2-foundation 0.3.x` 里的 API 与旧版本差别很大。**必须** 在实现前用以下命令核实：
 >
 > ```bash
 > # 直接 grep 本机 registry 里的源文件
@@ -227,7 +227,7 @@ let ok_write = unsafe { pb.writeObjects(&arr) };
 
 ## D. `uc-platform/Cargo.toml` 当前 Windows 段作为模板
 
-```/Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/crates/uc-platform/Cargo.toml#L101-103
+```/Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/crates/uc-platform/Cargo.toml#L101-103
 [target.'cfg(windows)'.dependencies]
 clipboard-win = { version = "5.4" }
 ```
@@ -244,11 +244,11 @@ objc2-foundation = { version = "0.3", features = ["NSArray", "NSData", "NSString
 **Feature 选取来源**（已核实自 `objc2-app-kit-0.3.2/Cargo.toml`）：
 - `NSPasteboard` feature 内部自带依赖：`bitflags` + `objc2-foundation/{NSArray, NSData, NSDictionary, NSError, NSFileWrapper, NSSet, NSString, NSURL}`。
 - `NSPasteboardItem` feature 内部自带依赖：`objc2-foundation/{NSArray, NSData, NSDictionary, NSError, NSSet, NSString}`。
-- 即 `objc2-app-kit` 的 `NSPasteboard + NSPasteboardItem` 两个 feature 已经 **transitively** 启用了 `objc2-foundation` 所需的 `NSArray / NSData / NSString`。但为了可读性（避免"哪些 feature 由哪个 feature 传递启用"的心智负担），上面仍**显式**列出 `objc2-foundation` 的 `features = ["NSArray", "NSData", "NSString"]`。两种写法都能编过；**选显式这一种**，docstring 注释"显式列 features 便于阅读 / 避免将来 feature 传递规则变更后静默失效"。
+- 即 `objc2-app-kit` 的 `NSPasteboard + NSPasteboardItem` 两个 feature 已经 **transitively** 启用了 `objc2-foundation` 所需的 `NSArray / NSData / NSString`。但为了可读性（避免"哪些 feature 由哪个 feature 传递启用"的心智负担），上面仍 **显式** 列出 `objc2-foundation` 的 `features = ["NSArray", "NSData", "NSString"]`。两种写法都能编过；**选显式这一种**，docstring 注释"显式列 features 便于阅读 / 避免将来 feature 传递规则变更后静默失效"。
 
 ## E. 既有 `macos.rs` 骨架（任务 2 要改的那个文件）
 
-```/Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs#L1-57
+```/Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs#L1-57
 use super::super::common::CommonClipboardImpl;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -262,15 +262,15 @@ use uc_core::ports::SystemClipboardPort;
 pub struct MacOSClipboard { ... }
 ```
 
-本次**不改** `MacOSClipboard::write_snapshot` —— 它继续通过 `CommonClipboardImpl::write_snapshot(&mut ctx, snapshot)` 进入 common.rs，common.rs 会自动分流到新增的 `write_snapshot_multi_macos`。
+本次 **不改** `MacOSClipboard::write_snapshot` —— 它继续通过 `CommonClipboardImpl::write_snapshot(&mut ctx, snapshot)` 进入 common.rs，common.rs 会自动分流到新增的 `write_snapshot_multi_macos`。
 
-**与 Windows 的关键区别**：macOS 用 `objc2-app-kit::NSPasteboard::generalPasteboard()` **不占用** `clipboard-rs` 的 ctx（两者都只是对同一个系统级 NSPasteboard 单例的抽象）。因此 macOS 路径**不需要** Windows 上那种"提前 drop clipboard-rs ctx + dummy_ctx 绕路"的 workaround。直接在 `write_snapshot_multi_macos` 里 grab `generalPasteboard` 即可；`ctx` 可以继续被 `CommonClipboardImpl::write_snapshot` 的 `&mut` 借用持有（虽然本函数根本不用它）。
+**与 Windows 的关键区别**：macOS 用 `objc2-app-kit::NSPasteboard::generalPasteboard()` **不占用** `clipboard-rs` 的 ctx（两者都只是对同一个系统级 NSPasteboard 单例的抽象）。因此 macOS 路径 **不需要** Windows 上那种"提前 drop clipboard-rs ctx + dummy_ctx 绕路"的 workaround。直接在 `write_snapshot_multi_macos` 里 grab `generalPasteboard` 即可；`ctx` 可以继续被 `CommonClipboardImpl::write_snapshot` 的 `&mut` 借用持有（虽然本函数根本不用它）。
 
 ## F. 项目规范摘要
 
 - `uc-platform/AGENTS.md` §4.4：`cfg(target_os = ...)` 必须收敛在平台层内部，上层不感知。
 - `uc-platform/AGENTS.md` §6.1 / §11.3：平台层不定义业务规则；平台怪异行为（如"高层 API 隐式 clear"）由平台层消化。
-- `uc-platform/AGENTS.md` §9.3：平台能力差异（Linux 本 phase 暂不支持原子多 rep）必须**显式表达**，不能静默降级 —— 用 `warn!` + FIXME + 可追踪的降级路径呈现。
+- `uc-platform/AGENTS.md` §9.3：平台能力差异（Linux 本 phase 暂不支持原子多 rep）必须 **显式表达**，不能静默降级 —— 用 `warn!` + FIXME + 可追踪的降级路径呈现。
 - `uc-platform/AGENTS.md` §15.1：新增平台依赖必须回答"是否必须""是否会让条件编译复杂度失控"。本次 `objc2` 系列只在 macOS target 下启用，不影响 Linux / Windows 构建。
 - 根 `AGENTS.md`：注释与 doc comments 使用中文；commit message 保持英文；`.planning/` 文档统一中文。
 - 项目当前无 Rust 测试（commit `6f1d6a2d` 全删）；验证以 `cargo check -p uc-platform` 为主。
@@ -290,10 +290,10 @@ pub struct MacOSClipboard { ... }
 ### 1. 版本核实（先做这一步，不要直接写版本号）
 
 ```bash
-grep -E 'name = "objc2(|-app-kit|-foundation)"' /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/Cargo.lock
-grep -B1 -A3 'name = "objc2"$' /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/Cargo.lock | head -10
-grep -B1 -A3 'name = "objc2-app-kit"$' /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/Cargo.lock | head -10
-grep -B1 -A3 'name = "objc2-foundation"$' /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri/Cargo.lock | head -10
+grep -E 'name = "objc2(|-app-kit|-foundation)"' /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/Cargo.lock
+grep -B1 -A3 'name = "objc2"$' /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/Cargo.lock | head -10
+grep -B1 -A3 'name = "objc2-app-kit"$' /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/Cargo.lock | head -10
+grep -B1 -A3 'name = "objc2-foundation"$' /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri/Cargo.lock | head -10
 ```
 
 预期（截至 plan 写入时）：`objc2 0.6.3` / `objc2-app-kit 0.3.2` / `objc2-foundation 0.3.2`。版本号写 `Cargo.toml` 时用 **minor-compatible** 表达（`"0.6"` / `"0.3"`），避免未来 patch 升级时反复修订。
@@ -316,15 +316,15 @@ objc2-foundation = { version = "0.3", features = ["NSArray", "NSData", "NSString
 
 ### 3. 其他约束
 
-- **不要**把这些依赖加到顶层 `[dependencies]`。Windows / Linux 构建不需要它们，加到顶层会让 `cargo check` 在 Linux / Windows target 上也下载并编译 objc2 系列（冗余 + 跨编译风险）。
-- **不要**动顶层 `[dependencies]` 里的 `arboard = "3.4"` 或 `clipboard-rs` —— 任务 2 直接用 `objc2-app-kit` 原生 API，不走 arboard；但 arboard 仍可能在本 crate 的其他路径用，保持原样。
-- **不要**新增 workspace-level 改动；只改这一个 Cargo.toml。
+- **不要** 把这些依赖加到顶层 `[dependencies]`。Windows / Linux 构建不需要它们，加到顶层会让 `cargo check` 在 Linux / Windows target 上也下载并编译 objc2 系列（冗余 + 跨编译风险）。
+- **不要** 动顶层 `[dependencies]` 里的 `arboard = "3.4"` 或 `clipboard-rs` —— 任务 2 直接用 `objc2-app-kit` 原生 API，不走 arboard；但 arboard 仍可能在本 crate 的其他路径用，保持原样。
+- **不要** 新增 workspace-level 改动；只改这一个 Cargo.toml。
 - 所有新增注释用中文（与项目规范一致）。
 
 ### 4. 验证
 
 ```bash
-cd /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri
+cd /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri
 cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tail -30
 # 或当前 host 就是 macOS 时：cargo check -p uc-platform
 ```
@@ -338,7 +338,7 @@ cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tail -30
 - 不添加 Linux 平台专属依赖段（Linux 留给下一个 phase）。
   </action>
   <verify>
-    <automated>cd /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task1.log; ! grep -E "^error" /tmp/uc-platform-cargo-task1.log</automated>
+    <automated>cd /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task1.log; ! grep -E "^error" /tmp/uc-platform-cargo-task1.log</automated>
   </verify>
   <done>
 - `Cargo.toml` 新增 `[target.'cfg(target_os = "macos")'.dependencies]` 段，列 `objc2` / `objc2-app-kit` / `objc2-foundation` 三条。
@@ -353,7 +353,7 @@ cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tail -30
   <name>任务 2：macOS 原子多 rep 写入实现（write_snapshot_multi_macos）</name>
   <files>src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs</files>
   <action>
-目标：在 `macos.rs` 新增 `pub(crate) fn write_snapshot_multi_macos(snapshot: SystemClipboardSnapshot) -> Result<()>`，在**一次** `NSPasteboard::writeObjects` 调用内原子写入 `NSPasteboardTypeString`（对应 `text/plain`）+ `NSPasteboardTypeHTML`（对应 `text/html`）。
+目标：在 `macos.rs` 新增 `pub(crate) fn write_snapshot_multi_macos(snapshot: SystemClipboardSnapshot) -> Result<()>`，在 **一次** `NSPasteboard::writeObjects` 调用内原子写入 `NSPasteboardTypeString`（对应 `text/plain`）+ `NSPasteboardTypeHTML`（对应 `text/html`）。
 
 ### 1. API 核实清单（实现前必须核实，不要凭 plan 里的伪代码脑补）
 
@@ -389,7 +389,7 @@ grep -B2 -A2 'MainThreadMarker\|MainThreadOnly\|#\[unsafe(method(' \
 
 **绝对不要**：凭 ChatGPT / 记忆 / 旧 blog 的 objc2 代码范例直接写。objc2 从 0.4 → 0.5 → 0.6 的 API 变化比一般 crate 剧烈；旧范例几乎肯定编不过。
 
-核实后在**你实现的函数 doc comment 顶部**用中文写一段"实测 API 版本：objc2-app-kit 0.3.2，核实的函数签名如下……"的记录，便于后续维护。这是本任务 SUMMARY 必须包含的"偏差记录"素材。
+核实后在 **你实现的函数 doc comment 顶部** 用中文写一段"实测 API 版本：objc2-app-kit 0.3.2，核实的函数签名如下……"的记录，便于后续维护。这是本任务 SUMMARY 必须包含的"偏差记录"素材。
 
 ### 2. 函数骨架
 
@@ -619,7 +619,7 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 }
 ```
 
-> **重要**：上面的骨架里保留了 `todo!()` 与伪代码注释，是**有意**的 —— 让执行者必须把 API 核实结果落到实际代码里，不能复制粘贴就走。执行者提交前务必删掉 `todo!()`。
+> **重要**：上面的骨架里保留了 `todo!()` 与伪代码注释，是 **有意** 的 —— 让执行者必须把 API 核实结果落到实际代码里，不能复制粘贴就走。执行者提交前务必删掉 `todo!()`。
 
 ### 3. 调用位点 / 导出
 
@@ -656,12 +656,12 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 - [ ] 文件顶部没有 `#[cfg(target_os = "macos")]` 装饰 —— 不需要，`macos.rs` 整个文件已经在 `platform/mod.rs` 的 `#[cfg(target_os = "macos")]` 门控下。
   </action>
   <verify>
-    <automated>cd /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task2.log; ! grep -E "^error|\\btodo!\\(|unimplemented!\\(" /tmp/uc-platform-cargo-task2.log src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs</automated>
+    <automated>cd /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task2.log; ! grep -E "^error|\\btodo!\\(|unimplemented!\\(" /tmp/uc-platform-cargo-task2.log src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs</automated>
   </verify>
   <done>
 - `macos.rs` 新增 `pub(crate) fn write_snapshot_multi_macos(snapshot: SystemClipboardSnapshot) -> Result<()>`，在单次 pasteboard 会话内用 `NSPasteboardItem::setData_forType` + `NSPasteboard::writeObjects` 提交 `NSPasteboardTypeString` + `NSPasteboardTypeHTML`。
 - `cargo check -p uc-platform --target x86_64-apple-darwin` 编译通过，零 error，零新 warning（与依赖相关的 unused import 也要消灭）。
-- 源码中**没有**任何 `todo!()` / `unimplemented!()`；`NSData` / `NSArray` / `ProtocolObject` 的构造函数名已被替换为 API 核实的实际名称。
+- 源码中 **没有** 任何 `todo!()` / `unimplemented!()`；`NSData` / `NSArray` / `ProtocolObject` 的构造函数名已被替换为 API 核实的实际名称。
 - 函数 doc comment 用中文写明：(1) MVP 仅 text/plain + text/html、(2) 前置 writable 扫描的防御理由、(3) 与 Windows 路径"不需要 dummy_ctx"的对比、(4) API 核实版本（`objc2-app-kit 0.3.2`）。
 - `MacOSClipboard::write_snapshot` **零改动**；`read_snapshot` / 文件顶部 `use` 块仅按需增加（objc2 / objc2-app-kit / objc2-foundation 的 import）。
 - git diff 约束：本任务仅改 `macos.rs`；`Cargo.toml` 已在任务 1 落地，不重复动。
@@ -756,7 +756,7 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 
 ### 3. 更新 `write_snapshot` 的顶部 doc comment
 
-现在 `#L571-586`（当前代码）说的"macOS / Linux：暂不支持原子多 rep，降级为…… 后续 phase 补齐 NSPasteboardItem / Wayland data source 实现"已经**不再是事实**（macOS 已经支持）。改为：
+现在 `#L571-586`（当前代码）说的"macOS / Linux：暂不支持原子多 rep，降级为…… 后续 phase 补齐 NSPasteboardItem / Wayland data source 实现"已经 **不再是事实**（macOS 已经支持）。改为：
 
 ```rust
 /// 写入 `SystemClipboardSnapshot` 到系统剪贴板。
@@ -805,7 +805,7 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 
 ### 5. 检查点
 
-- `#[cfg(target_os = "macos")]` 必须**只**出现在本文件 `write_snapshot_multi` 内部 + `macos.rs` 已经天然在 `platform/mod.rs` 的 `#[cfg(target_os = "macos")]` 门控下（§4.4）。
+- `#[cfg(target_os = "macos")]` 必须 **只** 出现在本文件 `write_snapshot_multi` 内部 + `macos.rs` 已经天然在 `platform/mod.rs` 的 `#[cfg(target_os = "macos")]` 门控下（§4.4）。
 - `#[cfg(target_os = "linux")]` / `#[cfg(not(any(target_os = "windows", target_os = "macos")))]` 的组合必须保证"任何 target 至少命中其中一个分支"——上面的 `#[cfg(any(target_os = "linux", not(any(target_os = "windows", target_os = "macos"))))]` 能覆盖 Linux、FreeBSD、iOS 等所有非 Windows / 非 macOS 的 target。
 - Windows 分支 `#[cfg(target_os = "windows")]` **不动**，保持既有委派行为。
 - 不要改 `write_snapshot` 的单 rep 快路径、不要改 `read_snapshot`、不要改 port 签名。
@@ -819,7 +819,7 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 - 不处理 macOS 分支下 `write_snapshot_multi_macos` 自身 bail 的 fallback —— 按 §6.1 "平台层不替业务决定"：macOS 的 bail 直接作为错误上抛给调用方（`MacOSClipboard::write_snapshot` → `SystemClipboardPort::write_snapshot`），由 app 层决定如何处理（当前 app 层已经在错误路径有日志，不需本次处理）。
   </action>
   <verify>
-    <automated>cd /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task3.log; ! grep -E "^error|warning: unused" /tmp/uc-platform-cargo-task3.log</automated>
+    <automated>cd /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri && cargo check -p uc-platform --target x86_64-apple-darwin 2>&1 | tee /tmp/uc-platform-cargo-task3.log; ! grep -E "^error|warning: unused" /tmp/uc-platform-cargo-task3.log</automated>
   </verify>
   <done>
 - `common.rs::write_snapshot_multi` 内的单一 `#[cfg(not(target_os = "windows"))]` 分支已被拆为 `#[cfg(target_os = "macos")]`（委派）+ `#[cfg(any(target_os = "linux", not(any(target_os = "windows", target_os = "macos"))))]`（显式降级 + FIXME）。
@@ -841,7 +841,7 @@ fn make_nsdata(bytes: &[u8]) -> Retained<NSData> {
 ### 1. 编译（主硬性门槛）
 
 ```bash
-cd /Volumes/ExternalSSD/superset/uniclipboard/slender-soybean/src-tauri
+cd /Volumes/ExternalSSD/superset/clipboard/slender-soybean/src-tauri
 
 # macOS target：必须通过。任务 2 / 3 的真正代码在 macOS 下才被编译进去。
 cargo check -p uc-platform --target x86_64-apple-darwin
@@ -865,7 +865,7 @@ cargo check -p uc-platform --target x86_64-pc-windows-msvc
 git diff --name-only
 ```
 
-应**只**出现：
+应 **只** 出现：
 - `src-tauri/crates/uc-platform/Cargo.toml`
 - `src-tauri/crates/uc-platform/Cargo.lock`（由 task 1 的 cargo 自动更新，如 workspace-level lock，则可能在 `src-tauri/Cargo.lock`）
 - `src-tauri/crates/uc-platform/src/clipboard/platform/macos.rs`
@@ -880,7 +880,7 @@ git diff --name-only
    - 在 TextEdit 富文本模式下 Cmd+V：应该看到带格式的 HTML 渲染。
    - 在 TextEdit 纯文本模式（Format → Make Plain Text）或终端 Cmd+V：应该看到纯文本内容（证明 `NSPasteboardTypeString` 被写入）。
    - 如上都成立，则 macOS 原子多 rep 写入能力闭环。
-2. **macOS Linux 分支语义验证（只读代码）**：读 `common.rs` 的 `#[cfg(any(target_os = "linux", ...))]` 分支，确认其与改前的 `#[cfg(not(target_os = "windows"))]` 分支逻辑**除了 FIXME 注释外**字节级相同；保证 Linux 行为零回归。
+2. **macOS Linux 分支语义验证（只读代码）**：读 `common.rs` 的 `#[cfg(any(target_os = "linux", ...))]` 分支，确认其与改前的 `#[cfg(not(target_os = "windows"))]` 分支逻辑 **除了 FIXME 注释外** 字节级相同；保证 Linux 行为零回归。
 3. **Windows（VM 或 CI）**：`cargo check -p uc-platform --target x86_64-pc-windows-msvc` 通过即可。本次不动任何 Windows 代码路径。
 
 上述第 1 步不是本 plan 的 `<done>` 必须项（本 plan 只交付"能力"，不负责接线），但执行者若能顺手验证一次会极大加速后续"删除 narrow_to_primary，让 apply_inbound 直接 write 全 snapshot" phase 的信心。
@@ -905,9 +905,9 @@ git diff --name-only
 - [ ] `macos.rs` 源码中无 `todo!()` / `unimplemented!()`；`NSData` / `NSArray` / `ProtocolObject` 的具体构造 API 已用核实结果替换（不是骨架里的 `todo!()`）。
 - [ ] `common.rs::write_snapshot_multi` 的 `#[cfg(not(target_os = "windows"))]` 分支被拆为 macOS（委派）+ Linux（显式降级 + FIXME）两支；Windows 分支不变。
 - [ ] `write_snapshot` 与 `write_snapshot_multi` 的 doc comment 均已更新为"Windows / macOS / Linux"三段式，不再写"macOS 未支持"。
-- [ ] Linux 分支仍走 V1-policy 降级，**行为语义**与改前等价；新增 `FIXME(260423-mxu-next-phase)` 注释指向后续 phase。
+- [ ] Linux 分支仍走 V1-policy 降级，**行为语义** 与改前等价；新增 `FIXME(260423-mxu-next-phase)` 注释指向后续 phase。
 - [ ] 所有新增代码注释使用中文；commit message 英文；每个任务一个原子 commit（共三个 commit：Cargo.toml + macos.rs + common.rs）。
-- [ ] git diff 仅涉及 `Cargo.toml` / `Cargo.lock` / `macos.rs` / `common.rs` 四个文件；`windows.rs` / `linux.rs` / `mod.rs` / `apply_inbound.rs` / port 定义**零改动**。
+- [ ] git diff 仅涉及 `Cargo.toml` / `Cargo.lock` / `macos.rs` / `common.rs` 四个文件；`windows.rs` / `linux.rs` / `mod.rs` / `apply_inbound.rs` / port 定义 **零改动**。
 - [ ] SUMMARY 包含 "API 核实 / 偏差记录" 段，列出实际采用的 `NSData` / `NSArray` / `ProtocolObject` 构造函数名与版本。
 
 </success_criteria>

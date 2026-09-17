@@ -8,14 +8,14 @@
 
 ## 1. 现象
 
-Windows 复制一个文件（`deskflow-1.26.0-win-x64.msi`，~15MB）同步到 macOS，dashboard 出现 **两个 entry**：一个完整、一个永久 partial（`uniclip-missing://` 占位的幽灵）。复现条件：先建 relay（慢），叠加 Windows dispatch + restore，再叠加接收端 daemon 反复重启。
+Windows 复制一个文件（`deskflow-1.26.0-win-x64.msi`，~15MB）同步到 macOS，dashboard 出现 **两个 entry**：一个完整、一个永久 partial（`clip-missing://` 占位的幽灵）。复现条件：先建 relay（慢），叠加 Windows dispatch + restore，再叠加接收端 daemon 反复重启。
 
 ## 2. 根因（已从日志 + 代码双向确认）
 
 同一份内容经 **两条通道** 到达接收端，且两条通道携带 **不同的 `snapshot_hash`**：
 
 - 通道 1 — **push/dispatch**（`dispatch_entry::delivery`）：`snapshot_hash = A`（`blake3v1:4985…`）
-- 通道 2 — **active-clipboard pull**（`active_state::serve_pull`，ALPN `uniclipboard/active-clipboard-pull/0`）：`snapshot_hash = B`（`blake3v1:6cb3…`）
+- 通道 2 — **active-clipboard pull**（`active_state::serve_pull`，ALPN `clipboard/active-clipboard-pull/0`）：`snapshot_hash = B`（`blake3v1:6cb3…`）
 
 接收端 entry 去重以 `snapshot_hash` 为键（`find_entry_id_by_snapshot_hash`），A ≠ B → 两次 miss → 两个 entry。慢 relay + 重启把传输拖成并发，并让其中一个 partial 永久残留。
 
@@ -57,7 +57,7 @@ restore / active-state / pull **忠实地复用存储的 hash B**（`crates/uc-a
   - 任何复用该 entry 的再发（dispatch / active pull serve / 显式 Resend）**只能发 `EntryFileSet` 记录的那一组字节**——**绝不** 在旧 H 下多发当初被排除的文件。
   - 用户若想"把当初超限排除的大文件也发出去"，那是一次 **新捕获 → 新 `EntryFileSet` → 新 H → 新 entry**，不是同一身份。
   - 即消除 R2-F2 接受的"Resend 绕过 size-cap"与"H 不可变"之间的矛盾：Resend 可以是用户显式动作，但它发的仍是原 `EntryFileSet`；绕过 cap 只在 **新捕获** 时影响选集，不回灌旧 entry。
-- **完整性/可用性 = 实时派生（F-3/F-7；R2-F4 不反规范化；R3-F4 含 FS 实查）**：一个 entry「可用持有」⟺ 其全部 representation 的 `PayloadAvailability` 均就绪（无 `uniclip-missing://` 占位 / 无 Failed/Lost/未物化 blob ref）**且**——对文件 entry——其 file-list 指向的本地 cache 文件 **实际存在、可读、是普通文件**。**不** 存 denormalized `is_complete` 列（rep 状态由异步物化、janitor/reconciler 多路改写，反规范化会陈旧）。改为一个 **可用性查询接口** `is_entry_available(entry_id)`：先查 reps + missing-URI（DB），文件 entry 再 **实查本地文件 FS 状态 + transfer/cache 一致性**（不能只是 SQL）。调用方（dedup skip、active-state converge）按需查，非热点。**关键**：active-state 仅在 `is_entry_available` 为真时 converge，避免把 DB 显示 Inline 但本地文件已失效的坏内容写进 OS 剪贴板。
+- **完整性/可用性 = 实时派生（F-3/F-7；R2-F4 不反规范化；R3-F4 含 FS 实查）**：一个 entry「可用持有」⟺ 其全部 representation 的 `PayloadAvailability` 均就绪（无 `clip-missing://` 占位 / 无 Failed/Lost/未物化 blob ref）**且**——对文件 entry——其 file-list 指向的本地 cache 文件 **实际存在、可读、是普通文件**。**不** 存 denormalized `is_complete` 列（rep 状态由异步物化、janitor/reconciler 多路改写，反规范化会陈旧）。改为一个 **可用性查询接口** `is_entry_available(entry_id)`：先查 reps + missing-URI（DB），文件 entry 再 **实查本地文件 FS 状态 + transfer/cache 一致性**（不能只是 SQL）。调用方（dedup skip、active-state converge）按需查，非热点。**关键**：active-state 仅在 `is_entry_available` 为真时 converge，避免把 DB 显示 Inline 但本地文件已失效的坏内容写进 OS 剪贴板。
 - **「已持有」⟺ 完整持有**：所有「我有没有 H」的判断（dedup skip、active-state converge、in-flight 决策）一律以 **complete & available** 为准，**hash 命中但 partial ≠ 已持有**。
 
 ### 4.1 ① 根因修复 — canonical compute-once hash
@@ -114,7 +114,7 @@ restore / active-state / pull **忠实地复用存储的 hash B**（`crates/uc-a
   - `find(H)` 命中但 **partial**、或未命中 —— 内容未完整持有：
     - **in-flight → 延迟**（不 pull，登记待激活）。
     - 否则 → pull（pull 成功后经 ② 升级/新建为 complete，再 converge）。
-  - **关键**：partial 命中 **绝不** 直接 converge（否则把 `uniclip-missing://` 占位写进 OS 剪贴板）。
+  - **关键**：partial 命中 **绝不** 直接 converge（否则把 `clip-missing://` 占位写进 OS 剪贴板）。
 - **失败回退 = 严格单次补偿（F-8，不构成自动重试）**：
   - 延迟时登记 **内存** `pending_activation[H] = (activated_at_ms, activated_by 等 LWW key + 元数据)`；同一 H 仅保留一条（重复延迟覆盖为最新 activation）。
   - **in-flight 成功必须消费待激活、而非简单丢弃（R2-F3，关键）**：被抑制后那条 in-flight（dispatch/0xC1 bulk）**成功完整提交** 时，若存在 `pending_activation[H]`，**必须用该 activation 的 LWW key `(activated_at_ms, activated_by)` 走与正常 0xC3 收敛同一条 converge tail**（前进 register + OS 写 + re-broadcast），**不可** 用 bulk inbound 自带的入站快照时间充当激活键——否则丢掉 issue1017 的权威 LWW 键、破坏跨设备收敛/断环。消费后清除该条。

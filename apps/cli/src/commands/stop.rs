@@ -29,13 +29,13 @@ impl fmt::Display for StopOutput {
             ("not_running", _) => write!(f, "Daemon is not running"),
             ("managed_by_gui", Some(pid)) => write!(
                 f,
-                "Daemon (pid {pid}) is running inside the UniClipboard GUI. \
-                 Quit the GUI from its tray menu instead — `uniclip stop` \
+                "Daemon (pid {pid}) is running inside the Clipboard GUI. \
+                 Quit the GUI from its tray menu instead — `clip stop` \
                  won't kill it."
             ),
             ("managed_by_gui", None) => write!(
                 f,
-                "Daemon is running inside the UniClipboard GUI. \
+                "Daemon is running inside the Clipboard GUI. \
                  Quit the GUI from its tray menu instead."
             ),
             (status, Some(pid)) => write!(f, "Daemon {} (pid {})", status, pid),

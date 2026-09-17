@@ -10,10 +10,10 @@
 
 | Target | 目录 | 职责 | 迁移取向 |
 |---|---|---|---|
-| 主 App | `UniClipboard/` | UI、SyncEngine 编排、剪贴板 I/O、生命周期 | 大部分**留原生**，编排逻辑可下沉 |
-| 键盘扩展 | `UniClipboardKeyboard/` | 自定义键盘，把同步内容贴进任意 app | UI 留原生，同步逻辑共享 |
-| 分享扩展 | `UniClipboardShare/` | 系统分享面板上传文本/图片/文件 | UI 留原生，上传逻辑共享 |
-| App Intents | `UniClipboard/Intents/` + `Shortcuts/` | Siri/快捷指令/主屏快捷操作发送·接收 | 壳留原生，send/receive 逻辑共享 |
+| 主 App | `Clipboard/` | UI、SyncEngine 编排、剪贴板 I/O、生命周期 | 大部分 **留原生**，编排逻辑可下沉 |
+| 键盘扩展 | `ClipboardKeyboard/` | 自定义键盘，把同步内容贴进任意 app | UI 留原生，同步逻辑共享 |
+| 分享扩展 | `ClipboardShare/` | 系统分享面板上传文本/图片/文件 | UI 留原生，上传逻辑共享 |
+| App Intents | `Clipboard/Intents/` + `Shortcuts/` | Siri/快捷指令/主屏快捷操作发送·接收 | 壳留原生，send/receive 逻辑共享 |
 | **共享层** | `Shared/` (Network/Models/Cache) | **协议、加密、编解码、配置、缓存** | **核心 Rust 共享候选** |
 
 ---
@@ -24,15 +24,15 @@
 
 | 模块 | 文件 | 说明 |
 |---|---|---|
-| connect-uri 解析 | `Shared/Network/ConnectURI.swift` | `uniclipboard://connect` 配对负载解析，有跨语言 golden vector |
+| connect-uri 解析 | `Shared/Network/ConnectURI.swift` | `clipboard://connect` 配对负载解析，有跨语言 golden vector |
 | SyncClipboard HTTP 客户端 | `Shared/Network/SyncClipboardClient.swift` | §2 全部端点；Basic Auth；重试；取消 |
 | 连通性探测 | `Shared/Network/ConnectionTester.swift` | 单 URL test + 多 URL 并发 probe（§5.3 Layer 2） |
 | 历史查询参数+multipart | `Shared/Network/HistoryQuery.swift`、`MultipartBody.swift` | §2.7 分页/增量；RFC 7578 字节级 |
 | 错误模型 | `Shared/Network/SyncError.swift` | HTTP/URLError → 语义错误 |
-| 剪贴板线模型+哈希+发布 | `Shared/Models/Clipboard.swift` | §3/§4，SHA-256、长文本溢出阈值、发布助手 |
+| 剪贴板线模型 + 哈希 + 发布 | `Shared/Models/Clipboard.swift` | §3/§4，SHA-256、长文本溢出阈值、发布助手 |
 | 历史记录线模型 | `Shared/Models/HistoryRecord.swift` | §3.6，乐观锁版本、软删除命名陷阱 |
 | 网络上下文+URL 分类 | `Shared/Models/NetworkContext.swift`、`ServerConfig.swift`、`ServerConfigList.swift` | §5.1–5.3 SSID 归一、LAN/TS/WAN 分类、自动切换排序 |
-| 配置+设置模型 | `Shared/Models/AppSettings.swift` | §5.4 字段+默认值，前向兼容 |
+| 配置 + 设置模型 | `Shared/Models/AppSettings.swift` | §5.4 字段 + 默认值，前向兼容 |
 | 持久化层 | `Shared/Models/SettingsStore.swift` | §5.5 键名（iOS/Android 共用导入导出）、watermark、SyncLoopGuard 状态 |
 | 循环守卫 | `Shared/Models/SyncLoopGuard.swift` | apply↔push 振荡检测状态机 |
 | 内容寻址缓存 | `Shared/Cache/PayloadCache.swift` | LRU 字节缓存（逻辑可共享，文件 I/O 需平台桥） |
@@ -40,7 +40,7 @@
 
 ### 🚫 留原生（平台 API / UI / 系统集成，不进 Rust）
 
-- 所有 `UniClipboard/Views/**`（Home、Settings、Onboarding、Setup、QRScanner 等 SwiftUI）
+- 所有 `Clipboard/Views/**`（Home、Settings、Onboarding、Setup、QRScanner 等 SwiftUI）
 - 剪贴板 I/O：`DevicePasteboardObserver`、`PastedItemExtractor`（UIPasteboard、"允许粘贴" 提示、changeCount）
 - 网络感知：`CurrentSSIDProvider`（NWPathMonitor、NEHotspotNetwork、CLLocationManager 授权）
 - 键盘/分享扩展的 UI 与系统钩子（UIInputViewController、NSExtensionContext、textDocumentProxy）
@@ -68,7 +68,7 @@
 | Basic Auth | §1.2 | `base64(utf8(user + ":" + pwd))`，冒号分隔，UTF-8 |
 | URL 分类网段 | §5.1 | LAN: 10/8、172.16/12、192.168/16、169.254/16；Tailscale: 100.64.0.0/10 |
 | connect-uri golden vector | ConnectURITests | 跨 Rust/TS/iOS 字节相等；**错误信息文案也是契约**，改动需三端同步 |
-| JSON 省略 nil | Clipboard §3.1 | `hash`/`dataName`/`size` 为 nil 时**整字段省略**，不写 `null` |
+| JSON 省略 nil | Clipboard §3.1 | `hash`/`dataName`/`size` 为 nil 时 **整字段省略**，不写 `null` |
 
 ---
 
@@ -77,7 +77,7 @@
 - **状态机**：`.idle/.succeeded`、`.hasNewUnwritten`（server 有新内容但 auto-apply 关）、`.offlineRetrying`、`.authFailed`、`.loopDetected`
 - **tick 频率**：前台 1.0 Hz；inactive（控制中心/来电）5.0s；后台暂停；离线指数退避 5s→60s + ±20% jitter；历史同步节流 30s
 - **每 tick 逻辑**：① 剪贴板观测（auto-push 开=读内容可能弹窗，关=仅读 changeCount 免提示）② GET §2.1（404=空，继续 push）③ server-wins 冲突（hash != lastSynced 时：auto-apply 开→取字节验 §4.4 hash 写入；关→暂存进 `.hasNewUnwritten`）④ push §2.2（仅当 server hash==synced 且 device hash 新）⑤ 历史 §2.7（detached、节流、冷启仅取 page 1 播种 watermark，增量用 `modifiedAfter`）
-- **网络变更**：取消在途请求 → 清退避+清 `lastAppliedContentHash` → nil liveURL → reconcile 有效 server（Wi-Fi 自动切换）→ 重新 probe
+- **网络变更**：取消在途请求 → 清退避 + 清 `lastAppliedContentHash` → nil liveURL → reconcile 有效 server（Wi-Fi 自动切换）→ 重新 probe
 - **去重守卫**：`lastSyncedContentHash`（防重复 pull）、`lastAppliedContentHash`（防刚写入内容被 push）、history 同 hash 去重并升级 direction
 - **网络 epoch**：路径变更自增；probe 结论仅在 epoch 未变时有效，否则整体丢弃
 - **loop guard**：同 hash apply/push 翻转 ≥3 次（30s 窗口）→ trip → `.loopDetected` → 用户确认 banner 后清空恢复
@@ -125,19 +125,19 @@
 ## 8. 扩展与系统集成（留原生壳，逻辑共享）
 
 ### 键盘扩展
-门控 `.ok/.needsFullAccess/.noServer`；上行（读 pasteboard→上传，watermark 先写）+ 下行（GET 最新→入历史）；卡片 text/link/image（文件/group 过滤）；图片走 ImageIO 缩略图（~48MB 预算）；文本卡 insertText 直插，图片卡复制到 pasteboard 提示长按粘贴；changeCount ~1.2s 轮询；NWPathMonitor 自动切换；行内服务器切换；空格/回车（按 returnKeyType 变标签）/退格 hold 重复/地球键；声音+触感（受设置门控）；**需 Full Access**（RequestsOpenAccess）。
+门控 `.ok/.needsFullAccess/.noServer`；上行（读 pasteboard→上传，watermark 先写）+ 下行（GET 最新→入历史）；卡片 text/link/image（文件/group 过滤）；图片走 ImageIO 缩略图（~48MB 预算）；文本卡 insertText 直插，图片卡复制到 pasteboard 提示长按粘贴；changeCount ~1.2s 轮询；NWPathMonitor 自动切换；行内服务器切换；空格/回车（按 returnKeyType 变标签）/退格 hold 重复/地球键；声音 + 触感（受设置门控）；**需 Full Access**（RequestsOpenAccess）。
 
 ### 分享扩展
 接受 URL/文本/图片/文件（优先级 url>text>image>file）；上传序 §3.5（先 PUT 文件后 metadata，watermark 在中间）；>1 server 显示 picker；Sharing Suggestions tile（INSendMessageIntent recipient=server.id）pre-fill 直达上传；捐赠 + 写历史。
 
 ### App Intents / Shortcuts
-`SendClipboardIntent`（server?/text?/file? 参数，优先级 file>text>pasteboard，openAppWhenRun=false，捐赠）；`ReceiveClipboardIntent`（server?/copyToDevice 默认 true，hash 校验，仅 copyToDevice 时写 watermark）；`ServerEntity`/`ServerEntityQuery`（App Group 读 + §5.3 解析）；`UniClipboardAppShortcuts`（Siri 短语，自动注册）。Siri 短语含中英文，必须带 `.applicationName` 占位。
+`SendClipboardIntent`（server?/text?/file? 参数，优先级 file>text>pasteboard，openAppWhenRun=false，捐赠）；`ReceiveClipboardIntent`（server?/copyToDevice 默认 true，hash 校验，仅 copyToDevice 时写 watermark）；`ServerEntity`/`ServerEntityQuery`（App Group 读 + §5.3 解析）；`ClipboardAppShortcuts`（Siri 短语，自动注册）。Siri 短语含中英文，必须带 `.applicationName` 占位。
 
 ### 主屏快捷操作
 `ShortcutAction{push, pull}`（raw value 稳定不可改）；`ShortcutInbox` 单例桥接；`AppDelegate` 冷启/运行时两条路径 → ContentView 排空 → `runShortcut`（走原生 push/pull，不复用 Intent 路径）。
 
 ### App Group 共享容器
-suite `group.app.uniclipboard.UniClipboard`。UserDefaults：serverConfigList、appSettings、keyboardExtensionEnabled/FullAccess、lastSyncedChangeCount、appearanceMode、keyboard 反馈偏好、keyboard_history_v1。文件（原子写跨进程）：`last_synced_hash`、`last_known_ssid`、`live_urls`。PayloadCache：`ImageData/<hash>.dat`、`payloads/`（200MB LRU）。
+suite `group.app.clipboard.Clipboard`。UserDefaults：serverConfigList、appSettings、keyboardExtensionEnabled/FullAccess、lastSyncedChangeCount、appearanceMode、keyboard 反馈偏好、keyboard_history_v1。文件（原子写跨进程）：`last_synced_hash`、`last_known_ssid`、`live_urls`。PayloadCache：`ImageData/<hash>.dat`、`payloads/`（200MB LRU）。
 
 ---
 
@@ -153,7 +153,7 @@ suite `group.app.uniclipboard.UniClipboard`。UserDefaults：serverConfigList、
 
 ## 9b. 桌面端 Rust 复用评估（2026-06-12 核对）
 
-> 关键认知：daemon 是 SyncClipboard 协议**服务端**，手机是**客户端**。可复用的是「双方共享的纯逻辑」，不是服务端 handler。可复用代码现都在 `crates/uc-application/src/usecases/mobile_sync/`（**但该 crate 背着 uc-core+uc-infra 重依赖，复用前需抽到叶子 crate**）。
+> 关键认知：daemon 是 SyncClipboard 协议 **服务端**，手机是 **客户端**。可复用的是「双方共享的纯逻辑」，不是服务端 handler。可复用代码现都在 `crates/uc-application/src/usecases/mobile_sync/`（**但该 crate 背着 uc-core+uc-infra 重依赖，复用前需抽到叶子 crate**）。
 
 | 能力 | 现有 Rust | 复用判定 | 位置 |
 |---|---|---|---|
@@ -168,11 +168,11 @@ suite `group.app.uniclipboard.UniClipboard`。UserDefaults：serverConfigList、
 
 ### 🔴 会改变此前判断的发现：mobile-sync 是明文（HTTP Basic Auth，TLS 可选）
 
-之前我把「字节级一致的 AEAD 加密」当作共享 Rust 的最强理由——**对 mobile-sync 阶段不成立**。mobile-sync 协议**没有应用层加密**：内容以明文走 HTTP，仅靠 Basic Auth 认证设备身份，传输加密交给部署层 TLS。`uc-infra/security` 的 XChaCha20/MasterKey 只服务 P2P 与本地 blob，**不在 mobile-sync 链路上**。
+之前我把「字节级一致的 AEAD 加密」当作共享 Rust 的最强理由——**对 mobile-sync 阶段不成立**。mobile-sync 协议 **没有应用层加密**：内容以明文走 HTTP，仅靠 Basic Auth 认证设备身份，传输加密交给部署层 TLS。`uc-infra/security` 的 XChaCha20/MasterKey 只服务 P2P 与本地 blob，**不在 mobile-sync 链路上**。
 
 含义：
 - **mobile-sync 试水的共享价值落在 connect-uri + DTO + hash + LAN 分类**——这些 Rust **已经写好且有 golden vector**，复用是实打实的（不必从零）。
-- **「加密字节兼容」这个最强理由要留到 P2P 阶段**才兑现（届时 AEAD/MasterKey 必须三端一致，且 iroh 是 Rust-only）。这进一步印证：试水的真正目的是铺 FFI 管道，而非省 mobile-sync 这点代码。
+- **「加密字节兼容」这个最强理由要留到 P2P 阶段** 才兑现（届时 AEAD/MasterKey 必须三端一致，且 iroh 是 Rust-only）。这进一步印证：试水的真正目的是铺 FFI 管道，而非省 mobile-sync 这点代码。
 - 别在 mobile-sync 阶段引入加密栈——会无谓拖重 mobile crate。
 
 ### 复用的现实约束
@@ -184,7 +184,7 @@ suite `group.app.uniclipboard.UniClipboard`。UserDefaults：serverConfigList、
 
 1. **核对 `autoApplyServerChanges` 默认值**（调研报告 true/false 冲突）——读源码定死。
 2. **加密/线格式必须用真实桌面 daemon 跑端到端**，单测自洽不够（字节兼容是 #1 回归风险）。
-3. **`isDelete`/`isDeleted` 命名陷阱**封装成 helper，防调用点写错。
+3. **`isDelete`/`isDeleted` 命名陷阱** 封装成 helper，防调用点写错。
 4. **PayloadCache/SettingsStore 的文件 I/O 边界**：逻辑进 Rust，读写经平台桥（App Group 容器路径由原生注入）。
 5. **golden vector 测试**（connect-uri、multipart、hash）作为跨语言契约移植进 Rust 测试。
-6. 把本清单逐条转成**可勾选验收表**（见各模块 + §8 扩展 checklist），替换后全绿才算无回归。
+6. 把本清单逐条转成 **可勾选验收表**（见各模块 + §8 扩展 checklist），替换后全绿才算无回归。

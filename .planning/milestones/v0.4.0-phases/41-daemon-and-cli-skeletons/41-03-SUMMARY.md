@@ -11,7 +11,7 @@ requires:
   - phase: 40-uc-bootstrap-crate
     provides: build_cli_context, build_non_gui_runtime, get_storage_paths
 provides:
-  - uniclipboard-cli binary with status, devices, space-status subcommands
+  - clipboard-cli binary with status, devices, space-status subcommands
   - CLI exit code conventions (0 success, 1 error, 5 daemon unreachable)
   - JSON and human-readable output formatting module
   - CLI smoke test suite
@@ -53,7 +53,7 @@ completed: 2026-03-18
 
 # Phase 41 Plan 03: CLI Binary Summary
 
-**uniclipboard-cli binary with clap parsing, dual-dispatch commands (daemon RPC + direct bootstrap), --json output, and stable exit codes**
+**clipboard-cli binary with clap parsing, dual-dispatch commands (daemon RPC + direct bootstrap), --json output, and stable exit codes**
 
 ## Performance
 
@@ -65,7 +65,7 @@ completed: 2026-03-18
 
 ## Accomplishments
 
-- Created uc-cli crate with uniclipboard-cli binary entry point using clap derive macros
+- Created uc-cli crate with clipboard-cli binary entry point using clap derive macros
 - Implemented status command with Unix socket RPC (exit code 5 when daemon unreachable)
 - Implemented devices and space-status commands via direct bootstrap (no daemon required)
 - Added JSON/human-readable output formatting with --json global flag

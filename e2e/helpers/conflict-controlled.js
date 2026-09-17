@@ -336,7 +336,7 @@ export async function controlledCases(instance, conn, run) {
     for (const theme of ['light', 'dark']) {
       await request(conn, '/settings', 'PUT', { general: { language, theme } })
       await instance.execute(
-        language => localStorage.setItem('uniclipboard.language', language),
+        language => localStorage.setItem('clipboard.language', language),
         language
       )
       await instance.execute(() => {
@@ -584,10 +584,8 @@ export async function nativeKeyboardCase(instance, conn, run) {
     document.querySelector('[role="radio"]').focus()
   })
   await screenshot(instance, run, 'U06-native-before')
-  const pids = execFileSync('pgrep', ['-x', 'uniclipboard'], { encoding: 'utf8' })
-    .trim()
-    .split(/\s+/)
-  const logPrefix = `n${join(homedir(), 'Library/Logs', `app.uniclipboard.desktop-${conn.profile}`)}/`
+  const pids = execFileSync('pgrep', ['-x', 'clipboard'], { encoding: 'utf8' }).trim().split(/\s+/)
+  const logPrefix = `n${join(homedir(), 'Library/Logs', `app.clipboard.desktop-${conn.profile}`)}/`
   const owners = pids.filter(pid =>
     execFileSync('lsof', ['-p', pid, '-Fn'], { encoding: 'utf8' })
       .split('\n')
@@ -597,7 +595,7 @@ export async function nativeKeyboardCase(instance, conn, run) {
   const pid = Number(owners[0])
   assert.equal(
     execFileSync('ps', ['-p', String(pid), '-o', 'command='], { encoding: 'utf8' }).trim(),
-    resolve('target/debug/uniclipboard')
+    resolve('target/debug/clipboard')
   )
   const keysToOS = codes => {
     assertNativeKeyboardAvailable()

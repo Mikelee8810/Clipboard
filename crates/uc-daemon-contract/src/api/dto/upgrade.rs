@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 /// Discriminated union mirroring `uc_application::facade::UpgradeStatus`.
 ///
 /// Wire encoding uses `kind` discriminator with snake_case variants to
-/// keep parity with the CLI JSON output produced by `uniclip upgrade
+/// keep parity with the CLI JSON output produced by `clip upgrade
 /// status --json`.
 ///
 /// 防御性补丁(issue #606 followup):同时声明 `rename_all_fields`,

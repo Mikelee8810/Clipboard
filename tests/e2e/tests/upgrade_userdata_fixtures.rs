@@ -25,17 +25,17 @@ fn tracked_v0191_fixture_validates_and_extracts_without_runtime_files() {
         .unwrap();
 
     for required in [
-        "uniclipboard.db",
+        "clipboard.db",
         "vault/.setup_status",
         "vault/keyslot.json",
         "vault/device_id.txt",
     ] {
         assert!(data.join(required).is_file(), "missing {required}");
     }
-    let database_size = std::fs::metadata(data.join("uniclipboard.db"))
+    let database_size = std::fs::metadata(data.join("clipboard.db"))
         .unwrap()
         .len();
-    let wal_size = std::fs::metadata(data.join("uniclipboard.db-wal"))
+    let wal_size = std::fs::metadata(data.join("clipboard.db-wal"))
         .map(|metadata| metadata.len())
         .unwrap_or(0);
     assert!(
@@ -58,11 +58,11 @@ fn tracked_v0191_fixture_validates_and_extracts_without_runtime_files() {
         "daemon.conn",
         ".daemon-token",
         ".daemon-pid",
-        ".uniclipd.lock",
+        ".clipd.lock",
         "daemon-run.json",
         "daemon-last-exit.json",
         "e2e-daemon-process.log",
-        "uniclipboard.db-shm",
+        "clipboard.db-shm",
     ] {
         assert!(
             !data.join(forbidden).exists(),
@@ -117,11 +117,11 @@ fn selected_breaking_release_fixtures_validate_and_extract() {
             "daemon.conn",
             ".daemon-token",
             ".daemon-pid",
-            ".uniclipd.lock",
+            ".clipd.lock",
             "daemon-run.json",
             "daemon-last-exit.json",
             "e2e-daemon-process.log",
-            "uniclipboard.db-shm",
+            "clipboard.db-shm",
         ] {
             assert!(
                 !data.join(forbidden).exists(),

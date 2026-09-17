@@ -1,6 +1,6 @@
 # Architecture Principles
 
-UniClipboard follows **Hexagonal Architecture** (also known as **Ports and Adapters**). This document explains the core principles and how they apply to our codebase.
+Clipboard follows **Hexagonal Architecture** (also known as **Ports and Adapters**). This document explains the core principles and how they apply to our codebase.
 
 ## What is Hexagonal Architecture?
 
@@ -253,11 +253,11 @@ Each crate has a specific responsibility:
 | `uc-infra`         | Infrastructure adapters            | `uc-core`                      | ❌ `uc-application`, biz logic  |
 | `uc-platform`      | Platform adapters                  | `uc-core`                      | ❌ `uc-application`, biz logic  |
 | `uc-bootstrap`     | Composition root (DI wiring)       | All core/app/infra/platform    | ❌ Business decisions           |
-| `uc-daemon`        | Daemon runtime + `uniclipd` binary | `uc-bootstrap` + webserver     | ❌ GUI frameworks               |
+| `uc-daemon`        | Daemon runtime + `clipd` binary | `uc-bootstrap` + webserver     | ❌ GUI frameworks               |
 | `uc-desktop`       | Desktop host logic                 | daemon-client/contract/process | ❌ Tauri/AppKit/egui            |
 | `uc-tauri`         | Tauri shell adapter                | `uc-desktop` + daemon-client   | ❌ `uc-application` directly    |
 | `uc-daemon-client` | HTTP/WS client to daemon           | contract + process             | ❌ iroh, diesel, sqlite         |
-| `uc-cli`           | CLI (`uniclip`)                    | daemon-client + contract       | ❌ iroh, diesel (in release)    |
+| `uc-cli`           | CLI (`clip`)                    | daemon-client + contract       | ❌ iroh, diesel (in release)    |
 
 See [Module Boundaries](module-boundaries.md) for detailed rules.
 

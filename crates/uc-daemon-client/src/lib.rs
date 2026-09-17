@@ -1,6 +1,6 @@
 //! # uc-daemon-client
 //!
-//! Daemon HTTP and WebSocket client for UniClipboard.
+//! Daemon HTTP and WebSocket client for Clipboard.
 //! Zero Tauri dependencies -- usable from any async context.
 
 use std::path::PathBuf;
@@ -30,8 +30,8 @@ pub use http_ws_service::HttpWsDaemonService;
 pub use service::{ControlLeaseGuard, DaemonService, FileExport};
 pub use ws_bridge::{BridgeState, DaemonWsBridge, DaemonWsBridgeConfig, DaemonWsBridgeError};
 
-const ENV_BASE_URL: &str = "UNICLIPBOARD_DAEMON_BASE_URL";
-const ENV_TOKEN_PATH: &str = "UNICLIPBOARD_DAEMON_TOKEN_PATH";
+const ENV_BASE_URL: &str = "CLIPBOARD_DAEMON_BASE_URL";
+const ENV_TOKEN_PATH: &str = "CLIPBOARD_DAEMON_TOKEN_PATH";
 
 /// Build an HTTP client dedicated to the local daemon transport.
 ///
@@ -58,7 +58,7 @@ fn build_local_http_client_from(
 /// This is the CLI equivalent of what the GUI gets from the daemon lifecycle manager.
 ///
 /// Resolution order (ADR-011):
-/// 1. Explicit `UNICLIPBOARD_DAEMON_BASE_URL` / `UNICLIPBOARD_DAEMON_TOKEN_PATH`
+/// 1. Explicit `CLIPBOARD_DAEMON_BASE_URL` / `CLIPBOARD_DAEMON_TOKEN_PATH`
 ///    overrides (CI / tests / manual runs) — unchanged legacy contract.
 /// 2. The `daemon.conn` connection file — the single source of truth for the
 ///    loopback address and bearer token of the running daemon. Missing file or
@@ -90,8 +90,8 @@ pub fn resolve_connection_info_from_env() -> Result<DaemonConnectionInfo> {
 
 /// Resolve connection info from explicit env overrides only.
 ///
-/// `UNICLIPBOARD_DAEMON_BASE_URL` pins the base URL; the bearer token comes
-/// from `UNICLIPBOARD_DAEMON_TOKEN_PATH` (a plain token file) when set, else
+/// `CLIPBOARD_DAEMON_BASE_URL` pins the base URL; the bearer token comes
+/// from `CLIPBOARD_DAEMON_TOKEN_PATH` (a plain token file) when set, else
 /// from the `daemon.conn` connection file. Kept for the CI/test contract that
 /// points at mock daemons.
 fn resolve_connection_info_env_only(

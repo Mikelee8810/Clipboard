@@ -181,9 +181,9 @@ jobs:
 
       - name: Check Rust workspace
         env:
-          # ADR-008 D13 added `externalBin: ["binaries/uniclipd"]` to
+          # ADR-008 D13 added `externalBin: ["binaries/clipd"]` to
           # tauri.conf.json, so `tauri_build::build()` hard-fails unless
-          # `src-tauri/binaries/uniclipd-<triple>` exists. Real bundles stage it
+          # `src-tauri/binaries/clipd-<triple>` exists. Real bundles stage it
           # via prepare-daemon-sidecar.mjs (build.yml / alpha-build.yml); this
           # `cargo check` neither bundles nor spawns the sidecar. Override the
           # config to drop the sidecar for this build (tauri-build merges
@@ -266,5 +266,5 @@ jobs:
 
       - name: Run E2E tests
         run: >-
-          UC_E2E_DEV_CLI="$GITHUB_WORKSPACE/target/e2e-dev/debug/uniclip"
+          UC_E2E_DEV_CLI="$GITHUB_WORKSPACE/target/e2e-dev/debug/clip"
           cargo test --manifest-path tests/e2e/Cargo.toml -- --ignored

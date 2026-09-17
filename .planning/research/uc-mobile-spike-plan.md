@@ -128,7 +128,7 @@ impl MobileSyncClient {
 ## 5. CI / 构建（B1–B2）
 
 - pin：uniffi 版本、NDK 版本、android API level、rust toolchain（现 1.95.0）——B1 前全部钉死，否则管道不可复现。
-- iOS：`cargo build` aarch64-apple-ios(+sim) → `xcodebuild -create-xcframework` → `UniClipboardCore.xcframework` + UniFFI Swift binding。
+- iOS：`cargo build` aarch64-apple-ios(+sim) → `xcodebuild -create-xcframework` → `ClipboardCore.xcframework` + UniFFI Swift binding。
 - Android（B2 可选延后）：cargo-ndk → `.so` + AAR + Kotlin binding。
 - 新增 CI：交叉编译 + binding 生成 + 体积报告（硬性体积预算 fail 条件）+ `cargo tree -i aws-lc-rs` 为空断言。
 - 先验证 ring 的 `aarch64-apple-ios` asm 构建通过，再谈下一步。

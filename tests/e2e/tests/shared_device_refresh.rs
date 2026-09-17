@@ -74,7 +74,7 @@ impl Node {
         node
     }
 
-    /// Stop the daemon via the CLI (`uniclip --json stop`).
+    /// Stop the daemon via the CLI (`clip --json stop`).
     async fn stop(&mut self) {
         let output = self.cli.run_capture(&["--json", "stop"]);
         let deadline = tokio::time::Instant::now() + Duration::from_secs(20);

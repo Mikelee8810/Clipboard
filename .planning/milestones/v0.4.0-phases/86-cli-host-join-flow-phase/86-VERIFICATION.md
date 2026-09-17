@@ -21,10 +21,10 @@ gaps:
     missing:
       - 'Integration tests for join flow cannot compile'
 human_verification:
-  - test: 'Manual end-to-end test of `uniclipboard setup pair` flow'
+  - test: 'Manual end-to-end test of `clipboard setup pair` flow'
     expected: 'Host sees WaitingJoinRequest spinner, receives join request, enters NeedDecision state, can accept/reject, transitions to NeedVerification, completes or cancels correctly'
     why_human: "Requires interactive terminal and daemon running"
-  - test: 'Manual end-to-end test of `uniclipboard setup join` flow'
+  - test: 'Manual end-to-end test of `clipboard setup join` flow'
     expected: 'Join flow starts, peer discovery works, passphrase entry works, confirmation works, completes or cancels correctly'
     why_human: "Requires interactive terminal and daemon running"
   - test: 'Debug log output for state changes'
@@ -101,8 +101,8 @@ human_verification:
 
 ### Human Verification Required
 
-1. **End-to-end `setup pair` flow test** - Run `uniclipboard setup pair` in interactive terminal with daemon running to verify host flow transitions work correctly
-2. **End-to-end `setup join` flow test** - Run `uniclipboard setup join` in interactive terminal to verify join flow transitions work correctly
+1. **End-to-end `setup pair` flow test** - Run `clipboard setup pair` in interactive terminal with daemon running to verify host flow transitions work correctly
+2. **End-to-end `setup join` flow test** - Run `clipboard setup join` in interactive terminal to verify join flow transitions work correctly
 3. **Debug log state change detection** - Run with `RUST_LOG=debug` to verify "host pairing state changed" / "join pairing state changed" messages appear only on actual state transitions, not every poll
 
 ### Gaps Summary

@@ -1,6 +1,6 @@
 # Project Overview
 
-**UniClipboard Desktop** is a privacy-first, cross-device clipboard synchronization tool. It combines a React/Tauri desktop UI with a modular Rust backend and daemon so devices can pair, sync clipboard content, and manage encrypted local history.
+**Clipboard Desktop** is a privacy-first, cross-device clipboard synchronization tool. It combines a React/Tauri desktop UI with a modular Rust backend and daemon so devices can pair, sync clipboard content, and manage encrypted local history.
 
 ## Technology Stack
 
@@ -18,7 +18,7 @@
 
 ## What It Does
 
-UniClipboard solves the problem of **clipboard fragmentation across devices**:
+Clipboard solves the problem of **clipboard fragmentation across devices**:
 
 - **Automatic Sync**: Copy on one device, paste on another
 - **Cross-Platform**: Works on macOS, Windows, and Linux
@@ -29,13 +29,13 @@ UniClipboard solves the problem of **clipboard fragmentation across devices**:
 
 ## System Architecture
 
-UniClipboard 采用 **六边形架构（Ports & Adapters）**，运行时分为三个独立进程：daemon（业务核心）、GUI（纯客户端壳）、CLI（轻量命令行客户端）。
+Clipboard 采用 **六边形架构（Ports & Adapters）**，运行时分为三个独立进程：daemon（业务核心）、GUI（纯客户端壳）、CLI（轻量命令行客户端）。
 
 ### 运行时拓扑
 
 ```
 ┌─────────────────────────────────────┐     ┌────────────────────┐
-│         GUI (Tauri + React)         │     │   CLI (uniclip)    │
+│         GUI (Tauri + React)         │     │   CLI (clip)    │
 │  - Quick Panel / Tray / Settings    │     │  - copy/paste/list │
 │  - 不打开 SQLite、不运行 iroh       │     │  - search/status   │
 └──────────────────┬──────────────────┘     └─────────┬──────────┘
@@ -43,7 +43,7 @@ UniClipboard 采用 **六边形架构（Ports & Adapters）**，运行时分为�
                    └──────────────────┬────────────────┘
                                       ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                    Daemon (uniclipd)                          │
+│                    Daemon (clipd)                          │
 │  uc-bootstrap 组装 → uc-application 编排 → uc-core 领域      │
 │  uc-infra (SQLite/iroh/crypto) + uc-platform (OS adapters)   │
 │  uc-webserver (axum HTTP/WS API)                             │
@@ -82,13 +82,13 @@ src-tauri/crates/
 ├── uc-daemon-process/    # 薄进程原语（PID, socket, spawn）
 ├── uc-daemon-local/      # 本地 daemon 元数据（auth token, 健康轮询）
 ├── uc-webserver/         # axum HTTP + WebSocket 服务端
-├── uc-daemon/            # Daemon 运行时库 + uniclipd 二进制
+├── uc-daemon/            # Daemon 运行时库 + clipd 二进制
 ├── uc-daemon-client/     # Daemon HTTP/WS 客户端（GUI + CLI 共用）
 # ── GUI 桌面层 ──
 ├── uc-desktop/           # 桌面宿主逻辑（GUI 框架无关）
 ├── uc-tauri/             # Tauri 壳适配（commands, tray, panel）
 # ── CLI ──
-├── uc-cli/               # uniclip 命令行工具
+├── uc-cli/               # clip 命令行工具
 ├── uc-cli-macros/        # CLI proc-macro 辅助
 # ── 测试/Spike ──
 └── p2p-bench/            # P2P 吞吐量基准（不发布）
@@ -140,7 +140,7 @@ Remote-origin events avoid re-capture loops via origin tracking
 
 - 16 crate 的六边形模块化架构已完成，生产代码运行在此之上
 - GUI 进程与 daemon 进程完全分离（ADR-008），GUI 是纯 HTTP/WS 客户端
-- CLI (`uniclip`) 同样通过 daemon client 与后台通信，不直接链接 iroh/diesel
+- CLI (`clip`) 同样通过 daemon client 与后台通信，不直接链接 iroh/diesel
 - 若文档与代码冲突，以代码为准并更新文档
 
 ## Development Setup
@@ -177,7 +177,7 @@ bun run tauri build
 ### Directory Navigation
 
 ```
-uniclipboard-desktop/
+clipboard-desktop/
 ├── src/                      # Frontend (React + TypeScript)
 │   ├── pages/               # Route pages (Dashboard, Devices, Settings)
 │   ├── components/          # Reusable UI components
@@ -264,7 +264,7 @@ Store ciphertext + metadata
 ### Key Management
 
 - **Password Storage**: System keyring (macOS Keychain, Windows Credential Manager, Linux Secret Service)
-- **Salt**: Stored in `~/.uniclipboard/salt` (unique per installation)
+- **Salt**: Stored in `~/.clipboard/salt` (unique per installation)
 - **Key Derivation**: Argon2id (memory-hard, resistant to GPU attacks)
 - **No Plaintext**: Clipboard content never stored unencrypted
 
@@ -288,7 +288,7 @@ Store ciphertext + metadata
 Large clipboard items (images, rich text) stored separately:
 
 - **Inline**: Text content < 10KB stored in database
-- **Blob**: Large content stored in `~/.uniclipboard/blobs/`
+- **Blob**: Large content stored in `~/.clipboard/blobs/`
 - **Reference**: Database stores blob hash (SHA-256)
 
 ### Network Optimization

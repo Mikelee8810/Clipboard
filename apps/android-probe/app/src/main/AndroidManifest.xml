@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="UniClipboard Engine Probe"
+        android:label="Clipboard Engine Probe"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
@@ -18,7 +18,7 @@
             android:name=".ProbeReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="app.uniclipboard.engineprobe.COMMAND" />
+                <action android:name="app.clipboard.engineprobe.COMMAND" />
             </intent-filter>
         </receiver>
         <service

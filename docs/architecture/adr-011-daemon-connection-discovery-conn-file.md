@@ -2,7 +2,7 @@
 
 - **状态**：Accepted（2026-08-11）
 - **日期**：2026-08-11
-- **相关文档**：[`adr-008-uniclipd-split-gui-as-client.md`](./adr-008-uniclipd-split-gui-as-client.md)（D4/D5/D13/D14/D22）、[`adr-008-review-2026-05-30.md`](./adr-008-review-2026-05-30.md)（C7 现状订正）、`docs/uat/direct-daemon-ws.md`、`docs/development/config.md`、`crates/uc-daemon-process/AGENTS.md`
+- **相关文档**：[`adr-008-clipd-split-gui-as-client.md`](./adr-008-clipd-split-gui-as-client.md)（D4/D5/D13/D14/D22）、[`adr-008-review-2026-05-30.md`](./adr-008-review-2026-05-30.md)（C7 现状订正）、`docs/uat/direct-daemon-ws.md`、`docs/development/config.md`、`crates/uc-daemon-process/AGENTS.md`
 
 ## 1. 决策
 

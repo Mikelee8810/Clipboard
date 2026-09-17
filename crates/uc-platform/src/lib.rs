@@ -1,6 +1,6 @@
 //! # uc-platform
 //!
-//! Platform-specific implementations for UniClipboard.
+//! Platform-specific implementations for Clipboard.
 //!
 //! This crate contains infrastructure implementations that interact with
 //! the operating system, external services, and hardware.

@@ -1,11 +1,11 @@
-export const appName = 'UniClipboard'
+export const appName = 'Clipboard'
 export const docsRoute = '/'
 export const docsImageRoute = '/og'
 export const docsContentRoute = '/llms.mdx'
 
 export const gitConfig = {
-  user: 'UniClipboard',
-  repo: 'UniClipboard',
+  user: 'Clipboard',
+  repo: 'Clipboard',
   branch: 'main',
 }
 

@@ -164,7 +164,7 @@ pub fn load_daemon_connection_info() -> Result<DaemonConnectionInfo, DaemonBoots
 
 /// GUI 进程启动时统一的"探测 → 连或拉"入口（双模 daemon 模型）。
 ///
-/// ADR-008 P3-3 (B2'-3): GUI 是外部 `uniclipd` 的纯客户端。不再有 in-process
+/// ADR-008 P3-3 (B2'-3): GUI 是外部 `clipd` 的纯客户端。不再有 in-process
 /// daemon —— 没有 daemon 时拉起的是一个 **detached 外部进程**
 /// ([`spawn_detached_daemon`])。
 ///
@@ -173,7 +173,7 @@ pub fn load_daemon_connection_info() -> Result<DaemonConnectionInfo, DaemonBoots
 /// 2. **Compatible** —— 已有外部 daemon（如 `cli start` 拉起的独立进程）
 ///    在跑且版本匹配，把 `ownership` 标记为 [`DaemonOwnership::set_external`]
 ///    并返回连接信息；
-/// 3. **Absent** —— 没有 daemon，detached spawn `uniclipd` 外部进程，等到
+/// 3. **Absent** —— 没有 daemon，detached spawn `clipd` 外部进程，等到
 ///    daemon 健康再返回连接信息；
 /// 4. **Incompatible** —— 版本/契约不匹配的 daemon。分两种方向（ADR-008 P4-7
 ///    OQ-downgrade-rollback）：
@@ -276,7 +276,7 @@ pub async fn bootstrap_daemon_in_process(
     load_daemon_connection_info()
 }
 
-/// Detached-spawn the external `uniclipd` binary, mark ownership `External`, then
+/// Detached-spawn the external `clipd` binary, mark ownership `External`, then
 /// poll `/health` until the daemon is reachable. The GUI does not own the
 /// spawned process's lifecycle: it survives GUI quit; only an explicit
 /// "full quit" stops it (ADR-008 D3 three-state, landed in P4-3).
@@ -422,7 +422,7 @@ fn terminate_incompatible_daemon_by_conn_file() -> Result<(), DaemonBootstrapErr
 /// ("彻底退出"), stop the connected daemon **regardless of who spawned it** — an
 /// explicit Quit means "shut everything down". Users who want the daemon to keep
 /// running have the dedicated 关窗 (hide) and 轻量模式 (lightweight) actions, so
-/// Quit is free to mean a thorough teardown — including a user's own `uniclip
+/// Quit is free to mean a thorough teardown — including a user's own `clip
 /// start` daemon. (This reverses the original D3 "only stop GUI-spawned" rule on
 /// the product owner's call; the three-state tray already covers "keep daemon".)
 ///
@@ -513,7 +513,7 @@ where
 /// [`stop_local_daemon_on_full_quit`], but returns `Err` when the daemon was
 /// identified as running yet could not be terminated (timeout / signal
 /// failure).  This lets the caller abort the install on Windows where the
-/// NSIS installer cannot overwrite a locked `uniclipd.exe`.
+/// NSIS installer cannot overwrite a locked `clipd.exe`.
 ///
 /// Safe no-ops (no PID file, stale PID, InProcess legacy) return
 /// `Ok(false)`.  Successful termination returns `Ok(true)`.  Unreadable
@@ -1046,7 +1046,7 @@ mod tests {
     #[test]
     fn full_quit_stops_any_live_standalone_daemon_regardless_of_origin() {
         // Revised D3: explicit Quit kills the daemon no matter who spawned it —
-        // GUI-spawned, `uniclip start`, or a manually-run uniclipd.
+        // GUI-spawned, `clip start`, or a manually-run clipd.
         use uc_daemon_process::process_metadata::PidVerification;
         for origin in [
             DaemonSpawnOrigin::Gui,

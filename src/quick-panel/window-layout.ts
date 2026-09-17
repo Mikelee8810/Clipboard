@@ -3,7 +3,7 @@ import { createLogger } from '@/lib/logger'
 import { detectPlatformInfo } from '@/lib/platform'
 import { adjustUiScale, readStoredUiScale } from '@/lib/ui-scale'
 
-const STORAGE_KEY = 'uniclipboard.quickPanel.windowScale'
+const STORAGE_KEY = 'clipboard.quickPanel.windowScale'
 const MIN_WINDOW_SCALE = 0.8
 const MAX_WINDOW_SCALE = 1.5
 const WINDOW_SCALE_STEP = 0.1

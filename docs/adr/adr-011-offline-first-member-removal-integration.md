@@ -2,7 +2,7 @@
 
 - **状态**：已实施
 - **日期**：2026-08-11
-- **上游**：UniClipboard/Engine PR #24，固定提交 `983fb2562f55fca3838a927f7831ae51eaadf885`
+- **上游**：Clipboard/Engine PR #24，固定提交 `983fb2562f55fca3838a927f7831ae51eaadf885`
 
 ## 背景
 

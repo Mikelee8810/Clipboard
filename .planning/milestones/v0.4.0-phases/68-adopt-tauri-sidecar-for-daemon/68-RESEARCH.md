@@ -11,10 +11,10 @@
 ### Locked Decisions
 
 - **D-01:** Use Tauri `externalBin` in `tauri.conf.json` to declare daemon as a sidecar binary. Tauri handles platform-specific target-triple naming and inclusion in app bundle.
-- **D-02:** Binary naming follows Tauri sidecar convention: `uniclipboard-daemon-{target-triple}` (e.g., `uniclipboard-daemon-aarch64-apple-darwin`).
-- **D-03:** Replace `std::process::Command` in `run.rs` with Tauri sidecar API (`app.shell().sidecar("uniclipboard-daemon")`). Delete custom `resolve_daemon_binary_path()` and `daemon_binary_name()` functions.
+- **D-02:** Binary naming follows Tauri sidecar convention: `clipboard-daemon-{target-triple}` (e.g., `clipboard-daemon-aarch64-apple-darwin`).
+- **D-03:** Replace `std::process::Command` in `run.rs` with Tauri sidecar API (`app.shell().sidecar("clipboard-daemon")`). Delete custom `resolve_daemon_binary_path()` and `daemon_binary_name()` functions.
 - **D-04:** Pass `--gui-managed` argument via sidecar `.args()`.
-- **D-05:** Use `build.rs` in uc-tauri to copy the compiled daemon binary from `target/{profile}/uniclipboard-daemon` to `src-tauri/binaries/uniclipboard-daemon-{target-triple}` after build. Tauri's workspace cargo build already compiles all workspace members including uc-daemon.
+- **D-05:** Use `build.rs` in uc-tauri to copy the compiled daemon binary from `target/{profile}/clipboard-daemon` to `src-tauri/binaries/clipboard-daemon-{target-triple}` after build. Tauri's workspace cargo build already compiles all workspace members including uc-daemon.
 - **D-06:** Migrate existing stdin pipe tether (GUI-managed daemon shutdown) to sidecar `CommandChild` stdin. The sidecar API supports `.write(bytes)` for async stdin communication. Daemon-side stdin monitoring logic (`--gui-managed` mode) remains unchanged.
 - **D-07:** CLI (`uc-cli`) path resolution stays as-is in this phase.
 
@@ -26,7 +26,7 @@
 
 ### Deferred Ideas (OUT OF SCOPE)
 
-- Unified CLI distribution via Homebrew — single `uniclipboard` command, daemon binary bundled inside.
+- Unified CLI distribution via Homebrew — single `clipboard` command, daemon binary bundled inside.
 - CLI daemon path resolution unification — extract shared resolve module to uc-daemon-client when CLI distribution is addressed.
   </user_constraints>
 
@@ -36,11 +36,11 @@
 
 Phase 68 migrates the daemon launch mechanism from manual `std::process::Command` with custom path resolution to Tauri's first-class sidecar API (`tauri-plugin-shell`). This gives Tauri ownership of binary path resolution, cross-platform bundling, and macOS code signing of the daemon binary.
 
-The implementation has three sub-problems: (1) declare the binary in `tauri.conf.json` as `externalBin`, (2) create a `build.rs` in `uc-tauri` that copies the compiled daemon into `src-tauri/binaries/` with the correct target-triple suffix so both dev and CI builds work, and (3) replace `spawn_daemon_process()` with `app.shell().sidecar("uniclipboard-daemon")` and adapt the `GuiOwnedDaemonState` to hold a `CommandChild` instead of `std::process::Child`.
+The implementation has three sub-problems: (1) declare the binary in `tauri.conf.json` as `externalBin`, (2) create a `build.rs` in `uc-tauri` that copies the compiled daemon into `src-tauri/binaries/` with the correct target-triple suffix so both dev and CI builds work, and (3) replace `spawn_daemon_process()` with `app.shell().sidecar("clipboard-daemon")` and adapt the `GuiOwnedDaemonState` to hold a `CommandChild` instead of `std::process::Child`.
 
 The supervision loop (`supervise_daemon`) already uses an HTTP health-probe model (not `child.try_wait()`), so it does not fundamentally depend on the child process handle type. The main adaptation is holding the `CommandChild` for stdin writes (the `--gui-managed` tether) and for exit cleanup at app shutdown.
 
-**Primary recommendation:** Add `tauri-plugin-shell = "2"` to both workspace `Cargo.toml` and `uniclipboard/Cargo.toml`; write a minimal `build.rs` in `uc-tauri` that reads `TAURI_ENV_TARGET_TRIPLE` (injected by Tauri CLI) or falls back to `CARGO_CFG_TARGET_ARCH`/`CARGO_CFG_TARGET_OS`; replace the spawn path in `run.rs`; update `GuiOwnedDaemonState` to hold `CommandChild`; add shell capability permission.
+**Primary recommendation:** Add `tauri-plugin-shell = "2"` to both workspace `Cargo.toml` and `clipboard/Cargo.toml`; write a minimal `build.rs` in `uc-tauri` that reads `TAURI_ENV_TARGET_TRIPLE` (injected by Tauri CLI) or falls back to `CARGO_CFG_TARGET_ARCH`/`CARGO_CFG_TARGET_OS`; replace the spawn path in `run.rs`; update `GuiOwnedDaemonState` to hold `CommandChild`; add shell capability permission.
 
 ---
 
@@ -58,7 +58,7 @@ The supervision loop (`supervise_daemon`) already uses an HTTP health-probe mode
 **Installation:**
 
 ```bash
-# In src-tauri/Cargo.toml (main uniclipboard binary) and workspace Cargo.toml
+# In src-tauri/Cargo.toml (main clipboard binary) and workspace Cargo.toml
 tauri-plugin-shell = "2"
 
 # In src-tauri/crates/uc-tauri/Cargo.toml (where shell API is used)
@@ -74,7 +74,7 @@ tauri-plugin-shell = "2"
 ```
 src-tauri/
 ├── binaries/                          # Sidecar staging directory (NEW)
-│   └── uniclipboard-daemon-{triple}   # Created by build.rs, .gitignored
+│   └── clipboard-daemon-{triple}   # Created by build.rs, .gitignored
 ├── tauri.conf.json                    # Add bundle.externalBin
 ├── build.rs                           # Existing: only calls tauri_build::build()
 │                                      # (No changes needed here — daemon copy
@@ -93,12 +93,12 @@ src-tauri/
 // src-tauri/tauri.conf.json
 {
   "bundle": {
-    "externalBin": ["binaries/uniclipboard-daemon"]
+    "externalBin": ["binaries/clipboard-daemon"]
   }
 }
 ```
 
-The path `"binaries/uniclipboard-daemon"` is relative to `src-tauri/`. Tauri appends the target-triple suffix automatically — it expects to find `src-tauri/binaries/uniclipboard-daemon-{triple}` (or `.exe` on Windows).
+The path `"binaries/clipboard-daemon"` is relative to `src-tauri/`. Tauri appends the target-triple suffix automatically — it expects to find `src-tauri/binaries/clipboard-daemon-{triple}` (or `.exe` on Windows).
 
 ### Pattern 2: build.rs Binary Copy (TAURI_ENV_TARGET_TRIPLE)
 
@@ -127,7 +127,7 @@ fn main() {
         .find(|p| p.ends_with(&profile))
         .unwrap_or_else(|| &out_dir);
 
-    let daemon_src = target_dir.join("uniclipboard-daemon");
+    let daemon_src = target_dir.join("clipboard-daemon");
     #[cfg(target_os = "windows")]
     let daemon_src = daemon_src.with_extension("exe");
 
@@ -142,7 +142,7 @@ fn main() {
     std::fs::create_dir_all(&binaries_dir).expect("failed to create binaries dir");
 
     let binary_ext = if cfg!(target_os = "windows") { ".exe" } else { "" };
-    let dest_name = format!("uniclipboard-daemon-{}{}", target_triple, binary_ext);
+    let dest_name = format!("clipboard-daemon-{}{}", target_triple, binary_ext);
     let dest = binaries_dir.join(&dest_name);
 
     if daemon_src.exists() {
@@ -190,7 +190,7 @@ fn spawn_daemon_process<R: tauri::Runtime>(
 ) -> Result<CommandChild, DaemonBootstrapError> {
     let (mut rx, child) = app
         .shell()
-        .sidecar("uniclipboard-daemon")
+        .sidecar("clipboard-daemon")
         .map_err(|e| DaemonBootstrapError::Spawn(anyhow::Error::new(e)))?
         .args(["--gui-managed"])
         .spawn()
@@ -239,7 +239,7 @@ The daemon's existing stdin monitoring code (`--gui-managed` mode) remains uncha
   "identifier": "shell:allow-spawn",
   "allow": [
     {
-      "name": "binaries/uniclipboard-daemon",
+      "name": "binaries/clipboard-daemon",
       "sidecar": true,
       "args": ["--gui-managed"]
     }
@@ -251,7 +251,7 @@ Note: `shell:allow-spawn` (not `shell:allow-execute`) is required for long-runni
 
 ### Anti-Patterns to Avoid
 
-- **Using the full path in `sidecar()`:** Call `sidecar("uniclipboard-daemon")` not `sidecar("binaries/uniclipboard-daemon")`. Tauri resolves the path internally from `externalBin` config.
+- **Using the full path in `sidecar()`:** Call `sidecar("clipboard-daemon")` not `sidecar("binaries/clipboard-daemon")`. Tauri resolves the path internally from `externalBin` config.
 - **Hardcoding target triple in `build.rs`:** Always read `TAURI_ENV_TARGET_TRIPLE` first; CFG vars are fallback only.
 - **Calling `child.id()` on `CommandChild`:** `CommandChild` does not expose a PID accessor like `std::process::Child`. PID tracking in `GuiOwnedDaemonState` must change to store `CommandChild` directly (or obtain PID via other means if needed for termination).
 - **Holding rx without draining:** The sidecar command's `rx` receiver must be consumed or drained. If rx is not polled, the sidecar's stdout buffer will block.
@@ -303,7 +303,7 @@ The `shutdown_owned_daemon()` function in `daemon_lifecycle.rs` currently uses `
 
 ### Pitfall 1: build.rs in wrong crate
 
-**What goes wrong:** Placing the daemon copy logic in `src-tauri/build.rs` (the main `uniclipboard` crate) instead of `src-tauri/crates/uc-tauri/build.rs`.
+**What goes wrong:** Placing the daemon copy logic in `src-tauri/build.rs` (the main `clipboard` crate) instead of `src-tauri/crates/uc-tauri/build.rs`.
 **Why it happens:** The existing `src-tauri/build.rs` only calls `tauri_build::build()` — it is the canonical place. The context decision says to put the copy in `uc-tauri/build.rs`.
 **How to avoid:** Create `src-tauri/crates/uc-tauri/build.rs` as a new file. The main `src-tauri/build.rs` remains unchanged (only `tauri_build::build()`).
 **Warning signs:** Copy logic in `src-tauri/build.rs` will run before `tauri_build::build()` has set up paths, causing issues.
@@ -374,7 +374,7 @@ fn spawn_daemon_process<R: tauri::Runtime>(
 ) -> Result<CommandChild, DaemonBootstrapError> {
     let (rx, child) = app
         .shell()
-        .sidecar("uniclipboard-daemon")
+        .sidecar("clipboard-daemon")
         .map_err(|e| DaemonBootstrapError::Spawn(anyhow::Error::msg(format!("sidecar create: {e}"))))?
         .args(["--gui-managed"])
         .spawn()
@@ -412,7 +412,7 @@ fn spawn_daemon_process<R: tauri::Runtime>(
   "identifier": "shell:allow-spawn",
   "allow": [
     {
-      "name": "binaries/uniclipboard-daemon",
+      "name": "binaries/clipboard-daemon",
       "sidecar": true,
       "args": ["--gui-managed"]
     }
@@ -428,7 +428,7 @@ fn spawn_daemon_process<R: tauri::Runtime>(
     "active": true,
     "targets": "all",
     "externalBin": [
-      "binaries/uniclipboard-daemon"
+      "binaries/clipboard-daemon"
     ],
     ...
   }
@@ -461,20 +461,20 @@ fn copy_daemon_binary_to_binaries() {
         std::env::var("CARGO_MANIFEST_DIR").unwrap()
     );
 
-    // From src-tauri/target/{profile}/uniclipboard-daemon
+    // From src-tauri/target/{profile}/clipboard-daemon
     let target_dir = manifest_dir.join("target").join(&profile);
     let binary_name = if cfg!(target_os = "windows") {
-        "uniclipboard-daemon.exe"
+        "clipboard-daemon.exe"
     } else {
-        "uniclipboard-daemon"
+        "clipboard-daemon"
     };
     let src = target_dir.join(binary_name);
 
-    // To src-tauri/binaries/uniclipboard-daemon-{triple}[.exe]
+    // To src-tauri/binaries/clipboard-daemon-{triple}[.exe]
     let binaries_dir = manifest_dir.join("binaries");
     let _ = std::fs::create_dir_all(&binaries_dir);
     let ext = if cfg!(target_os = "windows") { ".exe" } else { "" };
-    let dest_name = format!("uniclipboard-daemon-{}{}", target_triple, ext);
+    let dest_name = format!("clipboard-daemon-{}{}", target_triple, ext);
     let dest = binaries_dir.join(&dest_name);
 
     if src.exists() {

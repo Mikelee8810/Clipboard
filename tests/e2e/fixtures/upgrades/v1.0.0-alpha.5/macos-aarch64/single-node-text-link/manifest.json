@@ -9,12 +9,12 @@
   "archiveSha256": "eae5965439a0a6fdfe7c78bd2930d0e07a595c4b0304353552a75d167f08449c",
   "files": [
     {
-      "path": "data/uniclipboard.db",
+      "path": "data/clipboard.db",
       "size": 868352,
       "sha256": "ed418cde38a1d4789d8155d66a27a19cca05c37af16f31c3143ea14a0a2f8a0d"
     },
     {
-      "path": "data/uniclipboard.db-wal",
+      "path": "data/clipboard.db-wal",
       "size": 350232,
       "sha256": "a068ea05f0dfecef2f448b063e170c8b6ff3ad146347c26494856ce2a005980b"
     },

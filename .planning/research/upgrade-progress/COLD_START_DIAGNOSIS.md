@@ -10,7 +10,7 @@
 
 ## 证据来源
 
-- 用户分享的 `uniclipboard-diagnostics-20260910-033108.zip` 已下载并解压分析。
+- 用户分享的 `clipboard-diagnostics-20260910-033108.zip` 已下载并解压分析。
 - 导出时间 `2026-09-10T03:31:08.585828300Z`，Windows，包含两天 daemon/gui 日志。
 - 原日志和分享密钥不进入仓库。分析使用文件内 UTC 时间，不使用 ZIP 中的 1980 年时间戳。
 - 代码对照：已交付测试包 Desktop `361c3718b`、Engine `e01893df`。

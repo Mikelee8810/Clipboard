@@ -248,7 +248,7 @@ async fn list_entries(
     static DEPRECATION_WARNED: std::sync::Once = std::sync::Once::new();
     DEPRECATION_WARNED.call_once(|| {
         tracing::warn!(
-            target: "uniclipboard.deprecation",
+            target: "clipboard.deprecation",
             endpoint = "GET /clipboard/entries",
             replacement = "GET /search/query",
             "deprecated clipboard list endpoint is in use; migrate callers to the unified search endpoint"

@@ -6,7 +6,7 @@ import path from 'node:path'
 
 const profile = process.argv[2]
 if (!profile?.startsWith('dev-upgrade-')) throw new Error('Expected isolated upgrade profile')
-const root = path.join(os.homedir(), 'Library/Application Support', `app.uniclipboard.desktop-${profile}`)
+const root = path.join(os.homedir(), 'Library/Application Support', `app.clipboard.desktop-${profile}`)
 const output = path.resolve('tests/e2e/fixtures/upgrades/v1.0.0-alpha.5/macos-aarch64/single-node-text-link')
 const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'alpha5-baseline-'))
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
@@ -32,7 +32,7 @@ function collect(relative) {
   fs.writeFileSync(target, bytes, { mode: 0o600 })
   files.push({ path: `data/${relative}`, size: bytes.length, sha256: hash(bytes) })
 }
-for (const item of ['uniclipboard.db', 'uniclipboard.db-wal', 'settings.json', 'upgrade-cursor.json', 'vault/.setup_status', 'vault/keyslot.json', 'vault/device_id.txt', 'keyring', 'iroh-identity', 'iroh-blobs']) collect(item)
+for (const item of ['clipboard.db', 'clipboard.db-wal', 'settings.json', 'upgrade-cursor.json', 'vault/.setup_status', 'vault/keyslot.json', 'vault/device_id.txt', 'keyring', 'iroh-identity', 'iroh-blobs']) collect(item)
 fs.mkdirSync(output, { recursive: true })
 execFileSync('tar', ['-czf', path.join(output, 'userdata.tar.gz'), '-C', stage, 'data'])
 const archive = fs.readFileSync(path.join(output, 'userdata.tar.gz'))

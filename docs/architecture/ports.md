@@ -1,4 +1,4 @@
-# UniClipboard Port Definition Specification
+# Clipboard Port Definition Specification
 
 ## 1. Scope
 

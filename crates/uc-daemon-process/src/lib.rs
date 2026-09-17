@@ -1,6 +1,6 @@
 //! # uc-daemon-process
 //!
-//! Thin, dependency-light primitives for managing the local `uniclipd` daemon
+//! Thin, dependency-light primitives for managing the local `clipd` daemon
 //! **process**: its PID-file metadata, loopback socket/token paths, detached
 //! spawn, and the CLI↔daemon spawn contract.
 //!
@@ -26,7 +26,7 @@
 //!   endpoint absence.
 //! - [`process_metadata`]: PID-file read/write + `DaemonProcessMode`.
 //! - [`socket`]: loopback HTTP address + daemon token path resolution.
-//! - [`spawn`]: `uniclipd` detached spawn (`setsid` / `DETACHED_PROCESS`).
+//! - [`spawn`]: `clipd` detached spawn (`setsid` / `DETACHED_PROCESS`).
 //! - [`spawn_contract`]: CLI→daemon run-mode / unattended-unlock env contract.
 //! - [`timing`]: cross-process timing contract for the daemon stop → start
 //!   handoff (base durations + derived wait budgets in one place).

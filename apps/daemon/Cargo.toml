@@ -3,14 +3,14 @@ name = "uc-daemon"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "GUI-agnostic daemon runtime (ADR-008); hosts the uniclipd binary"
+description = "GUI-agnostic daemon runtime (ADR-008); hosts the clipd binary"
 
 [lib]
 name = "uc_daemon"
 path = "src/lib.rs"
 
 [[bin]]
-name = "uniclipd"
+name = "clipd"
 path = "src/main.rs"
 
 [dependencies]

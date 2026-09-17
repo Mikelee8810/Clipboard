@@ -14,7 +14,7 @@ updated: 2026-03-15T00:00:00Z
 
 ### 1. Cold Start Smoke Test
 
-expected: Kill any running UniClipboard instance. Start the application from scratch with `bun tauri dev`. App boots without errors in terminal, main window appears, and the Settings page is accessible.
+expected: Kill any running Clipboard instance. Start the application from scratch with `bun tauri dev`. App boots without errors in terminal, main window appears, and the Settings page is accessible.
 result: pass
 
 ### 2. File Sync Settings Group Visible

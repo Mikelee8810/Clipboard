@@ -559,7 +559,7 @@ mod tests {
     #[test]
     fn engine_directories_use_the_resolved_log_directory() {
         let paths = DesktopHostPaths {
-            db_path: "/host/private/uniclipboard.db".into(),
+            db_path: "/host/private/clipboard.db".into(),
             vault_dir: "/host/private/vault".into(),
             settings_path: "/host/private/settings.json".into(),
             logs_dir: "/host/platform-logs".into(),

@@ -154,9 +154,9 @@ impl Modify for ContractMeta {
 #[derive(OpenApi)]
 #[openapi(
     info(
-        title = "UniClipboard Daemon API",
+        title = "Clipboard Daemon API",
         version = "1.0.0",
-        description = "Local daemon HTTP API for the UniClipboard GUI and native clients. \
+        description = "Local daemon HTTP API for the Clipboard GUI and native clients. \
             All enveloped responses use the canonical `{ data, ts }` shape; errors use \
             `{ code, message, details? }`. Binary and WebSocket endpoints are exempt from \
             the envelope. L2+ operations require a session token (query `?auth=` or the \

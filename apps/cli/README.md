@@ -1,6 +1,6 @@
 # uc-cli
 
-`uc-cli` 是 UniClipboard 的终端入口 crate，构建出的二进制名是 `uniclip`。
+`uc-cli` 是 Clipboard 的终端入口 crate，构建出的二进制名是 `clip`。
 
 它用于在终端里完成空间初始化、设备加入、配对查看、文本发送、入站监听、搜索诊断、blob 诊断，以及本机 daemon 的启动和停止。
 
@@ -18,7 +18,7 @@ cargo run -p uc-cli -- --json status
 
 ```bash
 cargo build -p uc-cli
-./target/debug/uniclip --help
+./target/debug/clip --help
 ```
 
 ## 全局参数
@@ -34,32 +34,32 @@ cargo build -p uc-cli
 
 | 命令                                | 用途                                                                                                                                                                                                                                                     |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `uniclip start`                     | 启动本机 daemon。默认后台运行。                                                                                                                                                                                                                          |
-| `uniclip start --foreground`        | 前台启动 daemon，并把日志输出到终端。                                                                                                                                                                                                                    |
-| `uniclip stop`                      | 停止本机 daemon。                                                                                                                                                                                                                                        |
-| `uniclip space status`                    | 查看当前应用状态。                                                                                                                                                                                                                                       |
-| `uniclip space init`                      | 在当前 profile 创建新的加密空间。                                                                                                                                                                                                                        |
-| `uniclip space invite`                    | 作为 sponsor 发起配对邀请。                                                                                                                                                                                                                              |
-| `uniclip space join`                      | 用邀请码加入空间。默认走非破坏性的赎回 / 重新配对分支（首次加入，以及在「同一空间」单侧解除配对后重新配对——见 issue #1023）。加 `--switch` 才切换到「另一个」sponsor 的空间并重加密迁移本地历史（破坏性，会先确认，再加 `--yes` 在非交互场景跳过确认）。 |
-| `uniclip space join --no-wait`            | 发起加入后，如果请求仍在等待，只报告当前状态并立即返回。                                                                                                                                                                                                 |
-| `uniclip space join status`               | 查看 Engine 保存的当前加入状态。                                                                                                                                                                                                                         |
-| `uniclip space join cancel`               | 取消当前仍在等待的加入请求。                                                                                                                                                                                                                             |
-| `uniclip space reset --yes`               | 重建为只包含本机的新空间；保留本机历史、已完成文件、设置、设备身份和解锁能力，所有设备需要重新配对。                                                                                                                                                      |
-| `uniclip members`                   | 列出空间成员（本机 + 已配对设备）及在线状态；加 `--probe` 主动探测刷新状态。`devices` 是其别名。                                                                                                                                                         |
-| `uniclip member remove <PEER-ID>`   | 移除一个空间成员；即使对方离线也会立即记录并停止向它发送新内容。                                                                                                                                                                                         |
-| `uniclip member removal-status`     | 查看当前空间的成员移除与收敛状态。                                                                                                                                                                                                                       |
-| `uniclip member trust status`       | 查看当前设备组变化及两种选择的影响。                                                                                                                                                                                                                     |
-| `uniclip member trust apply`        | 应用当前设备组变化；脚本调用必须指定变化编号。                                                                                                                                                                                                           |
-| `uniclip member trust keep`         | 保留当前设备组；脚本调用必须指定变化编号。                                                                                                                                                                                                               |
-| `uniclip member sync show <DEVICE>` | 查看一个成员的发送、接收和内容类型设置。                                                                                                                                                                                                                 |
-| `uniclip member sync set <DEVICE>`  | 只修改明确给出的成员同步设置。                                                                                                                                                                                                                           |
-| `uniclip send [TEXT]`               | 向在线配对设备发送一段文本；省略 `TEXT` 时从 stdin 读取。                                                                                                                                                                                                |
-| `uniclip watch`                     | 监听并打印收到的剪贴板 payload；不会写入系统剪贴板。                                                                                                                                                                                                     |
-| `uniclip recv`                      | 阻塞等待 **下一个** 入站文件并落盘；不会写入系统剪贴板。                                                                                                                                                                                                 |
-| `uniclip get`                       | 读取 **已同步** 的剪贴板条目并立即返回（headless / 脚本 / agent 友好）。                                                                                                                                                                                 |
+| `clip start`                     | 启动本机 daemon。默认后台运行。                                                                                                                                                                                                                          |
+| `clip start --foreground`        | 前台启动 daemon，并把日志输出到终端。                                                                                                                                                                                                                    |
+| `clip stop`                      | 停止本机 daemon。                                                                                                                                                                                                                                        |
+| `clip space status`                    | 查看当前应用状态。                                                                                                                                                                                                                                       |
+| `clip space init`                      | 在当前 profile 创建新的加密空间。                                                                                                                                                                                                                        |
+| `clip space invite`                    | 作为 sponsor 发起配对邀请。                                                                                                                                                                                                                              |
+| `clip space join`                      | 用邀请码加入空间。默认走非破坏性的赎回 / 重新配对分支（首次加入，以及在「同一空间」单侧解除配对后重新配对——见 issue #1023）。加 `--switch` 才切换到「另一个」sponsor 的空间并重加密迁移本地历史（破坏性，会先确认，再加 `--yes` 在非交互场景跳过确认）。 |
+| `clip space join --no-wait`            | 发起加入后，如果请求仍在等待，只报告当前状态并立即返回。                                                                                                                                                                                                 |
+| `clip space join status`               | 查看 Engine 保存的当前加入状态。                                                                                                                                                                                                                         |
+| `clip space join cancel`               | 取消当前仍在等待的加入请求。                                                                                                                                                                                                                             |
+| `clip space reset --yes`               | 重建为只包含本机的新空间；保留本机历史、已完成文件、设置、设备身份和解锁能力，所有设备需要重新配对。                                                                                                                                                      |
+| `clip members`                   | 列出空间成员（本机 + 已配对设备）及在线状态；加 `--probe` 主动探测刷新状态。`devices` 是其别名。                                                                                                                                                         |
+| `clip member remove <PEER-ID>`   | 移除一个空间成员；即使对方离线也会立即记录并停止向它发送新内容。                                                                                                                                                                                         |
+| `clip member removal-status`     | 查看当前空间的成员移除与收敛状态。                                                                                                                                                                                                                       |
+| `clip member trust status`       | 查看当前设备组变化及两种选择的影响。                                                                                                                                                                                                                     |
+| `clip member trust apply`        | 应用当前设备组变化；脚本调用必须指定变化编号。                                                                                                                                                                                                           |
+| `clip member trust keep`         | 保留当前设备组；脚本调用必须指定变化编号。                                                                                                                                                                                                               |
+| `clip member sync show <DEVICE>` | 查看一个成员的发送、接收和内容类型设置。                                                                                                                                                                                                                 |
+| `clip member sync set <DEVICE>`  | 只修改明确给出的成员同步设置。                                                                                                                                                                                                                           |
+| `clip send [TEXT]`               | 向在线配对设备发送一段文本；省略 `TEXT` 时从 stdin 读取。                                                                                                                                                                                                |
+| `clip watch`                     | 监听并打印收到的剪贴板 payload；不会写入系统剪贴板。                                                                                                                                                                                                     |
+| `clip recv`                      | 阻塞等待 **下一个** 入站文件并落盘；不会写入系统剪贴板。                                                                                                                                                                                                 |
+| `clip get`                       | 读取 **已同步** 的剪贴板条目并立即返回（headless / 脚本 / agent 友好）。                                                                                                                                                                                 |
 
 旧的顶层 `status`、`init`、`invite` 和 `join` 入口仍可使用，但会提示对应的
-`space` 命令。新脚本和文档应使用 `uniclip space ...`。
+`space` 命令。新脚本和文档应使用 `clip space ...`。
 
 ## 取回已同步内容（`get`）
 
@@ -67,11 +67,11 @@ cargo build -p uc-cli
 直接从 daemon 历史里取出已同步的条目并立即返回（区别于 `recv` 的「阻塞等下一个入站」）：
 
 ```bash
-uniclip get                      # 取最新一条可用条目
-uniclip get --type image         # 取最新一张图片
-uniclip get --type file -o ~/in  # 取最新一个文件并落地到 ~/in
-uniclip get --id <ENTRY-ID>      # 取指定条目（id 来自 uniclip search）
-uniclip get --list -n 20         # 仅列出最近 20 条，不取回
+clip get                      # 取最新一条可用条目
+clip get --type image         # 取最新一张图片
+clip get --type file -o ~/in  # 取最新一个文件并落地到 ~/in
+clip get --id <ENTRY-ID>      # 取指定条目（id 来自 clip search）
+clip get --list -n 20         # 仅列出最近 20 条，不取回
 ```
 
 输出契约：
@@ -86,27 +86,27 @@ uniclip get --list -n 20         # 仅列出最近 20 条，不取回
 典型的 agent 闭环（在 SSH 机器上把图片喂给工具）：
 
 ```bash
-path=$(uniclip get --type image)   # 落地并拿到路径
+path=$(clip get --type image)   # 落地并拿到路径
 # 把 $path 交给读取文件的工具即可
 ```
 
 ## 搜索命令
 
 ```bash
-uniclip search "keyword"
-uniclip search status
-uniclip search rebuild
+clip search "keyword"
+clip search status
+clip search rebuild
 ```
 
 查询直接跟在 `search` 后面，支持内容类型、文件扩展名、来源设备、时间范围、分页和详细输出：
 
 ```bash
-uniclip search "report" --type text --ext md --limit 20 --detailed
-uniclip search "report" --from-ms 1710000000000 --to-ms 1710100000000
-uniclip search "report" --source-device "Laptop"
+clip search "report" --type text --ext md --limit 20 --detailed
+clip search "report" --from-ms 1710000000000 --to-ms 1710100000000
+clip search "report" --source-device "Laptop"
 ```
 
-`--source-device` 接受设备名（大小写无关）或设备 id，可重复多次；运行 `uniclip members` 查看可用设备名。
+`--source-device` 接受设备名（大小写无关）或设备 id，可重复多次；运行 `clip members` 查看可用设备名。
 
 `search rebuild` 是同步命令，完成后才返回。
 
@@ -115,48 +115,48 @@ uniclip search "report" --source-device "Laptop"
 `blob` 命令用于发布或拉取加密的大 payload，主要服务于文件同步和传输诊断。
 
 ```bash
-uniclip blob publish ./sample.bin
-uniclip blob fetch <TICKET> --entry-id <ENTRY_ID> --out ./restored.bin
+clip blob publish ./sample.bin
+clip blob fetch <TICKET> --entry-id <ENTRY_ID> --out ./restored.bin
 ```
 
 发布会输出后续拉取需要的 ticket 和 entry id。拉取时必须同时提供这两个值。
 
 ## 空间切换
 
-切换到另一个 sponsor 的空间已合并进 `uniclip space join`：在已加入空间的设备上运行 `uniclip space join --switch`，会走切换分支，重加密并迁移本地历史数据。无需单独的 `switch-space` 命令。不带 `--switch` 的 `space join` 始终走非破坏性的赎回 / 重新配对分支。
+切换到另一个 sponsor 的空间已合并进 `clip space join`：在已加入空间的设备上运行 `clip space join --switch`，会走切换分支，重加密并迁移本地历史数据。无需单独的 `switch-space` 命令。不带 `--switch` 的 `space join` 始终走非破坏性的赎回 / 重新配对分支。
 
 ## 重建空间
 
-`uniclip space reset --yes` 会创建一个只包含本机的新空间，并永久废弃与所有旧设备的
+`clip space reset --yes` 会创建一个只包含本机的新空间，并永久废弃与所有旧设备的
 配对、信任和同步关系。本机剪贴板历史、已完成文件、设置、设备身份和解锁能力都会保留；
 其他设备不会被删除，但必须重新配对后才能恢复同步。这不是恢复出厂设置。
 
 ## 隐藏的剪贴板诊断命令组（`probe`）
 
-`uniclip probe` 是隐藏子命令（不会出现在 `--help` 中），收编自原先的
+`clip probe` 是隐藏子命令（不会出现在 `--help` 中），收编自原先的
 `clipboard-probe` 二进制，仅供开发与 E2E 调试。`probe restore` 是 CLI
 中唯一允许直接写系统剪贴板的入口，详见 `AGENTS.md` 的诊断例外条款。
 
 ```bash
-uniclip probe watch                    # 监听剪贴板变化
-uniclip probe watch --max-events 10    # 最多观察 10 个事件
-uniclip probe capture --out snap.json  # 抓取当前剪贴板到文件
-uniclip probe inspect --in snap.json   # 解析快照文件
-uniclip probe restore --in snap.json   # 把快照写回系统剪贴板（诊断用）
-uniclip probe restore --in snap.json --select 0  # 多 representation 时选其一
+clip probe watch                    # 监听剪贴板变化
+clip probe watch --max-events 10    # 最多观察 10 个事件
+clip probe capture --out snap.json  # 抓取当前剪贴板到文件
+clip probe inspect --in snap.json   # 解析快照文件
+clip probe restore --in snap.json   # 把快照写回系统剪贴板（诊断用）
+clip probe restore --in snap.json --select 0  # 多 representation 时选其一
 ```
 
 ## 隐藏的开发者命令组（`dev`）
 
-`uniclip dev` 是隐藏子命令（不会出现在 `--help` 中），仅供开发与 E2E
+`clip dev` 是隐藏子命令（不会出现在 `--help` 中），仅供开发与 E2E
 调试，不属于用户接口。
 
 ```bash
-uniclip dev seed-clipboard --text <TEXT>  # 写入一条加密文本记录（测试种子）
-uniclip dev dump-clipboard --limit <N>    # 打印最近的解密记录预览
-uniclip dev pairing addrs                 # 列出配对邀请候选地址
-uniclip dev pairing issue --addr <IP>     # 指定本机 IP 发起配对邀请
-uniclip --dev --json dev capture-files --path <PATH>  # 捕获文件或目录并输出持久化清单
+clip dev seed-clipboard --text <TEXT>  # 写入一条加密文本记录（测试种子）
+clip dev dump-clipboard --limit <N>    # 打印最近的解密记录预览
+clip dev pairing addrs                 # 列出配对邀请候选地址
+clip dev pairing issue --addr <IP>     # 指定本机 IP 发起配对邀请
+clip --dev --json dev capture-files --path <PATH>  # 捕获文件或目录并输出持久化清单
 ```
 
 `capture-files` 可重复传入 `--path`，也可用 `--max-members` 和

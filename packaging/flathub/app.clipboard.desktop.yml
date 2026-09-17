@@ -1,15 +1,15 @@
 # Flatpak manifest for Flathub. App-id intentionally matches the Tauri
-# bundle identifier (app.uniclipboard.desktop).
+# bundle identifier (app.clipboard.desktop).
 #
 # Build strategy: repackage the official .deb (same rationale as the nixpkgs
 # AppImage wrap — a from-source Tauri build inside the offline flatpak-builder
 # sandbox would need vendored cargo + bun deps and is impractical). Flathub
 # accepts deb repackaging for this class of app.
-app-id: app.uniclipboard.desktop
+app-id: app.clipboard.desktop
 runtime: org.gnome.Platform
 runtime-version: '46'
 sdk: org.gnome.Sdk
-command: uniclipboard
+command: clipboard
 
 finish-args:
   # GUI. WebKitGTK comes from the GNOME runtime.
@@ -30,39 +30,39 @@ finish-args:
   - --filesystem=xdg-download
 
 modules:
-  - name: uniclipboard
+  - name: clipboard
     buildsystem: simple
     build-commands:
       # Unpack the .deb (ar -> data.tar) into the build dir.
       - ar x *.deb
       - tar -xf data.tar.*
       # Binaries: GUI + its required sidecar daemon.
-      - install -Dm755 usr/bin/uniclipboard /app/bin/uniclipboard
-      - install -Dm755 usr/bin/uniclipd /app/bin/uniclipd
+      - install -Dm755 usr/bin/clipboard /app/bin/clipboard
+      - install -Dm755 usr/bin/clipd /app/bin/clipd
       # Desktop file must be named after the app-id; point its icon at the app-id too.
-      - desktop-file-edit --set-icon=app.uniclipboard.desktop usr/share/applications/uniclipboard.desktop
-      - install -Dm644 usr/share/applications/uniclipboard.desktop
-        /app/share/applications/app.uniclipboard.desktop.desktop
-      # Icons must be renamed from "uniclipboard" to the app-id.
+      - desktop-file-edit --set-icon=app.clipboard.desktop usr/share/applications/clipboard.desktop
+      - install -Dm644 usr/share/applications/clipboard.desktop
+        /app/share/applications/app.clipboard.desktop.desktop
+      # Icons must be renamed from "clipboard" to the app-id.
       - |
-        for png in $(find usr/share/icons -name 'uniclipboard.png'); do
+        for png in $(find usr/share/icons -name 'clipboard.png'); do
           dest="/app/${png#usr/}"
-          dest="${dest%/uniclipboard.png}/app.uniclipboard.desktop.png"
+          dest="${dest%/clipboard.png}/app.clipboard.desktop.png"
           install -Dm644 "$png" "$dest"
         done
       # AppStream metadata (Flathub requirement).
-      - install -Dm644 app.uniclipboard.desktop.metainfo.xml
-        /app/share/metainfo/app.uniclipboard.desktop.metainfo.xml
+      - install -Dm644 app.clipboard.desktop.metainfo.xml
+        /app/share/metainfo/app.clipboard.desktop.metainfo.xml
     sources:
       - type: file
-        url: https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/UniClipboard_0.15.0_amd64.deb
+        url: https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/Clipboard_0.15.0_amd64.deb
         sha256: '0000000000000000000000000000000000000000000000000000000000000000'
         only-arches:
           - x86_64
       - type: file
-        url: https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/UniClipboard_0.15.0_arm64.deb
+        url: https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/Clipboard_0.15.0_arm64.deb
         sha256: '0000000000000000000000000000000000000000000000000000000000000000'
         only-arches:
           - aarch64
       - type: file
-        path: app.uniclipboard.desktop.metainfo.xml
+        path: app.clipboard.desktop.metainfo.xml

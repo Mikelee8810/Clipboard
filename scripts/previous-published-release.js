@@ -94,7 +94,7 @@ export async function fetchPublishedReleases(repo, token, fetchImpl = fetch) {
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: token ? `Bearer ${token}` : undefined,
-          'User-Agent': 'uniclipboard-release-history',
+          'User-Agent': 'clipboard-release-history',
         },
       }
     )

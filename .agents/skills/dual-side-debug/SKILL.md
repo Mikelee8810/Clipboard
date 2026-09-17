@@ -1,6 +1,6 @@
 ---
 name: dual-side-debug
-description: Inspect uniclipboard logs from BOTH the macOS host and the mounted Windows peer when debugging cross-platform sync, pairing, transfer, or daemon issues. Use whenever the user asks to "check logs", "see what's happening on both sides", or describes a symptom that involves the Windows peer (e.g. "Windows didn't receive...", "Mac sent but...", pairing/transfer/sync failures during dual-side dev).
+description: Inspect clipboard logs from BOTH the macOS host and the mounted Windows peer when debugging cross-platform sync, pairing, transfer, or daemon issues. Use whenever the user asks to "check logs", "see what's happening on both sides", or describes a symptom that involves the Windows peer (e.g. "Windows didn't receive...", "Mac sent but...", pairing/transfer/sync failures during dual-side dev).
 ---
 
 # dual-side-debug
@@ -13,11 +13,11 @@ The helper script lives at `.agents/skills/dual-side-debug/dual-logs.sh`. It is 
 
 ## Log layout you must remember
 
-* **macOS logs**: `~/Library/Logs/app.uniclipboard.desktop[-<UC_PROFILE>]/uniclipboard-{gui,daemon,cli}.json.YYYY-MM-DD`
+* **macOS logs**: `~/Library/Logs/app.clipboard.desktop[-<UC_PROFILE>]/clipboard-{gui,daemon,cli}.json.YYYY-MM-DD`
   — Apple convention (`~/Library/Logs/<app>`); the profile dir **is** the log dir, there is **no `logs/` subdir** on macOS.
-* **Windows logs (mounted)**: `/tmp/win-local/app.uniclipboard.desktop[-<WIN_PROFILE>]/logs/uniclipboard-{gui,daemon,cli}.json.YYYY-MM-DD`
+* **Windows logs (mounted)**: `/tmp/win-local/app.clipboard.desktop[-<WIN_PROFILE>]/logs/clipboard-{gui,daemon,cli}.json.YYYY-MM-DD`
   — Windows keeps the `logs/` subdir under the data-local app root.
-* **Per-role files** (since the platform-log-dir split): each process writes its own family — `gui` (Tauri host), `daemon` (`uniclipd`), `cli` (`uniclip`) — daily rotation, 7-day retention. `dual-logs.sh` picks the **newest by mtime** per side, i.e. the busiest process (usually the daemon for sync/pairing/transfer). The legacy single-file name `uniclipboard.json.YYYY-MM-DD` is still matched for old logs. For per-role single-host digging, use the **`local-log-debug`** skill instead.
+* **Per-role files** (since the platform-log-dir split): each process writes its own family — `gui` (Tauri host), `daemon` (`clipd`), `cli` (`clip`) — daily rotation, 7-day retention. `dual-logs.sh` picks the **newest by mtime** per side, i.e. the busiest process (usually the daemon for sync/pairing/transfer). The legacy single-file name `clipboard.json.YYYY-MM-DD` is still matched for old logs. For per-role single-host digging, use the **`local-log-debug`** skill instead.
 * Format: **JSON Lines**. Each line has at least `timestamp` (UTC, ISO-8601 with `Z`, always the first field), `level`, `target`, `message`, `span`, `device_id`, plus structured fields.
 * The date in the filename is **UTC**, not local time. A file named `...2026-04-25` can be the live file while it is still 2026-04-24 in PDT.
 
@@ -28,32 +28,32 @@ The Windows logs only exist on this Mac because an SMB share is mounted from `DE
 Before debugging, verify a mount exists:
 
 ```bash
-mount | grep -E 'win-local|win-uniclipboard' || echo "no SMB mount yet"
+mount | grep -E 'win-local|win-clipboard' || echo "no SMB mount yet"
 ```
 
 If nothing is mounted, **stop and ask the user before running `mount_smbfs`** — it prompts for the Windows password interactively and the agent shouldn't silently do credential prompts. Hand the user the exact commands and let them run via `! <cmd>`.
 
 ### Default: broad mount of `AppData/Local` at `/tmp/win-local`
 
-This is what `dual-logs.sh` expects out of the box. It exposes **every** Windows uniclipboard profile dir at once, so you can switch profiles without re-mounting:
+This is what `dual-logs.sh` expects out of the box. It exposes **every** Windows clipboard profile dir at once, so you can switch profiles without re-mounting:
 
 ```bash
 mkdir -p /tmp/win-local
 mount_smbfs '//DESKTOP-HIC7MLI/Users/mark/AppData/Local' /tmp/win-local
 ```
 
-After mount you'll see dirs like `/tmp/win-local/app.uniclipboard.desktop`, `/tmp/win-local/app.uniclipboard.desktop-dev`, plus old version-suffixed ones. The script auto-detects the freshest one (see "Profile resolution" below).
+After mount you'll see dirs like `/tmp/win-local/app.clipboard.desktop`, `/tmp/win-local/app.clipboard.desktop-dev`, plus old version-suffixed ones. The script auto-detects the freshest one (see "Profile resolution" below).
 
-### Legacy: narrow mount at `/tmp/win-uniclipboard`
+### Legacy: narrow mount at `/tmp/win-clipboard`
 
 Older sessions sometimes still use this — mounting **only one** profile dir directly. The script supports it via the `WIN_LOGS` env override (full-path bypass of `$WIN_BASE`):
 
 ```bash
-mkdir -p /tmp/win-uniclipboard
-mount_smbfs '//DESKTOP-HIC7MLI/Users/mark/AppData/Local/app.uniclipboard.desktop-<WIN_PROFILE>' /tmp/win-uniclipboard
+mkdir -p /tmp/win-clipboard
+mount_smbfs '//DESKTOP-HIC7MLI/Users/mark/AppData/Local/app.clipboard.desktop-<WIN_PROFILE>' /tmp/win-clipboard
 
 # Then for every invocation:
-WIN_LOGS=/tmp/win-uniclipboard/logs .agents/skills/dual-side-debug/dual-logs.sh status
+WIN_LOGS=/tmp/win-clipboard/logs .agents/skills/dual-side-debug/dual-logs.sh status
 ```
 
 Prefer the broad mount unless there's a specific reason — it pins you to one profile and requires re-mounting to switch.
@@ -63,7 +63,7 @@ Prefer the broad mount unless there's a specific reason — it pins you to one p
 If the mount is wedged (Finder hangs, `ls` blocks for 30s), unmount cleanly before re-mounting:
 
 ```bash
-umount /tmp/win-local   # or /tmp/win-uniclipboard
+umount /tmp/win-local   # or /tmp/win-clipboard
 ```
 
 If `umount` fails because the path is busy, fall back to `diskutil unmount force /tmp/win-local`.
@@ -78,7 +78,7 @@ Default is **`dev`** (`package.json`'s `tauri:dev` script sets `UC_PROFILE=dev`)
 
 ### Windows profile
 
-The script **auto-detects** the Windows profile by scanning `$WIN_BASE` for the profile dir whose latest log file has the newest mtime. This handles the common case where the Win side is on a different profile than the Mac side, without you having to know which one. Override with `--win-profile <name>` (or `--win-profile default` for the no-suffix `app.uniclipboard.desktop` dir).
+The script **auto-detects** the Windows profile by scanning `$WIN_BASE` for the profile dir whose latest log file has the newest mtime. This handles the common case where the Win side is on a different profile than the Mac side, without you having to know which one. Override with `--win-profile <name>` (or `--win-profile default` for the no-suffix `app.clipboard.desktop` dir).
 
 ### Always run `status` first
 

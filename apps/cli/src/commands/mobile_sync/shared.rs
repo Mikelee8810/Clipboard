@@ -130,5 +130,5 @@ pub fn read_password_stdin() -> Result<String, String> {
 
 /// 把 `restart_required=true` 转化为面向用户的提示字符串(英文,人类可读)。
 pub fn restart_hint() -> &'static str {
-    "Restart the daemon to apply: `uniclip stop && uniclip start`."
+    "Restart the daemon to apply: `clip stop && clip start`."
 }

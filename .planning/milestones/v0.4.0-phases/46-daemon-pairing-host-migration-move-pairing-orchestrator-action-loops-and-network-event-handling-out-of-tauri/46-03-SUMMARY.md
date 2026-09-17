@@ -141,4 +141,4 @@ For full daemon-backed pairing migration:
 
 - All new files created and committed
 - Tests pass: `cargo test -p uc-tauri --test pairing_bridge` exits 0
-- Code compiles: `cargo check -p uniclipboard` exits 0
+- Code compiles: `cargo check -p clipboard` exits 0

@@ -85,7 +85,7 @@ describe('projectClipboardEntry', () => {
     // that label rather than the legacy `text/uri-list` string.
     const entry = projectClipboardEntry(
       makeDto({
-        preview: 'file:///tmp/report.pdf\nuniclip-missing:///lost.bin?size=42',
+        preview: 'file:///tmp/report.pdf\nclip-missing:///lost.bin?size=42',
         contentType: 'file',
         fileSizes: [100, 42],
       })

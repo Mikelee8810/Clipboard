@@ -58,7 +58,7 @@ _Existing infrastructure covers core use case requirements. Only daemon integrat
 
 | Behavior                                     | Requirement | Why Manual                                | Test Instructions                                                                                                                                  |
 | -------------------------------------------- | ----------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Daemon restarts and proof verification works | D-01/D-02   | Requires running daemon process lifecycle | 1. Start daemon with initialized encryption 2. Kill daemon 3. Restart daemon 4. Run `uniclipboard-cli status` — encryption session should be ready |
+| Daemon restarts and proof verification works | D-01/D-02   | Requires running daemon process lifecycle | 1. Start daemon with initialized encryption 2. Kill daemon 3. Restart daemon 4. Run `clipboard-cli status` — encryption session should be ready |
 
 ---
 

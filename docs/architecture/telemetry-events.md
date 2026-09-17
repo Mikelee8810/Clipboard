@@ -1,7 +1,7 @@
 # 产品 Telemetry 事件 Schema（v1）
 
 > 起草时间：2026-05-09
-> 涉及 Issue：UniClipboard#549
+> 涉及 Issue：Clipboard#549
 > 状态：**v1 schema 已定稿**，§10 开放问题已全部裁决。
 > 本文件只定义事件 schema、身份标识与隐私契约；
 > 上报通道（PostHog Cloud SDK 接入、本地队列、批量发送）属于子任务 2，不在此处展开。
@@ -11,7 +11,7 @@
 
 ### 1.1 目标
 
-为 UniClipboard 客户端建立一套 **结构化的产品事件模型**，让早期增长与可靠性
+为 Clipboard 客户端建立一套 **结构化的产品事件模型**，让早期增长与可靠性
 判断有据可依。本草案聚焦 issue #549 的"第一版必须埋点"中 **最关键的两段**：
 
 - **Activation 漏斗**：`app_first_open` → `pairing_succeeded` → `first_clipboard_sync_succeeded`
@@ -214,7 +214,7 @@ pub enum InstallSource {
 
 获取策略（v1 简化）：
 
-- **桌面**：安装包文件名带后缀（如 `UniClipboard-v2ex.dmg`）→ 解析得到。
+- **桌面**：安装包文件名带后缀（如 `Clipboard-v2ex.dmg`）→ 解析得到。
   没有后缀 → `Unknown`。
 - **官网下载**：URL 带 `?src=v2ex` → 写入 cookie / localStorage → 安装后
   通过 deeplink 回填。**v1 不做**，列入 v2。
@@ -739,7 +739,7 @@ pub enum InstallKind {
 
 ## 9. 类型定义落地位置（建议）
 
-```/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-observability/src/analytics/
+```/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-observability/src/analytics/
 mod.rs        // pub use 与 sink trait
 context.rs    // EventContext 与构造工厂
 events.rs     // TelemetryEvent 枚举或 newtype 包装
@@ -834,7 +834,7 @@ Content-Type: application/json
     // PostHog 标准 $-prefix 字段（仅 PosthogSink 注入，详见 §10.1 字段映射）
     "$device_id": "<analytics_device_id>",
     "$session_id": "<session_id>",
-    "$lib": "uniclipboard-rust",
+    "$lib": "clipboard-rust",
     "$lib_version": "<app_version>",
     "$geoip_disable": true,
     "$set": { "app_version": "...", "os": "...", "active_device_count": 2, ... },
@@ -879,7 +879,7 @@ schema 不动。
 |---|---|---|
 | `$device_id` | `analytics_device_id` | Person ↔ Device 关联，控制台按设备维度切片 |
 | `$session_id` | `session_id` | Session funnel、未来接 Session Replay |
-| `$lib` | 固定 `"uniclipboard-rust"` | 控制台按客户端来源过滤流量 |
+| `$lib` | 固定 `"clipboard-rust"` | 控制台按客户端来源过滤流量 |
 | `$lib_version` | `app_version` | 同上，按版本过滤 |
 | `$geoip_disable` | 固定 `true` | 见下方"`disable_geoip` 等价语义" |
 | `$set` | EventContext 中 9 个"可变当前状态"字段 | Person Properties 当前快照 |

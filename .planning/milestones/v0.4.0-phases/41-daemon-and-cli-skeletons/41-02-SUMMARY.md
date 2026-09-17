@@ -12,7 +12,7 @@ provides:
   - Unix socket JSON-RPC server with ping/status/device_list dispatch
   - DaemonApp lifecycle (bind, start workers, accept loop, graceful shutdown)
   - Stale socket detection with full ping RPC verification
-  - uniclipboard-daemon binary entry point
+  - clipboard-daemon binary entry point
 
 affects: [41-03, daemon-workers, cli-rpc-client]
 

@@ -1,6 +1,6 @@
-# Sources: UniClipboard relay image deployment
+# Sources: Clipboard relay image deployment
 
-## UniClipboard relay repository
+## Clipboard relay repository
 
 - `https://github.com/UniClipboard/relay`：镜像入口、环境变量、令牌约束、反向代理要求和安全边界。
 - `https://github.com/UniClipboard/relay/blob/main/Dockerfile`：非特权用户、`3340` 端口、`/healthz` 和 AMD64/ARM64 运行镜像基础。

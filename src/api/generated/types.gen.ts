@@ -2235,7 +2235,7 @@ export type RegisterMobileDeviceResultDto = {
     baseUrl: string;
     clientType: string;
     /**
-     * `uniclipboard://connect?...` deep link (the main QR content).
+     * `clipboard://connect?...` deep link (the main QR content).
      */
     connectUri: string;
     createdAtMs: number;
@@ -3649,7 +3649,7 @@ export type UpdateMobileSyncSettingsResultDto = {
  * Discriminated union mirroring `uc_application::facade::UpgradeStatus`.
  *
  * Wire encoding uses `kind` discriminator with snake_case variants to
- * keep parity with the CLI JSON output produced by `uniclip upgrade
+ * keep parity with the CLI JSON output produced by `clip upgrade
  * status --json`.
  *
  * 防御性补丁(issue #606 followup):同时声明 `rename_all_fields`,

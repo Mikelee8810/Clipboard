@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: UniClipboard Mobile LAN API
+  title: Clipboard Mobile LAN API
   version: '1.0.0'
   summary: SyncClipboard-compatible LAN endpoints exposed by the desktop daemon.
   description: |
@@ -29,15 +29,15 @@ info:
     `POST /api/history` are streamed to local staging and capped at **10 GiB**
     per uploaded file.
   contact:
-    name: UniClipboard
-    url: https://github.com/mkdir700/uniclipboard
+    name: Clipboard
+    url: https://github.com/mkdir700/clipboard
 servers:
   - url: http://{host}:{port}
     description: Desktop daemon on the LAN
     variables:
       host:
         default: 192.168.1.10
-        description: LAN IP of the desktop running UniClipboard
+        description: LAN IP of the desktop running Clipboard
       port:
         default: '42720'
         description: Port the daemon advertised during pairing (SPEC §3.2 default)
@@ -45,11 +45,11 @@ tags:
   - name: Probe
     description: Lightweight compatibility probes used by SyncClipboard clients.
   - name: Health
-    description: UniClipboard-private liveness probe for offline clients (not part of the SyncClipboard protocol).
+    description: Clipboard-private liveness probe for offline clients (not part of the SyncClipboard protocol).
   - name: Clipboard
     description: Clipboard metadata read/write (SyncClipboard JSON document).
   - name: Push
-    description: UniClipboard-private push channel signaling clipboard changes (not part of the SyncClipboard protocol).
+    description: Clipboard-private push channel signaling clipboard changes (not part of the SyncClipboard protocol).
   - name: History
     description: Android-compatible history API bridge for the current clipboard item.
   - name: File
@@ -66,7 +66,7 @@ paths:
       security: []
       summary: Liveness probe for the mobile LAN listener
       description: |
-        UniClipboard-private extension (not part of the SyncClipboard protocol):
+        Clipboard-private extension (not part of the SyncClipboard protocol):
         a constant-cost liveness check for clients that have gone offline and
         need to discover when the listener is reachable again.
 
@@ -163,12 +163,12 @@ paths:
       description: Compatibility probe used by SyncClipboard clients.
       responses:
         '200':
-          description: UniClipboard server version string.
+          description: Clipboard server version string.
           content:
             application/json:
               schema:
                 type: string
-              example: UniClipboard 1.0.0
+              example: Clipboard 1.0.0
         '401':
           $ref: '#/components/responses/Unauthorized'
   /version:
@@ -179,12 +179,12 @@ paths:
       description: Alias of `GET /api/version`.
       responses:
         '200':
-          description: UniClipboard server version string.
+          description: Clipboard server version string.
           content:
             application/json:
               schema:
                 type: string
-              example: UniClipboard 1.0.0
+              example: Clipboard 1.0.0
         '401':
           $ref: '#/components/responses/Unauthorized'
   /SyncClipboard.json:
@@ -271,7 +271,7 @@ paths:
             response body (an empty `200` is the historical contract), so this
             is a purely additive extension: legacy and third-party
             SyncClipboard clients that only check the status code ignore it
-            safely. UniClipboard's own mobile sync engine reads `contentId`
+            safely. Clipboard's own mobile sync engine reads `contentId`
             back to learn the server identity of the write it just made,
             without a follow-up `GET`.
           content:
@@ -297,7 +297,7 @@ paths:
       operationId: getSseClipboard
       summary: Subscribe to clipboard change signals (SSE)
       description: |
-        UniClipboard-private extension (not part of the SyncClipboard
+        Clipboard-private extension (not part of the SyncClipboard
         protocol): a Server-Sent Events stream that signals when the desktop's
         active clipboard changes, so a client can call
         `GET /SyncClipboard.json` immediately instead of polling.
@@ -425,7 +425,7 @@ paths:
       summary: Accept a history clear request
       description: |
         Compatibility-only route. The request is accepted so clients can
-        continue their flow, but UniClipboard does not clear the real clipboard
+        continue their flow, but Clipboard does not clear the real clipboard
         history through this endpoint.
       responses:
         '200':
@@ -456,7 +456,7 @@ paths:
       summary: Fetch a current history record
       description: |
         Compatibility bridge to the current latest clipboard item. For image
-        and file records, UniClipboard can satisfy a same-type request even
+        and file records, Clipboard can satisfy a same-type request even
         when the client's uploaded hash differs from the server-recomputed hash.
       responses:
         '200':
@@ -526,7 +526,7 @@ paths:
       summary: Accept a history metadata update request
       description: |
         Compatibility-only route. It returns the current matching record, but
-        UniClipboard does not persist starred, pinned, deleted, or other
+        Clipboard does not persist starred, pinned, deleted, or other
         history-state mutations through this endpoint.
       responses:
         '200':
@@ -562,7 +562,7 @@ paths:
       summary: Accept a file-folder cleanup request
       description: |
         Compatibility-only route. The request is accepted so clients can
-        continue their flow, but UniClipboard does not delete staged clipboard
+        continue their flow, but Clipboard does not delete staged clipboard
         payloads through this endpoint.
       responses:
         '200':
@@ -681,7 +681,7 @@ components:
         WWW-Authenticate:
           schema:
             type: string
-            example: 'Basic realm="UniClipboard"'
+            example: 'Basic realm="Clipboard"'
   schemas:
     SyncClipboardDoc:
       type: object

@@ -1,4 +1,4 @@
-//! `uniclip mobile status` — combined settings + devices view.
+//! `clip mobile status` — combined settings + devices view.
 //!
 //! Routes through daemon HTTP endpoints (P5-2b ADR).
 
@@ -143,7 +143,7 @@ pub async fn run(json: bool, verbose: bool) -> i32 {
         if devices.is_empty() {
             ui::info(
                 "devices",
-                "0 — run `uniclip mobile setup` or `uniclip mobile add` to register one.",
+                "0 — run `clip mobile setup` or `clip mobile add` to register one.",
             );
         } else {
             ui::info("devices", &format!("{} paired", devices.len()));

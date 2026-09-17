@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 <Feature since="0.7.0" status="experimental">
   HTTP 伴侣模式 —— 默认走局域网，也可经自建 server 节点或 Tailscale 跨网络。iPhone 推荐使用
-  **UniClipboard iOS App（TestFlight beta 公测中）**；也支持内置的 iOS 快捷指令或任意兼容
+  **Clipboard iOS App（TestFlight beta 公测中）**；也支持内置的 iOS 快捷指令或任意兼容
   SyncClipboard 协议的客户端。
 </Feature>
 
@@ -93,11 +93,11 @@ modal 里实时显示 **当前监听地址（Listening URL）**。若监听 IP �
 
 - **大二维码（顶部，常驻）** —— 把 **全部可达候选地址**（已配置的
   公网入口 + 所有合格网卡 IP，含 Tailscale CGNAT）连同凭据编码进
-  单一 `uniclipboard://connect` URI —— 同一个码在内网、外网都能用，
-  支持候选列表的客户端会逐个探活选路。用 **UniClipboard iOS App**
+  单一 `clipboard://connect` URI —— 同一个码在内网、外网都能用，
+  支持候选列表的客户端会逐个探活选路。用 **Clipboard iOS App**
   （TestFlight beta 公测中，推荐路径，详见下文
   [配对一台 iPhone](#配对一台-iphone)）、
-  [UniClipboard Android 客户端](https://github.com/UniClipboard/UniClip)
+  [Clipboard Android 客户端](https://github.com/UniClipboard/UniClip)
   或任何兼容 SyncClipboard 协议的客户端扫一下即可，所有字段自动
   填好、无需手输。二维码旁边带一个 baseUrl 下拉，可以切换哪个地址
   作为首选（第一）候选——其余候选仍保留在码里——不必回到「配置」
@@ -130,18 +130,18 @@ modal 里实时显示 **当前监听地址（Listening URL）**。若监听 IP �
 
 ```bash
 # 一键：启用功能 + LAN 监听器，注册一台设备，打印安装 QR + 一次性密码。
-uniclip stop                                 # 必须：写命令拒绝同 profile daemon 在跑
-uniclip mobile setup                    # 推荐：交互式
+clip stop                                 # 必须：写命令拒绝同 profile daemon 在跑
+clip mobile setup                    # 推荐：交互式
 
 # 或非交互（如 CI / 脚本）
-uniclip mobile setup \
+clip mobile setup \
     --label "My iPhone 15" \
     --accept-network-risk \
     --non-interactive
 # → 输出 baseUrl、username、password (one-time)、installUrl，
 #   以及一个多地址 QR (ASCII)，手机会逐个地址探活连通
 
-uniclip start                                # 把 daemon 拉回来
+clip start                                # 把 daemon 拉回来
 ```
 
 非交互模式下 `--label`、`--accept-network-risk` 必填；`--ip` / `--port`
@@ -155,18 +155,18 @@ uniclip start                                # 把 daemon 拉回来
 <Callout type="info">
   明文密码 **只显示一次**。丢了就在 **移动端同步** 设备列表里点对应
   设备卡片，在弹出的 dialog 里点 **Edit device** 设置或重新生成密码，
-  或 `uniclip mobile revoke <id>` + `add` 重新
+  或 `clip mobile revoke <id>` + `add` 重新
   签发 —— 没法把原始密码再拿回来。
 </Callout>
 
 ## 配对一台 iPhone
 
-iOS 端目前有两条路径，**推荐使用 UniClipboard iOS App**；快捷指令保留
+iOS 端目前有两条路径，**推荐使用 Clipboard iOS App**；快捷指令保留
 作为备选。
 
-### iOS（UniClipboard App，TestFlight beta 公测）
+### iOS（Clipboard App，TestFlight beta 公测）
 
-UniClipboard iOS App 目前通过 **TestFlight** 进行 beta 公测，邀请链接：
+Clipboard iOS App 目前通过 **TestFlight** 进行 beta 公测，邀请链接：
 
 [https://testflight.apple.com/join/nyNQ8dQe](https://testflight.apple.com/join/nyNQ8dQe)
 
@@ -177,7 +177,7 @@ UniClipboard iOS App 目前通过 **TestFlight** 进行 beta 公测，邀请链�
 #### 先在 App Store 安装 TestFlight
 
 打开 iPhone 上的 **App Store**，搜索 **TestFlight** 并安装。TestFlight
-是 Apple 官方的 beta 测试分发工具，是安装 UniClipboard iOS App beta 的
+是 Apple 官方的 beta 测试分发工具，是安装 Clipboard iOS App beta 的
 前置依赖。
 
 </Step>
@@ -193,7 +193,7 @@ https://testflight.apple.com/join/nyNQ8dQe
 ```
 
 链接会自动跳转到 TestFlight App，点击 **「接受 / Accept」**，再点
-**「安装 / Install」**，UniClipboard 就会装到主屏幕上。
+**「安装 / Install」**，Clipboard 就会装到主屏幕上。
 
 </Step>
 
@@ -214,7 +214,7 @@ connect URI 的大二维码 —— 不再有「先下载 → 再配对」的两�
 
 #### 在 App 里填入连接信息
 
-打开 UniClipboard iOS App，点 **「添加服务端」**，扫描桌面端凭据
+打开 Clipboard iOS App，点 **「添加服务端」**，扫描桌面端凭据
 弹窗顶部那张大二维码。base URL、用户名、密码会自动填好，确认保存
 即可。完成后即可与桌面双向同步剪贴板。
 
@@ -235,14 +235,14 @@ TestFlight 走直连；安装完应用后再把代理打开即可。App 本身�
 
 </Callout>
 
-### iOS（快捷指令，备选，未安装 UniClipboard App）
+### iOS（快捷指令，备选，未安装 Clipboard App）
 
 如果暂时不方便走 TestFlight，也可以继续用快捷指令。在凭据弹窗中
 展开 **「还没装客户端？」** 折叠区，停在 **iOS** tab，找到
 **「不想装 App？扫码安装快捷指令作为兜底」** 那张子级二维码。
 
 1. 用 iPhone 相机扫这张快捷指令安装二维码（或在 Safari 打开安装
-   链接），iOS 会提示安装 `UniClipboard.shortcut`。
+   链接），iOS 会提示安装 `Clipboard.shortcut`。
 2. 打开安装好的快捷指令，**手动** 把凭据复制过去：弹窗底部的
    **凭据** amber 折叠区里有完整的 base URL / 用户名 / 密码，
    用其中的 **备份** 按钮一键复制三行后粘到快捷指令对应字段。
@@ -251,7 +251,7 @@ TestFlight 走直连；安装完应用后再把代理打开即可。App 本身�
 
 ### Android / 其他客户端
 
-**UniClipboard Android 客户端** 的仓库地址是
+**Clipboard Android 客户端** 的仓库地址是
 [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip)
 —— 一个客户端同时覆盖 iOS 与 Android，Android APK 直接在
 [releases 页](https://github.com/UniClipboard/UniClip/releases/latest)
@@ -279,7 +279,7 @@ SyncClipboard 协议，其他任意 SyncClipboard 协议兼容客户端也能接
   并宣告它的地址而不是内网 IP：
 
 ```bash
-uniclip mobile network set \
+clip mobile network set \
     --url https://clip.example.com \
     --accept-network-risk
 ```
@@ -292,7 +292,7 @@ uniclip mobile network set \
 </Callout>
 
 <Callout type="info">
-  UniClipboard 移动端 App 讲的是与桌面监听器一致的 SyncClipboard 兼容协议。App 本身的 bug 一般请在
+  Clipboard 移动端 App 讲的是与桌面监听器一致的 SyncClipboard 兼容协议。App 本身的 bug 一般请在
   [UniClipboard/UniClip](https://github.com/UniClipboard/UniClip/issues) 提，桌面端监听器 的协议侧
   bug 留在本仓库即可。
 </Callout>
@@ -324,17 +324,17 @@ uniclip mobile network set \
 
 | 操作           | GUI                                                            | CLI                                  |
 | -------------- | -------------------------------------------------------------- | ------------------------------------ |
-| 列出已配对     | 设备页 → 移动端同步面板                                        | `uniclip mobile status`              |
-| 再加一台       | 移动端同步面板 → **Add device**                                | `uniclip mobile add --label "…"`     |
+| 列出已配对     | 设备页 → 移动端同步面板                                        | `clip mobile status`              |
+| 再加一台       | 移动端同步面板 → **Add device**                                | `clip mobile add --label "…"`     |
 | 编辑设备       | 点设备卡片 → dialog → **Edit device**（label / 用户名 / 密码） | _目前只 GUI_；签新的并重新配对手机端 |
-| 吊销一台设备   | 点设备卡片 → dialog → **Revoke**                               | `uniclip mobile revoke <device-id>`  |
-| 关闭整个功能   | 配置 modal → 关闭总开关                                        | `uniclip mobile disable`             |
-| 查当前监听 URL | 移动端同步面板状态条                                           | `uniclip mobile status`              |
+| 吊销一台设备   | 点设备卡片 → dialog → **Revoke**                               | `clip mobile revoke <device-id>`  |
+| 关闭整个功能   | 配置 modal → 关闭总开关                                        | `clip mobile disable`             |
+| 查当前监听 URL | 移动端同步面板状态条                                           | `clip mobile status`              |
 
 **编辑设备** 可以在 **Edit device** 视图里修改 label、用户名和/或密码。
 设置或重新生成密码会签发一个新的一次性密码，并原子失效旧的 Argon2id
 哈希；改用户名同样会重铸密码。旧凭据立即停用，需要把新凭据同步更新
-到手机端（UniClipboard iOS App、快捷指令或其他客户端）。
+到手机端（Clipboard iOS App、快捷指令或其他客户端）。
 
 **吊销** 会删除设备记录。携带旧凭据的后续请求会拿到 `401 Unauthorized`。
 
@@ -375,11 +375,11 @@ uniclip mobile network set \
 - [移动端 LAN API](../reference/mobile-api) —— 监听器对外的协议
   （兼容 SyncClipboard 的 HTTP + JSON）。
 - [移动端扫码接入协议](../reference/mobile-connect-uri) ——
-  `uniclipboard://connect` 二维码协议规范。如果你在写一个新的兼容
+  `clipboard://connect` 二维码协议规范。如果你在写一个新的兼容
   SyncClipboard 客户端或快捷指令，需要消费弹窗里的「扫码接入」二维码，
   看这一页。
 - [CLI 参考 — 移动端同步](../cli/reference#移动端同步) —— 所有
-  `uniclip mobile ...` 子命令与参数。
+  `clip mobile ...` 子命令与参数。
 - [自建无头 server 节点](../guides/self-host-server-node) —— 把网关跑在
   公网 VPS 上，让手机从任意网络都能经 HTTPS 访问。
 - [配对与同步 — 移动端伴侣](../guides/pairing#移动端伴侣) —— 移动端

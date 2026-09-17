@@ -4,7 +4,7 @@
 
 - 状态：草案，待产品评审
 - 日期：2026-08-14
-- 范围：`uniclip` 命令行工具
+- 范围：`clip` 命令行工具
 - 依赖产品规则：`docs/prd/2026-08-13-device-trust-reconciliation.md`
 
 ## 一句话定义
@@ -17,11 +17,11 @@
 
 这意味着纯命令行、远程服务器和无桌面环境中的用户可以看到“存在待处理决定”，却无法知道谁提出了变化、哪些设备受影响，也无法完成决定。设备间同步因此可能长期暂停，用户必须转到 GUI 才能继续。
 
-CLI 是 UniClipboard 的正式产品入口，不是只供诊断使用的工具。相同的设备信任事实和决定，在 GUI 与 CLI 中必须得到相同结果；两者只在交互形式上不同。
+CLI 是 Clipboard 的正式产品入口，不是只供诊断使用的工具。相同的设备信任事实和决定，在 GUI 与 CLI 中必须得到相同结果；两者只在交互形式上不同。
 
 ## 目标用户
 
-- 在 Linux 服务器、无桌面系统或 SSH 会话中使用 UniClipboard 的用户。
+- 在 Linux 服务器、无桌面系统或 SSH 会话中使用 Clipboard 的用户。
 - 偏好终端管理设备的桌面用户。
 - 通过脚本监测设备状态，但由人明确批准安全决定的运维用户。
 - 需要在自动化环境中提交预先审核决定的高级用户。
@@ -162,14 +162,14 @@ CLI 支持两种结果导向选择：
 目标命令体验为：
 
 ```text
-uniclip member trust
-uniclip member trust decide --change <CHANGE-ID> --choice <apply|keep-current>
+clip member trust
+clip member trust decide --change <CHANGE-ID> --choice <apply|keep-current>
 ```
 
 非交互提交额外使用明确确认参数：
 
 ```text
-uniclip --json member trust decide \
+clip --json member trust decide \
   --change <CHANGE-ID> \
   --choice apply \
   --yes
@@ -185,15 +185,15 @@ uniclip --json member trust decide \
 
 ### 旧命令兼容
 
-- `uniclip member remove <PEER-ID>` 继续作为本机主动移除设备的公开入口。
+- `clip member remove <PEER-ID>` 继续作为本机主动移除设备的公开入口。
 - 主动移除成功后应展示新的完整设备关系结果，不能只展示旧收敛阶段。
-- `uniclip member removal-status` 在兼容期继续可用，输出明确引导用户改用 `uniclip member trust`。
+- `clip member removal-status` 在兼容期继续可用，输出明确引导用户改用 `clip member trust`。
 - 旧命令的 JSON 结构在兼容期不得静默替换。新脚本必须使用新的设备信任入口。
 - 移除旧命令需要单独发布说明和明确版本计划，不属于本次适配的强制范围。
 
 ### 总体状态提示
 
-`uniclip status` 应把需要用户决定、需要更新、本机已退出或存在无法验证资料作为清楚的产品状态展示，并引导用户运行设备信任查询。
+`clip status` 应把需要用户决定、需要更新、本机已退出或存在无法验证资料作为清楚的产品状态展示，并引导用户运行设备信任查询。
 
 总体状态只负责提醒，不复制完整详情，也不提供决定动作。
 
@@ -288,7 +288,7 @@ CLI 的结构化结果与退出行为结合后，必须让脚本区分以下情�
 
 18. `member remove` 继续可用，且结果不再依赖旧收敛摘要解释完成状态。
 19. `member removal-status` 在兼容期行为稳定，并清楚引导新入口。
-20. `uniclip status` 能提醒存在需要处理的设备信任问题，但不复制决定流程。
+20. `clip status` 能提醒存在需要处理的设备信任问题，但不复制决定流程。
 21. CLI 与 GUI 对同一快照展示相同的变化来源、目标、允许选择和最终设备关系。
 22. CLI 与 GUI 分别提交同一变化时，重复操作得到一致且安全的结果。
 

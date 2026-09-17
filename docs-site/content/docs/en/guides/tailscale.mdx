@@ -6,7 +6,7 @@ description: No VPS, no domain, no certificates — put your phone and desktop o
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-UniClipboard's mobile client is an **HTTP companion** — it doesn't join your
+Clipboard's mobile client is an **HTTP companion** — it doesn't join your
 space's trust mesh and doesn't run a P2P node. It just talks to the small HTTP
 gateway the desktop exposes, using a base URL + Basic Auth. By default that
 gateway is **only reachable on the same Wi-Fi**: once the phone moves to
@@ -72,10 +72,10 @@ trade-off is that the desktop has to stay awake.
 ## Prerequisites
 
 - A Tailscale account both the desktop and phone can sign in to.
-- UniClipboard desktop **0.12 or newer** (the Bind IP dropdown only lists the
+- Clipboard desktop **0.12 or newer** (the Bind IP dropdown only lists the
   CGNAT range from 0.12 on).
 - The desktop stays **awake** while you sync — asleep means unreachable.
-- The [UniClipboard mobile app](https://github.com/UniClipboard/UniClip) on your phone.
+- The [Clipboard mobile app](https://github.com/UniClipboard/UniClip) on your phone.
 
 ## Setup
 
@@ -189,13 +189,13 @@ No daemon restart needed — the listener hot-swaps.
 List the eligible interfaces and find the one starting with `100.`:
 
 ```bash
-uniclip mobile network interfaces
+clip mobile network interfaces
 ```
 
 Then point the advertised address at it (`--ip` renders as `http://<IP>:42720`):
 
 ```bash
-uniclip mobile network set --ip 100.101.102.103 --accept-network-risk
+clip mobile network set --ip 100.101.102.103 --accept-network-risk
 ```
 
 <Callout type="info">
@@ -226,7 +226,7 @@ uniclip mobile network set --ip 100.101.102.103 --accept-network-risk
 Run the normal [Mobile sync → Add device](../core-features/mobile-sync#enable-mobile-sync-one-shot) flow:
 
 ```bash
-uniclip mobile add --label "My iPhone"
+clip mobile add --label "My iPhone"
 ```
 
 The QR in the modal / terminal now encodes the tailnet address. **The one-time
@@ -242,7 +242,7 @@ device card dialog and the QR refreshes in place.
 
 ### Scan from the phone, and keep Tailscale connected
 
-Scan with the UniClipboard app — every field fills in automatically. From then
+Scan with the Clipboard app — every field fills in automatically. From then
 on, **as long as the phone's Tailscale VPN is Connected**, sync works both ways
 on cellular or any external Wi-Fi.
 
@@ -320,7 +320,7 @@ unreachable LAN addresses, and pairing never connects — see
 | Symptom                                      | Where to look                                                                                                                |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | App reports a connection timeout             | First confirm **both machines are online** in the Tailscale **Machines** list on both ends. Nine out of ten issues are here. |
-| Phone can ping `100.x` but the app times out | The desktop gateway is off or on a different port. Run `uniclip mobile status` to see the current listening URL.             |
+| Phone can ping `100.x` but the app times out | The desktop gateway is off or on a different port. Run `clip mobile status` to see the current listening URL.             |
 | Sync is slow, large files stall              | You're probably on DERP relays. Check direct vs DERP in the Tailscale client.                                                |
 | Auth failure / 401                           | Wrong username or password. Rotate on the desktop and re-enter on the phone.                                                 |
 | Can't connect after returning to home Wi-Fi  | Check which address the app says it **will use**; confirm the LAN entry is in the candidate list.                            |

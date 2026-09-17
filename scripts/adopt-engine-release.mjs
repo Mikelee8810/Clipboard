@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import process from 'node:process'
 
-const ENGINE_REPOSITORY = 'UniClipboard/Engine'
+const ENGINE_REPOSITORY = 'Clipboard/Engine'
 const ENGINE_GIT_URL = `https://github.com/${ENGINE_REPOSITORY}.git`
 
 function fail(message) {
@@ -58,14 +58,14 @@ if (manifest.release?.commit !== sourceCommit) {
 }
 
 const sourceArtifact = manifest.artifacts?.find(
-  candidate => candidate.name === 'UniClipboardEngine-source.tar.gz'
+  candidate => candidate.name === 'ClipboardEngine-source.tar.gz'
 )
 if (!sourceArtifact || !/^[0-9a-f]{64}$/.test(sourceArtifact.sha256 ?? '')) {
   fail('release manifest does not declare a valid source archive')
 }
 const sourceBytes = await readBytes(
   readArg('--source-archive'),
-  `${releaseBase}/UniClipboardEngine-source.tar.gz`
+  `${releaseBase}/ClipboardEngine-source.tar.gz`
 )
 if (sourceBytes.length !== sourceArtifact.size)
   fail('source archive size does not match the release')

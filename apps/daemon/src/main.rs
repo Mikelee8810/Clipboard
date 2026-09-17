@@ -1,6 +1,6 @@
 // Prevents an extra console window on Windows in release, DO NOT REMOVE!!
 //
-// `uniclipd` is a console-subsystem binary by default. In production it is only
+// `clipd` is a console-subsystem binary by default. In production it is only
 // ever spawned detached (`DETACHED_PROCESS`, stdio nulled) by the GUI/CLI, but
 // any launch path that forgets those flags — an installer relaunch, the update
 // flow, a stray double-click — flashes a black console window. Promoting the
@@ -8,7 +8,7 @@
 // of how the process is started. Debug builds keep the console for dev logs.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-//! `uniclipd` — standalone UniClipboard daemon binary.
+//! `clipd` — standalone Clipboard daemon binary.
 //!
 //! Thin entry point that initializes platform prerequisites and delegates to
 //! [`uc_daemon::daemon::host::run_standalone_from_env`].

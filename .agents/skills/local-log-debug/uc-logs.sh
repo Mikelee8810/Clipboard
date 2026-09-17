@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# uc-logs.sh — single-machine, cross-platform reader for uniclipboard's
+# uc-logs.sh — single-machine, cross-platform reader for clipboard's
 # per-role JSONL logs. Companion to the `local-log-debug` skill.
 #
 # Mirrors `uc_app_paths::app_log_dir()` (the single source of truth for where
@@ -8,9 +8,9 @@
 # uses that path verbatim.
 #
 # Roles map to file stems exactly as `uc_observability::scope::role_log_file_stem()`:
-#   gui    -> uniclipboard-gui.json.<UTC-date>
-#   daemon -> uniclipboard-daemon.json.<UTC-date>
-#   cli    -> uniclipboard-cli.json.<UTC-date>
+#   gui    -> clipboard-gui.json.<UTC-date>
+#   daemon -> clipboard-daemon.json.<UTC-date>
+#   cli    -> clipboard-cli.json.<UTC-date>
 #
 # Usage:
 #   uc-logs.sh status                         # profile, resolved dir, per-role freshness
@@ -31,7 +31,7 @@
 #   UC_PROFILE     fallback profile when --profile is omitted (matches the app's env)
 set -euo pipefail
 
-APP_DIR_NAME="app.uniclipboard.desktop"
+APP_DIR_NAME="app.clipboard.desktop"
 
 die() { echo "uc-logs: $*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "missing required tool: $1"; }
@@ -95,9 +95,9 @@ log_dir() {
 
 role_stem() {
   case "$1" in
-    gui)    printf 'uniclipboard-gui' ;;
-    daemon) printf 'uniclipboard-daemon' ;;
-    cli)    printf 'uniclipboard-cli' ;;
+    gui)    printf 'clipboard-gui' ;;
+    daemon) printf 'clipboard-daemon' ;;
+    cli)    printf 'clipboard-cli' ;;
   esac
 }
 
@@ -223,7 +223,7 @@ cmd_merge() {
   # sort of UTC ISO-8601 lines is chronological. Finally drop pre-since lines.
   {
     for f in "${FILES[@]}"; do
-      role="$(basename "$f" | sed -E 's/^uniclipboard-([a-z]+)\.json\..*/\1/')"
+      role="$(basename "$f" | sed -E 's/^clipboard-([a-z]+)\.json\..*/\1/')"
       tail -n "$per" "$f" | jq -c --arg role "$role" '. + {role: $role}' 2>/dev/null || true
     done
   } | sort \

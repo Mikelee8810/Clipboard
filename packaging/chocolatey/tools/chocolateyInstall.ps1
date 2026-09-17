@@ -4,12 +4,12 @@ $ErrorActionPreference = 'Stop'
 # publish workflow then only needs to bump the nuspec <version> and checksum64.
 $version = $env:ChocolateyPackageVersion
 $packageArgs = @{
-  packageName    = 'uniclipboard'
+  packageName    = 'clipboard'
   fileType       = 'exe'
   # Tauri NSIS installer. ARM64 Windows runs the x64 build under emulation, so a
   # single x64 installer covers both; add url/checksum for arm64 if you want a
   # native ARM64 install path.
-  url64bit       = "https://github.com/UniClipboard/UniClipboard/releases/download/v$version/UniClipboard_${version}_x64-setup.exe"
+  url64bit       = "https://github.com/UniClipboard/UniClipboard/releases/download/v$version/Clipboard_${version}_x64-setup.exe"
   # Placeholder. Fill before pushing — see ..\README.md (Get-RemoteChecksum or
   # the minisign-signed SHA256SUMS.txt from the release). Do NOT trust a hash
   # produced by an untrusted shell.
@@ -17,7 +17,7 @@ $packageArgs = @{
   checksumType64 = 'sha256'
   silentArgs     = '/S'   # NSIS silent install
   validExitCodes = @(0)
-  softwareName   = 'UniClipboard*'
+  softwareName   = 'Clipboard*'
 }
 
 Install-ChocolateyPackage @packageArgs

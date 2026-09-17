@@ -4048,7 +4048,7 @@
             "type": "string"
           },
           "connectUri": {
-            "description": "`uniclipboard://connect?...` deep link (the main QR content).",
+            "description": "`clipboard://connect?...` deep link (the main QR content).",
             "type": "string"
           },
           "createdAtMs": {
@@ -6246,7 +6246,7 @@
         "type": "object"
       },
       "UpgradeStatusDto": {
-        "description": "Discriminated union mirroring `uc_application::facade::UpgradeStatus`.\n\nWire encoding uses `kind` discriminator with snake_case variants to\nkeep parity with the CLI JSON output produced by `uniclip upgrade\nstatus --json`.\n\n防御性补丁(issue #606 followup):同时声明 `rename_all_fields`,\n避免未来新增多词字段(如 `target_version`)时 wire 字段名漂回\nsnake_case 与上层契约不一致。当前字段都是单词,加这个对 wire 无影响,\n但锁定未来添加字段的默认风格。详见 `docs/agent/rust-tauri-rules.md`\n的 \"Enum Wire Serialization\" 一节。",
+        "description": "Discriminated union mirroring `uc_application::facade::UpgradeStatus`.\n\nWire encoding uses `kind` discriminator with snake_case variants to\nkeep parity with the CLI JSON output produced by `clip upgrade\nstatus --json`.\n\n防御性补丁(issue #606 followup):同时声明 `rename_all_fields`,\n避免未来新增多词字段(如 `target_version`)时 wire 字段名漂回\nsnake_case 与上层契约不一致。当前字段都是单词,加这个对 wire 无影响,\n但锁定未来添加字段的默认风格。详见 `docs/agent/rust-tauri-rules.md`\n的 \"Enum Wire Serialization\" 一节。",
         "discriminator": {
           "propertyName": "kind"
         },
@@ -6423,11 +6423,11 @@
     }
   },
   "info": {
-    "description": "Local daemon HTTP API for the UniClipboard GUI and native clients. All enveloped responses use the canonical `{ data, ts }` shape; errors use `{ code, message, details? }`. Binary and WebSocket endpoints are exempt from the envelope. L2+ operations require a session token (query `?auth=` or the `Authorization` header).",
+    "description": "Local daemon HTTP API for the Clipboard GUI and native clients. All enveloped responses use the canonical `{ data, ts }` shape; errors use `{ code, message, details? }`. Binary and WebSocket endpoints are exempt from the envelope. L2+ operations require a session token (query `?auth=` or the `Authorization` header).",
     "license": {
       "name": "AGPL-3.0-only"
     },
-    "title": "UniClipboard Daemon API",
+    "title": "Clipboard Daemon API",
     "version": "1.0.0"
   },
   "openapi": "3.0.3",

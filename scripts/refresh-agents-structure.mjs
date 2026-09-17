@@ -41,15 +41,15 @@ const KNOWN_DESCRIPTIONS = {
   'uc-webserver': "Daemon's 127.0.0.1 HTTP + WebSocket API (OpenAPI / ApiEnvelope)",
   'uc-daemon-contract': 'Transport DTOs/contracts shared by client + server',
   'uc-daemon-process': 'Thin process primitives: PID file, socket path, spawn, health-wait',
-  'uc-daemon': 'GUI-agnostic daemon runtime; hosts the `uniclipd` binary',
+  'uc-daemon': 'GUI-agnostic daemon runtime; hosts the `clipd` binary',
   'uc-daemon-local': 'Local process coordination: auth token, socket discovery, health polling',
   'uc-daemon-client': 'Daemon HTTP + WS client (used by GUI + CLI)',
   'uc-desktop': 'Desktop host: runtime, daemon probe, background tasks (GUI-framework-agnostic)',
   'uc-tauri': 'Tauri adapter: commands (via tauri-specta), tray, quick panel, run loop',
-  'uc-cli': '`uniclip` CLI (daemon client; heavy deps feature-gated)',
+  'uc-cli': '`clip` CLI (daemon client; heavy deps feature-gated)',
   'uc-cli-macros': 'Proc-macros for uc-cli (internal)',
   'p2p-bench': 'Throwaway perf-spike bins (not shipped; publish = false)',
-  uniclipboard: 'Tauri desktop bin package (packaging shell; hands off to uc-tauri)',
+  clipboard: 'Tauri desktop bin package (packaging shell; hands off to uc-tauri)',
 }
 
 function getDescription(cratePath) {

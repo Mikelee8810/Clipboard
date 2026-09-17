@@ -7,7 +7,7 @@ tags: [tauri, sidecar, build-rs, shell-plugin, capabilities, daemon]
 # Dependency graph
 requires:
   - phase: 66-fix-daemon-ws-reconnection
-    provides: working daemon binary (uniclipboard-daemon) ready for sidecar adoption
+    provides: working daemon binary (clipboard-daemon) ready for sidecar adoption
 provides:
   - tauri-plugin-shell dependency in workspace and uc-tauri crates
   - externalBin declaration in tauri.conf.json for daemon sidecar
@@ -44,7 +44,7 @@ key-decisions:
   - "build.rs placed in src-tauri/ (main crate) not uc-tauri/ so TAURI_ENV_TARGET_TRIPLE is available from Tauri CLI"
 
 patterns-established:
-  - "Sidecar staging: build.rs copies target/{profile}/uniclipboard-daemon to binaries/uniclipboard-daemon-{triple} before tauri_build::build()"
+  - "Sidecar staging: build.rs copies target/{profile}/clipboard-daemon to binaries/clipboard-daemon-{triple} before tauri_build::build()"
   - "Capability format: shell:allow-spawn as object with identifier + allow array containing sidecar=true scoped rule"
 
 requirements-completed: [PH68-01, PH68-02, PH68-05]
@@ -68,8 +68,8 @@ completed: 2026-03-28
 
 ## Accomplishments
 
-- Added `tauri-plugin-shell = "2"` to workspace and uniclipboard/uc-tauri Cargo.toml, enabling Tauri sidecar spawn API
-- Configured `externalBin: ["binaries/uniclipboard-daemon"]` in tauri.conf.json for Tauri bundler to include daemon binary
+- Added `tauri-plugin-shell = "2"` to workspace and clipboard/uc-tauri Cargo.toml, enabling Tauri sidecar spawn API
+- Configured `externalBin: ["binaries/clipboard-daemon"]` in tauri.conf.json for Tauri bundler to include daemon binary
 - Extended `src-tauri/build.rs` with `copy_daemon_binary_to_binaries()` that stages daemon binary before `tauri_build::build()` validates paths
 - Added `shell:allow-spawn` capability permission with `sidecar=true` and `--gui-managed` arg to capabilities/default.json
 - Added `src-tauri/binaries/` to .gitignore to prevent build artifacts from being committed
@@ -86,7 +86,7 @@ Each task was committed atomically:
 - `src-tauri/build.rs` - Added copy_daemon_binary_to_binaries() and construct_triple_from_cfg() before tauri_build::build()
 - `src-tauri/Cargo.toml` - Added tauri-plugin-shell = "2" to [dependencies] and [workspace.dependencies]
 - `src-tauri/crates/uc-tauri/Cargo.toml` - Added tauri-plugin-shell = { workspace = true } in # Tauri section
-- `src-tauri/tauri.conf.json` - Added externalBin array with "binaries/uniclipboard-daemon"
+- `src-tauri/tauri.conf.json` - Added externalBin array with "binaries/clipboard-daemon"
 - `src-tauri/capabilities/default.json` - Added shell:allow-spawn permission object with sidecar allow rule
 - `.gitignore` - Added src-tauri/binaries/ line
 
@@ -103,10 +103,10 @@ Each task was committed atomically:
 **1. [Rule 1 - Bug] Reordered copy_daemon_binary_to_binaries() to run before tauri_build::build()**
 
 - **Found during:** Task 2 (verification)
-- **Issue:** Plan specified `tauri_build::build()` must remain first, but `cargo check -p uniclipboard` failed with `resource path 'binaries/uniclipboard-daemon-aarch64-apple-darwin' doesn't exist` because Tauri validates externalBin paths inside `tauri_build::build()`. Running copy after means Tauri sees missing binary.
+- **Issue:** Plan specified `tauri_build::build()` must remain first, but `cargo check -p clipboard` failed with `resource path 'binaries/clipboard-daemon-aarch64-apple-darwin' doesn't exist` because Tauri validates externalBin paths inside `tauri_build::build()`. Running copy after means Tauri sees missing binary.
 - **Fix:** Moved `copy_daemon_binary_to_binaries()` call to execute BEFORE `tauri_build::build()` so the binary is staged when Tauri validates it.
 - **Files modified:** src-tauri/build.rs
-- **Verification:** `cargo build -p uc-daemon && cargo check -p uniclipboard` succeeds; binaries/ shows `uniclipboard-daemon-aarch64-apple-darwin` (105MB)
+- **Verification:** `cargo build -p uc-daemon && cargo check -p clipboard` succeeds; binaries/ shows `clipboard-daemon-aarch64-apple-darwin` (105MB)
 - **Committed in:** 44497f12
 
 ---
@@ -125,7 +125,7 @@ None — no external service configuration required. First-run note: run `cd src
 ## Next Phase Readiness
 
 - Tauri sidecar infrastructure fully configured (externalBin, capabilities, dependencies, build staging)
-- Plan 02 can now replace `std::process::Command` spawn in `run.rs` with `app.shell().sidecar("uniclipboard-daemon")`
+- Plan 02 can now replace `std::process::Command` spawn in `run.rs` with `app.shell().sidecar("clipboard-daemon")`
 - `tauri-plugin-shell` dependency is available in uc-tauri for Plan 02 implementation
 
 ---

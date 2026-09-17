@@ -3,7 +3,7 @@
   "productName": "Clipboard",
   "mainBinaryName": "Clipboard",
   "version": "1.0.0-alpha.11",
-  "identifier": "app.uniclipboard.desktop",
+  "identifier": "app.clipboard.desktop",
   "build": {
     "beforeDevCommand": "bun run dev:sweep && bun run dev:sweep-port && bun run daemon:dev && bun run dev",
     "devUrl": "http://localhost:1420",
@@ -45,7 +45,7 @@
   "bundle": {
     "active": true,
     "targets": ["app", "dmg", "deb", "rpm", "appimage", "nsis"],
-    "externalBin": ["binaries/uniclipd"],
+    "externalBin": ["binaries/clipd"],
     "category": "Utility",
     "icon": [
       "icons/32x32.png",
@@ -65,11 +65,11 @@
       },
       "deb": {
         "depends": ["libayatana-appindicator3-1", "libgtk-layer-shell0"],
-        "desktopTemplate": "../packaging/linux/uniclipboard.desktop.hbs"
+        "desktopTemplate": "../packaging/linux/clipboard.desktop.hbs"
       },
       "rpm": {
         "depends": ["libayatana-appindicator-gtk3", "gtk-layer-shell"],
-        "desktopTemplate": "../packaging/linux/uniclipboard.desktop.hbs"
+        "desktopTemplate": "../packaging/linux/clipboard.desktop.hbs"
       }
     },
     "windows": {

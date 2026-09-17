@@ -39,8 +39,8 @@ Refactor the existing single-format tracing subscriber into a dual-output system
 ### JSON File Management
 
 - Daily rotation using `tracing_appender::rolling::daily()`
-- File naming: `uniclipboard.json.YYYY-MM-DD` (appender default)
-- Location: platform-standard app log directory (same as existing `uniclipboard.log`), using AppPaths.logs_dir
+- File naming: `clipboard.json.YYYY-MM-DD` (appender default)
+- Location: platform-standard app log directory (same as existing `clipboard.log`), using AppPaths.logs_dir
 - No retention policy in this phase
 
 ### Crate Organization
@@ -56,7 +56,7 @@ Refactor the existing single-format tracing subscriber into a dual-output system
 
 - Remove file output from `logging.rs` (legacy tauri-plugin-log) — structured JSON file replaces it
 - Keep Webview console output in `logging.rs` — `log::*` macros continue outputting to browser DevTools for frontend debugging
-- Result: `uniclipboard.log` file is removed; `uniclipboard.json.YYYY-MM-DD` replaces it for structured output
+- Result: `clipboard.log` file is removed; `clipboard.json.YYYY-MM-DD` replaces it for structured output
 
 ### Documentation
 
@@ -77,7 +77,7 @@ Refactor the existing single-format tracing subscriber into a dual-output system
 
 - User wants observability to be a standalone crate (`uc-observability`) for reuse and clean separation, with Seq integration pre-reserved
 - The init function should accept path parameters rather than resolving paths internally — keeps the crate independent of app-layer types
-- Legacy `uniclipboard.log` file output is actively removed (not just ignored) since JSON file replaces it
+- Legacy `clipboard.log` file output is actively removed (not just ignored) since JSON file replaces it
 
 </specifics>
 

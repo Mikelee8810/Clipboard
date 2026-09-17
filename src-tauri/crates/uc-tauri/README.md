@@ -1,6 +1,6 @@
 # uc-tauri
 
-Tauri adapter layer for UniClipboard.
+Tauri adapter layer for Clipboard.
 
 ## Purpose
 

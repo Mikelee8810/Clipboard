@@ -322,7 +322,7 @@ pub struct SearchQuery { query_string, operator, time_range,
 ## 6. 删除 list 的影响面（依赖点）
 
 - **前端**：`clipboardSlice.fetchClipboardItems`、`useClipboardCollection`、`useClipboardEventStream`、quick panel；`getClipboardEntry(id)` 当前 **误用** list 的 `?id` filter，需改走 `GET /clipboard/entries/:id`。
-- **CLI**：`apps/cli` 的 `uniclip dev dump-clipboard`、`uniclip get --list`。
+- **CLI**：`apps/cli` 的 `clip dev dump-clipboard`、`clip get --list`。
 - **stats 端点**：`list_uc.execute(10_000, 0)` 全量扫描，需改造。
 - **生成物**：OpenAPI spec + generated SDK 的 `listClipboardEntries`。
 - **`ready/not_ready`**：前端虚构状态（后端永远返回 ready），随 list 删除弃用，改用 §4.7 的 `state` + HTTP 状态码。

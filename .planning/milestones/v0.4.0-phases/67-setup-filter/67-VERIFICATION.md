@@ -61,7 +61,7 @@ Not applicable — this phase produces infrastructure/control-flow code (service
 | All daemon app tests pass                                | `cargo test -p uc-daemon --lib -- app::tests`        | 8 passed             | PASS   |
 | All bootstrap lib tests pass                             | `cargo test -p uc-bootstrap --lib`                   | 20 passed            | PASS   |
 | All uc-app setup tests pass                              | `cargo test -p uc-app -- setup`                      | 31 passed            | PASS   |
-| Daemon binary compiles with no errors                    | `cargo check -p uc-daemon --bin uniclipboard-daemon` | 0 errors, 0 warnings | PASS   |
+| Daemon binary compiles with no errors                    | `cargo check -p uc-daemon --bin clipboard-daemon` | 0 errors, 0 warnings | PASS   |
 | `setup_completion_emitter_fires_oneshot` test            | included in app::tests                               | pass                 | PASS   |
 | `setup_completion_emitter_double_call_is_noop` test      | included in app::tests                               | pass                 | PASS   |
 | `recover_encryption_session_ok_true_when_initialized`    | included in app::tests                               | pass                 | PASS   |

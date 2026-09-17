@@ -29,7 +29,7 @@ describe('Android update routes', () => {
       prerelease: false,
       pub_date: '2026-06-01T00:00:00Z',
       notes: { en: 'Release notes', zh: 'Release notes zh' },
-      assets: [{ name: 'uniclipboard-arm64-v8a.apk', sha256: 'abc123' }],
+      assets: [{ name: 'clipboard-arm64-v8a.apk', sha256: 'abc123' }],
     }
     const get = vi.fn(async () => r2Object(JSON.stringify(manifest)))
 
@@ -67,17 +67,17 @@ describe('Android update routes', () => {
     const get = vi.fn(async () => r2Object('apk bytes'))
 
     const response = await worker.fetch(
-      new Request('https://updates.example/android/artifacts/v0.19.0/uniclipboard-arm64-v8a.apk'),
+      new Request('https://updates.example/android/artifacts/v0.19.0/clipboard-arm64-v8a.apk'),
       envWith(get),
       context
     )
 
-    expect(get).toHaveBeenCalledWith('android/artifacts/v0.19.0/uniclipboard-arm64-v8a.apk')
+    expect(get).toHaveBeenCalledWith('android/artifacts/v0.19.0/clipboard-arm64-v8a.apk')
     expect(response.status).toBe(200)
     expect(response.headers.get('Content-Type')).toBe('application/vnd.android.package-archive')
     expect(response.headers.get('Cache-Control')).toBe('public, max-age=86400, immutable')
     expect(response.headers.get('Content-Disposition')).toBe(
-      'attachment; filename="uniclipboard-arm64-v8a.apk"'
+      'attachment; filename="clipboard-arm64-v8a.apk"'
     )
     expect(await response.text()).toBe('apk bytes')
   })

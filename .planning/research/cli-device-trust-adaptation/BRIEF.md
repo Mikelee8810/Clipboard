@@ -6,7 +6,7 @@
 
 ## 建议
 
-将 `uniclip member` 从旧的“成员移除进度”入口升级为完整的设备信任入口。提供独立的只读查询和明确决定命令：用户先读取后台给出的完整当前结果，再携带当前变化编号提交选择。交互式终端可以引导确认；JSON 模式和非交互环境不得弹出提示，也不得猜测用户意图。
+将 `clip member` 从旧的“成员移除进度”入口升级为完整的设备信任入口。提供独立的只读查询和明确决定命令：用户先读取后台给出的完整当前结果，再携带当前变化编号提交选择。交互式终端可以引导确认；JSON 模式和非交互环境不得弹出提示，也不得猜测用户意图。
 
 ## 关键发现
 
@@ -19,8 +19,8 @@
 
 ## 推荐产品形态
 
-- `uniclip member trust`：读取完整当前状态，不修改任何内容。
-- `uniclip member trust decide --change <CHANGE-ID> --choice <apply|keep-current>`：提交当前变化的决定。
+- `clip member trust`：读取完整当前状态，不修改任何内容。
+- `clip member trust decide --change <CHANGE-ID> --choice <apply|keep-current>`：提交当前变化的决定。
 - 当应用变化会移除本机时，额外要求 `--confirm-local-removal`；普通确认或 `--yes` 不能代替。
 - 交互式决定在提交前展示来源、目标和所选结果，并默认取消。
 - `--json` 始终为非交互模式；缺少必要确认参数时直接失败，不读取终端输入。

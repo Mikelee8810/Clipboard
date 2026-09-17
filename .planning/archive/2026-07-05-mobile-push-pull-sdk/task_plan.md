@@ -6,7 +6,7 @@ a new long-lived `MobileSyncEngine` uniffi Object collapsing the client-facing s
 `push(content)` / `pull(trigger, device_hash)` (+ `apply_staged` + a few lifecycle methods),
 with dedup/anti-loop/watermark/backoff/conflict-resolution fully internal. Delete the
 now-superseded `is_content_available`/`compute_snapshot_hash` FFI from the same PR. Desktop
-side and RN-side (`uniclipboard-android`) wiring are out of scope — only produce the Rust
+side and RN-side (`clipboard-android`) wiring are out of scope — only produce the Rust
 engine + Rust tests + an updated RN handoff doc (PR-C).
 
 ## Background

@@ -221,10 +221,10 @@ jobs:
             esac
 
             dest="$filename"
-            if [ -n "$target" ] && [ "$filename" = "UniClipboard.app.tar.gz" ]; then
-              dest="UniClipboard_${target}.app.tar.gz"
-            elif [ -n "$target" ] && [ "$filename" = "UniClipboard.app.tar.gz.sig" ]; then
-              dest="UniClipboard_${target}.app.tar.gz.sig"
+            if [ -n "$target" ] && [ "$filename" = "Clipboard.app.tar.gz" ]; then
+              dest="Clipboard_${target}.app.tar.gz"
+            elif [ -n "$target" ] && [ "$filename" = "Clipboard.app.tar.gz.sig" ]; then
+              dest="Clipboard_${target}.app.tar.gz.sig"
             fi
 
             if [ -e "release-assets/$dest" ]; then
@@ -261,13 +261,13 @@ jobs:
             filename="$(basename "$src")"
             cp "$src" "release-assets/$filename"
           done < <(find artifacts -type f \( \
-            -name "uniclipboard-cli-*.tar.gz" -o \
-            -name "uniclipboard-cli-*.zip" \
+            -name "clipboard-cli-*.tar.gz" -o \
+            -name "clipboard-cli-*.zip" \
           \) | sort)
 
           # Verify CLI archives are present
           echo "CLI archives in release-assets/:"
-          ls -la release-assets/uniclipboard-cli-* 2>/dev/null || echo "WARNING: No CLI archives found"
+          ls -la release-assets/clipboard-cli-* 2>/dev/null || echo "WARNING: No CLI archives found"
 
           echo "Release assets:"
           ls -lh release-assets
@@ -309,7 +309,7 @@ jobs:
           # passwordless key simply ignores the piped line.
           printf '%s\n' "${MINISIGN_RELEASE_PASSWORD:-}" | \
             minisign -S -s minisign-release.key -m SHA256SUMS.txt \
-              -t "UniClipboard v${VERSION} release artifacts (SHA256SUMS)"
+              -t "Clipboard v${VERSION} release artifacts (SHA256SUMS)"
           rm -f minisign-release.key
 
           echo "=== SHA256SUMS.txt.minisig ==="
@@ -419,7 +419,7 @@ jobs:
             filename=$(basename "$file")
             echo "Uploading ${filename} to R2..."
             wrangler r2 object put \
-              "uniclipboard-releases/artifacts/v${VERSION}/${filename}" \
+              "clipboard-releases/artifacts/v${VERSION}/${filename}" \
               --file "$file" \
               --remote
           done
@@ -542,10 +542,10 @@ jobs:
             "repos/${{ github.repository }}/actions/workflows/copr.yml/dispatches" \
             -f ref="v${VERSION}" \
             -f inputs[version]="${VERSION}" \
-            -f inputs[project]="uniclipboard-alpha" \
+            -f inputs[project]="clipboard-alpha" \
             -f inputs[run_ids]=""
 
-          echo "Dispatched copr.yml for v${VERSION} (uniclipboard-alpha)." >> "$GITHUB_STEP_SUMMARY"
+          echo "Dispatched copr.yml for v${VERSION} (clipboard-alpha)." >> "$GITHUB_STEP_SUMMARY"
 
   dispatch-npm-alpha:
     # alpha release 由本 workflow 用 GITHUB_TOKEN 自动发布,不会触发

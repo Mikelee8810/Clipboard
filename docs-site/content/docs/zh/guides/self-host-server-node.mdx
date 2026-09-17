@@ -1,9 +1,9 @@
 ---
 title: 部署一个常驻在线的同步节点
-description: 在 VPS 上把 UniClipboard 以无头方式跑成常驻在线的空间成员，并给手机提供网关。
+description: 在 VPS 上把 Clipboard 以无头方式跑成常驻在线的空间成员，并给手机提供网关。
 ---
 
-UniClipboard 自 0.13 起可以**在服务器上常驻运行**（VPS 或容器都行），作为
+Clipboard 自 0.13 起可以**在服务器上常驻运行**（VPS 或容器都行），作为
 你空间里一个**一直在线的成员**：纯后台、没有图形界面，也不读写这台服务器
 自己的剪贴板（这种运行方式就是标题里说的"无头"）。它像桌面端一样通过 iroh
 同步剪贴板，并在 TLS 后面给手机提供 mobile-sync 网关。
@@ -28,7 +28,7 @@ server 节点就是一个**普通 iroh 成员**，只是常驻在线、没有显
   的桌面端）。
 - **不是**：它不是中继（relay），也**不是**中央 store-and-forward 信箱。
   它只持久化 **它在线时收到的** 内容 —— 不是离线信箱。对端离线时未投递的
-  数据留在发送方本地，这与 UniClipboard 的 P2P 模型一致。
+  数据留在发送方本地，这与 Clipboard 的 P2P 模型一致。
 
 如果你要的其实是 NAT 打洞失败时的中转节点，那是另一回事 —— 见
 [自建 iroh relay](./self-host-relay)。
@@ -77,7 +77,7 @@ flowchart LR
   - 一个固定的 iroh 直连 **UDP** 端口（如 `42999/udp`）—— 让其它网络的
     桌面端能直连这个节点。
 - 一个已有的、**还有另一台设备在线** 的空间用来配对。server 节点是**加入**
-  空间，不创建空间。在一台已在空间里的桌面端跑 `uniclip space invite` 拿邀请码。
+  空间，不创建空间。在一台已在空间里的桌面端跑 `clip space invite` 拿邀请码。
 
 ## 拿到部署文件
 
@@ -85,7 +85,7 @@ flowchart LR
 
 ```bash
 git clone https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard/deploy/vps
+cd Clipboard/deploy/vps
 ```
 
 镜像有两种拿法，二选一：
@@ -99,7 +99,7 @@ docker compose pull
 ```
 
 想锁版本就在 `.env` 里写
-`UC_IMAGE=ghcr.io/uniclipboard/uniclipboard-server:vX.Y.Z`（默认 `:latest`）。
+`UC_IMAGE=ghcr.io/uniclipboard/clipboard-server:vX.Y.Z`（默认 `:latest`）。
 
 **方案 B —— 源码构建。** 需要约 4 GB 内存：
 
@@ -137,11 +137,11 @@ UC_IROH_BIND_PORT=42999         # iroh 直连用的固定 UDP 端口
 `space join` 和 `mobile` 这些写命令**在 daemon 运行时会拒绝执行**，所以置备
 全部用一次性容器先做完。它们和常驻守护进程共用同一个状态卷。
 
-**1. 加入你的空间。** 在一台已在空间里的桌面端跑 `uniclip space invite` 拿邀请码,
+**1. 加入你的空间。** 在一台已在空间里的桌面端跑 `clip space invite` 拿邀请码,
 然后：
 
 ```bash
-docker compose run --rm app uniclip space join
+docker compose run --rm app clip space join
 ```
 
 它会交互式提示输入 **邀请码** 和 **空间口令**（在交互式终端里跑，口令就不会
@@ -152,7 +152,7 @@ docker compose run --rm app uniclip space join
 
 ```bash
 docker compose run --rm app \
-  uniclip mobile network set \
+  clip mobile network set \
   --url https://clip.example.com \
   --accept-network-risk
 ```
@@ -160,7 +160,7 @@ docker compose run --rm app \
 **3. 注册你的手机。** 铸设备凭据并渲染安装 QR：
 
 ```bash
-docker compose run --rm app uniclip mobile add --label "我的 iPhone"
+docker compose run --rm app clip mobile add --label "我的 iPhone"
 ```
 
 把它打印的一次性密码记下来 —— 不会再显示第二次。
@@ -173,7 +173,7 @@ docker compose up -d
 
 会拉起两个容器：
 
-- **`app`** —— 无头守护进程（`uniclip start --server`）。通过 iroh 加入
+- **`app`** —— 无头守护进程（`clip start --server`）。通过 iroh 加入
   空间并提供 mobile-sync 网关。iroh UDP 端口发布到宿主；明文网关端口
   **只**在 Docker 内网。
 - **`caddy`** —— 在 `443` 终结 TLS，自动给 `UC_DOMAIN` 签证书，反代到 app
@@ -183,7 +183,7 @@ docker compose up -d
 
 ## 接入手机
 
-在 UniClipboard / SyncClipboard 手机客户端里扫第 3 步的 QR（或打开打印出来的
+在 Clipboard / SyncClipboard 手机客户端里扫第 3 步的 QR（或打开打印出来的
 `https://<域名>` 安装 URL）。手机此时就能经 Caddy 拉取最新剪贴板、推送新内容;
 推送会经 iroh fan-out 回你的桌面端。客户端那一侧见
 [移动端同步](../core-features/mobile-sync)。
@@ -250,16 +250,16 @@ Basic Auth、没有 websocket，一个默认的反代块就够了。
 
 ## 状态与备份
 
-保住身份、空间成员、手机凭据所需的一切都在 `HOME=/data` 的 `uniclip-state`
+保住身份、空间成员、手机凭据所需的一切都在 `HOME=/data` 的 `clip-state`
 卷里，所以节点重启**永不重新配对**。位于
-`/data/.local/share/app.uniclipboard.desktop/` 下：
+`/data/.local/share/app.clipboard.desktop/` 下：
 
 | 状态                  | 路径                                        |
 | --------------------- | ------------------------------------------- |
 | iroh 身份（节点私钥） | `iroh-identity/`                            |
 | 文件式 KEK            | `keyring/`                                  |
 | keyslot + 设备 id     | `vault/keyslot.json`、`vault/device_id.txt` |
-| 数据库                | `uniclipboard.db`                           |
+| 数据库                | `clipboard.db`                           |
 | iroh blob 缓存        | `iroh-blobs/blobs.db`                       |
 | 设置（手机凭据、LAN） | `settings.json`                             |
 
@@ -267,8 +267,8 @@ Basic Auth、没有 websocket，一个默认的反代块就够了。
 存储 —— iroh 私钥和 KEK 都在卷里。把它备份好（顺带 Caddy 的卷，里面是已签发的证书）：
 
 ```bash
-docker run --rm -v uniclip-state:/data -v "$PWD":/backup alpine \
-  tar czf /backup/uniclip-state.tgz -C /data .
+docker run --rm -v clip-state:/data -v "$PWD":/backup alpine \
+  tar czf /backup/clip-state.tgz -C /data .
 ```
 
 ## 运维

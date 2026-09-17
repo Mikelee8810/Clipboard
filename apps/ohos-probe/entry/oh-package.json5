@@ -1,9 +1,9 @@
 {
   name: 'entry',
   version: '1.0.0',
-  description: 'UniClipboard HarmonyOS engine acceptance entry',
+  description: 'Clipboard HarmonyOS engine acceptance entry',
   main: '',
-  author: 'UniClipboard',
+  author: 'Clipboard',
   license: 'AGPL-3.0-only',
   dependencies: {
     'libuc_ohos_napi.so': 'file:./src/main/cpp/types/libuc_ohos_napi',

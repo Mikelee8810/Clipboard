@@ -224,7 +224,7 @@ impl DaemonDiagnosticArchive for DesktopDiagnosticArchive {
             .ok_or_else(|| anyhow::anyhow!("Downloads directory is unavailable"))?;
         std::fs::create_dir_all(&directory)?;
         let destination = directory.join(format!(
-            "uniclipboard-diagnostics-{}.zip",
+            "clipboard-diagnostics-{}.zip",
             Utc::now().format("%Y%m%d-%H%M%S")
         ));
         let logs_dir = self.logs_dir.clone();

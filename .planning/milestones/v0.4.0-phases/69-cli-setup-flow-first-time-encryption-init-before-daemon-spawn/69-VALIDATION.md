@@ -61,7 +61,7 @@ Test file: `src-tauri/crates/uc-cli/tests/setup_cli.rs` (extends existing test h
 
 | Behavior                                | Requirement | Why Manual                     | Test Instructions                                                                                     |
 | --------------------------------------- | ----------- | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Post-setup prompts daemon start command | PH69-03     | UX verification of output text | After new space completes, verify CLI outputs guidance to run `uniclipboard-daemon` then `setup host` |
+| Post-setup prompts daemon start command | PH69-03     | UX verification of output text | After new space completes, verify CLI outputs guidance to run `clipboard-daemon` then `setup host` |
 
 _PH69-03 (next-step hint display) is inherently a UI text check — automated guard tests cover the control flow, manual verification covers the exact wording._
 

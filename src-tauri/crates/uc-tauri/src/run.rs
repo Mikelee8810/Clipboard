@@ -54,7 +54,7 @@ pub(crate) const SHUTDOWN_FRONTEND_GRACE_MS: u64 = 100;
 
 /// 这个 GUI shell 期望 daemon 上报的 `packageVersion`——`probe_daemon_health`
 /// 用它做版本兼容性判断。`env!` 拿的是 `uc-tauri` 自己的 cargo 版本，
-/// workspace 共享版本号所以与 `uniclipboard` bin 一致。
+/// workspace 共享版本号所以与 `clipboard` bin 一致。
 const EXPECTED_PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Marker arg the OS auto-start login item launches with (registered on the
@@ -82,7 +82,7 @@ mod launch_argument_tests {
     #[test]
     fn recognizes_the_quick_panel_launch_argument() {
         assert!(has_quick_panel_launch_argument([
-            "uniclipboard".to_string(),
+            "clipboard".to_string(),
             "--quick-panel".to_string(),
         ]));
     }
@@ -90,7 +90,7 @@ mod launch_argument_tests {
     #[test]
     fn ignores_other_launch_arguments() {
         assert!(!has_quick_panel_launch_argument([
-            "uniclipboard".to_string(),
+            "clipboard".to_string(),
             "--autostart".to_string(),
         ]));
     }
@@ -105,7 +105,7 @@ mod launch_argument_tests {
 /// Await the first process-level "terminate this app" signal.
 ///
 /// Unix: SIGINT (terminal Ctrl-C) or SIGTERM (`kill`, logout). Other platforms:
-/// Ctrl-C. The detached `uniclipd` lives in its own session / process group
+/// Ctrl-C. The detached `clipd` lives in its own session / process group
 /// (`setsid` / `CREATE_NEW_PROCESS_GROUP`), so a terminal signal never reaches
 /// it — without this handler it is orphaned when the GUI dies (the `bun
 /// tauri:dev` + Ctrl-C case). The caller turns this into a full quit so the
@@ -238,7 +238,7 @@ pub fn run(tauri_ctx: tauri::Context<tauri::Wry>) -> anyhow::Result<()> {
     #[cfg(target_os = "linux")]
     disable_webkit_dmabuf_on_wayland();
 
-    // ADR-008 P3-3 (B2'-3): the GUI is a pure client of an external `uniclipd`.
+    // ADR-008 P3-3 (B2'-3): the GUI is a pure client of an external `clipd`.
     // It assembles ONLY the file-backed ports it needs (settings / setup-status /
     // analytics / device-id / storage paths) via `build_gui_client_context` —
     // it never opens the sqlite pool, builds the in-process `AppFacade`, or runs
@@ -1053,7 +1053,7 @@ pub fn run(tauri_ctx: tauri::Context<tauri::Wry>) -> anyhow::Result<()> {
 
 /// Lightweight tracing init for the GUI process.
 ///
-/// Sets up console (stdout) + JSON file (`uniclipboard-gui.json.<date>`)
+/// Sets up console (stdout) + JSON file (`clipboard-gui.json.<date>`)
 /// output, matching the daemon's dual-output approach. No Sentry layer —
 /// the daemon is the single authoritative telemetry exporter.
 ///

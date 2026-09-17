@@ -8,7 +8,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 This page covers **Regular sync**, a LAN / self-hosted connection mode. It doesn't
 join the desktop's encrypted space, and it doesn't run a P2P node — it connects
-to a computer running the UniClipboard **desktop app with "phone sync" turned
+to a computer running the Clipboard **desktop app with "phone sync" turned
 on**, and everything flows through that computer. Two phones never sync directly
 with each other; each one talks to the desktop on its own.
 
@@ -23,7 +23,7 @@ in the same dialog instead.
 
 ### Get the credential on the desktop
 
-Open the UniClipboard desktop app on your computer and go to
+Open the Clipboard desktop app on your computer and go to
 **Devices**, click the phone icon beside the invitation button, and keep
 **Regular sync** selected. On first use, confirm enabling it, then enter a
 device label and add the phone. The desktop shows a one-time credential
@@ -115,7 +115,7 @@ switcher panel, where you can **switch** between desktops, **delete** one, or
 </Steps>
 
 <Callout type="info">
-  The desktop QR code uses the `uniclipboard://connect` deep-link format. Its full specification
+  The desktop QR code uses the `clipboard://connect` deep-link format. Its full specification
   only matters if you want to write your own compatible client — regular use doesn't require any of
   it. See the [Mobile Connect URI protocol](../reference/mobile-connect-uri).
 </Callout>

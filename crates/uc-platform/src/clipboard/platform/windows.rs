@@ -1016,7 +1016,7 @@ fn write_text_windows_native(text: &str) -> Result<()> {
 /// emit offsets that are off by 1-2 bytes when the payload contains
 /// multi-byte UTF-8 characters; when the bad offset lands inside such a
 /// character `std`'s string slicer aborts the process. See Sentry issue
-/// UNICLIPBOARD-RUST-1V and the regression tests in
+/// CLIPBOARD-RUST-1V and the regression tests in
 /// `crate::clipboard::cf_html::tests::cf_html_endhtml_panic_repro`.
 ///
 /// We grab the raw CF_HTML bytes with `clipboard-win` (the lower-level crate

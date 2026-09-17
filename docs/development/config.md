@@ -7,8 +7,8 @@ When `config.toml` is absent, the application uses system-default paths:
 ### macOS
 
 ```
-~/Library/Application Support/app.uniclipboard.desktop[-<profile>]/
-├── uniclipboard.db          # Database
+~/Library/Application Support/app.clipboard.desktop[-<profile>]/
+├── clipboard.db          # Database
 ├── vault/                   # Encryption vault
 │   ├── key
 │   └── snapshot
@@ -19,8 +19,8 @@ When `config.toml` is absent, the application uses system-default paths:
 ### Linux
 
 ```
-~/.local/share/app.uniclipboard.desktop[-<profile>]/
-├── uniclipboard.db
+~/.local/share/app.clipboard.desktop[-<profile>]/
+├── clipboard.db
 ├── vault/
 │   ├── key
 │   └── snapshot
@@ -31,8 +31,8 @@ When `config.toml` is absent, the application uses system-default paths:
 ### Windows
 
 ```
-%LOCALAPPDATA%\app.uniclipboard.desktop[-<profile>]\
-├── uniclipboard.db
+%LOCALAPPDATA%\app.clipboard.desktop[-<profile>]\
+├── clipboard.db
 ├── vault\
 │   ├── key
 │   └── snapshot
@@ -40,7 +40,7 @@ When `config.toml` is absent, the application uses system-default paths:
 └── settings.json
 ```
 
-`[-<profile>]` means the suffix is present only when `UC_PROFILE` is set, for example `app.uniclipboard.desktop-dev`.
+`[-<profile>]` means the suffix is present only when `UC_PROFILE` is set, for example `app.clipboard.desktop-dev`.
 
 ## Development Mode (Optional)
 
@@ -53,7 +53,7 @@ Developers can create `config.toml` in the project root to override default path
 device_name = "DevDevice"
 
 [storage]
-database_path = "/tmp/uniclipboard-dev.db"
+database_path = "/tmp/clipboard-dev.db"
 
 [security]
 vault_key_path = "/tmp/vault/key"

@@ -70,7 +70,7 @@ completed: 2026-04-05
 - `init_otlp_pipeline`: returns `Ok(None)` when OTEL_EXPORTER_OTLP_ENDPOINT unset or profile is Prod; returns `Ok(Some((OtlpLayer, OtlpGuard)))` when env var is set and profile is Dev/DebugClipboard/Cli
 - `init_otlp_pipeline_generic<S>`: typed version for bootstrap composition with specific subscriber type
 - `OtlpGuard`: holds `SdkTracerProvider`, best-effort `shutdown()` on drop, logs warn on failure, no panic
-- `build_resource`: populates SERVICE_NAME="uniclipboard-desktop", SERVICE_VERSION from CARGO_PKG_VERSION, os.type, deployment.environment.name, service.instance.id (when device_id provided)
+- `build_resource`: populates SERVICE_NAME="clipboard-desktop", SERVICE_VERSION from CARGO_PKG_VERSION, os.type, deployment.environment.name, service.instance.id (when device_id provided)
 - `inject_current_context` / `extract_remote_context`: W3C TraceContext propagation helpers using global propagator
 - W3C `TraceContextPropagator` installed globally as a side effect of `init_otlp_pipeline` (even when disabled)
 - Added `opentelemetry-otlp` 0.31 and `opentelemetry-semantic-conventions` 0.31 to `[dependencies]`

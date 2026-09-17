@@ -9,7 +9,7 @@
 
 ## 0. 本里程碑架构变更摘要
 
-> **核心判断：** 这不是新架构，而是**在既有钩子上挂一根线**。`uc-core::Settings` 已有 `// pub network: NetworkSettings,` 注释占位（`uc-core/src/settings/model.rs:201-202`），`IrohNodeConfig.disable_relays` 已是 `pub`（`uc-infra/src/network/iroh/node.rs:161`），`bind` 时 `RelayMode` 路径已通（`node.rs:368-372`）。本里程碑要补的是"把这根线接通"，外加一个全新的"连接通道"读出能力。
+> **核心判断：** 这不是新架构，而是 **在既有钩子上挂一根线**。`uc-core::Settings` 已有 `// pub network: NetworkSettings,` 注释占位（`uc-core/src/settings/model.rs:201-202`），`IrohNodeConfig.disable_relays` 已是 `pub`（`uc-infra/src/network/iroh/node.rs:161`），`bind` 时 `RelayMode` 路径已通（`node.rs:368-372`）。本里程碑要补的是"把这根线接通"，外加一个全新的"连接通道"读出能力。
 
 | 类别 | 涉及组件 | 备注 |
 |------|---------|------|
@@ -17,7 +17,7 @@
 | **修改** | `apply_settings_patch`（多挂一段）+ `Settings::default`（多一行）+ `build_space_setup_assembly` 调用方（`builders.rs:178` / `non_gui_runtime.rs:280`）从 `IrohNodeConfig::default()` 改成"先读 settings 再造"+ NetworkSection 替换占位 + `PeerSnapshotDto` 加字段 + `peers.changed` 路径不变（增量字段而非新事件类型） | 中等 |
 | **保持不变** | 六边形分层、daemon-first 主权、HTTP `/settings` 与 WS `peers.changed` 协议骨架、Tauri commands（**继续没有 settings 命令**，前端走 daemon HTTP）、iroh `RelayMode` 在 bind 时确定的事实、`disable_relays` 字段本身、settings JSON 文件原子写策略、SQLite migration 链（settings 是 JSON 文件，不走 SQL migration） | 大量 |
 
-> **常见误区纠正：** Settings 不是 SQLite 存储。它是 `~/Library/Application Support/app.uniclipboard.desktop/.../settings.json` 的 JSON 文件 + serde（`uc-infra/src/settings/repository.rs:77 atomic_write`），migration 走 `SettingsMigrator`（基于 `schema_version` 数值递增）而非 SQL。原 question 里"SQLite 存储/migration 怎么走"的提法本身假设错了。
+> **常见误区纠正：** Settings 不是 SQLite 存储。它是 `~/Library/Application Support/app.clipboard.desktop/.../settings.json` 的 JSON 文件 + serde（`uc-infra/src/settings/repository.rs:77 atomic_write`），migration 走 `SettingsMigrator`（基于 `schema_version` 数值递增）而非 SQL。原 question 里"SQLite 存储/migration 怎么走"的提法本身假设错了。
 
 ---
 
@@ -54,11 +54,11 @@ pub struct Settings {
 
 `Default for Settings` 在 `uc-core/src/settings/defaults.rs:251-262` 增一行 `network: NetworkSettings::default()`，并补 `impl Default for NetworkSettings { fn default() -> Self { Self { allow_relay_fallback: true } } }`。
 
-> **为什么放 `uc-core` 而不是 `uc-infra`：** `uc-core/AGENTS.md` §8 明确说"业务设置（如 `SyncSettings`）属于 core，配置加载属于 infra"。`network.allow_relay_fallback` 是用户业务偏好（"我要不要走公网中继"），不是 infra 的配置加载逻辑，归 core 是直接对应的。注意值对象**不持有**任何 iroh / libp2p 类型——`disable_relays` 这种命名留给 `uc-infra`。
+> **为什么放 `uc-core` 而不是 `uc-infra`：** `uc-core/AGENTS.md` §8 明确说"业务设置（如 `SyncSettings`）属于 core，配置加载属于 infra"。`network.allow_relay_fallback` 是用户业务偏好（"我要不要走公网中继"），不是 infra 的配置加载逻辑，归 core 是直接对应的。注意值对象 **不持有** 任何 iroh / libp2p 类型——`disable_relays` 这种命名留给 `uc-infra`。
 
 **`schema_version` 是否要 bump？** 不需要。新增字段全部带 `#[serde(default = ...)]`，旧 settings.json 反序列化时缺字段直接走默认值，向前兼容。`CURRENT_SCHEMA_VERSION` 保持 `1`（`uc-core/src/settings/model.rs:7`），`SettingsMigrator` 不需要新条目（`uc-infra/src/settings/migration.rs:38-41` 当前是空 vec）。
 
-**领域端口要加吗？** `SettingsPort`（`uc-core/src/ports/mod.rs`）签名 `load(&self) -> Settings` / `save(&self, &Settings)` 是字段无关的，新字段自动跟着流过去，**不动**。**但** §1.5 会建议**新增一个独立 port** `ConnectionChannelPort` 给"连接通道"指示器，原因见那一节。
+**领域端口要加吗？** `SettingsPort`（`uc-core/src/ports/mod.rs`）签名 `load(&self) -> Settings` / `save(&self, &Settings)` 是字段无关的，新字段自动跟着流过去，**不动**。**但** §1.5 会建议 **新增一个独立 port** `ConnectionChannelPort` 给"连接通道"指示器，原因见那一节。
 
 ---
 
@@ -96,9 +96,9 @@ if let Some(network) = patch.network {
 }
 ```
 
-**`facade.rs` 不动。** `SettingsFacade::get` / `update`（`facade.rs:27-48`）签名都是 `SettingsView` / `SettingsPatch`，新增字段透明流过。这是**纯 additive 改动，不是 namespace 重构**。`uc-application/AGENTS.md` §11.4 要求外部只通过 `facade/` 目录访问；`mod.rs:5-12` 的 `pub use` 白名单需要新增一行 `NetworkSettingsView, NetworkSettingsPatch`。
+**`facade.rs` 不动。** `SettingsFacade::get` / `update`（`facade.rs:27-48`）签名都是 `SettingsView` / `SettingsPatch`，新增字段透明流过。这是 **纯 additive 改动，不是 namespace 重构**。`uc-application/AGENTS.md` §11.4 要求外部只通过 `facade/` 目录访问；`mod.rs:5-12` 的 `pub use` 白名单需要新增一行 `NetworkSettingsView, NetworkSettingsPatch`。
 
-**为什么是 additive 而不是 namespace 隔离：** `SettingsView` 已经是 namespace 化的（`general` / `sync` / `security` / `pairing` / `file_sync`），新增 `network` 是**沿用既有结构**，不是重命名/迁移。其他 namespace 现状不动。
+**为什么是 additive 而不是 namespace 隔离：** `SettingsView` 已经是 namespace 化的（`general` / `sync` / `security` / `pairing` / `file_sync`），新增 `network` 是 **沿用既有结构**，不是重命名/迁移。其他 namespace 现状不动。
 
 ---
 
@@ -110,7 +110,7 @@ if let Some(network) = patch.network {
 
 文件：`src-tauri/crates/uc-bootstrap/src/space_setup.rs:208-228`
 
-当前签名（`build_space_setup_assembly` 接 `IrohNodeConfig` 参数）已经允许调用方传入定制配置。**调用方**才是真正的注入点：
+当前签名（`build_space_setup_assembly` 接 `IrohNodeConfig` 参数）已经允许调用方传入定制配置。**调用方** 才是真正的注入点：
 
 | 调用方文件 | 行号 | 当前 | 修改后 |
 |---|---|---|---|
@@ -118,7 +118,7 @@ if let Some(network) = patch.network {
 | `uc-bootstrap/src/non_gui_runtime.rs` | 280 | 同上 | 同上 |
 | `uc-bootstrap/src/space_setup.rs` 测试 | n/a | 测试用 `IrohNodeConfig { disable_relays: true, .. }` 直传 | 不动，集成测试保持显式控制 |
 
-**为什么不在 `space_setup.rs` 内部读 settings：** `space_setup.rs` 已经接 `IrohNodeConfig` 参数，是装配体的入参；它不应该再反向调用 `SettingsPort::load`，否则**装配体既是消费者又是配置读取者**，违反 `uc-bootstrap` 的"只装配，不决策"职责。读 settings 的责任应该留在 builders（已经持有 `wired.deps.settings`）。
+**为什么不在 `space_setup.rs` 内部读 settings：** `space_setup.rs` 已经接 `IrohNodeConfig` 参数，是装配体的入参；它不应该再反向调用 `SettingsPort::load`，否则 **装配体既是消费者又是配置读取者**，违反 `uc-bootstrap` 的"只装配，不决策"职责。读 settings 的责任应该留在 builders（已经持有 `wired.deps.settings`）。
 
 **新增 `IrohNodeConfig::from_network_settings(&NetworkSettings)`？** 不要做。`uc-infra/AGENTS.md` §4.1 明确"不让 core 适配 infra"——`NetworkSettings` 不应该被 `uc-infra` 直接知道。装配代码（`uc-bootstrap`）做翻译是正确的边界。
 
@@ -147,7 +147,7 @@ if let Some(network) = patch.network {
 
 * `settings.rs:162-218` 的 `settings_view_to_dto`：末尾补 `network: NetworkSettingsDto { allow_relay_fallback: value.network.allow_relay_fallback }`
 
-**Tauri commands：不需要新命令。** `uc-tauri/src/commands/mod.rs` 里**根本没有 settings 命令**（确认：grep `fn get_settings|fn update_settings` in `uc-tauri` 无结果）。前端的 settings 走 daemon HTTP 客户端 `daemonClient.request('/settings')`（`src/api/daemon/settings.ts:185-207`）。这是既有架构的明确选择（webserver `settings.rs:5-7` 有注释说明 "Unlike the Tauri command（which applies OS-level side effects），these handlers only update the settings domain model"——历史上**曾经**有 Tauri command；当前代码里 Tauri commands 已经下线 settings，全部走 HTTP）。
+**Tauri commands：不需要新命令。** `uc-tauri/src/commands/mod.rs` 里 **根本没有 settings 命令**（确认：grep `fn get_settings|fn update_settings` in `uc-tauri` 无结果）。前端的 settings 走 daemon HTTP 客户端 `daemonClient.request('/settings')`（`src/api/daemon/settings.ts:185-207`）。这是既有架构的明确选择（webserver `settings.rs:5-7` 有注释说明 "Unlike the Tauri command（which applies OS-level side effects），these handlers only update the settings domain model"——历史上 **曾经** 有 Tauri command；当前代码里 Tauri commands 已经下线 settings，全部走 HTTP）。
 
 **为什么不重新加 Tauri command：** `network.allow_relay_fallback` **没有 OS-level side effect**（不像 `auto_start` 要写注册表，或 `keyboard_shortcuts` 要 register global shortcut）。它只影响 daemon 进程下次启动时的 iroh bind 行为，是纯 daemon-domain 的字段。daemon HTTP 路径已经覆盖。
 
@@ -155,18 +155,18 @@ if let Some(network) = patch.network {
 
 ### 1.5 设备列表"连接通道"指示器
 
-这是本里程碑**唯一真正的"新增能力"**——前面所有改动都是"接通既有钩子"。
+这是本里程碑 **唯一真正的"新增能力"**——前面所有改动都是"接通既有钩子"。
 
 #### 现状（无指示器）
 
 * `PeerSnapshotDto`（`uc-daemon-contract/src/api/types.rs:33-40`）目前字段：`peer_id` / `device_name` / `addresses` / `is_paired` / `connected: bool` / `pairing_state: String`。**没有"通道类型"字段**。
 * `connected: bool` 来自 `PresencePort.current_state()`（即 `Online | Offline | Unknown`，`uc-core/src/ports/presence.rs:23-28`）二值化映射，与"通道"是两件事。
-* iroh **有**读 connection type 的 API：`Endpoint::remote_info(addr_id) -> Option<RemoteInfo>`，过滤 `TransportAddrInfo` 是 `Active` 的 entries（`uc-infra/src/network/iroh/connect.rs:51-67` 已经有用例，目前只用作日志）。
+* iroh **有** 读 connection type 的 API：`Endpoint::remote_info(addr_id) -> Option<RemoteInfo>`，过滤 `TransportAddrInfo` 是 `Active` 的 entries（`uc-infra/src/network/iroh/connect.rs:51-67` 已经有用例，目前只用作日志）。
 * 现成的事件路径：`PresenceMonitor`（`uc-desktop/src/daemon/peers/presence_monitor.rs:1-50`）在 `PresenceEvent` 触发时拉一遍 `app_facade.list_peer_snapshots()` 然后 broadcast `peers.changed` 全量快照；前端 `SpaceMembersPanel.tsx:50-58` 收到事件后重拉 `/paired-devices`。**新增字段沿这条路就行，不需要新事件类型。**
 
 #### 推荐设计
 
-新增一个**领域 port** + 一个**iroh adapter** + 给 `PeerSnapshotDto` 加字段。
+新增一个 **领域 port** + 一个 **iroh adapter** + 给 `PeerSnapshotDto` 加字段。
 
 **Port 定义**（`uc-core/src/ports/connection_channel.rs`，新文件）：
 
@@ -217,13 +217,13 @@ pub trait ConnectionChannelPort: Send + Sync {
 
 `build_space_setup_assembly` 在 `let iroh_node = builder.spawn();`（行 273 前后）拿到 `endpoint` 之后构造 `Arc::new(IrohConnectionChannelAdapter::new(endpoint.clone(), wired.peer_addr_repo.clone()))`，喂进 `MemberRosterFacade::new(...)`。
 
-> 注：`IrohNode` 当前**私有持有** `endpoint`（`node.rs:99-102`，没有 `pub fn endpoint()`）。需要新增一个 `pub fn endpoint(&self) -> Arc<Endpoint>` 访问器，**或**让 `IrohNodeBuilder::spawn()` 同时返回一个 `ConnectionChannelPort` 句柄（更干净，与现有 `install_*` 模式一致）。后者更符合 `uc-infra/AGENTS.md` §4.3 的可替换性原则——把 `Endpoint` 当 `Arc` 漏出去，等于把"拿到 iroh endpoint"作为隐式合约。
+> 注：`IrohNode` 当前 **私有持有** `endpoint`（`node.rs:99-102`，没有 `pub fn endpoint()`）。需要新增一个 `pub fn endpoint(&self) -> Arc<Endpoint>` 访问器，**或** 让 `IrohNodeBuilder::spawn()` 同时返回一个 `ConnectionChannelPort` 句柄（更干净，与现有 `install_*` 模式一致）。后者更符合 `uc-infra/AGENTS.md` §4.3 的可替换性原则——把 `Endpoint` 当 `Arc` 漏出去，等于把"拿到 iroh endpoint"作为隐式合约。
 
 **DTO/事件传递**：
 
 * `uc-daemon-contract/src/api/types.rs:33-40` 给 `PeerSnapshotDto` 加 `pub channel: String`（值 `"direct" | "relay" | "offline" | "unknown"`）
 * `uc-webserver/src/api/server.rs:99-112` 的 mapping 多一行 `channel: peer.channel.into()`（或 `channel_to_dto(...)` helper）
-* WS 协议**不改动**——`peers.changed` 仍然是全量快照（`PeersChangedFullPayload { peers: Vec<PeerSnapshotDto> }`，`types.rs:115-118`），新字段跟着走
+* WS 协议 **不改动**——`peers.changed` 仍然是全量快照（`PeersChangedFullPayload { peers: Vec<PeerSnapshotDto> }`，`types.rs:115-118`），新字段跟着走
 
 **前端**：
 
@@ -264,7 +264,7 @@ iroh 不主动 broadcast "通道切换"事件。当前逻辑是：每次 `Presen
         → IrohNodeBuilder::bind → Endpoint(relay_mode = Default | Disabled)
 ```
 
-**关键约束：** iroh `RelayMode` 在 `Endpoint::builder()...bind()` 时确定（`node.rs:368-396`），运行时改不了。本里程碑**接受这个限制**，UI 切换时弹"重启生效"（`node.rs:380` 的注释明确"Slice 1 always has pairing. A future slice ... would add a separate `bind_bare` constructor"——用户决策也明确不做热切换）。
+**关键约束：** iroh `RelayMode` 在 `Endpoint::builder()...bind()` 时确定（`node.rs:368-396`），运行时改不了。本里程碑 **接受这个限制**，UI 切换时弹"重启生效"（`node.rs:380` 的注释明确"Slice 1 always has pairing. A future slice ... would add a separate `bind_bare` constructor"——用户决策也明确不做热切换）。
 
 ### 2.2 用户切换 LAN-only Mode
 
@@ -310,7 +310,7 @@ DevicesPage 挂载
 
 ## 3. 集成点（已 grep 验证）
 
-| 位置 | 文件:行号 | 作用 | 本里程碑动作 |
+| 位置 | 文件：行号 | 作用 | 本里程碑动作 |
 |------|---------|------|--------|
 | `IrohNodeConfig::default()` 调用 | `uc-bootstrap/src/builders.rs:178` | GUI 启动装配 | **改**：先读 settings 再造 cfg |
 | 同上 | `uc-bootstrap/src/non_gui_runtime.rs:280` | CLI/daemon 启动装配 | **改**：同上 |
@@ -350,17 +350,17 @@ DevicesPage 挂载
 
 ### 4.2 历史欠账与命名清理
 
-* `uc-application/AGENTS.md` §11.4.7 提到"部分外部消费者仍直接从 `uc_application::<业务子模块>` 导入"。本里程碑**不解决**这个欠账，但**不能再引入**新的越界 import。新增 `NetworkSettingsView` / `NetworkSettingsPatch` 类型必须只通过 `facade/settings/mod.rs` 暴露。
+* `uc-application/AGENTS.md` §11.4.7 提到"部分外部消费者仍直接从 `uc_application::<业务子模块>` 导入"。本里程碑 **不解决** 这个欠账，但 **不能再引入** 新的越界 import。新增 `NetworkSettingsView` / `NetworkSettingsPatch` 类型必须只通过 `facade/settings/mod.rs` 暴露。
 * `IrohNodeConfig.disable_relays` 命名是 infra 内部细节（反向语义），不冒泡到 core。core 用 `allow_relay_fallback`（业务语义）；翻译在 builders 完成。这与之前 explore 阶段决策一致（见 `.context/attachments/Summary of Explore LAN version need.md` 用户对话末段）。
 
 ### 4.3 可观测性
 
-* `node.rs:399-404` 的 bind 后 `debug!(... disable_relays = config.disable_relays, ...)` 日志已经覆盖关键事实，建议**新增** `tracing::info!` 在 builders 翻译那一步打印 "applying network.allow_relay_fallback={} → disable_relays={}"，方便用户支持和排障。
+* `node.rs:399-404` 的 bind 后 `debug!(... disable_relays = config.disable_relays, ...)` 日志已经覆盖关键事实，建议 **新增** `tracing::info!` 在 builders 翻译那一步打印 "applying network.allow_relay_fallback={} → disable_relays={}"，方便用户支持和排障。
 * `IrohConnectionChannelAdapter` 实现里建议复用 `connect.rs:50-66` 的 `Active` 路径解析逻辑（提取成 free function），避免两份地方各自演化。
 
 ### 4.4 测试影响
 
-* `uc-bootstrap/tests/slice*_*.rs` 三个集成测试都用 `IrohNodeConfig { disable_relays: true, .. }`（`slice1_handshake_e2e.rs:344` / `slice2_phase1_presence_e2e.rs:354` / `slice2_phase2_clipboard_e2e.rs:373`）。这些测试**不动**——它们是 loopback-only 自动化，本来就要禁 relay，与 LAN-only Mode 业务无关。
+* `uc-bootstrap/tests/slice*_*.rs` 三个集成测试都用 `IrohNodeConfig { disable_relays: true, .. }`（`slice1_handshake_e2e.rs:344` / `slice2_phase1_presence_e2e.rs:354` / `slice2_phase2_clipboard_e2e.rs:373`）。这些测试 **不动**——它们是 loopback-only 自动化，本来就要禁 relay，与 LAN-only Mode 业务无关。
 * 新增单元测试：
   * `apply_settings_patch` 处理 `network.allow_relay_fallback`
   * `IrohConnectionChannelAdapter.channel_for` 三态映射（`Direct` / `Relay` / `Offline`）—— 用 fake `PeerAddressRepo` 与 mock endpoint 行为，或写 doc-test 验证私有 IP 判定
@@ -419,7 +419,7 @@ DevicesPage 挂载
 * **运行时热切换** —— 需要重建 endpoint。技术上需要 `IrohNodeBuilder::bind_bare` 风格的二次 bind，并处理 ALPN handler 重新注册、活跃 connection 重连、session 状态保持。已被用户决策推到下一里程碑。
 * **通道切换专用 WS 事件** —— 当前依赖 `peers.changed` 全量快照刷新，在"直连断了回落 relay"场景下可能慢一拍。如果用户反馈强烈再做。
 * **自托管 rendezvous 自动化部署** —— `IrohNodeConfig.rendezvous_base_url` 字段已 pub，本里程碑不暴露给用户；只在文档里点一下"是已有钩子，未来会做"。
-* **Anti-pattern 警惕：** 不要把 `network.allow_relay_fallback` 落到 `daemon` 进程的进程变量里再让 daemon 内部依赖。settings 真相源是 settings.json，daemon 启动时读一次，运行期不变；任何业务模块如果想"动态读 LAN-only 状态"都是错的——本里程碑**不存在**这种需求（开关只影响 bind 时刻）。
+* **Anti-pattern 警惕：** 不要把 `network.allow_relay_fallback` 落到 `daemon` 进程的进程变量里再让 daemon 内部依赖。settings 真相源是 settings.json，daemon 启动时读一次，运行期不变；任何业务模块如果想"动态读 LAN-only 状态"都是错的——本里程碑 **不存在** 这种需求（开关只影响 bind 时刻）。
 
 ---
 

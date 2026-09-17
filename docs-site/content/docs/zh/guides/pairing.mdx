@@ -3,7 +3,7 @@ title: 配对与同步
 description: 空间、邀请码、发现与传输的关系。
 ---
 
-UniClipboard 把"两台设备如何最终建立通信"拆成三层独立的问题。理解每一层的边界，
+Clipboard 把"两台设备如何最终建立通信"拆成三层独立的问题。理解每一层的边界，
 有助于判断故障位置以及"线上实际跑着什么"。
 
 | 层次     | 回答的问题           | 实现机制                                     |
@@ -22,7 +22,7 @@ UniClipboard 把"两台设备如何最终建立通信"拆成三层独立的问�
 
 ### 创建空间（sponsor）
 
-第一台设备执行 `uniclip space init`（CLI）或选择 **这是我的第一台设备**（GUI）。这一步会：
+第一台设备执行 `clip space init`（CLI）或选择 **这是我的第一台设备**（GUI）。这一步会：
 
 1. 提示输入口令。
 2. 通过 **Argon2id** 从口令派生密钥加密密钥（KEK）—— 内存 128 MB、迭代 3 次、并行度 4。
@@ -33,14 +33,14 @@ UniClipboard 把"两台设备如何最终建立通信"拆成三层独立的问�
 
 ### 加入空间（joiner）
 
-sponsor 执行 `uniclip space invite` 后会得到一段短期、一次性的邀请码。joiner 在 `uniclip space join <code>` 时输入相同的口令。
+sponsor 执行 `clip space invite` 后会得到一段短期、一次性的邀请码。joiner 在 `clip space join <code>` 时输入相同的口令。
 内部流程：
 
 1. 邀请码携带 sponsor 的 iroh node ID 与一个临时握手秘密，**不** 携带口令本身。
 2. 双方执行 **口令认证密钥交换（PAKE）**—— joiner 在不发送口令的前提下证明自己持有口令。
    口令错误会让握手失败，sponsor 也永远看不到错误的口令值。
 3. 握手成功后，sponsor 用 joiner 输入口令派生出的新 KEK 重新封装 MasterKey，joiner 像
-   `uniclip space init` 那样把它持久化。
+   `clip space init` 那样把它持久化。
 4. 双方互相加入对方的 **已配对设备** 列表。
 
 这一刻邀请码即作废。要加入第三台设备就要再生成新邀请码 —— 配对是按"加入"计数，不是按"对"计数。
@@ -52,7 +52,7 @@ sponsor 执行 `uniclip space invite` 后会得到一段短期、一次性的邀
 
 ## 发现：找到对端的位置
 
-信任层告诉守护进程 **和谁** 通信，发现层负责找出 **对方现在在哪里**。UniClipboard 基于
+信任层告诉守护进程 **和谁** 通信，发现层负责找出 **对方现在在哪里**。Clipboard 基于
 [iroh](https://www.iroh.computer)，每台设备都有一个稳定的 **node ID**（一个 Ed25519 公钥），
 切 Wi-Fi、唤醒睡眠、IP 变化都不影响它。
 
@@ -120,10 +120,10 @@ flowchart LR
 
 1. 给这台设备起一个标签。
 2. 守护进程签发一组一次性用户名 + 密码，在 **凭据弹窗** 里展示，含 iOS / Android tab：
-   - **iOS** —— 扫描二维码可一键安装内置的 UniClipboard iOS 快捷指令，
+   - **iOS** —— 扫描二维码可一键安装内置的 Clipboard iOS 快捷指令，
      其中预填了 base URL 与凭据。
    - **Android / 其他客户端** —— 复制 base URL、用户名、密码到任意兼容
-     SyncClipboard 协议的客户端即可。安卓侧装 **UniClipboard Android 客户端**：
+     SyncClipboard 协议的客户端即可。安卓侧装 **Clipboard Android 客户端**：
      [github.com/UniClipboard/UniClip](https://github.com/UniClipboard/UniClip)，
      APK 在
      [releases 页](https://github.com/UniClipboard/UniClip/releases/latest)

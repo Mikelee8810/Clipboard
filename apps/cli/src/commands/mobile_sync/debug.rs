@@ -1,4 +1,4 @@
-//! `uniclip mobile debug ...` —— SyncClipboard 协议链路的本地回归命令。
+//! `clip mobile debug ...` —— SyncClipboard 协议链路的本地回归命令。
 //!
 //! P5a.9 引入,便于无 iPhone 时手动验证整条 SyncClipboard 协议链路。
 //! 全部 4 个子命令绕过 HTTP，通过统一核心模拟 iPhone
@@ -15,7 +15,7 @@
 //! ## 与 daemon 的关系
 //!
 //! 全部子命令均经 `shared::enter_write` 拒绝同 profile 的 daemon —— CLI 与
-//! daemon 共享同一份 sqlite,不能并发持有。运行流程:`uniclip stop` →
+//! daemon 共享同一份 sqlite,不能并发持有。运行流程:`clip stop` →
 //! 跑 debug 命令 → 重启 daemon 看效果。
 //!
 //! OS 系统剪贴板写入仍是 daemon 的责任，不在 CLI 责任范围。
@@ -98,7 +98,7 @@ async fn ensure_session_resumed(ctx: &MobileSyncCmdCtx) -> Result<(), i32> {
         Ok(true) => Ok(()),
         Ok(false) => {
             ui::error(
-                "This profile is not set up yet. Run `uniclip space init` (or `uniclip space join`) first.",
+                "This profile is not set up yet. Run `clip space init` (or `clip space join`) first.",
             );
             Err(exit_codes::EXIT_ERROR)
         }

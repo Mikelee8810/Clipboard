@@ -55,7 +55,7 @@ Implement the Phase 90 infra search pipeline in `uc-infra`: HKDF-backed key deri
 ### search_key_derivation.rs
 
 - `HkdfSearchKeyDerivation` implements `SearchKeyDerivationPort`
-- Derives via `HKDF-SHA256(ikm = master_key, salt = profile_id, info = "uniclipboard-search-index/v1")`
+- Derives via `HKDF-SHA256(ikm = master_key, salt = profile_id, info = "clipboard-search-index/v1")`
 - `term_tag(search_key, token)` → 32-byte `HMAC-SHA256` — accepts `&SearchKey` only, never `&MasterKey`
 - `HmacSha256` type alias makes the type literal visible for tooling verification
 - 5 tests: determinism, profile isolation, SessionLocked, 32-byte tag, type-safety

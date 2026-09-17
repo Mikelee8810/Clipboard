@@ -55,7 +55,7 @@
 
 ## 已验证的实测结论
 
-- `url::Url::parse("uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ")` 在 `url 2.x` 下正常解析：`scheme="uniclipboard"`, `host=Some("connect")`, `query_pairs()` 正常迭代 — **不需要手写 URI parser**。
+- `url::Url::parse("clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ")` 在 `url 2.x` 下正常解析：`scheme="clipboard"`, `host=Some("connect")`, `query_pairs()` 正常迭代 — **不需要手写 URI parser**。
 - Python `base64.urlsafe_b64encode().rstrip(b'=')` 与 Rust `base64::engine::general_purpose::URL_SAFE_NO_PAD::encode()` 输出字节相同 — 三方编码器可用作 golden vector 的独立第三方验证。
 - 规范 §7.1 happy-path URI 经 Rust 编码器实测输出 = 259 字符，与 Python 实算一致，远低于 800 字符上限。
 - serde 默认序列化 struct 时按字段定义顺序输出; `BTreeMap` 序列化为字典序。两者合起来让 Rust 与 TS(将用 `Object.keys().sort()` 显式排序) 字节级一致。
@@ -77,7 +77,7 @@
 
 - `register_device.rs` 模块顶部注释提到 v3 切到 SyncClipboard 兼容路径后，不再维护自建 `.shortcut` 模板; 用户安装 Apple 签名的 iCloud 链接。本协议 **不挑战这个决策**, 只补全"扫码后填三栏"的缺口。
 - `.context/mobile-sync/SPEC.md` §14.2 + `findings.md` v3 段落是 mobile-sync 子系统的总规范，本协议是该规范"二维码内容"一项的细化，不替换主规范。
-- `get_settings.rs` 中曾有 `uniclip://config?u=...&t=...` 与 `TokenInjected` 的 dead code / 注释，它们是被本协议 **取代** 的早期方向，阶段 2 实现时可顺手删除注释保持代码整洁。
+- `get_settings.rs` 中曾有 `clip://config?u=...&t=...` 与 `TokenInjected` 的 dead code / 注释，它们是被本协议 **取代** 的早期方向，阶段 2 实现时可顺手删除注释保持代码整洁。
 
 ## 待澄清
 

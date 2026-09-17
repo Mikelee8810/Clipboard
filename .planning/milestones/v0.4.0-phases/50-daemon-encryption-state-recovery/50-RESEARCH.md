@@ -126,7 +126,7 @@ pub async fn run(self) -> anyhow::Result<()> {
 
 ```rust
 pub async fn run(self) -> anyhow::Result<()> {
-    info!("uniclipboard-daemon starting");
+    info!("clipboard-daemon starting");
 
     // 1. Bind RPC socket FIRST (fail-fast before starting workers)
     check_or_remove_stale_socket(&self.socket_path).await?;
@@ -149,7 +149,7 @@ pub async fn run(self) -> anyhow::Result<()> {
     .instrument(recover_span)
     .await?;
 
-    info!("uniclipboard-daemon running, RPC at {:?}", self.socket_path);
+    info!("clipboard-daemon running, RPC at {:?}", self.socket_path);
 
     // 2. Start workers
     ...
@@ -325,7 +325,7 @@ Daemon 层的调用比 Tauri 层更简单：不需要 emit 事件给前端，直
 | ---------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------- |
 | Initialized: 恢复成功，daemon 继续运行   | unit                    | `cd src-tauri && cargo test -p uc-app auto_unlock`                                  |
 | Uninitialized: 跳过恢复，daemon 正常启动 | unit                    | `cd src-tauri && cargo test -p uc-app auto_unlock_returns_false_when_uninitialized` |
-| Initialized + 恢复失败: daemon 拒绝启动  | unit                    | `cd src-tauri && cargo test -p uc-app auto_unlock_propagates`                       |
+| Initialized + 恢复失败：daemon 拒绝启动  | unit                    | `cd src-tauri && cargo test -p uc-app auto_unlock_propagates`                       |
 | daemon run() 调用恢复逻辑                | integration（手动验证） | 启动 daemon 后检查日志                                                              |
 
 ### Wave 0 Gaps
@@ -362,8 +362,8 @@ Daemon 层的调用比 Tauri 层更简单：不需要 emit 事件给前端，直
 
 - 现有代码状态（AutoUnlockEncryptionSession 已存在）: HIGH — 直接读取了源代码
 - 调用点（DaemonApp::run()）: HIGH — 直接读取了源代码，确认无恢复调用
-- 架构模式: HIGH — 参考了 Tauri 层已有的调用模式
-- 错误处理: HIGH — 直接读取了现有 AutoUnlockError 错误类型
+- 架构模式：HIGH — 参考了 Tauri 层已有的调用模式
+- 错误处理：HIGH — 直接读取了现有 AutoUnlockError 错误类型
 
 **Research date:** 2026-03-23
 **Valid until:** 2026-04-23（代码稳定，30 天内有效）

@@ -1,8 +1,8 @@
-# UniClipboard 贡献指南
+# Clipboard 贡献指南
 
 [English](./CONTRIBUTING.md) | 简体中文
 
-感谢你愿意为 UniClipboard 做贡献！本文档说明如何搭建开发环境、我们遵循的工作流，以及对贡献内容的约定。
+感谢你愿意为 Clipboard 做贡献！本文档说明如何搭建开发环境、我们遵循的工作流，以及对贡献内容的约定。
 
 ## 目录
 
@@ -49,13 +49,13 @@
 
 提 Bug 时请附带：
 
-- **环境信息**：操作系统及版本、UniClipboard 版本、安装方式（DMG、AppImage、MSI、Homebrew、源码构建）。
+- **环境信息**：操作系统及版本、Clipboard 版本、安装方式（DMG、AppImage、MSI、Homebrew、源码构建）。
 - **复现步骤**：简短、确定性、按编号列出。
 - **预期行为 vs 实际行为**。
 - **日志**：从下列日志目录摘取相关片段：
-  - macOS：`~/Library/Application Support/app.uniclipboard.desktop[-<profile>]/logs/`
-  - Linux：`~/.local/share/app.uniclipboard.desktop[-<profile>]/logs/`
-  - Windows：`%LOCALAPPDATA%\app.uniclipboard.desktop[-<profile>]\logs\`
+  - macOS：`~/Library/Application Support/app.clipboard.desktop[-<profile>]/logs/`
+  - Linux：`~/.local/share/app.clipboard.desktop[-<profile>]/logs/`
+  - Windows：`%LOCALAPPDATA%\app.clipboard.desktop[-<profile>]\logs\`
 - **截图或录屏**：UI 问题尤其需要。
 
 发布前请清除日志和剪贴板内容中的个人数据。
@@ -95,7 +95,7 @@
 # `--recurse-submodules` 会同步拉取 `src-tauri/vendor/iroh-blobs/`
 # 下的 iroh-blobs fork，缺这个 `cargo build` 会失败。
 git clone --recurse-submodules https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard
+cd Clipboard
 bun install
 ```
 
@@ -110,7 +110,7 @@ git submodule update --init --recursive
 ### 以开发模式运行桌面端
 
 ```bash
-# 单实例，dev profile（数据目录在 app.uniclipboard.desktop-dev 下）
+# 单实例，dev profile（数据目录在 app.clipboard.desktop-dev 下）
 bun tauri:dev
 ```
 
@@ -385,4 +385,4 @@ CI 会在每个改动到 lockfile 的 PR/push 上运行自动化依赖审计（`
 
 ---
 
-再次感谢你帮 UniClipboard 变得更好。如果本指南有任何不清楚或过时的地方，欢迎开 issue 或 PR —— 改进贡献者体验本身也是一种宝贵的贡献。
+再次感谢你帮 Clipboard 变得更好。如果本指南有任何不清楚或过时的地方，欢迎开 issue 或 PR —— 改进贡献者体验本身也是一种宝贵的贡献。

@@ -241,15 +241,15 @@ function createMockArtifacts() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'assemble-manifest-test-'))
 
   const mockFiles = {
-    'uniclipboard_0.1.0-alpha.1_aarch64.app.tar.gz.sig':
+    'clipboard_0.1.0-alpha.1_aarch64.app.tar.gz.sig':
       'dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUldRVEFBQUFBQUFBQUFBQSttb2NrLXNpZ25hdHVyZS1hYXJjaDY0',
-    'uniclipboard_0.1.0-alpha.1_x64.app.tar.gz.sig':
+    'clipboard_0.1.0-alpha.1_x64.app.tar.gz.sig':
       'dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUldRVEFBQUFBQUFBQUFBQSttb2NrLXNpZ25hdHVyZS14NjQ=',
-    'uniclipboard_0.1.0-alpha.1_amd64.AppImage.tar.gz.sig':
+    'clipboard_0.1.0-alpha.1_amd64.AppImage.tar.gz.sig':
       'dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUldRVEFBQUFBQUFBQUFBQSttb2NrLXNpZ25hdHVyZS1saW51eA==',
-    'uniclipboard_0.1.0-alpha.1_x64-setup.nsis.zip.sig':
+    'clipboard_0.1.0-alpha.1_x64-setup.nsis.zip.sig':
       'dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUldRVEFBQUFBQUFBQUFBQSttb2NrLXNpZ25hdHVyZS13aW5kb3dz',
-    'uniclipboard_0.1.0-alpha.1_arm64-setup.nsis.zip.sig':
+    'clipboard_0.1.0-alpha.1_arm64-setup.nsis.zip.sig':
       'dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUldRVEFBQUFBQUFBQUFBQSttb2NrLXNpZ25hdHVyZS13aW5kb3dzLWFybTY0',
   }
 

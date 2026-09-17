@@ -58,9 +58,9 @@ _Existing test infrastructure in uc-cli covers framework requirements._
 
 | Behavior                 | Requirement | Why Manual                             | Test Instructions                                                |
 | ------------------------ | ----------- | -------------------------------------- | ---------------------------------------------------------------- |
-| Background daemon spawn  | D-04        | Requires real daemon binary            | Run `uniclipboard-cli start`, verify daemon PID file created     |
-| Foreground log streaming | D-07        | Requires real daemon binary + terminal | Run `uniclipboard-cli start -f`, verify logs appear              |
-| Stop running daemon      | D-09/D-10   | Requires running daemon                | Run `uniclipboard-cli stop` after start, verify PID file removed |
+| Background daemon spawn  | D-04        | Requires real daemon binary            | Run `clipboard-cli start`, verify daemon PID file created     |
+| Foreground log streaming | D-07        | Requires real daemon binary + terminal | Run `clipboard-cli start -f`, verify logs appear              |
+| Stop running daemon      | D-09/D-10   | Requires running daemon                | Run `clipboard-cli stop` after start, verify PID file removed |
 
 ---
 

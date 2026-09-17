@@ -1,4 +1,4 @@
-# UniClipboard Architecture Reform — Final Unified Plan
+# Clipboard Architecture Reform — Final Unified Plan
 
 **Author**: Chief Architect (Moderator)
 **Date**: 2026-03-06

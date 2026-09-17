@@ -10,7 +10,7 @@ SyncClipboard client — can read and push clipboard items.
 All endpoints are mounted at the **root path**. The main SyncClipboard paths are
 `/SyncClipboard.json` and `/file/{dataName}`; Android-compatible clients may also
 call `/api/history/*`, `/api/time`, `/api/version`, `/version`, `/`, and `/file`.
-There are also two UniClipboard **private extensions**. Neither is part of the
+There are also two Clipboard **private extensions**. Neither is part of the
 SyncClipboard protocol, and third-party clients can ignore both:
 
 - `GET /api/sse/clipboard` (Server-Sent Events): pushes a signal to subscribed
@@ -43,7 +43,7 @@ and the **Devices → Mobile sync** panel in the desktop app.
 
 ## Compatibility boundary
 
-UniClipboard exposes the subset of the SyncClipboard server API needed for
+Clipboard exposes the subset of the SyncClipboard server API needed for
 current clipboard sync and Android client compatibility. It is not a full
 SyncClipboard history server.
 
@@ -54,10 +54,10 @@ SyncClipboard history server.
 | `POST /api/history`                                                             | Real Android-compatible inbound path for text, image, and file uploads.                                                                                                                     |
 | `GET /api/history/{profileId}`, `GET /api/history/{profileId}/data`             | Compatibility bridge to the current latest clipboard item. It does not expose an older history list.                                                                                        |
 | `POST /api/history/query`, `GET /api/history/statistics`                        | Compatibility responses based on the current latest item, or an empty result when there is no item.                                                                                         |
-| `PATCH /api/history/{type}/{hash}`, `DELETE /api/history/clear`, `DELETE /file` | Compatibility-only. These requests are accepted so clients can continue their flow, but UniClipboard does not persist starred, pinned, deleted, clear, or folder-delete state through them. |
+| `PATCH /api/history/{type}/{hash}`, `DELETE /api/history/clear`, `DELETE /file` | Compatibility-only. These requests are accepted so clients can continue their flow, but Clipboard does not persist starred, pinned, deleted, clear, or folder-delete state through them. |
 | `GET /api/time`, `GET /api/version`, `GET /version`, `/`                        | Probe endpoints used by clients to confirm that the server is reachable.                                                                                                                    |
-| `GET /api/sse/clipboard`                                                        | UniClipboard-private push extension (SSE). Carries change signals only, never content; not part of the SyncClipboard protocol.                                                              |
-| `GET /healthz`                                                                  | UniClipboard-private liveness probe. Public and constant-cost; not part of the SyncClipboard protocol, so older servers return `404`.                                                       |
+| `GET /api/sse/clipboard`                                                        | Clipboard-private push extension (SSE). Carries change signals only, never content; not part of the SyncClipboard protocol.                                                              |
+| `GET /healthz`                                                                  | Clipboard-private liveness probe. Public and constant-cost; not part of the SyncClipboard protocol, so older servers return `404`.                                                       |
 
 ## Upload behavior
 
@@ -73,7 +73,7 @@ Metadata-only requests, such as `PUT /SyncClipboard.json` and URL-encoded
 documents rather than file bodies.
 
 Some Android clients send images as `application/octet-stream`. When that
-happens, UniClipboard sniffs the file name and leading bytes so JPEG, PNG, GIF,
+happens, Clipboard sniffs the file name and leading bytes so JPEG, PNG, GIF,
 WEBP, BMP, TIFF, HEIC, and HEIF uploads remain image items instead of being
 misreported as text or generic files.
 

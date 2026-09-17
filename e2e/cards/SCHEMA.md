@@ -48,7 +48,7 @@
 
 ## Radix portal 与 selector 写法
 
-uniclipboard UI 用 Radix UI 的 HoverCard / Popover / Dialog / Tooltip。这些组件运行时通过 portal 把 content 渲染到 `document.body` 末尾，**不在 trigger 的 DOM 子树里**。
+clipboard UI 用 Radix UI 的 HoverCard / Popover / Dialog / Tooltip。这些组件运行时通过 portal 把 content 渲染到 `document.body` 末尾，**不在 trigger 的 DOM 子树里**。
 
 卡片 selector 涉及这些组件的 content 时，**不要** 写 `[trigger-ancestor] [content-marker]` —— 会匹配不到。
 

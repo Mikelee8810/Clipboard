@@ -120,8 +120,8 @@ jobs:
           retention-days: 14
           path: |
             ${{ runner.temp }}/membership-e2e/**
-            ~/Library/Application Support/app.uniclipboard.desktop-e2e-membership-*/**
-            ~/Library/Logs/app.uniclipboard.desktop-e2e-membership-*/**
-            ~/.local/share/app.uniclipboard.desktop-e2e-membership-*/**
-            ~/.local/state/app.uniclipboard.desktop-e2e-membership-*/**
-            ~/AppData/Local/app.uniclipboard.desktop-e2e-membership-*/**
+            ~/Library/Application Support/app.clipboard.desktop-e2e-membership-*/**
+            ~/Library/Logs/app.clipboard.desktop-e2e-membership-*/**
+            ~/.local/share/app.clipboard.desktop-e2e-membership-*/**
+            ~/.local/state/app.clipboard.desktop-e2e-membership-*/**
+            ~/AppData/Local/app.clipboard.desktop-e2e-membership-*/**

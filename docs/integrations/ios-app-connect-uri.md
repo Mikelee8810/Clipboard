@@ -1,6 +1,6 @@
-# iOS App integration: `uniclipboard://connect` deep link
+# iOS App integration: `clipboard://connect` deep link
 
-**Audience**: developers of the native UniClipboard iOS App (repo `app.uniclipboard.UniClipboard`).
+**Audience**: developers of the native Clipboard iOS App (repo `app.clipboard.Clipboard`).
 **Source of truth for the wire protocol**: `docs/architecture/mobile-sync-connect-uri.md` in
 the desktop repo. Read it once before this guide — this document tells you *how* to wire
 the protocol into the iOS App, not what the protocol means.
@@ -12,11 +12,11 @@ the protocol into the iOS App, not what the protocol means.
 The desktop app's "Add mobile device" flow shows a QR code whose content is
 
 ```
-uniclipboard://connect?v=1&svc=mobile-sync&p=<base64url-json>
+clipboard://connect?v=1&svc=mobile-sync&p=<base64url-json>
 ```
 
 We want the user to point the **system Camera app** at that QR code and have iOS surface
-a "Open in UniClipboard?" smart action that hands the URL to the App. The App then
+a "Open in Clipboard?" smart action that hands the URL to the App. The App then
 parses the payload and either pre-fills the Add Server form or saves the server directly.
 
 The iOS App already has an in-app `QRScannerView` that decodes a different QR format
@@ -24,7 +24,7 @@ The iOS App already has an in-app `QRScannerView` that decodes a different QR fo
 **not URL-scheme URIs**, so the system Camera shows them as plain text and cannot route
 them to the App. The system-camera flow only works when the QR content is a URL whose
 scheme is registered by the App — that is the entire point of moving to
-`uniclipboard://connect`.
+`clipboard://connect`.
 
 Both paths can coexist:
 
@@ -41,15 +41,15 @@ This guide covers A and the parser shared with B. C is documented separately in
 
 ## 2. Register the URL scheme
 
-The App must declare `uniclipboard` as a URL scheme so iOS routes
-`uniclipboard://…` URLs to it.
+The App must declare `clipboard` as a URL scheme so iOS routes
+`clipboard://…` URLs to it.
 
-In Xcode: **Target `UniClipboard` → Info tab → URL Types → +**
+In Xcode: **Target `Clipboard` → Info tab → URL Types → +**
 
 | Field            | Value                                |
 | ---------------- | ------------------------------------ |
-| Identifier       | `app.uniclipboard.UniClipboard`      |
-| URL Schemes      | `uniclipboard`                       |
+| Identifier       | `app.clipboard.Clipboard`      |
+| URL Schemes      | `clipboard`                       |
 | Role             | Editor                               |
 | Icon             | (leave blank)                        |
 
@@ -57,8 +57,8 @@ This writes a `CFBundleURLTypes` entry into the generated `Info.plist`. Verify a
 building:
 
 ```bash
-plutil -p "$(xcodebuild -scheme UniClipboard -sdk iphonesimulator -showBuildSettings \
-  2>/dev/null | awk -F'= ' '/BUILT_PRODUCTS_DIR/{print $2; exit}')/UniClipboard.app/Info.plist" \
+plutil -p "$(xcodebuild -scheme Clipboard -sdk iphonesimulator -showBuildSettings \
+  2>/dev/null | awk -F'= ' '/BUILT_PRODUCTS_DIR/{print $2; exit}')/Clipboard.app/Info.plist" \
   | grep -A 6 CFBundleURLTypes
 ```
 
@@ -67,7 +67,7 @@ plutil -p "$(xcodebuild -scheme UniClipboard -sdk iphonesimulator -showBuildSett
 > declare it under the Xcode 26 generated-Info.plist model.
 
 Do **not** register a Universal Link (Associated Domains). The desktop emits a
-`uniclipboard://` URI, not an `https://` URL — there is no host you control to serve an
+`clipboard://` URI, not an `https://` URL — there is no host you control to serve an
 `apple-app-site-association` file for.
 
 ---
@@ -75,12 +75,12 @@ Do **not** register a Universal Link (Associated Domains). The desktop emits a
 ## 3. Wire `.onOpenURL` to the App
 
 SwiftUI App lifecycle delivers incoming URLs via `.onOpenURL` on any view in the scene.
-The cleanest place is the root scene in `UniClipboardApp.swift`, so the handler runs
+The cleanest place is the root scene in `ClipboardApp.swift`, so the handler runs
 regardless of which tab the user is on or whether `SetupFlowView` is active:
 
 ```swift
 @main
-struct UniClipboardApp: App {
+struct ClipboardApp: App {
     @State private var vm = AppViewModel()
 
     var body: some Scene {
@@ -98,14 +98,14 @@ Add the dispatcher on `AppViewModel`:
 
 ```swift
 extension AppViewModel {
-    /// Entry point for `uniclipboard://…` URLs from the system Camera,
+    /// Entry point for `clipboard://…` URLs from the system Camera,
     /// Shortcuts, or any other UIApplication-level URL source.
     ///
     /// Routes:
-    /// - `uniclipboard://connect?…` → `presentConnectURIPrefill(payload)`
+    /// - `clipboard://connect?…` → `presentConnectURIPrefill(payload)`
     /// - everything else → ignore (forward-compat for future schemes)
     func handleIncomingURL(_ url: URL) {
-        guard url.scheme?.lowercased() == "uniclipboard" else { return }
+        guard url.scheme?.lowercased() == "clipboard" else { return }
         guard url.host == "connect" else { return }
 
         do {
@@ -127,7 +127,7 @@ The two `present*` methods are UI surface decisions — see §6 for the recommen
 ## 4. Parser implementation
 
 Add a new file `Shared/Network/ConnectURI.swift` so it builds into both the App target
-and the SwiftPM `UniClipboardNetwork` library (and is unit-testable via `swift test`).
+and the SwiftPM `ClipboardNetwork` library (and is unit-testable via `swift test`).
 Use pure Foundation only — no UIKit / SwiftUI / CryptoKit — per the `Shared/` rule in
 the project `CLAUDE.md`.
 
@@ -137,7 +137,7 @@ the project `CLAUDE.md`.
 import Foundation
 
 public enum ConnectURI {
-    /// Parsed `uniclipboard://connect?…` payload, v1.
+    /// Parsed `clipboard://connect?…` payload, v1.
     public struct Payload: Equatable, Sendable {
         public let url: String
         public let user: String
@@ -174,7 +174,7 @@ will cause the cross-language golden vector (§5) to fail.
 public extension ConnectURI {
     static func parse(_ raw: String) throws -> Payload {
         guard let components = URLComponents(string: raw),
-              components.scheme?.lowercased() == "uniclipboard"
+              components.scheme?.lowercased() == "clipboard"
         else { throw ParseError.invalidScheme }
 
         guard components.host == "connect" else { throw ParseError.invalidScheme }
@@ -277,19 +277,19 @@ This is the most important test in the iOS App for this feature. The desktop's R
 TypeScript tests already assert against the same string — if all three agree, the
 protocol is byte-stable in practice.
 
-Create `Tests/UniClipboardNetworkTests/ConnectURITests.swift`:
+Create `Tests/ClipboardNetworkTests/ConnectURITests.swift`:
 
 ```swift
 import Foundation
 import Testing
-@testable import UniClipboardNetwork
+@testable import ClipboardNetwork
 
 /// Golden vector from `docs/architecture/mobile-sync-connect-uri.md` §7.1.
 /// MUST equal the string in `connect_uri.rs:GOLDEN_URI` and
 /// `mobileSyncConnectUri.test.ts`. If any of the three sides drift, this
 /// test (or its peers) breaks and the diff points at the offender.
 private let goldenURI =
-    "uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ"
+    "clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ"
 
 @Test
 func parsesTheGoldenVector() throws {
@@ -305,11 +305,11 @@ func parsesTheGoldenVector() throws {
 @Test(arguments: [
     ("https://example.com/connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ",
         ConnectURI.ParseError.invalidScheme),
-    ("uniclipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ",
+    ("clipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ",
         .unsupportedVersion(found: 2)),
-    ("uniclipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ",
+    ("clipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ",
         .unsupportedService(found: "other")),
-    ("uniclipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#",
+    ("clipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#",
         .payloadDecodeFailed(detail: "invalid base64url")),
 ])
 func rejectsNegativeVectors(input: String, expected: ConnectURI.ParseError) {
@@ -347,7 +347,7 @@ truthful — vague "QR code error" copy makes people retry instead of getting he
 
 | `ParseError` case                | Suggested key                                | Suggested zh-Hans                                              | Suggested en                                                            |
 | -------------------------------- | -------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `invalidScheme`                  | `connectURI.error.invalidScheme`             | 这个二维码不属于 UniClipboard。                                | This QR code isn't a UniClipboard sync link.                           |
+| `invalidScheme`                  | `connectURI.error.invalidScheme`             | 这个二维码不属于 Clipboard。                                | This QR code isn't a Clipboard sync link.                           |
 | `unsupportedVersion(found:)`     | `connectURI.error.unsupportedVersion`        | 二维码版本是 v%lld，本 App 暂不支持，请更新 App。               | QR uses protocol v%lld, which this App version doesn't recognize yet.   |
 | `unsupportedService(found:)`     | `connectURI.error.unsupportedService`        | 二维码声明的服务 "%@" 不是手机同步。                           | The QR's declared service "%@" is not mobile sync.                      |
 | `payloadDecodeFailed(detail:)`   | `connectURI.error.payloadDecodeFailed`       | 二维码内容损坏，请在桌面端重新生成。                            | QR payload is corrupted. Re-generate it on the desktop.                 |
@@ -361,7 +361,7 @@ mapping itself is normative.
 
 ## 8. Reusing the parser inside `QRScannerView`
 
-Path B in §1 — the in-app scanner — should accept `uniclipboard://connect` URIs in
+Path B in §1 — the in-app scanner — should accept `clipboard://connect` URIs in
 addition to the legacy `ServerQRPayload` formats. Extend the dispatch point in
 `ServerQRPayload.parse` (or the call site of it), not the connect-URI parser:
 
@@ -371,7 +371,7 @@ public extension ServerQRPayload {
         let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // New primary path: connect URI from the desktop.
-        if trimmed.lowercased().hasPrefix("uniclipboard://") {
+        if trimmed.lowercased().hasPrefix("clipboard://") {
             if let p = try? ConnectURI.parse(trimmed) {
                 return ServerQRPayload(
                     name: p.label, url: p.url, username: p.user, password: p.pwd
@@ -402,7 +402,7 @@ inject it into the simulator:
 ```bash
 # Boots a sim if needed and routes the URL to the installed App.
 xcrun simctl openurl booted \
-  'uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
+  'clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ'
 ```
 
 Combine with `UC_FRESH=1` to test the empty-state path through `SetupFlowView`, and

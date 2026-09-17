@@ -58,8 +58,8 @@ describe('membership E2E hardening', () => {
       /fn tar_release_extracts_only_the_cli_pair\(\) \{[\s\S]*?\n\}/
     )?.[0]
 
-    expect(tarFixture).toContain('let cli = binary_name("uniclip");')
-    expect(tarFixture).toContain('let daemon = binary_name("uniclipd");')
+    expect(tarFixture).toContain('let cli = binary_name("clip");')
+    expect(tarFixture).toContain('let daemon = binary_name("clipd");')
   })
 
   it('preserves aggregate failures and explains a missing legacy release', () => {

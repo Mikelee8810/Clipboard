@@ -1,17 +1,17 @@
 # iroh 虚拟网卡地址过滤设计与实现
 
 > 落地时间：2026-05-05
-> 涉及版本：iroh 0.98.2、uniclipboard `0.6.x` 起
-> Issue 关联：UniClipboard#486
+> 涉及版本：iroh 0.98.2、clipboard `0.6.x` 起
+> Issue 关联：Clipboard#486
 > 主要 commits：`50477a17` / `800a508a` / `ae39f432`
 
 ## 1. 背景与动机
 
-UniClipboard 通过 iroh 建立设备之间的直连。iroh 在协商 NAT
+Clipboard 通过 iroh 建立设备之间的直连。iroh 在协商 NAT
 穿透时会把本机所有可达的网络地址（"direct addresses"）发布到
 pkarr/mDNS/DHT，让对端的 magicsock 拿到候选列表后逐个尝试连接。
 
-问题在于：现代用户机器上常有**虚拟网卡**，它们的 IP 看起来像普通
+问题在于：现代用户机器上常有 **虚拟网卡**，它们的 IP 看起来像普通
 LAN 地址，但跨主机不可达：
 
 | 网段 | 来源 | 跨主机可达性 |
@@ -49,7 +49,7 @@ LAN 地址，但跨主机不可达：
 198.18.x 没有任何合法跨主机用例 —— 暴露给用户只会增加误用面，没有收益。
 
 **为什么 Tailscale 段需要 opt-in？**
-如果两台设备**都在同一个 tailnet** 中，且真实 LAN/公网直连不通，那
+如果两台设备 **都在同一个 tailnet** 中，且真实 LAN/公网直连不通，那
 Tailscale 100.x / fd7a:: 是合法可达路径，过滤反而让用户损失一条
 路径。这是少数派但真实场景。
 
@@ -130,7 +130,7 @@ UI 上沿用既有 `RestartBanner` 组件——任何 `NetworkSettings` 字段
 
 `uc-core/src/settings/model.rs`：
 
-```/Users/mark/conductor/workspaces/uniclipboard/edinburgh/src-tauri/crates/uc-core/src/settings/model.rs#L189-219
+```/Users/mark/conductor/workspaces/clipboard/edinburgh/src-tauri/crates/uc-core/src/settings/model.rs#L189-219
 pub struct NetworkSettings {
     #[serde(default = "default_allow_relay_fallback")]
     pub allow_relay_fallback: bool,
@@ -203,7 +203,7 @@ pub struct NetworkSettingsDto {
 `uc-bootstrap/src/network_policy.rs` 是项目里**唯一允许进行业务语义
 ↔ infra 语义反转**的地方（Pitfall 1 铁律）。
 
-```/Users/mark/conductor/workspaces/uniclipboard/edinburgh/src-tauri/crates/uc-bootstrap/src/network_policy.rs#L37-50
+```/Users/mark/conductor/workspaces/clipboard/edinburgh/src-tauri/crates/uc-bootstrap/src/network_policy.rs#L37-50
 pub(crate) fn relay_policy_to_iroh_config(
     allow_relay_fallback: bool,
     allow_overlay_network_addrs: bool,
@@ -239,7 +239,7 @@ pub struct IrohNodeConfig {
 
 #### 4.5.2 `is_virtual_nic_ip` 双类拆分
 
-```/Users/mark/conductor/workspaces/uniclipboard/edinburgh/src-tauri/crates/uc-infra/src/network/iroh/node.rs#L302-336
+```/Users/mark/conductor/workspaces/clipboard/edinburgh/src-tauri/crates/uc-infra/src/network/iroh/node.rs#L302-336
 fn is_virtual_nic_ip(ip: IpAddr, allow_overlay: bool) -> bool {
     match ip {
         IpAddr::V4(v4) => {
@@ -459,7 +459,7 @@ pub(crate) fn publish(&self, data: &EndpointData) {
 - pkarr 公网 DHT、mDNS LAN 广播、可能的 DNS publisher 都拿到的是
   **过滤后的子集**。
 - peer 通过任何 lookup 渠道查询本机时，得到的候选地址列表里
-  **不会包含**我们丢弃的虚拟网卡 IP。
+  **不会包含** 我们丢弃的虚拟网卡 IP。
 
 ### 5.3 publish snapshot ≠ publish 给 peer 的内容
 
@@ -471,7 +471,7 @@ let ip_addrs: Vec<String> = addr.addrs.iter().filter_map(...).collect();
 info!(
     stage,
     ip_addrs = ?ip_addrs,
-    "iroh endpoint publish snapshot (refs UniClipboard#486)"
+    "iroh endpoint publish snapshot (refs Clipboard#486)"
 );
 ```
 
@@ -487,7 +487,7 @@ info!(
 `AddrFilter` 同样作用于 lookup 返回结果：本机通过 pkarr/mDNS/DHT
 查询某个对端 NodeId 时，返回的候选地址列表也过这个 filter。即使
 对端发来的列表里包含 `100.x`（比如对端用的是旧版本没装这个
-filter），本机的 magicsock **也不会去拨**这些地址。
+filter），本机的 magicsock **也不会去拨** 这些地址。
 
 这就是为什么"两边都升级"虽然是最干净的，但单边升级也仍然有
 保护效果——本机至少不会被坏候选拖累。
@@ -533,13 +533,13 @@ IPs**。iroh 的 publish 是**事件驱动**的，magicsock 每发现新地址
 dev profile 路径（macOS）：
 
 ```
-~/Library/Application Support/app.uniclipboard.desktop-dev/settings.json
+~/Library/Application Support/app.clipboard.desktop-dev/settings.json
 ```
 
 production 路径：
 
 ```
-~/Library/Application Support/uniclipboard/settings.json
+~/Library/Application Support/clipboard/settings.json
 ```
 
 字段在 `network` 段下：
@@ -553,20 +553,20 @@ production 路径：
 }
 ```
 
-直接编辑文件后**必须重启 daemon** 才能生效。
+直接编辑文件后 **必须重启 daemon** 才能生效。
 
 ### 6.3 何时建议开启 `allow_overlay_network_addrs`
 
-仅在以下条件**同时**满足时考虑开启：
+仅在以下条件 **同时** 满足时考虑开启：
 
-1. 两台设备**都**安装了 Tailscale（或其他相同的 overlay 网络）
+1. 两台设备 **都** 安装了 Tailscale（或其他相同的 overlay 网络）
    并加入同一个 tailnet
-2. 真实 LAN / 公网 NAT 穿透**不通**（连接持续走 relay 或失败）
+2. 真实 LAN / 公网 NAT 穿透 **不通**（连接持续走 relay 或失败）
 3. 在 Tailscale 客户端里能 `ping` / `ssh` 通对端，证明 overlay 路径
    本身可用
 
 不满足任一条件，开启后只会让连接变慢（多消耗 path-validation
-预算去试不通的 100.x），不会带来任何收益。**默认保持关闭**就好。
+预算去试不通的 100.x），不会带来任何收益。**默认保持关闭** 就好。
 
 ## 7. 日志与可观测性
 
@@ -597,13 +597,13 @@ dropped_count=<N>
 dropped=[<list of "ip:port">]
 ```
 
-只有当输入候选集**确实**包含被过滤段的 IP 时才打印（`apply_addr_filter`
+只有当输入候选集 **确实** 包含被过滤段的 IP 时才打印（`apply_addr_filter`
 对干净候选走 `Cow::Borrowed` 快路径不打日志）。
 
 ### 7.3 排障 grep 命令
 
 ```bash
-LOG="$HOME/Library/Application Support/app.uniclipboard.desktop-dev/logs/uniclipboard.json.<DATE>"
+LOG="$HOME/Library/Application Support/app.clipboard.desktop-dev/logs/clipboard.json.<DATE>"
 
 # 当前开关状态
 grep '"target":"settings.network"' "$LOG" | tail -3
@@ -643,12 +643,12 @@ grep "iroh endpoint publish snapshot" "$LOG" | tail -3
    - `dropped` 日志中包含本机的 `100.x:port`（Tailscale IPv4）
    - 如果本机有 Tailscale IPv6 ULA，也应被丢弃
 2. **打开开关 + 重启**，确认 ALLOWED 状态下：
-   - `dropped` 日志中**不再**包含 `100.x`
+   - `dropped` 日志中 **不再** 包含 `100.x`
    - 仍然丢弃 `198.18.x`、`169.254.x`（始终过滤类）
 
 ### 8.3 Level 3 — 跨设备连通性（需要两台设备）
 
-如果两端都装了 UniClipboard：
+如果两端都装了 Clipboard：
 
 1. 默认配置下复制粘贴正常 → 默认行为没坏
 2. 两端都打开新开关 → 复制粘贴仍然正常 → overlay 路径不会比 LAN/relay 差
@@ -711,7 +711,7 @@ grep "iroh endpoint publish snapshot" "$LOG" | tail -3
 
 ## 11. 参考资料
 
-- Issue：UniClipboard#486
+- Issue：Clipboard#486
 - iroh `AddrFilter` 文档：`iroh-0.98.2/src/address_lookup.rs` 顶部
   module doc
 - iroh PR：iroh#3960、iroh#4010（`AddrFilter` 引入与 publish 路径过滤）

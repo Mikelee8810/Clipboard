@@ -1,9 +1,9 @@
-//! `uc-daemon` — UniClipboard GUI-agnostic daemon runtime library + `uniclipd`
+//! `uc-daemon` — Clipboard GUI-agnostic daemon runtime library + `clipd`
 //! binary.
 //!
 //! Hosts the full daemon runtime: run_mode, workers, assembly chain, main loop,
 //! startup recovery, process bootstrap, and the standalone host entry. The
-//! `uniclipd` binary target is a thin wrapper that
+//! `clipd` binary target is a thin wrapper that
 //! delegates to [`daemon::host::run_standalone_from_env`].
 //!
 //! **Hard constraint**: no GUI / UI framework dependencies, and no reverse
@@ -12,7 +12,7 @@
 //! `DaemonOwnership`, was sunk into `uc-desktop`), so building the GUI no
 //! longer compiles the daemon runtime tree.
 //!
-//! See `docs/architecture/adr-008-uniclipd-split-gui-as-client.md`.
+//! See `docs/architecture/adr-008-clipd-split-gui-as-client.md`.
 
 pub mod daemon;
 

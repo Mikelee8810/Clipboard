@@ -1,6 +1,6 @@
 # Module Boundaries
 
-This document defines the **responsibilities and boundaries** for each crate in the UniClipboard architecture. It serves as a reference for both implementation and code review.
+This document defines the **responsibilities and boundaries** for each crate in the Clipboard architecture. It serves as a reference for both implementation and code review.
 
 ## Quick Reference
 
@@ -18,11 +18,11 @@ This document defines the **responsibilities and boundaries** for each crate in 
 | `uc-daemon-process`| Process management (PID, socket, spawn) | `uc-daemon-contract` + `uc-app-paths` | ❌ iroh, diesel, GUI frameworks    |
 | `uc-daemon-local`  | Local daemon metadata (auth, health)    | `uc-daemon-contract` + `uc-daemon-process` | ❌ GUI frameworks             |
 | `uc-webserver`     | Daemon HTTP + WebSocket API (axum)      | `uc-application` + `uc-core` + contract | ❌ GUI frameworks               |
-| `uc-daemon`        | Daemon runtime + `uniclipd` binary      | `uc-bootstrap` + webserver + all      | ❌ GUI frameworks (Tauri/AppKit)   |
+| `uc-daemon`        | Daemon runtime + `clipd` binary      | `uc-bootstrap` + webserver + all      | ❌ GUI frameworks (Tauri/AppKit)   |
 | `uc-daemon-client` | HTTP/WS client to daemon                | contract + process                    | ❌ iroh, diesel, sqlite            |
 | `uc-desktop`       | Desktop host logic (GUI-framework-agnostic) | daemon-client + contract + process | ❌ Tauri, AppKit, egui             |
 | `uc-tauri`         | Tauri shell adapter (commands, tray)    | `uc-desktop` + daemon-client + contract | ❌ `uc-application` directly     |
-| `uc-cli`           | CLI `uniclip` binary                    | daemon-client + contract + process    | ❌ iroh, diesel (release builds)   |
+| `uc-cli`           | CLI `clip` binary                    | daemon-client + contract + process    | ❌ iroh, diesel (release builds)   |
 
 ## uc-core (Domain Layer)
 
@@ -104,7 +104,7 @@ pub trait ClipboardRepositoryPort {
 // ❌ WRONG: DTO provides default value
 impl AppConfig {
     pub fn default_vault_path() -> PathBuf {
-        dirs::home_dir().join(".uniclipboard")  // External dependency!
+        dirs::home_dir().join(".clipboard")  // External dependency!
     }
 }
 ```
@@ -527,7 +527,7 @@ When reviewing `uc-tauri` code:
 ┌───────────────┼──────────────────┬──────────────────────┐
 │               │                  │                      │
 │  uc-daemon    │    uc-tauri      │      uc-cli          │
-│  (uniclipd)  │  (GUI shell)     │  (uniclip CLI)       │
+│  (clipd)  │  (GUI shell)     │  (clip CLI)       │
 └───────────────┘──────────────────┘──────────────────────┘
 ```
 

@@ -8,7 +8,7 @@
 
 ### 1.1 需求
 
-用户希望把 UniClipboard 以 **无头方式部署在自己的 VPS / 容器** 里，作为一个 **常驻在线的成员节点**：
+用户希望把 Clipboard 以 **无头方式部署在自己的 VPS / 容器** 里，作为一个 **常驻在线的成员节点**：
 
 1. 在其他设备看来它是一个 **普通 iroh 成员**，通过 P2P 接收桌面端复制的内容并落库。
 2. 它对外开放一个 **mobile-sync 接口**，手机端可以拉取最新内容（并可推送，推送会 fan-out 回桌面）。
@@ -27,7 +27,7 @@
 - CLI 业务命令（init/invite/join/send/recv/watch）已能无头运行（`UC_DISABLE_SYSTEM_CLIPBOARD=1` → Noop）。
 - daemon 此前 **无条件** `LocalClipboard::new()`（`uc-desktop/src/daemon/runtime_assembly.rs`），无 display 即失败——这是唯一的功能性无头障碍。
 - headless 解密 **已支持**：无 DISPLAY/DBUS 时 `SecureStoragePort` 回退到 `FileSecureStorage`，`Standalone` 运行模式强制 keyring auto-unlock；`init`/`join` 一次性落盘即可无人值守解锁。
-- **mobile_lan 子系统已存在且为双向**：`uc-webserver/src/mobile_lan/`、`uc-infra/src/mobile_sync/`、`uc-cli .../mobile_sync/`；SyncClipboard 协议，绑 `0.0.0.0`，`GET /SyncClipboard.json` 拉、`PUT` 推（PUT 经 `ApplyInboundClipboardUseCase` 落库并 fan-out 给 iroh peers），可经 `uniclip mobile-sync` 非交互启用；iOS/Android 客户端已存在。
+- **mobile_lan 子系统已存在且为双向**：`uc-webserver/src/mobile_lan/`、`uc-infra/src/mobile_sync/`、`uc-cli .../mobile_sync/`；SyncClipboard 协议，绑 `0.0.0.0`，`GET /SyncClipboard.json` 拉、`PUT` 推（PUT 经 `ApplyInboundClipboardUseCase` 落库并 fan-out 给 iroh peers），可经 `clip mobile-sync` 非交互启用；iOS/Android 客户端已存在。
 - iroh 0.98 每次启动绑 **随机 UDP 端口**（`node.rs` 的 `.bind()` 用 `0.0.0.0:0`），可通过 `bind_addr()` 固定，并通过 `add_external_addr()` 广播已知公网地址。
 - x11rb/wayland 在 Linux 下无条件编译，但用 Noop 后仅被链接、从不实例化（运行期零开销）。
 
@@ -47,20 +47,20 @@
 
 > 部分回答 [ADR-005](./adr-005-uc-engine-extraction.md) §7 **Open Question #3**。
 
-保留现有单二进制模型：`uniclip start` detached-spawn `uniclip daemon`（同一二进制 + 隐藏子命令）。**不** 在本阶段拆独立 daemon 二进制。
+保留现有单二进制模型：`clip start` detached-spawn `clip daemon`（同一二进制 + 隐藏子命令）。**不** 在本阶段拆独立 daemon 二进制。
 
 职责归位：
 
 - `uc-cli` 只负责 **翻译用户意图 + 拉起宿主**：`start --server` 设 `UC_DAEMON_RUN_MODE=server`（子进程环境继承，与 `UC_PROFILE` 同模式），不解析 run-mode、不知道 `UC_DISABLE_SYSTEM_CLIPBOARD`、不引用 `ServerHeadless` 细节。
 - `uc-desktop` 暴露 `daemon::run_standalone_from_env()`：自己读 `UC_DAEMON_RUN_MODE` 解析运行模式，server 模式下自己设置 Noop 剪贴板开关（平台层细节归宿主），再 `run`。
 
-被否决的 **Scope B**（拆出独立 `uniclipd` 二进制、`uc-cli` 彻底不依赖 `uc-desktop`）：正交且更大，动 spawn/start/stop/probe/打包/CI 双二进制，并推翻"单二进制自启"的既有约定。**不阻塞本部署**，如要做须单开 ADR。
+被否决的 **Scope B**（拆出独立 `clipd` 二进制、`uc-cli` 彻底不依赖 `uc-desktop`）：正交且更大，动 spawn/start/stop/probe/打包/CI 双二进制，并推翻"单二进制自启"的既有约定。**不阻塞本部署**，如要做须单开 ADR。
 
 ### 2.3 复用既有 mobile_lan 作为手机网关（不新增 API）
 
 server 节点的"mobile-sync 接口"**直接复用现有 mobile_lan**，不新建协议/路由：
 
-- 通过 `uniclip mobile-sync network set` / `add` 非交互启用并铸设备凭据。
+- 通过 `clip mobile-sync network set` / `add` 非交互启用并铸设备凭据。
 - `GET /SyncClipboard.json` 拉最新；`PUT` 推（fan-out 回桌面）。
 - mobile_lan 生命周期由 daemon settings 驱动（非 GUI），在 `ServerHeadless` 下照常启动。
 
@@ -91,15 +91,15 @@ mobile_lan 是 **明文 HTTP + Basic Auth**，仅为可信 LAN 设计。公网�
 因为 `join` / `mobile-sync` 写命令都 `refuse_if_daemon_running()`，置备全部在 server 启动 **之前** 用一次性容器完成：
 
 ```
-docker compose run --rm app uniclip join <code> <passphrase>
-docker compose run --rm app uniclip mobile-sync network set --url https://<域名> --accept-network-risk
-docker compose run --rm app uniclip mobile-sync add --label "<设备>"
-docker compose up -d            # 此时才真正 uniclip start --server，读已持久化设置
+docker compose run --rm app clip join <code> <passphrase>
+docker compose run --rm app clip mobile-sync network set --url https://<域名> --accept-network-risk
+docker compose run --rm app clip mobile-sync add --label "<设备>"
+docker compose up -d            # 此时才真正 clip start --server，读已持久化设置
 ```
 
 ### 2.8 Docker 拓扑与状态卷
 
-- app 容器 `HOME=/data`，volume 挂 `/data`，**必须覆盖**：iroh identity、vault/keyslot、`uniclipboard.db`、iroh-blobs cache、文件式 KEK（丢失等于要重新 join）。
+- app 容器 `HOME=/data`，volume 挂 `/data`，**必须覆盖**：iroh identity、vault/keyslot、`clipboard.db`、iroh-blobs cache、文件式 KEK（丢失等于要重新 join）。
 - 发布 iroh UDP 端口（`-p 42999:42999/udp`）；mobile_lan 端口仅 `expose` 到 Docker 内网；仅 Caddy 的 `443` 对公网发布。
 
 ## 3. 明确不做的事
@@ -147,7 +147,7 @@ docker compose up -d            # 此时才真正 uniclip start --server，读�
 
 1. **relay 兜底**：是否在 `RelayMode::Disabled` 之外提供"direct 优先 + relay 兜底"开关（n0 默认 vs 自托管 iroh-relay）？影响封了出站 UDP 的桌面网络。
 2. **mobile_lan 原生 TLS（v2）**：是否最终给 mobile_lan 加 rustls，免去反代依赖？（本期用反代规避。）
-3. **Scope B**：是否后续拆独立 `uniclipd` 二进制以彻底解耦 `uc-cli ✗→ uc-desktop`？（须单开 ADR；与 ADR-005 OQ#3 合并考虑。）→ **已立项于 [ADR-008](./adr-008-uniclipd-split-gui-as-client.md)**（拆 `uniclipd` + GUI 转 client + 轻量模式）。
+3. **Scope B**：是否后续拆独立 `clipd` 二进制以彻底解耦 `uc-cli ✗→ uc-desktop`？（须单开 ADR；与 ADR-005 OQ#3 合并考虑。）→ **已立项于 [ADR-008](./adr-008-clipd-split-gui-as-client.md)**（拆 `clipd` + GUI 转 client + 轻量模式）。
 4. **多 server 节点 / 多空间**：单 VPS 单空间已覆盖；多空间/多 profile 容器编排未定。
 
 ## 7. 决策记录

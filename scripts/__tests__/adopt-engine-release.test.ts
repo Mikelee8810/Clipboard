@@ -37,14 +37,14 @@ function fixture() {
     release: { version, commit: newCommit },
     artifacts: [
       {
-        name: 'UniClipboardEngine-source.tar.gz',
+        name: 'ClipboardEngine-source.tar.gz',
         sha256: createHash('sha256').update(sourceArchive).digest('hex'),
         size: sourceArchive.length,
       },
     ],
   }
   const manifestPath = join(root, 'release-manifest.json')
-  const archivePath = join(root, 'UniClipboardEngine-source.tar.gz')
+  const archivePath = join(root, 'ClipboardEngine-source.tar.gz')
   write(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   write(archivePath, sourceArchive.toString())
   write(
@@ -177,7 +177,7 @@ describe('desktop Engine release adoption', () => {
     roots.push(root)
     const fakeBin = join(root, 'bin')
     const fakeUname = join(fakeBin, 'uname')
-    const fakeCli = join(root, 'fake-uniclip')
+    const fakeCli = join(root, 'fake-clip')
     write(fakeUname, '#!/usr/bin/env bash\necho Darwin\n')
     write(
       fakeCli,

@@ -55,7 +55,7 @@ When reproducing a transport issue, capture this context before and after the ac
 1. Both devices' `peer_id`
 2. Both devices' active network interfaces and IPs
 3. Whether either device has VPN / proxy / guest-network isolation enabled
-4. Whether both OS firewalls explicitly allow UniClipboard
+4. Whether both OS firewalls explicitly allow Clipboard
 5. Whether the action reused an existing session or required a fresh reconnect
 
 ## Seq Query Templates

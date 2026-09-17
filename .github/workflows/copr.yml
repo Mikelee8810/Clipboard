@@ -21,13 +21,13 @@ on:
         type: string
         default: ''
       project:
-        description: 'COPR 项目名 — 主仓 = uniclipboard,预发渠道 = uniclipboard-alpha 等'
+        description: 'COPR 项目名 — 主仓 = clipboard,预发渠道 = clipboard-alpha 等'
         required: true
         type: choice
         options:
-          - 'uniclipboard'
-          - 'uniclipboard-alpha'
-        default: 'uniclipboard-alpha'
+          - 'clipboard'
+          - 'clipboard-alpha'
+        default: 'clipboard-alpha'
       run_ids:
         description: 'RPM 来源 build run ID(逗号分隔多个) — 留空走 GitHub Release;给 ID 时从这些 build run 的 artifact 直接取 RPM(免去先发 release 的循环依赖)'
         required: false
@@ -94,16 +94,16 @@ jobs:
           # 渠道映射规则(对应 release.yml 的 channel 推断):
           #   workflow_dispatch  → 用 inputs.project(用户选)
           #   workflow_run       → 看 upstream_tag 是否含 alpha/beta/rc
-          #     含       → uniclipboard-alpha
-          #     不含     → uniclipboard
+          #     含       → clipboard-alpha
+          #     不含     → clipboard
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             PROJECT="${{ inputs.project }}"
           else
             UPSTREAM_TAG="${{ steps.ver.outputs.upstream_tag }}"
             if [[ "$UPSTREAM_TAG" =~ -(alpha|beta|rc) ]]; then
-              PROJECT="uniclipboard-alpha"
+              PROJECT="clipboard-alpha"
             else
-              PROJECT="uniclipboard"
+              PROJECT="clipboard"
             fi
           fi
           echo "name=$PROJECT" >> "$GITHUB_OUTPUT"
@@ -116,7 +116,7 @@ jobs:
           UPSTREAM_TAG: ${{ steps.ver.outputs.upstream_tag }}
         run: |
           rpmdev-setuptree
-          cp packaging/uniclipboard.spec ~/rpmbuild/SPECS/
+          cp packaging/clipboard.spec ~/rpmbuild/SPECS/
           # 把 spec 里的占位符替换成实际版本号。为什么不能只靠 rpmbuild --define:
           # --define 只在当前 GH runner 上 `rpmbuild -bs` 那次生效;SRPM 进入
           # COPR mock chroot 二次 build 时,chroot 里没有 --define,会走 spec
@@ -124,7 +124,7 @@ jobs:
           sed -i \
             -e "s/@VERSION@/${RPM_VERSION}/g" \
             -e "s/@UPSTREAM_TAG@/${UPSTREAM_TAG}/g" \
-            ~/rpmbuild/SPECS/uniclipboard.spec
+            ~/rpmbuild/SPECS/clipboard.spec
 
       # 两条互斥路径,按 inputs.run_id 选其一:
       #   - 给了 run_id  → 从 build run 的 artifact 拉 RPM(免去先发 release 的循环)
@@ -139,7 +139,7 @@ jobs:
           # RUN_IDS 形如 "25618035983,25618036765" — 多 run 场景常见于
           # build.yml 按架构分别 dispatch 时(每个 run 只产一个架构 artifact)。
           # 遍历每个 run,用 GitHub REST API 列其下 artifact,过滤 name 后缀
-          # linux-gnu (匹配 build.yml 上传名 `uniclipboard-<arch>-unknown-linux-gnu`),
+          # linux-gnu (匹配 build.yml 上传名 `clipboard-<arch>-unknown-linux-gnu`),
           # 拉 zip 到 /tmp,unzip -j 把内层 *.rpm 平铺到 SOURCES。
           mkdir -p ~/rpmbuild/SOURCES /tmp/copr-art
           IFS=',' read -ra RUNS <<< "${RUN_IDS}"
@@ -163,7 +163,7 @@ jobs:
                 -H "Accept: application/vnd.github+json" \
                 "https://api.github.com/repos/UniClipboard/UniClipboard/actions/artifacts/${id}/zip" \
                 -o "/tmp/copr-art/${name}.zip"
-              # zip 内层路径形如 release/bundle/rpm/UniClipboard-...rpm,
+              # zip 内层路径形如 release/bundle/rpm/Clipboard-...rpm,
               # -j 平铺剥目录,只匹配 *.rpm(不要 *.rpm.sig — 那是 Tauri updater 用的,
               # COPR 重打的 RPM 会自己签 COPR GPG key)。
               unzip -j -o -d ~/rpmbuild/SOURCES/ "/tmp/copr-art/${name}.zip" '*/rpm/*.rpm'
@@ -178,7 +178,7 @@ jobs:
           # 健全性检查:必须同时有 x86_64 和 aarch64 两个 RPM,缺一个就 fail-fast
           # 避免后续 SRPM build 阶段报模糊错误。
           for arch in x86_64 aarch64; do
-            if ! ls ~/rpmbuild/SOURCES/UniClipboard-*"${arch}".rpm >/dev/null 2>&1; then
+            if ! ls ~/rpmbuild/SOURCES/Clipboard-*"${arch}".rpm >/dev/null 2>&1; then
               echo "::error::Missing ${arch} RPM in artifacts. Did you pass both run_ids?"
               exit 1
             fi
@@ -195,7 +195,7 @@ jobs:
           mkdir -p ~/rpmbuild/SOURCES
           BASE_URL="https://github.com/UniClipboard/UniClipboard/releases/download/v${UPSTREAM_TAG}"
           for ARCH in x86_64 aarch64; do
-            FILE="UniClipboard-${UPSTREAM_TAG}-1.${ARCH}.rpm"
+            FILE="Clipboard-${UPSTREAM_TAG}-1.${ARCH}.rpm"
             echo "Fetching ${FILE}..."
             curl -fL --retry 3 --retry-delay 5 \
               -o "$HOME/rpmbuild/SOURCES/${FILE}" \
@@ -217,7 +217,7 @@ jobs:
           # 不能 per-arch build SRPM 再合:SRPM 文件名只由 N-V-R 决定、不带
           # arch,循环 -bs 会同名覆盖,最终只剩最后那次 --target 对应的 SRPM。
           mkdir -p out-srpm
-          rpmbuild -bs ~/rpmbuild/SPECS/uniclipboard.spec \
+          rpmbuild -bs ~/rpmbuild/SPECS/clipboard.spec \
             --define "_version ${RPM_VERSION}" \
             --define "_upstream_tag ${UPSTREAM_TAG}" \
             --define "_topdir $HOME/rpmbuild"
@@ -277,5 +277,5 @@ jobs:
           echo "End-user install:" >> "$GITHUB_STEP_SUMMARY"
           echo '```bash' >> "$GITHUB_STEP_SUMMARY"
           echo "sudo dnf copr enable ${USERNAME}/${PROJECT}" >> "$GITHUB_STEP_SUMMARY"
-          echo "sudo dnf install uniclipboard" >> "$GITHUB_STEP_SUMMARY"
+          echo "sudo dnf install clipboard" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"

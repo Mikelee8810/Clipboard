@@ -9,7 +9,7 @@
 
 ## Engine 当前行为证据
 
-- `UniClipboard/Engine docs/adr/020-membership-reconciliation-and-user-decisions.md`：普通增加自动应用；未经本机确认的移除等待用户；拒绝后相关设备组彼此隔离但各自继续使用。
+- `Clipboard/Engine docs/adr/020-membership-reconciliation-and-user-decisions.md`：普通增加自动应用；未经本机确认的移除等待用户；拒绝后相关设备组彼此隔离但各自继续使用。
 - Engine `WorkspaceConvergenceSummary`：当前公开待移除目标、待决定编号、认知不一致设备和需要升级设备。
 - Engine `MembershipEvent`：内部保存发起成员身份，说明变化来源是可验证事实，但当前产品结果没有完整提供。
 - Engine `DecideMembershipRemoval`：产品可提交接受或拒绝；决定由 Engine 保存并恢复。
@@ -22,4 +22,4 @@
 
 ## 外部参考边界
 
-本轮尝试检索成熟产品的受信设备移除流程，但浏览器检索环境不可用。PRD 未引用未经核实的外部产品行为；当前草案仅基于 UniClipboard 的产品定位、现有用户界面和 Engine 已确认的业务规则。
+本轮尝试检索成熟产品的受信设备移除流程，但浏览器检索环境不可用。PRD 未引用未经核实的外部产品行为；当前草案仅基于 Clipboard 的产品定位、现有用户界面和 Engine 已确认的业务规则。

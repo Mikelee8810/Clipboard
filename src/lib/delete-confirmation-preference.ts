@@ -1,4 +1,4 @@
-export const DELETE_CONFIRMATION_STORAGE_KEY = 'uniclipboard.confirmBeforeDeletingHistoryItem'
+export const DELETE_CONFIRMATION_STORAGE_KEY = 'clipboard.confirmBeforeDeletingHistoryItem'
 export const DEFAULT_DELETE_CONFIRMATION_ENABLED = true
 
 const resolveStorage = (storage?: Storage | null): Storage | null => {

@@ -56,7 +56,7 @@ export function createTauriDevInvocation(args, currentEnv = process.env, portOve
     args: ['run', 'tauri', '--', 'dev', ...configuredTauriArgs],
     env: {
       ...currentEnv,
-      UNICLIPBOARD_ENV: 'development',
+      CLIPBOARD_ENV: 'development',
       UC_PROFILE: profile,
       UC_DEV_SERVER_PORT: String(devServerPort),
     },

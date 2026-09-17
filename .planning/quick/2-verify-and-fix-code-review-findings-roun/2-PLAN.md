@@ -249,7 +249,7 @@ In `sync_outbound.rs` tests `build_usecase` function (~line 555-625):
 In `runtime.rs` line 743: Remove `self.runtime.deps.encryption.clone(),` from the `sync_outbound_clipboard()` factory method.
 </action>
 <verify>
-<automated>cd /home/wuy6/myprojects/UniClipboard/src-tauri && cargo test -p uc-app -p uc-core -p uc-tauri --lib 2>&1 | tail -20</automated>
+<automated>cd /home/wuy6/myprojects/Clipboard/src-tauri && cargo test -p uc-app -p uc-core -p uc-tauri --lib 2>&1 | tail -20</automated>
 </verify>
 <done> - MIME constants defined in uc-core and used in sync_inbound.rs and list_entry_projections.rs - is_image check is case-insensitive - sync_inbound uses swap_remove for zero-copy repr selection - Test renamed to v2_message_with_tampered_content_returns_err - SyncOutbound no longer has unused encryption field; all call sites updated - All uc-app, uc-core, and uc-tauri tests pass
 </done>
@@ -426,7 +426,7 @@ To:
 
   </action>
   <verify>
-    <automated>cd /home/wuy6/myprojects/UniClipboard/src-tauri && cargo test -p uc-infra -p uc-tauri --lib 2>&1 | tail -20</automated>
+    <automated>cd /home/wuy6/myprojects/Clipboard/src-tauri && cargo test -p uc-infra -p uc-tauri --lib 2>&1 | tail -20</automated>
   </verify>
   <done>
     - ChunkedEncoder rejects plaintext > u32::MAX with descriptive error
@@ -444,7 +444,7 @@ To:
 Run the full workspace test suite to confirm no regressions:
 
 ```bash
-cd /home/wuy6/myprojects/UniClipboard/src-tauri && cargo test --workspace --lib
+cd /home/wuy6/myprojects/Clipboard/src-tauri && cargo test --workspace --lib
 ```
 
 Verify no remaining hardcoded MIME literals in uc-app:

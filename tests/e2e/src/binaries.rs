@@ -20,14 +20,14 @@ impl NodeBinarySet {
             .map(PathBuf::from)
             .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target"));
         let cli_name = if cfg!(windows) {
-            "uniclip.exe"
+            "clip.exe"
         } else {
-            "uniclip"
+            "clip"
         };
         let daemon_name = if cfg!(windows) {
-            "uniclipd.exe"
+            "clipd.exe"
         } else {
-            "uniclipd"
+            "clipd"
         };
         Self {
             version: "current".to_string(),
@@ -87,8 +87,8 @@ impl NodeBinarySet {
         let suffix = if cfg!(windows) { ".exe" } else { "" };
         let binaries = Self {
             version: version.into(),
-            cli: directory.join(format!("uniclip{suffix}")),
-            daemon: directory.join(format!("uniclipd{suffix}")),
+            cli: directory.join(format!("clip{suffix}")),
+            daemon: directory.join(format!("clipd{suffix}")),
             endpoint_discovery,
         };
         for path in [&binaries.cli, &binaries.daemon] {

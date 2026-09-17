@@ -6,7 +6,7 @@
 
 # content-availability 可靠探测 · 移动端 (RN) 对接指南
 
-面向 `uniclipboard-android`(RN/Expo,iOS + Android 共用 TS) 团队。
+面向 `clipboard-android`(RN/Expo,iOS + Android 共用 TS) 团队。
 对应 Rust core 变更：本仓库新增 `uc-content-hash` crate + `uc-mobile` 两个新 FFI 导出
 (`compute_snapshot_hash` / `MobileSyncClient.is_content_available`)。
 

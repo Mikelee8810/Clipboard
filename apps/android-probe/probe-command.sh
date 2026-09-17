@@ -7,11 +7,11 @@ if [[ $# -ne 1 ]]; then
 fi
 
 adb shell am start -W \
-  -n app.uniclipboard.engineprobe/.ProbeActivity >/dev/null
+  -n app.clipboard.engineprobe/.ProbeActivity >/dev/null
 
 COMMAND_BASE64="$(printf '%s' "$1" | base64 | tr -d '\n')"
 adb shell am broadcast \
   --receiver-foreground \
-  -n app.uniclipboard.engineprobe/.ProbeReceiver \
-  -a app.uniclipboard.engineprobe.COMMAND \
+  -n app.clipboard.engineprobe/.ProbeReceiver \
+  -a app.clipboard.engineprobe.COMMAND \
   --es command_base64 "$COMMAND_BASE64"

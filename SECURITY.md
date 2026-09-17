@@ -1,12 +1,12 @@
 # Security Policy
 
-UniClipboard is a security-oriented, end-to-end-encrypted clipboard sync tool.
+Clipboard is a security-oriented, end-to-end-encrypted clipboard sync tool.
 This document explains how to report vulnerabilities and how to verify the
 integrity and authenticity of the binaries we publish.
 
 ## Supported Versions
 
-UniClipboard is pre-1.0 and ships from a single active release line. Security
+Clipboard is pre-1.0 and ships from a single active release line. Security
 fixes land on the latest released minor; older builds are not maintained.
 Please update to the latest release before reporting an issue.
 
@@ -26,11 +26,11 @@ an unfixed vulnerability.
 
 We aim to acknowledge new reports within a few business days and will keep you
 updated through triage, the fix, and coordinated disclosure. Thank you for
-helping keep UniClipboard users safe.
+helping keep Clipboard users safe.
 
 ## Verifying Release Downloads
 
-UniClipboard uses two **independent** signing mechanisms, both built on
+Clipboard uses two **independent** signing mechanisms, both built on
 [minisign](https://jedisct1.github.io/minisign/)-compatible Ed25519 keys. The
 two keys are intentionally separate so they can be rotated independently.
 

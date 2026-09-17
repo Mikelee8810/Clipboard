@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# dual-logs.sh — Helper for inspecting macOS + Windows uniclipboard logs side-by-side.
+# dual-logs.sh — Helper for inspecting macOS + Windows clipboard logs side-by-side.
 #
 # Logs are JSONL (one JSON object per line). Since the platform-log-dir split,
-# files are written per role: uniclipboard-{gui,daemon,cli}.json.YYYY-MM-DD
+# files are written per role: clipboard-{gui,daemon,cli}.json.YYYY-MM-DD
 # (daily rotation, UTC dates), so "today" here means UTC today. The legacy
-# single-file name (uniclipboard.json.YYYY-MM-DD) is still matched for old logs.
+# single-file name (clipboard.json.YYYY-MM-DD) is still matched for old logs.
 # "Latest" = newest by mtime across roles, which in practice is the busiest
 # process (usually the daemon). For per-role single-host digging, use the
 # `local-log-debug` skill instead.
 #
-# macOS path:    $MAC_BASE/app.uniclipboard.desktop[-<UC_PROFILE>]/
+# macOS path:    $MAC_BASE/app.clipboard.desktop[-<UC_PROFILE>]/
 #                (Apple convention: ~/Library/Logs/<app>; the app dir IS the log
 #                dir — there is NO `logs/` subdir on macOS anymore)
-# Windows path:  $WIN_BASE/app.uniclipboard.desktop[-<WIN_PROFILE>]/logs/
+# Windows path:  $WIN_BASE/app.clipboard.desktop[-<WIN_PROFILE>]/logs/
 #                (SMB share of //<host>/Users/<user>/AppData/Local mounted at
 #                $WIN_BASE; Windows keeps the `logs/` subdir under the data root)
 #
@@ -53,11 +53,11 @@ Commands:
                                Plain-text grep on the latest log files.
 
 Profile resolution:
-  --profile <name>             Selects mac profile dir: app.uniclipboard.desktop[-<name>]
+  --profile <name>             Selects mac profile dir: app.clipboard.desktop[-<name>]
                                Default: $UC_PROFILE_DEFAULT (currently: dev)
   --win-profile <name>         Selects win profile under $WIN_BASE the same way.
                                Default: auto-detect newest mtime under $WIN_BASE.
-                               Use "default" for the no-suffix dir (app.uniclipboard.desktop).
+                               Use "default" for the no-suffix dir (app.clipboard.desktop).
   WIN_LOGS=...                 Env override that bypasses $WIN_BASE entirely and treats the
                                value as the literal logs/ dir. Useful for ad-hoc mounts.
 
@@ -69,13 +69,13 @@ EOF
 
 # --- generic profile resolution -------------------------------------------
 
-# profile_dir <base> <profile> -> "<base>/app.uniclipboard.desktop[-<profile>]"
+# profile_dir <base> <profile> -> "<base>/app.clipboard.desktop[-<profile>]"
 profile_dir() {
   local base="$1" profile="${2:-}"
   if [[ -z "$profile" || "$profile" == "default" ]]; then
-    echo "$base/app.uniclipboard.desktop"
+    echo "$base/app.clipboard.desktop"
   else
-    echo "$base/app.uniclipboard.desktop-$profile"
+    echo "$base/app.clipboard.desktop-$profile"
   fi
 }
 
@@ -97,14 +97,14 @@ list_profile_dirs_in() {
   local base="$1" logs_subdir="${2-logs}"
   shopt -s nullglob
   local d name profile logdir latest mtime epoch
-  for d in "$base"/app.uniclipboard.desktop "$base"/app.uniclipboard.desktop-*; do
+  for d in "$base"/app.clipboard.desktop "$base"/app.clipboard.desktop-*; do
     if [[ -n "$logs_subdir" ]]; then logdir="$d/$logs_subdir"; else logdir="$d"; fi
     [[ -d "$logdir" ]] || continue
     name="$(basename "$d")"
-    if [[ "$name" == "app.uniclipboard.desktop" ]]; then
+    if [[ "$name" == "app.clipboard.desktop" ]]; then
       profile="default"
     else
-      profile="${name#app.uniclipboard.desktop-}"
+      profile="${name#app.clipboard.desktop-}"
     fi
     latest="$(latest_log_in "$logdir" || true)"
     if [[ -n "$latest" ]]; then
@@ -129,12 +129,12 @@ latest_log_in() {
   local dir="$1"
   [[ -d "$dir" ]] || return 1
   # Pick the most recently modified log file across all roles. The glob
-  # `uniclipboard*.json.*` matches the per-role names
-  # (uniclipboard-{gui,daemon,cli}.json.<date>) AND the legacy single-file name
-  # (uniclipboard.json.<date>). ls -t orders by mtime descending, so the busiest
+  # `clipboard*.json.*` matches the per-role names
+  # (clipboard-{gui,daemon,cli}.json.<date>) AND the legacy single-file name
+  # (clipboard.json.<date>). ls -t orders by mtime descending, so the busiest
   # role's file wins — usually the daemon for sync/pairing/transfer debugging.
   local f
-  f="$(ls -t "$dir"/uniclipboard*.json.* 2>/dev/null | head -n1 || true)"
+  f="$(ls -t "$dir"/clipboard*.json.* 2>/dev/null | head -n1 || true)"
   # Guard against nullglob (list_profile_dirs_in enables it): with no match the
   # glob vanishes and bare `ls -t` would list the cwd. Only accept a path that
   # actually lives inside $dir.
@@ -216,7 +216,7 @@ cmd_status() {
   local mac_dir mac_log win_log
   mac_dir="$(mac_logs_dir "$profile")"
 
-  echo "=== uniclipboard dual-log status ==="
+  echo "=== clipboard dual-log status ==="
   echo "now (local):   $(date '+%Y-%m-%d %H:%M:%S %Z')"
   echo "now (UTC):     $(iso_now)"
   echo "mac profile:   $profile"
@@ -255,7 +255,7 @@ cmd_status() {
   elif [[ ! -d "$WIN_BASE" ]]; then
     echo "  (mount missing: $WIN_BASE — re-mount the SMB share)"
   else
-    echo "  (no uniclipboard profile dirs under $WIN_BASE)"
+    echo "  (no clipboard profile dirs under $WIN_BASE)"
   fi
 
   # If we auto-detected, also show the alternatives so the user can sanity-check.

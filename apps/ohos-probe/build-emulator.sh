@@ -7,7 +7,7 @@ deveco_contents="${DEVECO_STUDIO_CONTENTS:-/Applications/DevEco-Studio.app/Conte
 sdk_root="$deveco_contents/sdk"
 native_root="$sdk_root/default/openharmony/native"
 target="aarch64-unknown-linux-ohos"
-target_dir="${UC_OHOS_TARGET_DIR:-${TMPDIR:-/tmp}/uniclipboard-ohos-target}"
+target_dir="${UC_OHOS_TARGET_DIR:-${TMPDIR:-/tmp}/clipboard-ohos-target}"
 rust_linker="$native_root/llvm/bin/aarch64-unknown-linux-ohos-clang"
 rust_cxx="$native_root/llvm/bin/aarch64-unknown-linux-ohos-clang++"
 rust_ar="$native_root/llvm/bin/llvm-ar"
@@ -85,36 +85,36 @@ if [[ -z "$har_path" ]]; then
   echo "HarmonyOS HAR was not produced" >&2
   exit 1
 fi
-cp "$har_path" "$dist_dir/UniClipboardEngine.har"
+cp "$har_path" "$dist_dir/ClipboardEngine.har"
 cp "$project_root/entry/build/default/outputs/default/entry-default-signed.hap" \
-  "$dist_dir/UniClipboardEngineProbe.hap"
+  "$dist_dir/ClipboardEngineProbe.hap"
 
 for required_path in \
   package/Index.d.ets \
   package/libs/arm64-v8a/libuc_ohos_napi.so \
   package/oh-package.json5 \
   package/src/main/cpp/types/libuc_ohos_napi/index.d.ts; do
-  if ! tar -tzf "$dist_dir/UniClipboardEngine.har" | grep -Fxq "$required_path"; then
+  if ! tar -tzf "$dist_dir/ClipboardEngine.har" | grep -Fxq "$required_path"; then
     echo "HarmonyOS HAR is missing $required_path" >&2
     exit 1
   fi
 done
 
-if ! tar -xOzf "$dist_dir/UniClipboardEngine.har" package/oh-package.json5 \
-  | grep -Fq '"name":"@uniclipboard/engine"'; then
+if ! tar -xOzf "$dist_dir/ClipboardEngine.har" package/oh-package.json5 \
+  | grep -Fq '"name":"@clipboard/engine"'; then
   echo "HarmonyOS HAR has an unexpected package name" >&2
   exit 1
 fi
-if ! tar -xOzf "$dist_dir/UniClipboardEngine.har" package/oh-package.json5 \
+if ! tar -xOzf "$dist_dir/ClipboardEngine.har" package/oh-package.json5 \
   | grep -Fq "\"version\":\"$version\""; then
   echo "HarmonyOS HAR version does not match core-v$version" >&2
   exit 1
 fi
 
-shasum -a 256 "$dist_dir/UniClipboardEngine.har" | awk '{print $1}' \
-  > "$dist_dir/UniClipboardEngine.har.checksum.txt"
-shasum -a 256 "$dist_dir/UniClipboardEngineProbe.hap" | awk '{print $1}' \
-  > "$dist_dir/UniClipboardEngineProbe.checksum.txt"
+shasum -a 256 "$dist_dir/ClipboardEngine.har" | awk '{print $1}' \
+  > "$dist_dir/ClipboardEngine.har.checksum.txt"
+shasum -a 256 "$dist_dir/ClipboardEngineProbe.hap" | awk '{print $1}' \
+  > "$dist_dir/ClipboardEngineProbe.checksum.txt"
 
-echo "OK: $dist_dir/UniClipboardEngine.har"
-echo "OK: $dist_dir/UniClipboardEngineProbe.hap"
+echo "OK: $dist_dir/ClipboardEngine.har"
+echo "OK: $dist_dir/ClipboardEngineProbe.hap"

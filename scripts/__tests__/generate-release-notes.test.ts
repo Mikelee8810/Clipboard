@@ -28,39 +28,39 @@ describe('buildInstallerTable Windows rows', () => {
     // alphabetically, so arm64-setup.exe precedes x64-setup.exe — the old code
     // picked the first .exe and hard-labeled it x86_64, mislabeling arm64.
     seed([
-      'UniClipboard_0.13.0-alpha.4_arm64-portable.zip',
-      'UniClipboard_0.13.0-alpha.4_arm64-setup.exe',
-      'UniClipboard_0.13.0-alpha.4_x64-portable.zip',
-      'UniClipboard_0.13.0-alpha.4_x64-setup.exe',
+      'Clipboard_0.13.0-alpha.4_arm64-portable.zip',
+      'Clipboard_0.13.0-alpha.4_arm64-setup.exe',
+      'Clipboard_0.13.0-alpha.4_x64-portable.zip',
+      'Clipboard_0.13.0-alpha.4_x64-setup.exe',
     ])
 
     const table = buildInstallerTable({ artifactsDir, baseUrl: BASE_URL })
 
     expect(table).toContain(
-      '| Windows | x86_64 (Installer) | [UniClipboard_0.13.0-alpha.4_x64-setup.exe]'
+      '| Windows | x86_64 (Installer) | [Clipboard_0.13.0-alpha.4_x64-setup.exe]'
     )
     expect(table).toContain(
-      '| Windows | ARM64 (Installer) | [UniClipboard_0.13.0-alpha.4_arm64-setup.exe]'
+      '| Windows | ARM64 (Installer) | [Clipboard_0.13.0-alpha.4_arm64-setup.exe]'
     )
     expect(table).toContain(
-      '| Windows | x86_64 (Portable) | [UniClipboard_0.13.0-alpha.4_x64-portable.zip]'
+      '| Windows | x86_64 (Portable) | [Clipboard_0.13.0-alpha.4_x64-portable.zip]'
     )
     expect(table).toContain(
-      '| Windows | ARM64 (Portable) | [UniClipboard_0.13.0-alpha.4_arm64-portable.zip]'
+      '| Windows | ARM64 (Portable) | [Clipboard_0.13.0-alpha.4_arm64-portable.zip]'
     )
     // The arm64 installer must never be advertised under an x86_64 label.
     expect(table).not.toContain(
-      '| Windows | x86_64 (Installer) | [UniClipboard_0.13.0-alpha.4_arm64-setup.exe]'
+      '| Windows | x86_64 (Installer) | [Clipboard_0.13.0-alpha.4_arm64-setup.exe]'
     )
   })
 
   it('emits a single x86_64 installer row for legacy x64-only releases', () => {
-    seed(['UniClipboard_0.13.0-alpha.3_x64-setup.exe'])
+    seed(['Clipboard_0.13.0-alpha.3_x64-setup.exe'])
 
     const table = buildInstallerTable({ artifactsDir, baseUrl: BASE_URL })
 
     expect(table).toContain(
-      '| Windows | x86_64 (Installer) | [UniClipboard_0.13.0-alpha.3_x64-setup.exe]'
+      '| Windows | x86_64 (Installer) | [Clipboard_0.13.0-alpha.3_x64-setup.exe]'
     )
     expect(table).not.toContain('ARM64')
     expect(table).not.toContain('Portable')
@@ -69,7 +69,7 @@ describe('buildInstallerTable Windows rows', () => {
 
 describe('buildInstallerTable mobile rows', () => {
   it('links stable desktop releases to the latest stable Android release', () => {
-    seed(['UniClipboard_0.13.0_aarch64.dmg'])
+    seed(['Clipboard_0.13.0_aarch64.dmg'])
 
     const table = buildInstallerTable({ artifactsDir, baseUrl: BASE_URL })
 
@@ -84,7 +84,7 @@ describe('buildInstallerTable mobile rows', () => {
   })
 
   it('links prerelease desktop releases to the resolved Android preview release', () => {
-    seed(['UniClipboard_0.13.0-alpha.4_aarch64.dmg'])
+    seed(['Clipboard_0.13.0-alpha.4_aarch64.dmg'])
 
     const table = buildInstallerTable({
       artifactsDir,

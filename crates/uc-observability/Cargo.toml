@@ -3,7 +3,7 @@ name = "uc-observability"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Observability infrastructure for UniClipboard: dual-output tracing with profile-based filtering"
+description = "Observability infrastructure for Clipboard: dual-output tracing with profile-based filtering"
 
 [dependencies]
 uc-engine.workspace = true

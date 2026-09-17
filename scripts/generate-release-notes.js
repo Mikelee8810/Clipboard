@@ -216,21 +216,21 @@ function buildCliInstallerTable({ artifactsDir, baseUrl }) {
   const macosArm64 = findFirstFile(
     artifactsDir,
     file =>
-      file.startsWith('uniclipboard-cli-') &&
+      file.startsWith('clipboard-cli-') &&
       file.includes('aarch64-apple-darwin') &&
       file.endsWith('.tar.gz')
   )
   const macosX64 = findFirstFile(
     artifactsDir,
     file =>
-      file.startsWith('uniclipboard-cli-') &&
+      file.startsWith('clipboard-cli-') &&
       file.includes('x86_64-apple-darwin') &&
       file.endsWith('.tar.gz')
   )
   const linuxX64 = findFirstFile(
     artifactsDir,
     file =>
-      file.startsWith('uniclipboard-cli-') &&
+      file.startsWith('clipboard-cli-') &&
       file.includes('linux-musl') &&
       isX64(file) &&
       file.endsWith('.tar.gz')
@@ -238,7 +238,7 @@ function buildCliInstallerTable({ artifactsDir, baseUrl }) {
   const linuxArm64 = findFirstFile(
     artifactsDir,
     file =>
-      file.startsWith('uniclipboard-cli-') &&
+      file.startsWith('clipboard-cli-') &&
       file.includes('linux-musl') &&
       isArm(file) &&
       file.endsWith('.tar.gz')
@@ -246,7 +246,7 @@ function buildCliInstallerTable({ artifactsDir, baseUrl }) {
   const windows = findFirstFile(
     artifactsDir,
     file =>
-      file.startsWith('uniclipboard-cli-') && file.includes('windows-msvc') && file.endsWith('.zip')
+      file.startsWith('clipboard-cli-') && file.includes('windows-msvc') && file.endsWith('.zip')
   )
 
   const makeRow = (platform, arch, fileName) =>

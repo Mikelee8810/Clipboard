@@ -3,7 +3,7 @@ import path from 'node:path'
 import { validateTestProfile } from './helpers/conflict-userdata.mjs'
 
 const run = JSON.parse(readFileSync(process.env.CONFLICT_RUN, 'utf8'))
-const application = path.resolve('target/debug/uniclipboard')
+const application = path.resolve('target/debug/clipboard')
 const instance = profile => ({
   capabilities: {
     browserName: 'tauri',
@@ -15,7 +15,7 @@ const instance = profile => ({
       env: {
         ...process.env,
         UC_PROFILE: validateTestProfile(profile),
-        UNICLIPBOARD_ENV: 'development',
+        CLIPBOARD_ENV: 'development',
         UC_DISABLE_SINGLE_INSTANCE: '1',
         UC_DISABLE_SYSTEM_CLIPBOARD: '1',
         UC_CLIPBOARD_MODE: 'passive',

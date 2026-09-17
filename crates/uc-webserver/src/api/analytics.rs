@@ -199,7 +199,7 @@ fn event_kind_tag(req: &CaptureUiEventRequest) -> &'static str {
 /// `app.restart()` exits the process before its non-blocking writer flushes.
 /// The daemon log is a separate file that survives the GUI restart, so mirroring
 /// these fields here is the only durable on-device signal for diagnosing a
-/// failing auto-update (e.g. the loop observed in `uniclipboard-daemon.json`:
+/// failing auto-update (e.g. the loop observed in `clipboard-daemon.json`:
 /// repeated `check_performed=available` → `action_invoked` → daemon bounce).
 fn log_update_diag(req: &CaptureUiEventRequest) {
     match req {

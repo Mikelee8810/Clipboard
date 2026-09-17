@@ -32,7 +32,7 @@ pub enum DaemonRunMode {
     ///
     /// 目前在**每一个 predicate 上都与 [`Self::Standalone`] 完全一致**——
     /// 接系统剪贴板、自监听 OS 信号、自驱 deferred services、进程模式为
-    /// [`DaemonProcessMode::Standalone`]（仍可被 `uniclip stop` SIGTERM）。
+    /// [`DaemonProcessMode::Standalone`]（仍可被 `clip stop` SIGTERM）。
     /// 它是后续 sub-step（lease / 自终止 / analytics 门控 / health 字段 /
     /// handover）挂载的预留变体，**当前在生产路径里不可达**：没有任何 spawner
     /// 会发出 [`crate::RUN_MODE_ONESHOT`]，仅 env 解码识别它，行为中立。
@@ -93,7 +93,7 @@ impl DaemonRunMode {
     pub fn process_mode(self) -> DaemonProcessMode {
         match self {
             // P5-L L0: Oneshot mirrors Standalone — it must stay SIGTERM-able so
-            // `uniclip stop` keeps working until later sub-steps add self-terminate.
+            // `clip stop` keeps working until later sub-steps add self-terminate.
             Self::Standalone | Self::ServerHeadless | Self::Oneshot => {
                 DaemonProcessMode::Standalone
             }
@@ -209,7 +209,7 @@ mod tests {
         assert_eq!(
             oneshot.process_mode(),
             DaemonProcessMode::Standalone,
-            "oneshot must stay SIGTERM-able for `uniclip stop`"
+            "oneshot must stay SIGTERM-able for `clip stop`"
         );
 
         assert_eq!(

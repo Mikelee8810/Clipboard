@@ -1,6 +1,6 @@
 # 四平台 P2P 核心实施计划
 
-本计划由 2026-07-19 的架构评估生成，基于提交 `1c229e9e1`。目标是让 desktop、HarmonyOS、Android、iOS 使用同一套完整 P2P 核心，并由独立的 `UniClipboard/core` 仓库统一维护和发布。
+本计划由 2026-07-19 的架构评估生成，基于提交 `1c229e9e1`。目标是让 desktop、HarmonyOS、Android、iOS 使用同一套完整 P2P 核心，并由独立的 `Clipboard/core` 仓库统一维护和发布。
 
 实际执行结果、验证证据、跳过项和剩余风险见 [`core-migration-execution-record.md`](core-migration-execution-record.md)。各计划文件继续作为完成标准和后续工作的事实来源。
 

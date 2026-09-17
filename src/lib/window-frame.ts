@@ -1,7 +1,7 @@
 import type { PlatformInfo } from '@/lib/platform'
 
-export const WINDOW_FRAME_STORAGE_KEY = 'uniclipboard.useSystemWindowFrame'
-const WINDOW_FRAME_CHANGED_EVENT = 'uniclipboard:window-frame-changed'
+export const WINDOW_FRAME_STORAGE_KEY = 'clipboard.useSystemWindowFrame'
+const WINDOW_FRAME_CHANGED_EVENT = 'clipboard:window-frame-changed'
 export type WindowFramePreference = 'auto' | 'custom' | 'system' | 'none'
 let sessionPreference: WindowFramePreference | undefined
 

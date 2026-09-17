@@ -1,14 +1,14 @@
-# Task Plan: 099 · 移动端扫码接入协议 `uniclipboard://connect`
+# Task Plan: 099 · 移动端扫码接入协议 `clipboard://connect`
 
 ## 目标
 
-为移动端注册流程引入版本化深链协议 `uniclipboard://connect`,把 `base_url / username / password / 扩展元数据`编码进 **单个二维码**,让 iOS Shortcut / Android SyncClipboard 兼容客户端 / 未来原生 App **免输入接入**,消除 `MobileSyncCredentialModal` 中"用户肉眼抄写三栏"的体验缺陷。
+为移动端注册流程引入版本化深链协议 `clipboard://connect`,把 `base_url / username / password / 扩展元数据`编码进 **单个二维码**,让 iOS Shortcut / Android SyncClipboard 兼容客户端 / 未来原生 App **免输入接入**,消除 `MobileSyncCredentialModal` 中"用户肉眼抄写三栏"的体验缺陷。
 
 跟踪 issue: <https://github.com/UniClipboard/UniClipboard/issues/789>
 
 ## 当前阶段
 
-阶段 0-4A 已提交 (commits `ec59277b` / `3756c84e` / `23452385` / `3b220f75` / `aeb85dd5`); 阶段 5 (凭据弹窗按"接入方式"分 tab + install URL 独立 QR) 本地完成待提交。iOS App 4B 用户已在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 落地并真机扫码测试通过。剩余:4C (SyncClipboard 快捷指令模板手工更新，仓库外)。
+阶段 0-4A 已提交 (commits `ec59277b` / `3756c84e` / `23452385` / `3b220f75` / `aeb85dd5`); 阶段 5 (凭据弹窗按"接入方式"分 tab + install URL 独立 QR) 本地完成待提交。iOS App 4B 用户已在独立仓库 `/Users/mark/MyProjects/iOSApp/Clipboard` 落地并真机扫码测试通过。剩余:4C (SyncClipboard 快捷指令模板手工更新，仓库外)。
 
 ## 关键非目标 (本期不做)
 
@@ -22,7 +22,7 @@
 
 ## 已对齐的设计决策
 
-1. **单一 scheme**: 仅接受 `uniclipboard://`, 不接受 `uniclip://` alias(简化 Intent filter / URL handler / 解析器逻辑)。
+1. **单一 scheme**: 仅接受 `clipboard://`, 不接受 `clip://` alias(简化 Intent filter / URL handler / 解析器逻辑)。
 2. **base64url-no-pad 包裹 UTF-8 JSON**: 避免明文密码 / URL 特殊字符在 query string 中的二次编码问题，同时控制 QR 体积。
 3. **JSON 字段固定顺序** (`v / url / user / pwd / o`) + **`o` 键 BTreeMap 字典序**: 保证 Rust 与 TS 编码器字节级一致，让 golden vector 可在两端复用。
 4. **生成侧 `o` 字段白名单 + 解析侧宽松忽略未知键**: 编码侧用 `ConnectUriOther` 类型层强约束 (防 daemon bearer / 加密 passphrase 误塞); 解码侧用 `BTreeMap<String, String>` 接受任意键，前向兼容 v2 字段。
@@ -175,9 +175,9 @@
 
 ## 阶段 4: iOS App 集成 + Shortcut 兜底 + 真机闭环 ⏳
 
-**重要修订** (2026-05-18): 用户澄清主交互流程是"系统相机扫码 → 跳转 UniClipboard 原生 iOS App → 自动添加服务端",**不是** 快捷指令。已对齐 spec §9.1 提升为主路径，§9.2 (Shortcut) 降为仍维护的兜底路径。Android 文档暂不写 (spec §9.3 已够第三方实现参考)。
+**重要修订** (2026-05-18): 用户澄清主交互流程是"系统相机扫码 → 跳转 Clipboard 原生 iOS App → 自动添加服务端",**不是** 快捷指令。已对齐 spec §9.1 提升为主路径，§9.2 (Shortcut) 降为仍维护的兜底路径。Android 文档暂不写 (spec §9.3 已够第三方实现参考)。
 
-iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维护，本桌面仓库只产出集成文档，Swift 落地由用户在 iOS App 仓库完成。
+iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/Clipboard` 维护，本桌面仓库只产出集成文档，Swift 落地由用户在 iOS App 仓库完成。
 
 ### 4A: 集成文档 ✅
 
@@ -186,7 +186,7 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
 1. `docs/integrations/ios-app-connect-uri.md` (新增，英文，~430 行):
    - §1 Why: 三条客户端路径对比 (系统相机 / 内嵌扫码 / Shortcut),解释 iOS App 现有 ServerQRPayload (JSON/URL-userinfo) 与 connect URI 的差异。
    - §2 URL scheme 注册：Xcode 26 generated-Info.plist 模型下，CFBundleURLTypes 必须走 Project → Target → Info → URL Types UI (无 INFOPLIST_KEY_* 等价); plutil 验证命令。
-   - §3 .onOpenURL: 挂在 UniClipboardApp `WindowGroup` 上 (而非 ContentView), 防 SetupFlow / TabView 状态切换丢消息。AppViewModel.handleIncomingURL 路由 Sketch。
+   - §3 .onOpenURL: 挂在 ClipboardApp `WindowGroup` 上 (而非 ContentView), 防 SetupFlow / TabView 状态切换丢消息。AppViewModel.handleIncomingURL 路由 Sketch。
    - §4 Swift parser: `ConnectURI.Payload / ParseError` 类型 + 6 步 parser 完整 Swift 代码 (base64url decode helper, 字段提取，URL scheme 校验); 与 Rust/TS 行为对齐; 故意不实现 encoder (desktop 是唯一颁发方)。
    - §5 跨语言 golden test: 复用 spec §7.1 字面值 + 4 个 §7.2 负例，swift-testing macro 写法。
    - §6 UX 路由表：SetupFlow 空态 / Home tab 已有 server / 模态已开 三种状态分别该怎么响应。
@@ -204,7 +204,7 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
    - §6 退役条件 (>95% 走原生 App 后)。
 
 3. `docs/architecture/mobile-sync-connect-uri.md` 调整：
-   - §9 整体重排为 "delivery-priority order": §9.1 改为"Native UniClipboard iOS App (primary)", §9.2 改为"SyncClipboard Shortcut template (fallback, still maintained)", §9.3 改为"Android / other third-party clients (spec is the contract, no per-client guide)"。
+   - §9 整体重排为 "delivery-priority order": §9.1 改为"Native Clipboard iOS App (primary)", §9.2 改为"SyncClipboard Shortcut template (fallback, still maintained)", §9.3 改为"Android / other third-party clients (spec is the contract, no per-client guide)"。
    - §11 实现位置表新增两行：ios-app-connect-uri.md + ios-shortcut.md。
 
 **测试**: 文档型改动，无代码 / 单测变化。spec mermaid 图 + 既有跨语言 golden 测试 (Rust/TS) 已经覆盖协议层正确性，4A 不再重复测试。
@@ -213,15 +213,15 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
 
 ### 4B: iOS App 仓库 Swift 落地 ⏳ (跨仓库)
 
-**目标**: 在 `/Users/mark/MyProjects/iOSApp/UniClipboard` 按 4A 文档实现 connect URI 接入。
+**目标**: 在 `/Users/mark/MyProjects/iOSApp/Clipboard` 按 4A 文档实现 connect URI 接入。
 
 **预期改动** (在 iOS App 仓库，**非本桌面仓库**):
 - `Shared/Network/ConnectURI.swift` (新增): Payload + ParseError + parse 函数。
-- `Tests/UniClipboardNetworkTests/ConnectURITests.swift` (新增): golden vector + 6 个负例。
+- `Tests/ClipboardNetworkTests/ConnectURITests.swift` (新增): golden vector + 6 个负例。
 - `UniClipboard/UniClipboardApp.swift`: `.onOpenURL { vm.handleIncomingURL($0) }`。
-- `UniClipboard/AppViewModel.swift`: 加 `handleIncomingURL` + present 方法。
-- `UniClipboard/Views/QRScannerView.swift` (`ServerQRPayload.parse` 入口): 新增 `uniclipboard://` 分支。
-- Xcode 项目：Target Info → URL Types + `uniclipboard` scheme。
+- `Clipboard/AppViewModel.swift`: 加 `handleIncomingURL` + present 方法。
+- `Clipboard/Views/QRScannerView.swift` (`ServerQRPayload.parse` 入口): 新增 `clipboard://` 分支。
+- Xcode 项目：Target Info → URL Types + `clipboard` scheme。
 - `Localizable.xcstrings`: 6 个错误码 i18n key。
 
 **依赖**: 4A 文档 (作为实现规约)。
@@ -240,7 +240,7 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
 
 ### 验收 (4B + 4C 完成后)
 
-- 真机 iPhone 系统相机扫桌面 QR → 弹"在 UniClipboard 打开" → tap → App 解析 connect URI → ServerForm prefill → 用户确认保存 → 触发同步 → desktop entry 列表出现新增项。 **(4B 已通过)**
+- 真机 iPhone 系统相机扫桌面 QR → 弹"在 Clipboard 打开" → tap → App 解析 connect URI → ServerForm prefill → 用户确认保存 → 触发同步 → desktop entry 列表出现新增项。 **(4B 已通过)**
 - 备用路径：同一 QR 喂给 Shortcut 模板 → keychain 三栏自动填 → 后续 SyncClipboard 轮询正常。**(4C 待落地)**
 
 ---
@@ -309,7 +309,7 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
   1. 编解码模块归 `uc-application` (非 `uc-core`)
   2. `o` 字段采用"生成侧白名单 + 解析侧宽松"
   3. `install_url` DTO 字段保留
-- 2026-05-18: 单一 scheme 决定 — 仅 `uniclipboard://`, 拒绝 `uniclip://` alias。简化 Intent filter / 解析器逻辑，避免客户端分级。
+- 2026-05-18: 单一 scheme 决定 — 仅 `clipboard://`, 拒绝 `clip://` alias。简化 Intent filter / 解析器逻辑，避免客户端分级。
 - 2026-05-18: `MissingField` 错误码归并语义 — serde struct 字段加 `#[serde(default)]`, 让"字段缺失"和"空字符串"统一翻译为 `MissingField`, 与规范 §4.2 错误码表对齐。
 - 2026-05-18: golden vector 选用 `proto`/`label`/`did` 三个 `o` 键、不含 `install`, URI 长度 259 字符 (远低于 800)。
 - 2026-05-18 (阶段 2): `o.install` 字段在阶段 2 暂留空，等阶段 4 真机走通后再决定是否塞 iCloud 链接到 payload。
@@ -322,11 +322,11 @@ iOS 原生 App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维�
 - 2026-05-18 (阶段 3B): QR `<img src>` 字段保持 `data:image/png;base64,${qrCodePngBase64}` —— 后端 DTO 在阶段 2 已将该字段所编码的 URI 从 `installUrl` 切到 `connectUri`,前端无需感知具体编了什么，只需更新 alt/label 文案让 UX 语义对齐。
 - 2026-05-18 (阶段 3B): 不为 install URL 加 "Open in Shortcuts" CTA —— 桌面端打开 iCloud 链接无意义，沿用 CredentialField 自带 copy (在 iPhone Safari 粘贴即可); 同时 `installShortcut.cta` i18n 文案删除以免成为孤儿键。
 - 2026-05-18 (阶段 3B): 测试 mockPayload 加 `connectUri` 字段补齐 DTO; 不在前端单测里跑跨语言 byte-level 比对 (那是阶段 3A 的 mobileSyncConnectUri.test.ts 职责); 这里只断言 UI 结构 (alt 文案 + 次要卡片可见性),防止误改 UX。
-- 2026-05-18 (阶段 4 范围澄清): 用户裁定 iOS 原生 App (走 URL scheme + .onOpenURL) 是主路径，SyncClipboard 快捷指令降为兜底但仍维护; Android 文档不写 (spec §9.3 已够第三方实现)。iOS App 在独立仓库 `/Users/mark/MyProjects/iOSApp/UniClipboard` 维护，本桌面仓库阶段 4A 只产文档，Swift 落地 (4B) 跨仓库，模板更新 (4C) 仓库外手工。
-- 2026-05-18 (阶段 4A): iOS App 既有 `ServerQRPayload` (JSON / URL-userinfo 两种格式) 与 connect URI 不兼容 — 决策保留 legacy 格式，在 `ServerQRPayload.parse` 入口新增 `uniclipboard://` 分支调 ConnectURI.parse，让旧 QR 在 App 内嵌扫码下仍可用、新 QR 同时支持系统相机和 App 内嵌两个入口。
+- 2026-05-18 (阶段 4 范围澄清): 用户裁定 iOS 原生 App (走 URL scheme + .onOpenURL) 是主路径，SyncClipboard 快捷指令降为兜底但仍维护; Android 文档不写 (spec §9.3 已够第三方实现)。iOS App 在独立仓库 `/Users/mark/MyProjects/iOSApp/Clipboard` 维护，本桌面仓库阶段 4A 只产文档，Swift 落地 (4B) 跨仓库，模板更新 (4C) 仓库外手工。
+- 2026-05-18 (阶段 4A): iOS App 既有 `ServerQRPayload` (JSON / URL-userinfo 两种格式) 与 connect URI 不兼容 — 决策保留 legacy 格式，在 `ServerQRPayload.parse` 入口新增 `clipboard://` 分支调 ConnectURI.parse，让旧 QR 在 App 内嵌扫码下仍可用、新 QR 同时支持系统相机和 App 内嵌两个入口。
 - 2026-05-18 (阶段 4A): iOS App Swift parser 故意不实现 encoder — desktop 是唯一 QR 颁发方，iOS 侧 encoder 是 dead code + drift 风险。golden test 的 byte-equality 由 desktop Rust/TS + iOS Swift 三方独立断言同一字面值实现，任一漂移立即可见。
 - 2026-05-18 (阶段 4A): URL scheme 注册走 Xcode UI (Target → Info → URL Types) 而非 INFOPLIST_KEY_* — Xcode 26 的 INFOPLIST_KEY_* 不支持 `array<dict>` 结构，而 PlistBuddy build phase (类 UIFileSharingEnabled workaround) 是更重的备选，UI 路径足够稳定。
-- 2026-05-18 (阶段 4A): .onOpenURL 挂在 `UniClipboardApp` 的 `WindowGroup` 根 (而非 ContentView) — 防 SetupFlow / TabView 状态切换时 handler 重新挂载丢消息;handleIncomingURL 路由收敛到 AppViewModel 一处。
+- 2026-05-18 (阶段 4A): .onOpenURL 挂在 `ClipboardApp` 的 `WindowGroup` 根 (而非 ContentView) — 防 SetupFlow / TabView 状态切换时 handler 重新挂载丢消息;handleIncomingURL 路由收敛到 AppViewModel 一处。
 - 2026-05-18 (阶段 5 触发): 4B 真机测试通过后用户提出 Tab 重构 — 按"平台 (iOS/Android)"分既不准确 (connect URI 平台无关), 也让 Android 用户看到一个空 tab 误以为不支持。改成按"接入方式 (扫码接入/安装快捷指令)"分，同时把 install URL 升级为独立 QR (iPhone 相机直扫装快捷指令), 不再要求肉眼抄长 iCloud 链接。
 - 2026-05-18 (阶段 5): install URL QR 走后端 `render_qr_code` 二次渲染 (而非前端 qrcode 库即时生成) — 与 connect URI QR 共用同一管线，保证两个 QR 视觉/编码风格一致，同时前端零新依赖。ASCII 不渲染 (CLI 用例不需要 install QR)。
 - 2026-05-18 (阶段 5): mockPayload `installQrCodePngBase64` 与 `qrCodePngBase64` 故意用不同 base64 字面值 — 单测断言两个 QR 的 img.src 各自指向各自的 base64, 防止前端把字段串位 (变量名相似，类型相同，复制粘贴失误是真实风险)。后端测试也加了对称断言 (install QR == install URL 编码，主 QR ≠ install URL 编码)。

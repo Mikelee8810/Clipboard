@@ -27,7 +27,7 @@ export function QuickPanelShortcutRow(props: ComponentProps<typeof ShortcutRow>)
   return compositorShortcuts ? (
     <p className="text-ui-body text-muted-foreground">
       {t('settings.sections.quickPanel.compositorShortcuts')}
-      <code className="mt-2 block select-text">uniclipboard --quick-panel</code>
+      <code className="mt-2 block select-text">clipboard --quick-panel</code>
     </p>
   ) : (
     <ShortcutRow {...props} />

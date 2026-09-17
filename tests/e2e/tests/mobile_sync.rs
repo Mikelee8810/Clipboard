@@ -73,7 +73,7 @@ async fn mobile_sync_setup_non_interactive_json() {
     let (_daemon, cli) = setup_initialized_node("ms-setup-json").await;
 
     // Use a unique, uncommon LAN port. The well-known default (42720) is
-    // often occupied by a real UniClipboard instance on the same host (on
+    // often occupied by a real Clipboard instance on the same host (on
     // WSL2 even a Windows-side instance, via localhost forwarding), and setup
     // now aborts on a bind failure — so an e2e test must not depend on 42720
     // being free. The 42720 default itself is the DEFAULT_LAN_PORT constant.

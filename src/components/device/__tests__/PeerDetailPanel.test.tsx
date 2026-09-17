@@ -213,7 +213,7 @@ describe('PeerDetailPanel sync controls', () => {
 
     expect(
       screen.getByRole('button', {
-        name: 'Update UniClipboard on the other device to the latest version.',
+        name: 'Update Clipboard on the other device to the latest version.',
       })
     ).toBeInTheDocument()
   })

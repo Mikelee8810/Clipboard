@@ -119,7 +119,7 @@ fn spawn_direct_daemon(profile: &TestProfile, binary: &Path, log_name: &str) -> 
         .unwrap_or_else(|error| panic!("clone direct daemon log {}: {error}", log_path.display()));
     Command::new(binary)
         .env("UC_PROFILE", &profile.name)
-        .env("UNICLIPBOARD_ENV", "development")
+        .env("CLIPBOARD_ENV", "development")
         .env("UC_DAEMON_RUN_MODE", "server")
         .stdout(Stdio::from(stdout))
         .stderr(Stdio::from(stderr))
@@ -1632,7 +1632,7 @@ async fn u15_interrupted_first_current_start_recovers_without_data_loss() {
     let current = NodeBinarySet::current();
     let mut interrupted = Command::new(&current.daemon)
         .env("UC_PROFILE", &a.daemon.profile.name)
-        .env("UNICLIPBOARD_ENV", "development")
+        .env("CLIPBOARD_ENV", "development")
         .env("UC_DAEMON_RUN_MODE", "server")
         .env("UC_E2E_RENDEZVOUS_BASE_URL", &rendezvous_uri)
         .spawn()

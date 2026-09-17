@@ -26,7 +26,7 @@ impl DesktopHostPaths {
         };
 
         Self {
-            db_path: dirs.app_data_root.join("uniclipboard.db"),
+            db_path: dirs.app_data_root.join("clipboard.db"),
             vault_dir: dirs.app_data_root.join("vault"),
             settings_path: dirs.app_data_root.join("settings.json"),
             logs_dir: dirs.app_log_dir,

@@ -2,11 +2,11 @@ import { createLogger } from '@/lib/logger'
 
 const log = createLogger('ui-scale')
 
-export const UI_SCALE_STORAGE_KEY = 'uniclipboard.uiScale'
+export const UI_SCALE_STORAGE_KEY = 'clipboard.uiScale'
 export const DEFAULT_UI_SCALE = 1
 export const MIN_UI_SCALE = 0.8
 export const MAX_UI_SCALE = 1.5
-const UI_SCALE_CHANGED_EVENT = 'uniclipboard:ui-scale-changed'
+const UI_SCALE_CHANGED_EVENT = 'clipboard:ui-scale-changed'
 
 export type UiScaleOption = {
   label: string

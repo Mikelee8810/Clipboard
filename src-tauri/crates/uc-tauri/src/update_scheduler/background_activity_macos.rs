@@ -29,7 +29,7 @@ use tokio::sync::mpsc::Sender;
 use tracing::warn;
 
 /// 活动标识符。Apple 建议用反向域名风格、进程内稳定不变。
-const ACTIVITY_IDENTIFIER: &str = "app.uniclipboard.update-check";
+const ACTIVITY_IDENTIFIER: &str = "app.clipboard.update-check";
 
 /// 注册后台活动调度器。`interval` 为期望的检查周期（取 scheduler 的成功 cadence
 /// 基准，6h）；`tolerance` 给系统 ~10% 的合并窗口去和别的唤醒拼车省电。

@@ -133,7 +133,7 @@ FlareRelease 是发布信息和 Channel 的唯一管理方。客户端继续访�
 
 Desktop 工作流完成构建后只做两件事：上传不可变安装包，然后通过受 Cloudflare Access 保护的管理接口登记 Release。登记成功后 Release 状态为 Ready，但不会自动改变 Stable 或 Alpha Channel。维护者确认后，必须在 FlareRelease 中显式 Promote。
 
-CI 使用专门的 Cloudflare Access service token。以下凭据由 `UniClipboard` 组织的 GitHub Actions organization secrets 统一管理，并授权给 Desktop 与 UniClip 仓库：
+CI 使用专门的 Cloudflare Access service token。以下凭据由 `Clipboard` 组织的 GitHub Actions organization secrets 统一管理，并授权给 Desktop 与 Clip 仓库：
 
 - `FLARE_RELEASE_ACCESS_CLIENT_ID`
 - `FLARE_RELEASE_ACCESS_CLIENT_SECRET`
@@ -240,11 +240,11 @@ bun run version:bump --type minor --channel stable
 
 ## 安装包命名规则
 
-- macOS ARM64: `UniClipboard_X.Y.Z_aarch64.dmg`
-- macOS Intel: `UniClipboard_X.Y.Z_x64.dmg`
-- Linux Debian: `uniclipboard_X.Y.Z_amd64.deb`
-- Linux AppImage: `uniclipboard_X.Y.Z_amd64.AppImage`
-- Windows NSIS: `UniClipboard_X.Y.Z_x64-setup.exe`
+- macOS ARM64: `Clipboard_X.Y.Z_aarch64.dmg`
+- macOS Intel: `Clipboard_X.Y.Z_x64.dmg`
+- Linux Debian: `clipboard_X.Y.Z_amd64.deb`
+- Linux AppImage: `clipboard_X.Y.Z_amd64.AppImage`
+- Windows NSIS: `Clipboard_X.Y.Z_x64-setup.exe`
 
 所有安装包都附带 `.sig` 签名文件用于验证。
 
@@ -313,4 +313,4 @@ GH_REPO=UniClipboard/UniClipboard node scripts/ci/maintain-actions-cache.mjs --a
 - 发布工作流：[`.github/workflows/release.yml`](../.github/workflows/release.yml)
 - 预发布准备工作流：[`.github/workflows/prepare-release.yml`](../.github/workflows/prepare-release.yml)
 - 构建工作流：[`.github/workflows/build.yml`](../.github/workflows/build.yml)
-- 发布控制服务：[`UniClipboard/FlareRelease`](https://github.com/UniClipboard/FlareRelease)
+- 发布控制服务：[`Clipboard/FlareRelease`](https://github.com/UniClipboard/FlareRelease)

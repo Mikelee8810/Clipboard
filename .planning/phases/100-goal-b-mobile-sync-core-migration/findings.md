@@ -104,7 +104,7 @@ crates/
 
 ## M5 recon（2026-06-14，C 区 SyncEngine 决策核）
 
-### 规范源 `/tmp/uc-ios/UniClipboard/Sync/SyncEngine.swift`（968 行，已通读）
+### 规范源 `/tmp/uc-ios/Clipboard/Sync/SyncEngine.swift`（968 行，已通读）
 `@MainActor @Observable final class SyncEngine`。结构：
 - **State 枚举**：idle/succeeded/hasNewUnwritten/offlineRetrying/authFailed/loopDetected。
 - **UI 可观察态**：state/lastSyncedAt/lastError/stagedEntry/isExplicitlyRefreshing。
@@ -153,19 +153,19 @@ crates/
 
 ## M6 recon（2026-06-15，uc-ios 接入与灰度）
 
-### iOS repo 结构（`/Users/mark/MyProjects/iOSApp/UniClipboard`）
-- **两个消费方**：① `Package.swift` 的 SwiftPM library/test target（`UniClipboardModels`/`Network`/`Cache`，path 直指 `Shared/{Models,Network,Cache}`）——只为 `swift test`；② Xcode app target——经 `PBXFileSystemSynchronizedRootGroup` **直接** 吸收 `Shared/` 文件，**不经 SwiftPM 包**。
-- ⚠️ **关键约束**：`Shared/` 下的文件被两个消费方同时编译。往 `Shared/` 加 `import UniClipboardCore`（Rust binding 模块）会让 **app 构建在 Xcode 侧接线前就断**。所以 M6-0a 的 Rust 消费只放在 **测试目标**（`Tests/UniClipboardCoreTests`），不碰 `Shared/`。
-- `SyncEngine.swift` 在 `UniClipboard/Sync/`（app target），**不在 `Shared/`** → `swift test` 覆盖不到，验证是 📱 级。
+### iOS repo 结构（`/Users/mark/MyProjects/iOSApp/Clipboard`）
+- **两个消费方**：① `Package.swift` 的 SwiftPM library/test target（`ClipboardModels`/`Network`/`Cache`，path 直指 `Shared/{Models,Network,Cache}`）——只为 `swift test`；② Xcode app target——经 `PBXFileSystemSynchronizedRootGroup` **直接** 吸收 `Shared/` 文件，**不经 SwiftPM 包**。
+- ⚠️ **关键约束**：`Shared/` 下的文件被两个消费方同时编译。往 `Shared/` 加 `import ClipboardCore`（Rust binding 模块）会让 **app 构建在 Xcode 侧接线前就断**。所以 M6-0a 的 Rust 消费只放在 **测试目标**（`Tests/ClipboardCoreTests`），不碰 `Shared/`。
+- `SyncEngine.swift` 在 `Clipboard/Sync/`（app target），**不在 `Shared/`** → `swift test` 覆盖不到，验证是 📱 级。
 - `swift test` 跑在 macOS host（arm64-apple-macosx），用 Swift Testing(`@Test`/`#expect`) + XCTest 混合。Swift 6.2.3，Package tools-version 5.9（= Swift 5 语言模式，uniffi binding 不踩严格并发）。
 - `ConnectURI.Payload`(native)：url/urls([url]回落)/user/pwd/other。Rust FFI `ConnectPayload`：v/url/urls(单候选为空)/user/pwd/other(`o`)。`parseConnectUri(uri:)` throws `ConnectUriError`(case PascalCase)。
 
 ### xcframework 交付（D2：脚本构建 + gitignore）
 - 产物 **139M/3-slice 209M**（含 debuginfo，70M/slice）→ **不 check-in**。
-- iOS `Scripts/build-rust-core.sh`：`UC_RUST_REPO`(默认 `~/MyProjects/uniclipboard`) → 跑 Rust 的 `build-ios-xcframework.sh` → 拷 xcframework + `uc_mobile.swift` 进 gitignored `RustCore/`。binding 也 gitignore（与 xcframework 由脚本同步再生，零漂移；FFI surface 在 Rust repo review，CI 跑脚本）。
+- iOS `Scripts/build-rust-core.sh`：`UC_RUST_REPO`(默认 `~/MyProjects/clipboard`) → 跑 Rust 的 `build-ios-xcframework.sh` → 拷 xcframework + `uc_mobile.swift` 进 gitignored `RustCore/`。binding 也 gitignore（与 xcframework 由脚本同步再生，零漂移；FFI surface 在 Rust repo review，CI 跑脚本）。
 - xcframework 现含 3 slice：ios-arm64 / ios-arm64-simulator / **macos-arm64**（host `swift test` 链接用；app 不发布 macOS，Xcode 按平台选 slice）。
-- `Package.swift` 用 `FileManager.fileExists(RustCore/...xcframework)` **条件** 加 `binaryTarget`(UniClipboardCoreFFI) + `target`(UniClipboardCore，path RustCore，**exclude xcframework**，sources `uc_mobile.swift`) + test target。缺 RustCore 时 `swift test` 行为完全不变（Rust core opt-in）。
-- 坑：UniClipboardCore target path=RustCore 会把 xcframework 的 .a 当散文件 → emit-module 失败；必须 `exclude: ["UniClipboardCore.xcframework"]`。
+- `Package.swift` 用 `FileManager.fileExists(RustCore/...xcframework)` **条件** 加 `binaryTarget`(ClipboardCoreFFI) + `target`(ClipboardCore，path RustCore，**exclude xcframework**，sources `uc_mobile.swift`) + test target。缺 RustCore 时 `swift test` 行为完全不变（Rust core opt-in）。
+- 坑：ClipboardCore target path=RustCore 会把 xcframework 的 .a 当散文件 → emit-module 失败；必须 `exclude: ["ClipboardCore.xcframework"]`。
 
 ### connect-uri 防御式解析缺口（tracer-bullet 核心产出，已修）
 - proto parse **信任 desktop encoder**（strict）；native Swift **防御式**（容忍手改/未来 QR）。3 处不符：
@@ -178,17 +178,17 @@ crates/
 
 ### M6 拆解（当前进度）
 - **M6-0a done**：管道打通 (xcframework→SPM→Swift→FFI) + connect-uri A/B 全平价 + proto 防御式修复。
-- **M6-0b done**：Part 1=`MobileCoreFlags`(App Group A/B flag，默认 OFF)+`ConnectURIRouter`(canImport 守卫+Rust→native 类型/错误映射)+`AppViewModel` 用 router+Package.swift 条件依赖；Part 2(W1)=.pbxproj 加 XCLocalSwiftPackageReference "."+app 依赖 `UniClipboardCore` product。connect-uri 已在真 app 可灰度（默认 native）。⏳ 运行时翻转待模拟器+QR 验 (📱)。
+- **M6-0b done**：Part 1=`MobileCoreFlags`(App Group A/B flag，默认 OFF)+`ConnectURIRouter`(canImport 守卫+Rust→native 类型/错误映射)+`AppViewModel` 用 router+Package.swift 条件依赖；Part 2(W1)=.pbxproj 加 XCLocalSwiftPackageReference "."+app 依赖 `ClipboardCore` product。connect-uri 已在真 app 可灰度（默认 native）。⏳ 运行时翻转待模拟器+QR 验 (📱)。
 - **M6-1+ 下一步**：逐模块 M2/M3(client，FFI 已暴露但需补 client router/A/B + 路由 `SyncClipboardClient` 调用点)→M4(持久化，需暴露 FFI)→M5(reducer，需暴露 FFI 镜像 Record/Enum + `#[uniffi::export]`)。每切过 📱/🔗 清单。
 - 三进程 TLS 验收 + 删原生路径。
 
 ### Xcode 接线关键事实（W1，M6-0b Part 2）
 - 项目 objectVersion 77，已有 sentry-cocoa(XCRemoteSwiftPackageReference) 可镜像 product-dependency 接法。
-- W1 = app target `packageProductDependencies` 加 `UniClipboardCore`(来自 XCLocalSwiftPackageReference relativePath ".") + PBXBuildFile(productRef) 进 app Frameworks phase + PBXProject `packageReferences`。router 无需改码（canImport 一套）。
-- **硬前置（已处理）**：`UniClipboardCore` product 仅 `hasRustCore`(RustCore 在盘) 时定义 → app 构建前必须先 `Scripts/build-rust-core.sh`，否则 SPM 解析失败。CI：`testflight.yml`（仅 tags:v* + 手动触发）已加 checkout Rust 仓库 (`rust_core_ref` 输入默认 main) + 加 iOS targets + build-rust-core.sh，置于 swift test + archive 前。本地：CLAUDE.md Commands 段已注明。⚠️ military-muscle 未并 main 前，dispatch 需把 rust_core_ref 设该分支；Rust 仓库私有则需 checkout PAT。
+- W1 = app target `packageProductDependencies` 加 `ClipboardCore`(来自 XCLocalSwiftPackageReference relativePath ".") + PBXBuildFile(productRef) 进 app Frameworks phase + PBXProject `packageReferences`。router 无需改码（canImport 一套）。
+- **硬前置（已处理）**：`ClipboardCore` product 仅 `hasRustCore`(RustCore 在盘) 时定义 → app 构建前必须先 `Scripts/build-rust-core.sh`，否则 SPM 解析失败。CI：`testflight.yml`（仅 tags:v* + 手动触发）已加 checkout Rust 仓库 (`rust_core_ref` 输入默认 main) + 加 iOS targets + build-rust-core.sh，置于 swift test + archive 前。本地：CLAUDE.md Commands 段已注明。⚠️ military-muscle 未并 main 前，dispatch 需把 rust_core_ref 设该分支；Rust 仓库私有则需 checkout PAT。
 - **模拟器 slice 必须通用 (arm64+x86_64)**：generic/Release 编双架构，arm64-only 链接 x86_64 失败 → 脚本 lipo `aarch64-apple-ios-sim`+`x86_64-apple-ios`（需 `rustup target add x86_64-apple-ios`）。xcframework 现 3 slice：ios-arm64 / ios-arm64_x86_64-simulator / macos-arm64（280M，gitignored）。
-- **🔴 canImport 陷阱（已修，M6-1+ 复用）**：`Shared/` 被 app + 两扩展同时编译，但只有 app 链接 core。`#if canImport(UniClipboardCore)` 在不链接 core 的 Share 扩展里 **可能为真**（模块在共享 build 目录可见，依 build 顺序）→ 扩展编译 Rust 分支 → undefined symbol 链接失败（flaky）。**改用 `#if UC_RUST_CORE`**：只在链接 core 的 target 上定义——app target `SWIFT_ACTIVE_COMPILATION_CONDITIONS`(Debug+Release，pbxproj) + SwiftPM `UniClipboardNetwork` 的 `.define`(hasRustCore 时)。`import UniClipboardCore` 同 `#if` 守卫。已写进 iOS CLAUDE.md。
-- **真机 A/B 测试入口（M6-0b）**：`MobileCoreFlags`(默认 OFF) → SettingsView 诊断 section 有 `#if DEBUG` toggle "connect-uri 走 Rust 核心"；`ConnectURIRouter` 每次 parse 打 `log.notice`("via Rust core"/"via native Swift"，Console.app subsystem `app.uniclipboard`/category `network`；结果字节相同只能靠日志分辨)；应用内扫码 (QRScannerView/ServerQRPayload) 与 `.onOpenURL` 深链两条都已走 router。⚠️ DEBUG toggle 在 TestFlight(Release) 不显示。
+- **🔴 canImport 陷阱（已修，M6-1+ 复用）**：`Shared/` 被 app + 两扩展同时编译，但只有 app 链接 core。`#if canImport(ClipboardCore)` 在不链接 core 的 Share 扩展里 **可能为真**（模块在共享 build 目录可见，依 build 顺序）→ 扩展编译 Rust 分支 → undefined symbol 链接失败（flaky）。**改用 `#if UC_RUST_CORE`**：只在链接 core 的 target 上定义——app target `SWIFT_ACTIVE_COMPILATION_CONDITIONS`(Debug+Release，pbxproj) + SwiftPM `ClipboardNetwork` 的 `.define`(hasRustCore 时)。`import ClipboardCore` 同 `#if` 守卫。已写进 iOS CLAUDE.md。
+- **真机 A/B 测试入口（M6-0b）**：`MobileCoreFlags`(默认 OFF) → SettingsView 诊断 section 有 `#if DEBUG` toggle "connect-uri 走 Rust 核心"；`ConnectURIRouter` 每次 parse 打 `log.notice`("via Rust core"/"via native Swift"，Console.app subsystem `app.clipboard`/category `network`；结果字节相同只能靠日志分辨)；应用内扫码 (QRScannerView/ServerQRPayload) 与 `.onOpenURL` 深链两条都已走 router。⚠️ DEBUG toggle 在 TestFlight(Release) 不显示。
 - ⚠️ iOS 分支 `mobile-sync-rust-core` 本地 **7** commit，**未推送/未 PR**（用户未要求）。
 
 ## M6-1 recon（2026-06-15，M2/M3 client 切换）
@@ -212,15 +212,15 @@ crates/
 5. **scope**：一次切全部 7 方法 × ~15 调用点（大 diff）vs tracer-bullet 先切读路径（getClipboard）验证再铺开（对齐既定谨慎节奏）。
 
 ### M6-1 step 1 实现（iOS `188b991`，2026-06-15）
-- **新文件**（`Shared/Network/`，被 SwiftPM `UniClipboardNetwork` + Xcode app 双吸收）：
+- **新文件**（`Shared/Network/`，被 SwiftPM `ClipboardNetwork` + Xcode app 双吸收）：
   - `SyncClipboardClienting.swift`：协议 (getClipboard/putClipboard/getFile/putFile/queryHistory/getHistoryPayload/cancelInFlight)；`extension SyncClipboardClient: SyncClipboardClienting {}` 结构化 conform。
   - `SyncClientFactory.swift`：`make(server:trustInsecureCert:flags:) -> any SyncClipboardClienting`；Rust 分支 `#if UC_RUST_CORE`，扩展无 flag 恒返 native。
   - `RustSyncClient.swift`（整文件 `#if UC_RUST_CORE`）：`RustSyncCore.shared` 单例 (持 `MobileSyncClient` 一条 runtime 线程 + `ucMobileInit()` + `AppGroupBridge` + trust setter 热切)；`RustSyncClientAdapter`(progressive：getClipboard→Rust，其余→内部 native fallback `SyncClipboardClient`)；纯映射器 (`rustServer`/`clipboard`/`syncError`)。
 - **flag**：`MobileCoreFlags.syncClientUsesRustCore`(key `mobileCore.syncClientUsesRustCore`，默认 OFF)。
 - **调用点改动**：SyncEngine(`inFlightClient` + 3 helper 签名 → `any SyncClipboardClienting`；484 构造改 `SyncClientFactory.make`)、AppViewModel.refresh:1353、ReceiveClipboardIntent:55。
-- **🔴 dual-build 名字消歧（重要，step 2/3 复用）**：native 与 Rust binding 都叫 `ServerConfig`/`HistoryRecord`。adapter 文件同时 import 两模块 → 裸名歧义。用 `typealias Native*`：`#if canImport(UniClipboardModels)`(SwiftPM) 用 `UniClipboardModels.X` 限定，`#else`(app 单模块) 用裸名 (当前模块优先 import 的)。⚠️ typealias 不能 `private`(被 internal 方法签名用→访问级别报错)，要 internal。`Clipboard`(native 唯一，Rust 是 `ClipboardMeta`)/`HistoryQuery`/`SyncError`(同模块在 Network) 不冲突，免别名。
+- **🔴 dual-build 名字消歧（重要，step 2/3 复用）**：native 与 Rust binding 都叫 `ServerConfig`/`HistoryRecord`。adapter 文件同时 import 两模块 → 裸名歧义。用 `typealias Native*`：`#if canImport(ClipboardModels)`(SwiftPM) 用 `ClipboardModels.X` 限定，`#else`(app 单模块) 用裸名 (当前模块优先 import 的)。⚠️ typealias 不能 `private`(被 internal 方法签名用→访问级别报错)，要 internal。`Clipboard`(native 唯一，Rust 是 `ClipboardMeta`)/`HistoryQuery`/`SyncError`(同模块在 Network) 不冲突，免别名。
 - **映射事实**：Rust 错误 enum case **PascalCase**(`.NotInitialized`/`.InvalidInput(reason:)`/`.Network`/`.Unauthorized`/`.NotFound`/`.ServerError(status:)`/`.ProtocolError(status:)`/`.DecodingFailed`/`.Cancelled`/`.Internal(reason:)`)；`ClipboardKind` 普通 enum **lowercase**(`.text/.image/.file/.group`)。Rust `Network` 折叠 native connectTimeout/receiveTimeout/networkUnreachable(引擎都退避,中性)。`base_url` 去尾斜杠。**已知良性 gap**：server 省略 size 时 native→nil、Rust→0(size 不参与同步决策，hash 才是)。
-- **A/B 验证**：host swift test 无法字节平价 (reqwest 不走 URLProtocol)；新测只锁 flag 选后端 + 纯映射器 (8 测，用 `@testable import UniClipboardNetwork` 访问 internal adapter/mapper)。真机靠 `SyncClient.getClipboard via Rust core` log.notice。
+- **A/B 验证**：host swift test 无法字节平价 (reqwest 不走 URLProtocol)；新测只锁 flag 选后端 + 纯映射器 (8 测，用 `@testable import ClipboardNetwork` 访问 internal adapter/mapper)。真机靠 `SyncClient.getClipboard via Rust core` log.notice。
 - **生命周期成本**：flag ON 时每 tick 仍建 1 个 cheap adapter + 1 个 native fallback(URLSession，同 baseline)；贵的 Rust runtime 线程经 `RustSyncCore.shared` 复用。cancelInFlight 同时取消 shared Rust client(全局 abort,path 变正确，不 poison)+ 本 adapter 的 native fallback。
 
 ### M6-1 step 1 真机诊断坑（iOS `d725817`）
@@ -237,10 +237,10 @@ crates/
 ### M6-1 step 3 实现（iOS `6af01ed`）
 - queryHistory/getHistoryPayload 从 native fallback 搬到共享 Rust client（adapter 内，调用点零改）。**Rust client FFI 已 M2 暴露 history 端点，无需改 Rust**——纯 iOS adapter 加映射。**全 7 端点经 Rust**；native fallback 仅剩 `cancelInFlight` 在用，step 4 删。
 - **history 类型映射（step 4+ / M6-2 复用）**：
-  - `rustQuery(from: native HistoryQuery) -> UniClipboardCore.HistoryQuery`：page/types `Int?`→`Int64?`、before/after/modifiedAfter `Date?`→epoch millis `Int64?`、searchText/starred/sortByLastAccessed 1:1。**nil = 字段从 multipart body 省略**，两侧语义一致。
-  - `historyRecord(from: UniClipboardCore.HistoryRecord) -> NativeHistoryRecord`：hash/text/hasData/starred/pinned/isDeleted 1:1、kind 复用 `kind(from:)`、size/version `Int64?`→`Int?`(64-bit 无损)、create/lastModified/lastAccessed epoch millis→Date。
+  - `rustQuery(from: native HistoryQuery) -> ClipboardCore.HistoryQuery`：page/types `Int?`→`Int64?`、before/after/modifiedAfter `Date?`→epoch millis `Int64?`、searchText/starred/sortByLastAccessed 1:1。**nil = 字段从 multipart body 省略**，两侧语义一致。
+  - `historyRecord(from: ClipboardCore.HistoryRecord) -> NativeHistoryRecord`：hash/text/hasData/starred/pinned/isDeleted 1:1、kind 复用 `kind(from:)`、size/version `Int64?`→`Int?`(64-bit 无损)、create/lastModified/lastAccessed epoch millis→Date。
   - **时间戳约定**：Rust FFI 用 Unix epoch millis(i64)（同 M2/M4 约定），Swift 侧 `Int64((date.timeIntervalSince1970*1000).rounded())` ⇄ `Date(timeIntervalSince1970: Double(ms)/1000)`。`.rounded()` 取最近 ms——输入是 millis-精度（服务器时间戳由 millis ISO-8601 解析来），无损，wire 字节与 native fractional-seconds ISO-8601 一致。字节兼容由 Rust 侧 M2 `query_history` multipart golden 锁（决策③信 Rust oracle）。
-- **类型消歧**：native `HistoryQuery` 在 `UniClipboardNetwork`（adapter 当前模块，裸名即 native）；Rust 的需 `UniClipboardCore.HistoryQuery` 限定。native `HistoryRecord` 用既有 `NativeHistoryRecord` 别名（`UniClipboardModels`）。测试里构造 native HistoryQuery 用 `UniClipboardNetwork.HistoryQuery(...)`、构造 Rust 用 `UniClipboardCore.HistoryRecord(...)` 限定。
+- **类型消歧**：native `HistoryQuery` 在 `ClipboardNetwork`（adapter 当前模块，裸名即 native）；Rust 的需 `ClipboardCore.HistoryQuery` 限定。native `HistoryRecord` 用既有 `NativeHistoryRecord` 别名（`ClipboardModels`）。测试里构造 native HistoryQuery 用 `ClipboardNetwork.HistoryQuery(...)`、构造 Rust 用 `ClipboardCore.HistoryRecord(...)` 限定。
 - 测试 +4（HistoryQuery 全字段→Rust + nil 保 nil、HistoryRecord 全字段→native + nil 时间戳/flag 忠实）；现 **220 XCTest + 38 Swift Testing**。app build SUCCEEDED（扩展跳过 `#if UC_RUST_CORE`）。
 
 ## M6-2 recon（2026-06-15，M4 持久化 + M5 reducer 的 iOS 接入面）
@@ -275,7 +275,7 @@ crates/
 - **扩展约束（硬）**：Share/Keyboard 调 `SettingsStore.appendHistory`/`loadHistory`/`loadAppSettings` 等，但 **不链接 core**（UC_RUST_CORE 仅 app）。任何 routing 必须 `#if UC_RUST_CORE`+native fallback，扩展恒走 native。**字节兼容已由 M4「忠实匹配 Swift」决策保证**（timestamp Double-since-2001/UUID 大写），所以 app(Rust) 与扩展 (native) 读写同一 blob 无缝——这是 M4 routing 可行的关键前提。
 - pure-vs-IO 边界（与既定一致）：Rust 拥有 blob 字节（encode/decode/append/touch/plan_eviction）；native 做 UserDefaults/文件原子写/App Group 路径解析/UUID/Date.now/PayloadCache actor+semaphore。
 
-### iOS M5 SyncEngine 接入面（`UniClipboard/Sync/SyncEngine.swift` ~968 行，**app target，不在 Shared/**）
+### iOS M5 SyncEngine 接入面（`Clipboard/Sync/SyncEngine.swift` ~968 行，**app target，不在 Shared/**）
 - State 枚举（idle/succeeded/hasNewUnwritten/offlineRetrying/authFailed/loopDetected）+ UI 可观察态 + runtime 决策字段（lastSyncedContentHash/lastAppliedContentHash/loopGuard/stagedServerHash/consecutiveFailures/nextNetworkAttemptAt/lastHistorySyncAt(持久化)/isTicking/isHistorySyncing/inFlightClient）——**全部对应 M5 proto 已建模**。
 - tick 决策↔I/O↔commit 分界（agent 2）：plan_preamble(早退/退避门/cross-process resync) → getClipboard(I/O) → plan_after_server_get(truth-gate/server-new/push 路由) → apply/push(I/O) → commit_*(守卫/loopGuard 转移折回 state)。完全是 M5 reducer 形态。
 - **client 构造已 M6-1 接 `SyncClientFactory.make`**（tick:484 等）；reducer routing 与 client routing 可 **共用 syncClientUsesRustCore flag**（一个开关控整个 M6 Rust rollout）。
@@ -309,9 +309,9 @@ crates/
 - **函数 wrapper（~24）**：`plan_preamble`/`plan_after_server_get`；commit：`commit_converged`/`commit_apply`/`commit_apply_failed`/`commit_stage`/`commit_push`/`commit_push_skipped`/`commit_consent_push`/`commit_tick_success`/`commit_tick_failure`/`commit_history_sync_done`；转移：`mark_staged_applied`(→bool)/`acknowledge_loop_detection`/`reset_runtime_state`/`handle_active_server_changed`/`handle_network_route_changed`；纯函数：`hashes_equal`/`backoff_secs`/`cadence_secs`/`is_history_sync_due`/`is_cold_start`/`advance_watermark`/`is_probe_conclusion_valid`。
 - **🔑 设计抉择：mut state 怎么过 FFI**。proto 是 `fn(st: &mut SyncRuntimeState, ...) -> Output`（原地改 + 返回 plan）；uniffi Record 值语义无 `&mut`。**定 (i) 值传 + 返回 new state**（每个 mut fn wrapper 接 `SyncRuntimeState` 值、返回含「更新后 state + 输出」的 result Record；Swift `state = r.state`）。理由：忠实 proto caller-holds-plain-struct 哲学；`SyncReducerAdapter`(Shared/) 纯映射易测；不引入 uniffi::Object 的隐藏内部状态（mock 难）。代价：每 tick clone state 进出 FFI 两次（state 小、1Hz，可忽略）。否决 (ii) uniffi::Object 持 state。
 - **体量**：M2/M3 量级（~15 镜像 + From 双向 + 24 wrapper + 单测，约 800–1200 行 Rust）。是独立大 milestone。
-- ✅ **子步 2 done（iOS `288e10c`）**：`Shared/Network/SyncReducerAdapter.swift`——snapshot 构造 + native Clipboard⟷ClipboardMeta（复用 step2 `RustSyncClientAdapter.clipboardMeta`）+ reducer 转发（planPreamble/planAfterServerGet/commitStage/commitApplyFailed）。**实现收窄**：① State⟷SyncEngine.State 映射不在 adapter（State 嵌在 app-target engine，Shared/ 不可达）→ 留子步 3 engine 自己映射；② hash-only commit + 纯函数无 Clipboard 映射 → 子步 3 SyncEngine 直调 `UniClipboardCore` binding，不经 adapter（避免 passthrough）。10 swift test（220 XCTest + 48 Swift Testing）。
+- ✅ **子步 2 done（iOS `288e10c`）**：`Shared/Network/SyncReducerAdapter.swift`——snapshot 构造 + native Clipboard⟷ClipboardMeta（复用 step2 `RustSyncClientAdapter.clipboardMeta`）+ reducer 转发（planPreamble/planAfterServerGet/commitStage/commitApplyFailed）。**实现收窄**：① State⟷SyncEngine.State 映射不在 adapter（State 嵌在 app-target engine，Shared/ 不可达）→ 留子步 3 engine 自己映射；② hash-only commit + 纯函数无 Clipboard 映射 → 子步 3 SyncEngine 直调 `ClipboardCore` binding，不经 adapter（避免 passthrough）。10 swift test（220 XCTest + 48 Swift Testing）。
 ### M6-2 ② 子步 3 设计（recon+ 设计 done 2026-06-16，✅ 拍 A1 双路径）
-> `UniClipboard/Sync/SyncEngine.swift` 968 行 refactor，**📱-only**（app target，swift test 覆盖不到）。完整字段/调用点映射见 agent recon。
+> `Clipboard/Sync/SyncEngine.swift` 968 行 refactor，**📱-only**（app target，swift test 覆盖不到）。完整字段/调用点映射见 agent recon。
 
 **字段迁移**（→ Rust `SyncRuntimeState` / 留 native）：
 - → Rust state：`lastSyncedContentHash`(86)→last_synced_hash、`lastAppliedContentHash`(96)→last_applied_hash、`loopGuard`(102,native SyncLoopGuard)→loop_events、`stagedServerHash`(107)→staged_server_hash、`stagedEntry`(70,Clipboard?)→staged_entry(ClipboardMeta)、`consecutiveFailures`(167)→consecutive_failures、`nextNetworkAttemptAt`(383,Date?)→next_attempt_ms(epoch-ms)、`lastHistorySyncAt`(192,Date?)→last_history_sync_ms。
@@ -343,12 +343,12 @@ crates/
 
 > 子步 3 全 5 阶段 + 诊断 harness（含 happy-path）已坐实 → 收口不可逆清理。**核心认识：「删原生路径」≠「删所有 native」**。
 
-- **🔴 边界铁律 = `#if UC_RUST_CORE` 是扩展边界**：Share/Keyboard 扩展 **不链接 core**，共编 `Shared/` 文件时只编 native 分支，且 **直接实例化 native `SyncClipboardClient` + `SettingsStore`**（`UniClipboardKeyboard/{KeyboardModel,KeyboardUploader,KeyboardViewController}`、`UniClipboardShare/{ShareRootView,ShareUploader}`），**不经** 工厂/router/flag/adapter。→ native `SyncClipboardClient`/`SettingsStore`/`ConnectURI.parse`/`ConnectionTester` **永久保留**。
+- **🔴 边界铁律 = `#if UC_RUST_CORE` 是扩展边界**：Share/Keyboard 扩展 **不链接 core**，共编 `Shared/` 文件时只编 native 分支，且 **直接实例化 native `SyncClipboardClient` + `SettingsStore`**（`ClipboardKeyboard/{KeyboardModel,KeyboardUploader,KeyboardViewController}`、`ClipboardShare/{ShareRootView,ShareUploader}`），**不经** 工厂/router/flag/adapter。→ native `SyncClipboardClient`/`SettingsStore`/`ConnectURI.parse`/`ConnectionTester` **永久保留**。
 - **删除面分三类**：
-  1. **app-only 文件 → 彻底单一路径**：`UniClipboard/Sync/SyncEngine.swift`（仅 app target 编、app 硬依赖 core SPM product）。10 个 dispatcher triple（287/315/337/386/420/446/664/720/945/1057）形态 `func foo(){ #if UC_RUST_CORE if flag {fooViaReducer();return} #endif fooNative() }` + `private func fooNative(){verbatim}` + `fooViaReducer` 在底部 `#if UC_RUST_CORE` 扩展 (1168+)。塌缩=删 dispatcher+ 全部 `*Native()`，公开/内部方法直接走 reducer 逻辑，**恒真的 `#if UC_RUST_CORE` 一并去掉**，`import UniClipboardCore` 转无条件。
+  1. **app-only 文件 → 彻底单一路径**：`Clipboard/Sync/SyncEngine.swift`（仅 app target 编、app 硬依赖 core SPM product）。10 个 dispatcher triple（287/315/337/386/420/446/664/720/945/1057）形态 `func foo(){ #if UC_RUST_CORE if flag {fooViaReducer();return} #endif fooNative() }` + `private func fooNative(){verbatim}` + `fooViaReducer` 在底部 `#if UC_RUST_CORE` 扩展 (1168+)。塌缩=删 dispatcher+ 全部 `*Native()`，公开/内部方法直接走 reducer 逻辑，**恒真的 `#if UC_RUST_CORE` 一并去掉**，`import ClipboardCore` 转无条件。
   2. **Shared/ 共编文件 → 只删 flag 分叉，保留 `#if UC_RUST_CORE`(Rust)/`#else`(native) 结构**：`SyncClientFactory.make`（→`#if UC_RUST_CORE return RustSyncClientAdapter #else return SyncClipboardClient`，删 `flags` 参数）、`ConnectURIRouter.parse`（同形，删 `flags`）、`RustSyncClientAdapter`（整文件已 `#if UC_RUST_CORE`，删内部 `fallback: SyncClipboardClient`(93)+init(98)+`cancelInFlight` 的 `fallback.cancelInFlight()`(170)；cancelInFlight 只 cancel 共享 Rust）。
   3. **整删**：`Shared/Network/MobileCoreFlags.swift`（两 flag 删后零引用）、`SettingsView.swift` 两 DEBUG toggle(147/156)。
 - **保留不动**：`SyncClipboardClienting`(协议 seam，两后端 conform)、`SyncReducerAdapter`(reducer 桥，SyncEngine 1182/1224/1274/1301 在用，**非死代码**)、`RustSyncClientAdapter` 的映射器（rustServer/clipboard/clipboardMeta/syncError/rustQuery/historyRecord）。
-- **测试要更新**：`Tests/UniClipboardCoreTests/SyncClientRouterTests.swift`(flag→backend 路由用例，如 `client is RustSyncClientAdapter`)、`ConnectURIRouterTests.swift`(flag on/off 用例)、任何注入 `MobileCoreFlags` 的测试——flag 删后改为「UC_RUST_CORE 下恒 Rust」单态。
+- **测试要更新**：`Tests/ClipboardCoreTests/SyncClientRouterTests.swift`(flag→backend 路由用例，如 `client is RustSyncClientAdapter`)、`ConnectURIRouterTests.swift`(flag on/off 用例)、任何注入 `MobileCoreFlags` 的测试——flag 删后改为「UC_RUST_CORE 下恒 Rust」单态。
 - **验证**：SyncEngine app-target-only → `swift test`(macOS host) 覆盖不到，每 commit 只能 `xcodebuild 模拟器 build`(禁签名) + `swift test`(Shared/+adapter+ 映射器不回归)。flag 删后无 A/B，reducer 是唯一路径，靠 `ios-log-diagnose` skill 自查 + 用户 📱 终验。**不可逆**：删后无 native 对照，但子步 3 全路径 + happy-path 已 📱/agent 验过、风险有界。
 - **commit 序列（每步 build+test）见 task_plan**。⚠️ 全在 iOS repo `mobile-sync-rust-core` 分支；本会话前 iOS 工作树 clean（无用户并行 WIP）。RustCore 不变（纯删 iOS 代码，无 Rust 改动）。

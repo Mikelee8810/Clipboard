@@ -357,14 +357,14 @@
         <div class="pill-row"><span class="b violet">magic 0xC2</span><span class="b green">新增</span></div>
         <h3>Active-clipboard Pull</h3>
         <p class="muted" style="font-size:13.5px">按 content_hash 请求 / 响应一份 transfer 信封。请求→响应双向。</p>
-        <div class="dim" style="font-size:12px">ALPN <code>uniclipboard/active-clipboard-pull/0</code></div>
+        <div class="dim" style="font-size:12px">ALPN <code>clipboard/active-clipboard-pull/0</code></div>
         <span class="dim mono" style="font-size:11px">pull_wire.rs</span>
       </div>
       <div class="card accent" style="border-top:3px solid var(--accent)">
         <div class="pill-row"><span class="b blue">magic 0xC3</span><span class="b green">新增</span></div>
         <h3>Active-clipboard State</h3>
         <p class="muted" style="font-size:13.5px">单向广播一条轻量「现在这条被激活了」观测。fire-and-forget,收敛靠 register。</p>
-        <div class="dim" style="font-size:12px">ALPN <code>uniclipboard/active-clipboard/0</code></div>
+        <div class="dim" style="font-size:12px">ALPN <code>clipboard/active-clipboard/0</code></div>
         <span class="dim mono" style="font-size:11px">wire.rs</span>
       </div>
     </div>
@@ -693,7 +693,7 @@ should_advance =
     </details>
     <details>
       <summary><span class="id">D12</span> 线格协议:0xC3 state + 0xC2 pull 独立 sibling ALPN <span class="chev">▸</span></summary>
-      <div class="inner"><p>state ALPN <code>uniclipboard/active-clipboard/0</code> magic 0xC3;pull 独立 sibling ALPN,不动现有 0xC1 帧。威胁模型已知接受项:明文 content_hash 是 in-space 关联预言机,但现有 0xC1 已送同样的 hash,<b>不引入新暴露</b>。</p></div>
+      <div class="inner"><p>state ALPN <code>clipboard/active-clipboard/0</code> magic 0xC3;pull 独立 sibling ALPN,不动现有 0xC1 帧。威胁模型已知接受项:明文 content_hash 是 in-space 关联预言机,但现有 0xC1 已送同样的 hash,<b>不引入新暴露</b>。</p></div>
     </details>
   </section>
 

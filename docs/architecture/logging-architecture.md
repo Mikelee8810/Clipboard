@@ -2,7 +2,7 @@
 
 ## Overview
 
-UniClipboard uses **`tracing`** crate as the primary logging framework with structured logging and span-based context tracking. The system produces **dual output** from a single tracing pipeline:
+Clipboard uses **`tracing`** crate as the primary logging framework with structured logging and span-based context tracking. The system produces **dual output** from a single tracing pipeline:
 
 - **Console output**: Pretty human-readable format with ANSI colors (stdout)
 - **JSON file output**: Structured flat JSON with daily-rotating files (7-day retention) for tooling and analysis
@@ -218,7 +218,7 @@ The tracing subscriber produces two simultaneous outputs from the same pipeline:
 
 - **Format**: Flat NDJSON (one JSON object per line)
 - **Destination**: Daily-rotating file in platform log directory
-- **File naming**: `uniclipboard-{gui,daemon,cli}.json.YYYY-MM-DD` (role prefix; see [JSON File Locations](#json-file-locations))
+- **File naming**: `clipboard-{gui,daemon,cli}.json.YYYY-MM-DD` (role prefix; see [JSON File Locations](#json-file-locations))
 - **Rotation**: New file each day (UTC date boundary)
 
 **JSON field layout**:
@@ -251,15 +251,15 @@ The tracing subscriber produces two simultaneous outputs from the same pipeline:
 
 ### JSON File Locations
 
-Each process role writes its own daily-rotating file — `uniclipboard-gui`,
-`uniclipboard-daemon`, or `uniclipboard-cli` (e.g.
-`uniclipboard-daemon.json.YYYY-MM-DD`) — so co-resident processes never share a
+Each process role writes its own daily-rotating file — `clipboard-gui`,
+`clipboard-daemon`, or `clipboard-cli` (e.g.
+`clipboard-daemon.json.YYYY-MM-DD`) — so co-resident processes never share a
 file. Logs follow each platform's logging convention and live **outside** the
 data directory:
 
-- **macOS**: `~/Library/Logs/app.uniclipboard.desktop[-<profile>]/`
-- **Linux**: `~/.local/state/app.uniclipboard.desktop[-<profile>]/logs/` (XDG state dir)
-- **Windows**: `%LOCALAPPDATA%\app.uniclipboard.desktop[-<profile>]\logs\`
+- **macOS**: `~/Library/Logs/app.clipboard.desktop[-<profile>]/`
+- **Linux**: `~/.local/state/app.clipboard.desktop[-<profile>]/logs/` (XDG state dir)
+- **Windows**: `%LOCALAPPDATA%\app.clipboard.desktop[-<profile>]\logs\`
 
 `[-<profile>]` means the directory gains a suffix such as `-dev` when `UC_PROFILE` is set.
 
@@ -582,7 +582,7 @@ bun run tauri:dev
 
 ```bash
 # Run the application
-./uniclipboard
+./clipboard
 
 # tracing::* output appears in terminal (pretty format)
 # log::* output also appears in terminal (stdout)
@@ -594,28 +594,28 @@ Replace `gui` with `daemon` or `cli` to inspect another role's file.
 
 ```bash
 # macOS - view latest JSON log
-cat ~/Library/Logs/app.uniclipboard.desktop/uniclipboard-gui.json.$(date +%Y-%m-%d) | jq .
+cat ~/Library/Logs/app.clipboard.desktop/clipboard-gui.json.$(date +%Y-%m-%d) | jq .
 
 # macOS - follow live
-tail -f ~/Library/Logs/app.uniclipboard.desktop/uniclipboard-gui.json.$(date +%Y-%m-%d)
+tail -f ~/Library/Logs/app.clipboard.desktop/clipboard-gui.json.$(date +%Y-%m-%d)
 
 # Linux
-tail -f ~/.local/state/app.uniclipboard.desktop/logs/uniclipboard-gui.json.$(date +%Y-%m-%d)
+tail -f ~/.local/state/app.clipboard.desktop/logs/clipboard-gui.json.$(date +%Y-%m-%d)
 
 # Windows (PowerShell)
-Get-Content "$env:LOCALAPPDATA\app.uniclipboard.desktop\logs\uniclipboard-gui.json.$(Get-Date -Format yyyy-MM-dd)" -Wait
+Get-Content "$env:LOCALAPPDATA\app.clipboard.desktop\logs\clipboard-gui.json.$(Get-Date -Format yyyy-MM-dd)" -Wait
 ```
 
 **Filter JSON logs for errors**:
 
 ```bash
-cat ~/Library/Logs/app.uniclipboard.desktop/uniclipboard-gui.json.$(date +%Y-%m-%d) | jq 'select(.level == "ERROR")'
+cat ~/Library/Logs/app.clipboard.desktop/clipboard-gui.json.$(date +%Y-%m-%d) | jq 'select(.level == "ERROR")'
 ```
 
 **View last 100 lines**:
 
 ```bash
-tail -n 100 ~/Library/Logs/app.uniclipboard.desktop/uniclipboard-gui.json.$(date +%Y-%m-%d)
+tail -n 100 ~/Library/Logs/app.clipboard.desktop/clipboard-gui.json.$(date +%Y-%m-%d)
 ```
 
 ## Testing
@@ -667,7 +667,7 @@ cd src-tauri && cargo test --package uc-tauri -- bootstrap::tracing
 ### JSON log file not created
 
 1. Check app has write permissions to the log directory
-2. Verify the directory exists: `ls ~/Library/Logs/app.uniclipboard.desktop/` (macOS)
+2. Verify the directory exists: `ls ~/Library/Logs/app.clipboard.desktop/` (macOS)
 3. Check `init_tracing_subscriber()` completed without error (look for "Tracing initialized" in console)
 4. Ensure `UC_LOG_PROFILE` is a valid value (or unset for default)
 

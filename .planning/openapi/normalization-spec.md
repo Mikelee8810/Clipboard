@@ -1,4 +1,4 @@
-# UniClipboard OpenAPI Normalization Spec (ADR-008)
+# Clipboard OpenAPI Normalization Spec (ADR-008)
 
 **What:** Normalize the daemon HTTP API into a single, deterministically-generated OpenAPI document and a generated TypeScript fetch client, replacing the ~20 hand-written `src/api/daemon/*.ts` wrappers and bespoke `{ data, ts }` response structs with a contract-owned, codegen-driven surface.
 

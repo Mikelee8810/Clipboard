@@ -35,7 +35,7 @@
     ".planning/",
     ".superset/",
     "**/*.md",
-    "packaging/linux/uniclipboard.desktop.hbs",
+    "packaging/linux/clipboard.desktop.hbs",
     ".vscode/*",
     "!.vscode/extensions.json",
     ".idea",

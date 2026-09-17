@@ -32,7 +32,7 @@
 
 ## 约束
 
-- Access 凭据由 `UniClipboard` GitHub 组织的 Actions secrets 统一管理，并授权给 Desktop 与 UniClip 仓库；凭据不写入仓库。
+- Access 凭据由 `Clipboard` GitHub 组织的 Actions secrets 统一管理，并授权给 Desktop 与 Clip 仓库；凭据不写入仓库。
 - 公开 updater 和 artifact URL 不变。
 - R2 中旧的可变 JSON 作为迁移备份保留，但 CI 不再更新。
 - registration 失败必须让发布 workflow 失败。
@@ -48,4 +48,4 @@
 
 ## 生产切换状态
 
-2026-08-20 检查时，`release.uniclipboard.app/health` 仍返回旧 update-server。FlareRelease Access service token 已改由 GitHub organization secrets 管理，维护者已确认 Desktop 与 UniClip 两个仓库都在授权范围内。仓库改动不得在完成 FlareRelease 导入、公开 Worker 切换与生产验证之前合入发布分支。
+2026-08-20 检查时，`release.uniclipboard.app/health` 仍返回旧 update-server。FlareRelease Access service token 已改由 GitHub organization secrets 管理，维护者已确认 Desktop 与 Clip 两个仓库都在授权范围内。仓库改动不得在完成 FlareRelease 导入、公开 Worker 切换与生产验证之前合入发布分支。

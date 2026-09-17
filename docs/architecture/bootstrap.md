@@ -213,7 +213,7 @@ pub fn wire_dependencies(config: &AppConfig) -> Result<AppDeps, WiringError> {
 
 ### Direct Construction Pattern
 
-UniClipboard **does not use Builder pattern** for App construction. Instead, we use direct construction with `AppDeps`:
+Clipboard **does not use Builder pattern** for App construction. Instead, we use direct construction with `AppDeps`:
 
 ```rust
 // uc-app/src/lib.rs

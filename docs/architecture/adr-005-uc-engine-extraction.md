@@ -23,7 +23,7 @@
 | `uc-tauri`                          | Tauri builder / commands / plugin 装配              |
 | `uc-webserver`                      | 进程内 axum HTTP/WS server                          |
 | `uc-daemon-{contract,local,client}` | 进程间协议与客户端                                  |
-| `uc-cli`                            | `uniclip` 二进制                                    |
+| `uc-cli`                            | `clip` 二进制                                    |
 
 **实质上 engine = `uc-core` + `uc-application` + 一个"组合 + 生命周期"门面**。
 当前这个门面被埋在 `uc-bootstrap` 与 `uc-desktop` 里，并且夹杂了不少桌面假设。
@@ -137,7 +137,7 @@ uc-engine  ✗→ uc-webserver / uc-daemon-*  ← host 决定是否启动的外�
 
 #### 2.5.1 项目定位决定了语义
 
-UniClipboard 的定位是"**多台设备服务一个人**"，不是协作工具，不是消息队列。这意味着：
+Clipboard 的定位是"**多台设备服务一个人**"，不是协作工具，不是消息队列。这意味着：
 
 - **"对端离线"不是失败**，是预期。用户清楚自己关上了 Mac mini。
 - **剪贴板默认是 ephemeral 的**。系统剪贴板关机即失。本项目把它持久化已经超出 OS 默认；如果再加自动补投，等于"用户不在场时替他做了同步决定"——开机后桌上突然多出几小时前在公司复制的临时 OTP / token，违反 ephemeral 语义。
@@ -191,7 +191,7 @@ pub struct ResendEntryCommand {
 | ---------------------------------- | -------------------------------------------------------------- |
 | desktop                            | 用户在详情视图点"重发"（按 entry 整体 / 按某个 peer 行）       |
 | mobile (iOS / Android / HarmonyOS) | 同 desktop，UI 上点"重发"                                      |
-| CLI                                | `uniclip send --resend <entry-id> [--peer <device-id>]` 子命令 |
+| CLI                                | `clip send --resend <entry-id> [--peer <device-id>]` 子命令 |
 | web server                         | 不暴露（只读视图）                                             |
 
 **不存在自动触发器**，因此也不存在"BGTask 周期"、"presence 上线钩子"、"`WorkManager` 调度"这些跨平台差异。mobile 与 desktop 在重发能力上 **行为完全对称**——跟 §1.3 的核心约束"前台时 mobile = 一个完整 node"自洽。
@@ -293,7 +293,7 @@ pub struct ResendEntryCommand {
 
 **桌面端今日收益**：当前桌面端 **没有 resend 按钮**——用户能看到某条 entry 对某 peer 是 `Failed { Offline }`，却无法主动重发。补齐后这条缺口立刻关上，desktop 用户可见。
 
-**项目定位约束**：UniClipboard 是"多台设备服务一个人"的工具，"对端离线"是预期而非失败（详见 §2.5.1）。因此本步骤 **只做用户主动 resend**，不做任何自动触发。
+**项目定位约束**：Clipboard 是"多台设备服务一个人"的工具，"对端离线"是预期而非失败（详见 §2.5.1）。因此本步骤 **只做用户主动 resend**，不做任何自动触发。
 
 实现步骤：
 
@@ -316,7 +316,7 @@ pub struct ResendEntryCommand {
 - 在 `ClipboardOutboundFacade` 上加 thin method `resend_entry(cmd)`（遵 §11.4 facade 唯一对外纪律）
 - 通过 `AppFacade` 暴露给 `uc-tauri` / `uc-cli` 等 host
 - desktop UI 在 entry 详情视图加"重发"入口（按 entry 整体 / 按某个 peer 行）
-- CLI 加 `uniclip send --resend <entry-id> [--peer <device-id>]` 子命令
+- CLI 加 `clip send --resend <entry-id> [--peer <device-id>]` 子命令
 - **验收**：
   - desktop 上对一条已存在的、对某 peer 状态为 `Failed { Offline }` 的 entry，点"重发"→ 若 peer 已在线则该 peer 收到内容，`EntryDeliveryRecord` 翻为 `Delivered`
   - peer 仍离线时，点"重发"→ 落新 `Failed { Offline }` 记录，UI 状态保持但 `updated_at_ms` 更新
@@ -409,8 +409,8 @@ pub struct ResendEntryCommand {
 1. **iOS share extension 拓扑**：v1 选 (A) extension 内 in-process 跑完整 engine，还是 (B) extension 只把用户操作安全交给主 app，由主 app 启动完整 engine？不得引入第三套精简协议实现。
 2. **UniFFI 的 async 标注 vs callback bridge**：哪种风格更适合 `Engine::start` 这种长 init 操作？
 3. **CLI 的 in-process 路径是否仍保留**？还是统一改走 `uc-daemon-client`（即便在同机上也跨进程）？这影响 `Engine` 是否要支持"无 daemon 模式"。
-   - **部分解答（[ADR-007](./adr-007-headless-server-node-deployment.md) §2.2）**：本期保留单二进制自启（`uniclip start` detached-spawn `uniclip daemon`），RunMode 解析下沉 `uc-desktop`（Scope A）；拆独立 `uniclipd` 二进制（Scope B）暂缓，须单独 ADR。完整的"是否统一走 daemon-client"仍待定。
-   - **后续立项（[ADR-008](./adr-008-uniclipd-split-gui-as-client.md)）**：Scope B 正式立项——拆独立 `uniclipd` 二进制、GUI 删除 `GuiInProcess` 永久转 client、轻量模式（GUI 退出后 daemon detach 留守）。即对本 OQ "统一走 daemon-client（即便同机也跨进程）" 给出肯定回答（GUI 侧；CLI 的一次性业务命令仍保留 in-process `uc-bootstrap` 路径）。
+   - **部分解答（[ADR-007](./adr-007-headless-server-node-deployment.md) §2.2）**：本期保留单二进制自启（`clip start` detached-spawn `clip daemon`），RunMode 解析下沉 `uc-desktop`（Scope A）；拆独立 `clipd` 二进制（Scope B）暂缓，须单独 ADR。完整的"是否统一走 daemon-client"仍待定。
+   - **后续立项（[ADR-008](./adr-008-clipd-split-gui-as-client.md)）**：Scope B 正式立项——拆独立 `clipd` 二进制、GUI 删除 `GuiInProcess` 永久转 client、轻量模式（GUI 退出后 daemon detach 留守）。即对本 OQ "统一走 daemon-client（即便同机也跨进程）" 给出肯定回答（GUI 侧；CLI 的一次性业务命令仍保留 in-process `uc-bootstrap` 路径）。
 4. **移动端 share intent 如何进入统一操作入口**？它必须转换为与桌面相同的捕获/发送用例并产生一致的投递记录，不得调用旧 `mobile_sync` facade 或新建旁路协议。
 
 ## 8. 决策记录

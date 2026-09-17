@@ -43,7 +43,7 @@ fn main() {
                 .application()
                 .expect("GTK application");
             let target = gtk::ApplicationWindow::new(&application);
-            target.set_title("UniClipboard paste smoke target");
+            target.set_title("Clipboard paste smoke target");
             target.set_default_size(500, 200);
             let entry = gtk::Entry::new();
             entry.set_placeholder_text(Some(

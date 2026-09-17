@@ -100,7 +100,7 @@ PR-C `3fa5749be`）。本文所有行号锚点相对阶段 3a 基线。
     受管缓存 `cache_dir/iroh-blobs/<entry_id>/<unique_filename>`。`unique_filename` 冲突 → `N-{base}`。
   - `MaterializeResult { snapshot, missing: Vec<MissingFileRef>, partial: bool }`（`:64-73`）——
     中间态 **从未持久化**、未与 `EntryDeliveryRecord` 打通。
-  - `finalize_partial`（`:626-717`）：混合 `file://` 与 `uniclip-missing:///…?reason=cancelled`
+  - `finalize_partial`（`:626-717`）：混合 `file://` 与 `clip-missing:///…?reason=cancelled`
     占位 URI 拼 `text/uri-list`——**平铺文件的宽松半成品路径**。
   - 成功路径不设 `snapshot.file_set_v1_component`（保持 `None`）。
 - 解码入口 `decode_v3_bytes_to_snapshot_and_blob_refs`（`payload_codec.rs:140-173`）：产
@@ -223,7 +223,7 @@ PR-C `3fa5749be`）。本文所有行号锚点相对阶段 3a 基线。
 - **与平铺文件的关系**：**同一套机制的加强版**，非新路径。差异是一个策略开关：
   - 目录 entry（`InboundFileSetManifest` 存在）→ 严格全有或全无，**禁止** `finalize_partial` 的
     占位 URI 半成品（ADR 连带决策 2）。
-  - 平铺文件集（无 manifest）→ 维持现有宽松路径（`finalize_partial` 贴 `uniclip-missing` 占位）不变。
+  - 平铺文件集（无 manifest）→ 维持现有宽松路径（`finalize_partial` 贴 `clip-missing` 占位）不变。
 
 ### 4.3 落点
 

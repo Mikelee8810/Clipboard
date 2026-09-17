@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Assemble publishable npm packages from the CLI release archives.
 //
-// Input:  the `uniclipboard-cli-<version>-<target>.{tar.gz,zip}` archives
-//         produced by build-cli.yml (each contains `uniclip` + `uniclipd`).
+// Input:  the `clipboard-cli-<version>-<target>.{tar.gz,zip}` archives
+//         produced by build-cli.yml (each contains `clip` + `clipd`).
 // Output: <out>/cli-<platform>-<arch>/  — 5 platform packages with binaries
-//         <out>/uniclipboard/          — main package with the JS launcher
+//         <out>/clipboard/          — main package with the JS launcher
 //
-// Platform packages MUST ship `uniclip` and `uniclipd` side by side in bin/:
-// `uniclip start` resolves the daemon as a sibling of current_exe()
+// Platform packages MUST ship `clip` and `clipd` side by side in bin/:
+// `clip start` resolves the daemon as a sibling of current_exe()
 // (ADR-008 D13). The main package pins platform packages to the exact same
 // version so a partially-upgraded install can never mix versions.
 //
@@ -73,13 +73,13 @@ const licenseSrc = path.join(REPO_ROOT, 'LICENSE')
 for (const target of TARGETS) {
   const archive = path.join(
     artifactsDir,
-    `uniclipboard-cli-${version}-${target.rust}.${target.ext}`
+    `clipboard-cli-${version}-${target.rust}.${target.ext}`
   )
   if (!fs.existsSync(archive)) {
     fail(`missing CLI archive for ${target.rust}: ${archive}`)
   }
 
-  const pkgName = `@uniclipboard/cli-${target.node}`
+  const pkgName = `@clipboard/cli-${target.node}`
   const pkgDir = path.join(outDir, `cli-${target.node}`)
   const binDir = path.join(pkgDir, 'bin')
   fs.mkdirSync(binDir, { recursive: true })
@@ -93,7 +93,7 @@ for (const target of TARGETS) {
   }
 
   const exeSuffix = target.os === 'win32' ? '.exe' : ''
-  for (const bin of ['uniclip', 'uniclipd']) {
+  for (const bin of ['clip', 'clipd']) {
     const binPath = path.join(binDir, `${bin}${exeSuffix}`)
     if (!fs.existsSync(binPath)) {
       fail(`archive ${path.basename(archive)} does not contain ${bin}${exeSuffix}`)
@@ -107,7 +107,7 @@ for (const target of TARGETS) {
       {
         name: pkgName,
         version,
-        description: `UniClipboard CLI binaries (uniclip + uniclipd) for ${target.node}. Install the "uniclipboard" package instead of this one.`,
+        description: `Clipboard CLI binaries (clip + clipd) for ${target.node}. Install the "clipboard" package instead of this one.`,
         homepage: 'https://github.com/UniClipboard/UniClipboard',
         repository: {
           type: 'git',
@@ -134,8 +134,8 @@ for (const target of TARGETS) {
 
 // --- Main package ----------------------------------------------------------
 
-const mainSrc = path.join(REPO_ROOT, 'npm', 'uniclipboard')
-const mainDir = path.join(outDir, 'uniclipboard')
+const mainSrc = path.join(REPO_ROOT, 'npm', 'clipboard')
+const mainDir = path.join(outDir, 'clipboard')
 fs.cpSync(mainSrc, mainDir, { recursive: true })
 
 const mainPkgPath = path.join(mainDir, 'package.json')
@@ -147,10 +147,10 @@ for (const dep of Object.keys(mainPkg.optionalDependencies)) {
   mainPkg.optionalDependencies[dep] = version
 }
 const declared = Object.keys(mainPkg.optionalDependencies).sort()
-const assembled = TARGETS.map(t => `@uniclipboard/cli-${t.node}`).sort()
+const assembled = TARGETS.map(t => `@clipboard/cli-${t.node}`).sort()
 if (JSON.stringify(declared) !== JSON.stringify(assembled)) {
   fail(
-    `optionalDependencies in npm/uniclipboard/package.json (${declared.join(', ')}) ` +
+    `optionalDependencies in npm/clipboard/package.json (${declared.join(', ')}) ` +
       `do not match assembled platform packages (${assembled.join(', ')})`
   )
 }
@@ -160,11 +160,11 @@ if (fs.existsSync(licenseSrc)) {
   fs.copyFileSync(licenseSrc, path.join(mainDir, 'LICENSE'))
 }
 
-console.log(`assembled uniclipboard@${version}`)
+console.log(`assembled clipboard@${version}`)
 
 // Publish order matters: platform packages first, the main package last, so
-// there is no window where `npm install @uniclipboard/cli` resolves but its
+// there is no window where `npm install @clipboard/cli` resolves but its
 // optional dependencies 404.
-const order = [...TARGETS.map(t => `cli-${t.node}`), 'uniclipboard']
+const order = [...TARGETS.map(t => `cli-${t.node}`), 'clipboard']
 fs.writeFileSync(path.join(outDir, 'publish-order.txt'), order.join('\n') + '\n')
 console.log(`publish order written to ${path.join(outDir, 'publish-order.txt')}`)

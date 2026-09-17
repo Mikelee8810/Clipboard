@@ -1,4 +1,4 @@
-//! UniClipboard Observability Crate
+//! Clipboard Observability Crate
 //!
 //! Provides dual-output tracing initialization with profile-based filtering:
 //! - Pretty console output for developer experience

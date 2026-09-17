@@ -40,8 +40,8 @@ created: 2026-03-12
 | -------- | ---- | ---- | ------------------- | --------- | ------------------------------------------------------------------------------------ | ---------- | ---------- |
 | 25-01-01 | 01   | 1    | CT-01, CT-02        | unit      | `cd src-tauri && cargo test -p uc-core settings::content_type_filter -- --nocapture` | inline TDD | ⬜ pending |
 | 25-01-02 | 01   | 1    | CT-03, CT-04        | unit      | `cd src-tauri && cargo test -p uc-app --lib usecases::clipboard::sync_outbound`      | inline TDD | ⬜ pending |
-| 25-02-01 | 02   | 1    | CT-05, CT-06        | build     | `cd /home/wuy6/myprojects/UniClipboard && bun run build`                             | n/a (UI)   | ⬜ pending |
-| 25-02-02 | 02   | 1    | CT-05, CT-06, CT-07 | unit      | `cd /home/wuy6/myprojects/UniClipboard && bun test DeviceSettingsPanel`              | test-fix   | ⬜ pending |
+| 25-02-01 | 02   | 1    | CT-05, CT-06        | build     | `cd /home/wuy6/myprojects/Clipboard && bun run build`                             | n/a (UI)   | ⬜ pending |
+| 25-02-02 | 02   | 1    | CT-05, CT-06, CT-07 | unit      | `cd /home/wuy6/myprojects/Clipboard && bun test DeviceSettingsPanel`              | test-fix   | ⬜ pending |
 
 _Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky_
 

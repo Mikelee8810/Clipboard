@@ -1,13 +1,13 @@
 {
-  "name": "@uniclipboard/cli",
+  "name": "@clipboard/cli",
   "version": "0.0.0-dev",
-  "description": "Cross-platform clipboard sync CLI. Installs the `uniclip` command and the `uniclipd` daemon for your platform.",
+  "description": "Cross-platform clipboard sync CLI. Installs the `clip` command and the `clipd` daemon for your platform.",
   "keywords": [
     "clipboard",
     "sync",
     "cli",
     "cross-platform",
-    "uniclipboard"
+    "clipboard"
   ],
   "homepage": "https://github.com/UniClipboard/UniClipboard",
   "bugs": "https://github.com/UniClipboard/UniClipboard/issues",
@@ -17,7 +17,7 @@
   },
   "license": "AGPL-3.0-only",
   "bin": {
-    "uniclip": "launcher.mjs"
+    "clip": "launcher.mjs"
   },
   "files": [
     "launcher.mjs"
@@ -26,10 +26,10 @@
     "node": ">=18"
   },
   "optionalDependencies": {
-    "@uniclipboard/cli-darwin-arm64": "0.0.0-dev",
-    "@uniclipboard/cli-darwin-x64": "0.0.0-dev",
-    "@uniclipboard/cli-linux-arm64": "0.0.0-dev",
-    "@uniclipboard/cli-linux-x64": "0.0.0-dev",
-    "@uniclipboard/cli-win32-x64": "0.0.0-dev"
+    "@clipboard/cli-darwin-arm64": "0.0.0-dev",
+    "@clipboard/cli-darwin-x64": "0.0.0-dev",
+    "@clipboard/cli-linux-arm64": "0.0.0-dev",
+    "@clipboard/cli-linux-x64": "0.0.0-dev",
+    "@clipboard/cli-win32-x64": "0.0.0-dev"
   }
 }

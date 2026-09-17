@@ -1,13 +1,13 @@
 #!/bin/bash
 # Repro / regression harness for the #1029 X11 lazy-clipboard race.
 #
-# Drives `uniclip probe watch` (daemon-identical event loop) against
+# Drives `clip probe watch` (daemon-identical event loop) against
 # lazy_owner.py, which owns CLIPBOARD immediately but only serves text/plain
 # DELAY_MS later WITHOUT re-asserting ownership (no second XFIXES). The fixed
 # 3x150ms retry lost any delay beyond ~300ms; the owner-lifetime backoff poll
 # recovers anything within CHANGE_POLL_DEADLINE (3s).
 #
-# Verdict signal: `uniclip probe watch` prints its own "event #N" lines for
+# Verdict signal: `clip probe watch` prints its own "event #N" lines for
 # every captured snapshot. lazy_owner.py serves the literal URL below, so a
 # log line containing it == the copy was captured. Its absence == lost.
 # (probe does not emit uc_platform tracing logs, so grepping for
@@ -18,7 +18,7 @@
 #   - an XWayland / X11 display at :0 (e.g. niri + xwayland-satellite, or any
 #     real X server). GNOME-on-Wayland reproduces via its XWayland bridge too.
 #   - python3-xlib
-#   - a debug uniclip built with dev-tools:
+#   - a debug clip built with dev-tools:
 #       cargo build -p uc-cli --features dev-tools
 #
 # Usage:
@@ -26,8 +26,8 @@
 #   ./repro.sh 1000:5 3500:6         # explicit <DELAY_MS>:<POST_OWNER_WAIT_S>
 set +e
 
-REPO="${UC_REPO:-$HOME/projects/UniClipboard}"
-PROBE="${UC_PROBE:-$REPO/target/debug/uniclip}"
+REPO="${UC_REPO:-$HOME/projects/Clipboard}"
+PROBE="${UC_PROBE:-$REPO/target/debug/clip}"
 OWNER="$(dirname "$0")/lazy_owner.py"
 URL_MARKER="http://example.com/lazy-chrome-url-AABBCC"
 

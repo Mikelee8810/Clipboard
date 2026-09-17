@@ -1,15 +1,15 @@
 ---
 title: 上手
-description: 在终端中安装 uniclip、启动守护进程、创建或加入空间。
+description: 在终端中安装 clip、启动守护进程、创建或加入空间。
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-`uniclip` 是 UniClipboard 的终端版本。它通过 HTTP 与后台守护进程通信，
+`clip` 是 Clipboard 的终端版本。它通过 HTTP 与后台守护进程通信，
 所以 GUI 能做的（配对、同步、发送、搜索）都能在 SSH、tmux、服务器或脚本里完成。
-如果守护进程尚未运行，`uniclip` 会自动拉起。
+如果守护进程尚未运行，`clip` 会自动拉起。
 
-安装方式见[安装](../getting-started/install)（macOS Homebrew、Linux 服务器单装 `uniclip` 等）。
+安装方式见[安装](../getting-started/install)（macOS Homebrew、Linux 服务器单装 `clip` 等）。
 
 ## 全局参数
 
@@ -29,11 +29,11 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 | 命令                         | 作用                                                                                                           |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `uniclip start`              | 后台启动守护进程。                                                                                             |
-| `uniclip start --foreground` | 前台启动并把日志输出到当前终端。                                                                               |
-| `uniclip start --server`     | 以无头 server 节点运行：不接系统剪贴板、不监听剪贴板，作为普通成员经 iroh 同步。用于无 display 的 VPS / 容器。 |
-| `uniclip stop`               | 停止运行中的守护进程。                                                                                         |
-| `uniclip space status`             | 查看守护进程健康度与设备信任摘要，包括本机成员状态、待确认变化和需要更新的设备。                               |
+| `clip start`              | 后台启动守护进程。                                                                                             |
+| `clip start --foreground` | 前台启动并把日志输出到当前终端。                                                                               |
+| `clip start --server`     | 以无头 server 节点运行：不接系统剪贴板、不监听剪贴板，作为普通成员经 iroh 同步。用于无 display 的 VPS / 容器。 |
+| `clip stop`               | 停止运行中的守护进程。                                                                                         |
+| `clip space status`             | 查看守护进程健康度与设备信任摘要，包括本机成员状态、待确认变化和需要更新的设备。                               |
 
 需要守护进程的命令会自动拉起它，所以显式 `start` 主要用于"日志流式查看"或"长驻后台"的服务器场景。
 
@@ -50,10 +50,10 @@ CLI 与 GUI 流程一致，详见[配对与同步](../guides/pairing)。
 
 ```bash
 # 在当前 profile 下新建加密空间
-uniclip space init
+clip space init
 
 # 发起一次性邀请并等待 joiner
-uniclip space invite
+clip space invite
 ```
 
 `space init` 默认交互式输入口令。`--passphrase` 与 `--device-name` 仅在非交互场景（如 E2E 测试脚本）中使用。
@@ -64,10 +64,10 @@ uniclip space invite
 
 ```bash
 # 用邀请码加入 sponsor 的空间
-uniclip space join <invitation-code>
+clip space join <invitation-code>
 
 # 验证配对结果
-uniclip members
+clip members
 ```
 
 `space join` 在不带 `--passphrase` 时会提示输入。口令通过 PAKE 在本地验证 —— 输错会立即失败，
@@ -77,8 +77,8 @@ uniclip members
 之后可继续查看或取消同一个请求：
 
 ```bash
-uniclip space join status
-uniclip space join cancel
+clip space join status
+clip space join cancel
 ```
 
 按 Ctrl-C 只会停止本地等待，不会取消加入请求。
@@ -91,7 +91,7 @@ uniclip space join cancel
 带上新 sponsor 的邀请码并加 `--switch` 运行 `space join`：
 
 ```bash
-uniclip space join --switch --code <新邀请码>
+clip space join --switch --code <新邀请码>
 ```
 
 切换是破坏性操作（会重新加密本地历史），因此 `space join` 会先弹出确认提示。
@@ -103,7 +103,7 @@ uniclip space join --switch --code <新邀请码>
 ## 重建当前空间
 
 ```bash
-uniclip space reset --yes
+clip space reset --yes
 ```
 
 该命令会创建一个只包含本机的新空间，并永久废弃与所有旧设备的配对、信任和同步关系。

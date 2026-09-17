@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document tracks the current status of all Tauri commands in the uniclipboard-desktop
+This document tracks the current status of all Tauri commands in the clipboard-desktop
 application, showing migration progress from direct Port access to UseCases accessor pattern.
 
 ## Architecture Principle

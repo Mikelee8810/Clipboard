@@ -3,7 +3,7 @@ name = "uc-daemon-client"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Daemon HTTP and WebSocket client for UniClipboard"
+description = "Daemon HTTP and WebSocket client for Clipboard"
 
 [lib]
 name = "uc_daemon_client"

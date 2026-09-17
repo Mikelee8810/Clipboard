@@ -1,9 +1,9 @@
-# Root cargo workspace for the UniClipboard monorepo.
+# Root cargo workspace for the Clipboard monorepo.
 #
 # Layout:
-# - apps/    runnable binaries (cli => uniclip, daemon => uniclipd)
+# - apps/    runnable binaries (cli => clip, daemon => clipd)
 # - crates/  desktop host, platform, observability, and daemon libraries
-# - src-tauri/  Tauri packaging only: the `uniclipboard` desktop bin package
+# - src-tauri/  Tauri packaging only: the `clipboard` desktop bin package
 #               plus its adapter crate src-tauri/crates/uc-tauri
 
 [workspace]
@@ -65,7 +65,7 @@ tauri = { version = "2.11", features = [
 ] }
 tauri-plugin-autostart = "2"
 
-# Pin the UniClipboard iroh-blobs fork at b33af91e8a4bd189cc0f954fc6584feb5ffd1823
+# Pin the Clipboard iroh-blobs fork at b33af91e8a4bd189cc0f954fc6584feb5ffd1823
 # (version 0.102.0, MIT OR Apache-2.0). It fixes HashContext::persist(), which
 # otherwise leaves BaoFileStorage poisoned after persisting a non-partial state.
 # This must remain an auditable Git revision rather than a local submodule so a

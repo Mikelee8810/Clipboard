@@ -10,8 +10,8 @@
 
 ### Locked Decisions
 
-- **RPC transport**: Unix domain socket, JSON-RPC 2.0, newline-delimited JSON. No external RPC framework — use `tokio::net::UnixListener` + `serde_json` directly. Methods: `ping`, `status`, `device_list`. Socket path: `{app_data_dir}/uniclipboard-daemon.sock`.
-- **Binary structure**: `src-tauri/crates/uc-daemon/` → `uniclipboard-daemon`; `src-tauri/crates/uc-cli/` → `uniclipboard-cli`. Both depend on `uc-bootstrap`. Shared RPC types live in `uc-daemon` lib section; `uc-cli` depends on `uc-daemon` as library.
+- **RPC transport**: Unix domain socket, JSON-RPC 2.0, newline-delimited JSON. No external RPC framework — use `tokio::net::UnixListener` + `serde_json` directly. Methods: `ping`, `status`, `device_list`. Socket path: `{app_data_dir}/clipboard-daemon.sock`.
+- **Binary structure**: `src-tauri/crates/uc-daemon/` → `clipboard-daemon`; `src-tauri/crates/uc-cli/` → `clipboard-cli`. Both depend on `uc-bootstrap`. Shared RPC types live in `uc-daemon` lib section; `uc-cli` depends on `uc-daemon` as library.
 - **DaemonWorker trait**: `name() -> &str`, `start(CancellationToken) -> Result<()>`, `stop() -> Result<()>`, `health_check() -> WorkerHealth`. `WorkerHealth` enum: `Healthy`, `Degraded(String)`, `Stopped`. Placeholder workers: `ClipboardWatcherWorker`, `PeerDiscoveryWorker`.
 - **Graceful shutdown**: `tokio::signal::ctrl_c()` + SIGTERM → `CancellationToken` cascade. Sequence: stop accepting RPC → stop workers in reverse order → delete socket → exit 0.
 - **Stale socket handling**: Ping existing socket on startup; if ping succeeds → error "already running"; if fails → delete stale socket and proceed.
@@ -143,7 +143,7 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "uniclipboard-daemon"
+name = "clipboard-daemon"
 path = "src/main.rs"
 
 [lib]
@@ -344,7 +344,7 @@ async fn wait_for_shutdown_signal() {
 **What goes wrong:** Daemon and CLI use different methods to resolve the socket path, resulting in CLI connecting to the wrong path.
 **Why it happens:** `DaemonBootstrapContext` has `storage_paths` (an `AppPaths`) but `CliBootstrapContext` only has `deps` and `config`. The socket path must derive from the same source.
 **How to avoid:** Both crates should compute socket path from `AppPaths::data_dir` (or equivalent). Add `storage_paths` to `CliBootstrapContext` if not already present, or compute it from `config` using `get_storage_paths()` (already pub in uc-bootstrap).
-**Warning signs:** `uniclipboard-cli status` returns exit code 5 even when daemon is running.
+**Warning signs:** `clipboard-cli status` returns exit code 5 even when daemon is running.
 
 ### Pitfall 4: Workspace Member Registration
 
@@ -355,7 +355,7 @@ async fn wait_for_shutdown_signal() {
 
 ### Pitfall 5: RPC Connection from CLI Not Timing Out
 
-**What goes wrong:** `uniclipboard-cli status` hangs indefinitely when daemon is not running because `UnixStream::connect()` blocks until the socket file appears.
+**What goes wrong:** `clipboard-cli status` hangs indefinitely when daemon is not running because `UnixStream::connect()` blocks until the socket file appears.
 **Why it happens:** `UnixStream::connect()` returns `Err` immediately if socket doesn't exist, but calling code may retry or block.
 **How to avoid:** Wrap `UnixStream::connect()` in `tokio::time::timeout()` with ~2 second limit. On `Err` or timeout → exit code 5.
 **Warning signs:** CLI hangs when daemon is not running instead of printing "daemon unreachable".
@@ -425,7 +425,7 @@ let lifecycle_status = Arc::new(InMemoryLifecycleStatus::new());
 //   .storage_paths: AppPaths   <-- available for socket path resolution
 //   .config: AppConfig
 let ctx = build_daemon_app()?;
-// socket path: ctx.storage_paths.data_dir.join("uniclipboard-daemon.sock")
+// socket path: ctx.storage_paths.data_dir.join("clipboard-daemon.sock")
 ```
 
 ### CliBootstrapContext Return Type
@@ -447,7 +447,7 @@ let storage_paths = get_storage_paths(&ctx.config)?;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "uniclipboard-cli")]
+#[command(name = "clipboard-cli")]
 struct Cli {
     #[arg(long, global = true)]
     json: bool,

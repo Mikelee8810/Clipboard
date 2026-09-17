@@ -26,7 +26,7 @@
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclip}"
+CLI="${CLI:-./target/debug/clip}"
 PASSPHRASE_ALICE="${PASSPHRASE_ALICE:-hunter22hunter22}"
 PASSPHRASE_BOB="${PASSPHRASE_BOB:-bobsfirstpasspass}"
 SEED_TEXT="${SEED_TEXT:-secret-clipboard-message-from-bob}"
@@ -40,13 +40,13 @@ fi
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclip" >&2
+    echo "Build first: cargo build -p uc-cli --bin clip" >&2
     exit 2
 fi
 
 APP_ROOT="$HOME/Library/Application Support"
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-alice"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-bob"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-alice"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-bob"
 
 cleanup() {
     if [[ -n "${ALICE_PID:-}" ]] && kill -0 "$ALICE_PID" 2>/dev/null; then

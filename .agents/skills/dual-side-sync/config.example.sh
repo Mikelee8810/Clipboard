@@ -18,10 +18,10 @@ WIN_USER="mark"
 
 # Absolute path of the repo on the Windows machine, in a form that the remote
 # shell understands. Two common formats:
-#   * Git-Bash / MSYS2 / Cygwin / WSL bash:   /c/Users/mark/projects/UniClipboard
-#   * Native PowerShell / cmd:                C:/Users/mark/projects/UniClipboard
+#   * Git-Bash / MSYS2 / Cygwin / WSL bash:   /c/Users/mark/projects/Clipboard
+#   * Native PowerShell / cmd:                C:/Users/mark/projects/Clipboard
 # Forward slashes are safest. Avoid spaces in the path.
-WIN_REPO="/c/Users/mark/projects/UniClipboard"
+WIN_REPO="/c/Users/mark/projects/Clipboard"
 
 # --- authentication (pick exactly one) --------------------------------------
 
@@ -42,7 +42,7 @@ WIN_PORT="22"
 
 # Local repo (defaults to the current project root). Override only if you run
 # the skill from a different working tree.
-# MAC_REPO="/Volumes/ExternalSSD/superset/uniclipboard/slender-soybean"
+# MAC_REPO="/Volumes/ExternalSSD/superset/clipboard/slender-soybean"
 
 # Extra paths to *exclude* from rsync, in addition to .git/, target/,
 # node_modules/, and dist/ which are always excluded. One pattern per element.

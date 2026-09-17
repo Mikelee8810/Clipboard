@@ -56,5 +56,5 @@ jobs:
           VERSION: ${{ steps.resolve.outputs.version }}
         run: |
           gh workflow run update-tap.yml \
-            --repo UniClipboard/homebrew-tap \
+            --repo Clipboard/homebrew-tap \
             --field version="$VERSION"

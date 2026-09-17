@@ -53,14 +53,14 @@ const applicationPath =
     rootDir,
     'target',
     'debug',
-    process.platform === 'win32' ? 'uniclipboard.exe' : 'uniclipboard'
+    process.platform === 'win32' ? 'clipboard.exe' : 'clipboard'
   )
 
 function resolveProfileDataDir(activeProfile) {
   if (process.platform === 'win32') {
     return path.join(
       process.env.LOCALAPPDATA ?? path.join(os.homedir(), 'AppData', 'Local'),
-      `app.uniclipboard.desktop-${activeProfile}`
+      `app.clipboard.desktop-${activeProfile}`
     )
   }
 
@@ -69,13 +69,13 @@ function resolveProfileDataDir(activeProfile) {
       os.homedir(),
       'Library',
       'Application Support',
-      `app.uniclipboard.desktop-${activeProfile}`
+      `app.clipboard.desktop-${activeProfile}`
     )
   }
 
   return path.join(
     process.env.XDG_DATA_HOME ?? path.join(os.homedir(), '.local', 'share'),
-    `app.uniclipboard.desktop-${activeProfile}`
+    `app.clipboard.desktop-${activeProfile}`
   )
 }
 

@@ -1,6 +1,6 @@
-//! UniClipboard 桌面宿主层（desktop host layer）—— GUI-framework agnostic。
+//! Clipboard 桌面宿主层（desktop host layer）—— GUI-framework agnostic。
 //!
-//! 本 crate 负责把 UniClipboard 的 app runtime（`uc-application`）跑在
+//! 本 crate 负责把 Clipboard 的 app runtime（`uc-application`）跑在
 //! 桌面环境里：接入系统能力、后台任务、HTTP/IPC、daemon 进程协调。
 //!
 //! 它**不是业务层**，不承载核心业务规则；**也不绑定任何 GUI 框架**，

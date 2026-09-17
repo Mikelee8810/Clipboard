@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# P5a.9: SyncClipboard 协议本地端到端 e2e（基于 `uniclip mobile debug`
+# P5a.9: SyncClipboard 协议本地端到端 e2e（基于 `clip mobile debug`
 # 4 子命令，无 iPhone / 无 LAN / 无 daemon）。
 #
 # 验证范围:
@@ -20,11 +20,11 @@
 # Requirements:
 #   * macOS（profile data dir 走 `~/Library/Application Support`）
 #   * `--dev` 模式（避开 keychain、用 file-based secure storage）
-#   * uniclip binary 已 build：`cargo build -p uc-cli --bin uniclip`
+#   * clip binary 已 build：`cargo build -p uc-cli --bin clip`
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclip}"
+CLI="${CLI:-./target/debug/clip}"
 PROFILE="${PROFILE:-p5a9-debug-e2e}"
 PASSPHRASE="${PASSPHRASE:-p5a9-debug-passphrase}"
 COMMON=("--dev" "--profile" "$PROFILE")
@@ -36,11 +36,11 @@ fi
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclip" >&2
+    echo "Build first: cargo build -p uc-cli --bin clip" >&2
     exit 2
 fi
 
-PROFILE_DIR="$HOME/Library/Application Support/app.uniclipboard.desktop-$PROFILE"
+PROFILE_DIR="$HOME/Library/Application Support/app.clipboard.desktop-$PROFILE"
 TMPDIR_RUN="$(mktemp -d -t uc_p5a9_e2e.XXXXXX)"
 
 PASS_COUNT=0

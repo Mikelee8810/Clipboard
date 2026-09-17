@@ -7,8 +7,8 @@
 - User wants the "complete fix" (not the minimal always-upload fallback), with all ends
   (desktop daemon + uc-mobile FFI + eventually RN) sharing ONE hash-computation rule set,
   extracted into an independent crate.
-- Scope for THIS repo (uniclipboard desktop/daemon): crate + uc-core refactor + server endpoint
-  + uc-mobile FFI methods. RN-side (`uniclipboard-android`) integration is a separate repo/PR,
+- Scope for THIS repo (clipboard desktop/daemon): crate + uc-core refactor + server endpoint
+  + uc-mobile FFI methods. RN-side (`clipboard-android`) integration is a separate repo/PR,
   out of scope here beyond a handoff doc.
 
 ## Research Findings

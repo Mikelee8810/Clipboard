@@ -226,7 +226,7 @@ fn print_update(output: &DebugUpdateOutput, json: bool) -> i32 {
     }
     if output.restart_required {
         ui::warn("Restart the daemon for the logging profile change to fully take effect.");
-        ui::info("command", "uniclip stop && uniclip start");
+        ui::info("command", "clip stop && clip start");
     }
     0
 }

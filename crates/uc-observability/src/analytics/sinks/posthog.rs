@@ -186,16 +186,16 @@ impl AnalyticsPort for PosthogSink {
 }
 
 /// `$lib` 取值：自写 client 自报身份，便于 PostHog 控制台按来源过滤。
-const POSTHOG_LIB_NAME: &str = "uniclipboard-rust";
+const POSTHOG_LIB_NAME: &str = "clipboard-rust";
 
 /// `$device_type` 固定为 PostHog 标准枚举的 `"Desktop"`。
 ///
 /// PostHog 标准取值集合（Web SDK 推断 UA 时落到这三个值之一）：
-/// `Mobile` / `Tablet` / `Desktop`。uniclipboard 是桌面 App——只可能跑在
+/// `Mobile` / `Tablet` / `Desktop`。clipboard 是桌面 App——只可能跑在
 /// macOS / Windows / Linux 桌面环境，固定 `Desktop` 让 PostHog 内置
 /// "Device type" breakdown 直接可用，无需在 PostHog 端配置自定义映射。
 ///
-/// 注意：iOS Shortcut / Android 客户端只是发请求过来的"对端"——uniclipboard
+/// 注意：iOS Shortcut / Android 客户端只是发请求过来的"对端"——clipboard
 /// 桌面 daemon 本身仍是 desktop，对端 OS 走 event property `peer_os`（见
 /// `events.rs::PairingSucceeded`），不影响本字段。
 const POSTHOG_DEVICE_TYPE_DESKTOP: &str = "Desktop";
@@ -213,7 +213,7 @@ const POSTHOG_DEVICE_TYPE_DESKTOP: &str = "Desktop";
 ///     <context + event-specific 字段，不含 event / distinct_id>,
 ///     "$device_id": "<analytics_device_id>",
 ///     "$session_id": "<session_id>",
-///     "$lib": "uniclipboard-rust",
+///     "$lib": "clipboard-rust",
 ///     "$lib_version": "<app_version>",
 ///     "$geoip_disable": true,
 ///     "$set": { <person property 当前快照> },
@@ -346,7 +346,7 @@ fn build_set_snapshot(payload: &Map<String, Value>) -> Map<String, Value> {
 ///   "distinct_id": "<new_distinct_id>",
 ///   "properties": {
 ///     "$anon_distinct_id": "<old_distinct_id>",
-///     "$lib": "uniclipboard-rust",
+///     "$lib": "clipboard-rust",
 ///     "$geoip_disable": true,
 ///     "$set":      { ... },          // 可选：payload.set 非空时出现
 ///     "$set_once": { ... }           // 可选：payload.set_once 非空时出现
@@ -406,7 +406,7 @@ fn build_identify_body(payload: &IdentifyPayload, api_key: &str) -> Value {
 ///     "$group_type": "<group_type>",
 ///     "$group_key":  "<group_key>",
 ///     "$group_set":  { ...payload.set... },
-///     "$lib": "uniclipboard-rust",
+///     "$lib": "clipboard-rust",
 ///     "$geoip_disable": true
 ///   },
 ///   "timestamp": "..."
@@ -663,7 +663,7 @@ mod tests {
 
         assert_eq!(
             props.get("$lib").and_then(Value::as_str),
-            Some("uniclipboard-rust"),
+            Some("clipboard-rust"),
             "$lib 应固定为 client 名"
         );
         assert_eq!(
@@ -707,7 +707,7 @@ mod tests {
         );
     }
 
-    /// `$device_type` 固定 `"Desktop"`——uniclipboard 桌面 daemon 只可能跑在
+    /// `$device_type` 固定 `"Desktop"`——clipboard 桌面 daemon 只可能跑在
     /// 桌面 OS。PostHog 内置"Device type"图表读这个字段做 Mobile/Tablet/Desktop
     /// 切片，缺失会让所有事件归到"Unknown"。
     #[test]
@@ -930,7 +930,7 @@ mod tests {
         );
         assert_eq!(
             props.get("$lib").and_then(Value::as_str),
-            Some("uniclipboard-rust")
+            Some("clipboard-rust")
         );
         assert_eq!(
             props.get("$lib_version").and_then(Value::as_str),
@@ -1182,7 +1182,7 @@ mod tests {
         let props = body["properties"].as_object().unwrap();
         assert_eq!(
             props.get("$lib").and_then(Value::as_str),
-            Some("uniclipboard-rust")
+            Some("clipboard-rust")
         );
         assert_eq!(
             props.get("$geoip_disable"),

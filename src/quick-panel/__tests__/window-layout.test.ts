@@ -9,7 +9,7 @@ vi.mock('@/lib/platform', () => ({ detectPlatformInfo: () => platform }))
 vi.mock('@/lib/ipc', () => ({ commands: { setQuickPanelLayout: setLayout } }))
 vi.mock('@/lib/ui-scale', () => ({ readStoredUiScale: () => 1.25, adjustUiScale }))
 vi.mock('@/lib/logger', () => ({ createLogger: () => ({ warn: vi.fn() }) }))
-const storageKey = 'uniclipboard.quickPanel.windowScale'
+const storageKey = 'clipboard.quickPanel.windowScale'
 
 beforeEach(() => {
   vi.resetModules()

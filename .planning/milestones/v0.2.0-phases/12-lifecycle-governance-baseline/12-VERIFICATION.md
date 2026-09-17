@@ -78,7 +78,7 @@ No TODOs, FIXMEs, placeholders, or stub implementations found in phase artifacts
 
 ### 2. No Orphaned Background Processes
 
-**Test:** Start the app, wait for background tasks to initialize, then close. Check if the process exits fully (`ps aux | grep uniclipboard`).
+**Test:** Start the app, wait for background tasks to initialize, then close. Check if the process exits fully (`ps aux | grep clipboard`).
 **Expected:** Process exits within a few seconds of window close.
 **Why human:** Requires running the application and observing OS-level process state.
 

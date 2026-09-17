@@ -1,6 +1,6 @@
-# UniClipboard 领域术语表（CONTEXT.md）
+# Clipboard 领域术语表（CONTEXT.md）
 
-本文件记录 UniClipboard 跨 crate 复用、且对领域专家有意义的统一语言（Ubiquitous
+本文件记录 Clipboard 跨 crate 复用、且对领域专家有意义的统一语言（Ubiquitous
 Language）。只收录本项目语境特有的概念，不收通用编程概念。随设计讨论惰性增长。
 
 > 约定：术语名用英文（与代码标识符一致），定义用中文且尽量一句话——说清它**是

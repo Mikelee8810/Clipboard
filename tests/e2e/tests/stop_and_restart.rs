@@ -64,7 +64,7 @@ async fn setup_initialized_node(name: &str) -> (TestDaemon, TestCli) {
 // stop_running_daemon_via_cli
 // ---------------------------------------------------------------------------
 
-/// Start a daemon, init a space, then stop it via `uniclip stop --json`.
+/// Start a daemon, init a space, then stop it via `clip stop --json`.
 ///
 /// In E2E the CLI `stop` sends SIGTERM via PID file, but the daemon spawned
 /// by `TestDaemon` may not be killed within the CLI's 10s timeout (the PID

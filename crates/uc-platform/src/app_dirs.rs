@@ -7,7 +7,7 @@ use crate::ports::{AppDirs, AppDirsError, AppDirsProvider};
 /// Delegates the raw computation to [`uc_app_paths::resolved_app_dir_name`],
 /// threading in `uc-platform`'s compile-time [`crate::default_profile`] (the
 /// `dev-profile` feature) as the fallback. The result is
-/// `app.uniclipboard.desktop` followed by `-<profile>` when a profile resolves,
+/// `app.clipboard.desktop` followed by `-<profile>` when a profile resolves,
 /// otherwise the bare app directory name.
 fn resolved_app_dir_name() -> String {
     uc_app_paths::resolved_app_dir_name(crate::default_profile())
@@ -96,8 +96,8 @@ impl AppDirsProvider for DirsAppDirsAdapter {
     /// `AppDirs` with `app_data_root` set to the base local data directory joined with the
     /// value captured from `resolved_app_dir_name()` when this adapter is created.
     ///
-    /// Depending on `UC_PROFILE`, `resolved_app_dir_name()` resolves to `"uniclipboard"`
-    /// or `"uniclipboard-{profile}"`.
+    /// Depending on `UC_PROFILE`, `resolved_app_dir_name()` resolves to `"clipboard"`
+    /// or `"clipboard-{profile}"`.
     ///
     /// # Examples
     ///
@@ -142,7 +142,7 @@ impl AppDirsProvider for DirsAppDirsAdapter {
 /// # use uc_platform::app_dirs::default_app_dirs;
 /// let dirs = default_app_dirs().expect("failed to resolve app dirs");
 /// // `app_data_root` and `app_cache_root` are absolute paths that include the app directory name.
-/// assert!(dirs.app_data_root.to_string_lossy().contains("app.uniclipboard.desktop"));
+/// assert!(dirs.app_data_root.to_string_lossy().contains("app.clipboard.desktop"));
 /// ```
 pub fn default_app_dirs() -> Result<AppDirs, AppDirsError> {
     DirsAppDirsAdapter::new().get_app_dirs()

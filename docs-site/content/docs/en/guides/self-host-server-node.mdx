@@ -1,9 +1,9 @@
 ---
 title: Deploy an always-online sync node
-description: Run UniClipboard headless on a VPS as an always-online Space member with a phone gateway.
+description: Run Clipboard headless on a VPS as an always-online Space member with a phone gateway.
 ---
 
-Since 0.13, UniClipboard can run on a server (VPS or container) as an
+Since 0.13, Clipboard can run on a server (VPS or container) as an
 **always-online member** of your Space — a background service with **no
 GUI and no system clipboard** (a "headless" node). It syncs clipboard
 over iroh exactly like a desktop peer, and serves the mobile-sync gateway
@@ -32,7 +32,7 @@ online and has no display:
 - **Is not**: a relay, and **not** a central store-and-forward mailbox.
   It only keeps what it received **while it was online** — it is not an
   offline inbox. When a peer is offline, undelivered data stays on the
-  sender, consistent with UniClipboard's P2P model.
+  sender, consistent with Clipboard's P2P model.
 
 If what you actually want is a transit point for NAT hole-punching
 failures, that's a different thing — see
@@ -90,7 +90,7 @@ section) — it's a sync hub, not an offline inbox.
   - A fixed **UDP** port for iroh direct connections (e.g. `42999/udp`) —
     so desktops on other networks can dial the node directly.
 - An existing Space with **another device online** to pair with. The
-  server node _joins_ a Space; it does not create one. Run `uniclip
+  server node _joins_ a Space; it does not create one. Run `clip
 invite` on a desktop already in the Space to get an invitation code.
 
 ## Get the stack
@@ -99,7 +99,7 @@ Everything lives in the repository under `deploy/vps/`:
 
 ```bash
 git clone https://github.com/UniClipboard/UniClipboard.git
-cd UniClipboard/deploy/vps
+cd Clipboard/deploy/vps
 ```
 
 There are two ways to get the image. Pick one:
@@ -113,7 +113,7 @@ docker compose pull
 ```
 
 Pin a release in `.env` with
-`UC_IMAGE=ghcr.io/uniclipboard/uniclipboard-server:vX.Y.Z` (defaults to
+`UC_IMAGE=ghcr.io/uniclipboard/clipboard-server:vX.Y.Z` (defaults to
 `:latest`).
 
 **Option B — build from source.** Needs ~4 GB of RAM:
@@ -155,11 +155,11 @@ socket so peers can dial it directly.
 daemon is up**, so all provisioning happens in one-off containers first.
 They share the same state volume the long-running daemon will read.
 
-**1. Join your Space.** On a desktop already in the Space, run `uniclip space
+**1. Join your Space.** On a desktop already in the Space, run `clip space
 invite` to get a code, then:
 
 ```bash
-docker compose run --rm app uniclip space join
+docker compose run --rm app clip space join
 ```
 
 This prompts interactively for the **invitation code** and the **Space
@@ -171,7 +171,7 @@ makes the phone's install URL/QR point at your HTTPS endpoint:
 
 ```bash
 docker compose run --rm app \
-  uniclip mobile network set \
+  clip mobile network set \
   --url https://clip.example.com \
   --accept-network-risk
 ```
@@ -179,7 +179,7 @@ docker compose run --rm app \
 **3. Register your phone.** Mints credentials and renders the install QR:
 
 ```bash
-docker compose run --rm app uniclip mobile add --label "My iPhone"
+docker compose run --rm app clip mobile add --label "My iPhone"
 ```
 
 Copy the one-time password it prints — it is not shown again.
@@ -192,7 +192,7 @@ docker compose up -d
 
 This brings up two containers:
 
-- **`app`** — the headless daemon (`uniclip start --server`). Joins the
+- **`app`** — the headless daemon (`clip start --server`). Joins the
   Space over iroh and serves the mobile-sync gateway. The iroh UDP port
   is published to the host; the plaintext gateway port is **only** on
   the internal Docker network.
@@ -205,7 +205,7 @@ to confirm the certificate was issued.
 ## Connect your phone
 
 Scan the QR from step 3 (or open the printed `https://<domain>` install
-URL) in the UniClipboard / SyncClipboard mobile client. The phone now
+URL) in the Clipboard / SyncClipboard mobile client. The phone now
 pulls the latest clipboard and pushes new content through Caddy; pushes
 fan out to your desktops over iroh. See
 [Mobile sync](../core-features/mobile-sync) for the client side.
@@ -283,16 +283,16 @@ already satisfies this. Only two situations need attention:
 ## State and backups
 
 Everything needed to keep identity, Space membership, and mobile
-credentials lives under `HOME=/data` on the `uniclip-state` volume, so
+credentials lives under `HOME=/data` on the `clip-state` volume, so
 the node **never re-pairs** across restarts. Under
-`/data/.local/share/app.uniclipboard.desktop/`:
+`/data/.local/share/app.clipboard.desktop/`:
 
 | State                        | Path                                        |
 | ---------------------------- | ------------------------------------------- |
 | iroh identity (node secret)  | `iroh-identity/`                            |
 | file-based KEK               | `keyring/`                                  |
 | keyslot + device id          | `vault/keyslot.json`, `vault/device_id.txt` |
-| database                     | `uniclipboard.db`                           |
+| database                     | `clipboard.db`                           |
 | iroh blob cache              | `iroh-blobs/blobs.db`                       |
 | settings (mobile creds, LAN) | `settings.json`                             |
 
@@ -302,8 +302,8 @@ on the volume. Back it up (and Caddy's volume, which holds the issued
 certificate):
 
 ```bash
-docker run --rm -v uniclip-state:/data -v "$PWD":/backup alpine \
-  tar czf /backup/uniclip-state.tgz -C /data .
+docker run --rm -v clip-state:/data -v "$PWD":/backup alpine \
+  tar czf /backup/clip-state.tgz -C /data .
 ```
 
 ## Operations

@@ -75,7 +75,7 @@ where
 ///
 /// # Arguments
 ///
-/// * `logs_dir` - Directory for JSON log files (creates `uniclipboard-<role>.json.YYYY-MM-DD`,
+/// * `logs_dir` - Directory for JSON log files (creates `clipboard-<role>.json.YYYY-MM-DD`,
 ///   role from [`crate::scope::role_log_file_stem`] so co-resident processes don't share a file)
 /// * `profile` - The [`LogProfile`] controlling filter verbosity
 ///
@@ -161,9 +161,9 @@ fn build_json_writer(
     std::fs::create_dir_all(logs_dir)?;
 
     // ADR-008 D20 (P4-0): per-role file name so the GUI host and the detached
-    // `uniclipd` never append to the same rolling log file. The `.json` is part
+    // `clipd` never append to the same rolling log file. The `.json` is part
     // of the *prefix* (no suffix is set), so the rolled files keep the
-    // `uniclipboard-<role>.json.<date>` shape — the Builder appends `.<date>`.
+    // `clipboard-<role>.json.<date>` shape — the Builder appends `.<date>`.
     // `max_files` prunes everything older than the last `LOG_RETENTION_DAYS`.
     let filename_prefix = format!("{}.json", crate::scope::role_log_file_stem());
     let daily_appender = tracing_appender::rolling::RollingFileAppender::builder()
@@ -195,7 +195,7 @@ fn build_json_writer(
 ///
 /// # Arguments
 ///
-/// * `logs_dir` - Directory for JSON log files (creates `uniclipboard-<role>.json.YYYY-MM-DD`,
+/// * `logs_dir` - Directory for JSON log files (creates `clipboard-<role>.json.YYYY-MM-DD`,
 ///   role from [`crate::scope::role_log_file_stem`] so co-resident processes don't share a file)
 /// * `profile` - The [`LogProfile`] controlling filter verbosity
 ///

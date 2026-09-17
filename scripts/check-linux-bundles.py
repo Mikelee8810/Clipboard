@@ -28,7 +28,7 @@ def check(bundle_root):
                 if not re.search(r"^gtk-layer-shell(?:\s|$)", dependencies, re.MULTILINE):
                     raise RuntimeError(f"{package.name}: missing gtk-layer-shell dependency")
             else:
-                with tempfile.TemporaryDirectory(prefix="uniclipboard-appimage-") as directory:
+                with tempfile.TemporaryDirectory(prefix="clipboard-appimage-") as directory:
                     subprocess.run(
                         [str(package), "--appimage-extract", "usr/lib/libgtk-layer-shell.so.0"],
                         cwd=directory, check=True, stdout=subprocess.DEVNULL,

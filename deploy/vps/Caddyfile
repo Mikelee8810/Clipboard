@@ -1,4 +1,4 @@
-# UniClipboard mobile-sync gateway — TLS termination + reverse proxy (ADR-007 §2.5).
+# Clipboard mobile-sync gateway — TLS termination + reverse proxy (ADR-007 §2.5).
 #
 # Caddy obtains and renews a certificate for $UC_DOMAIN automatically
 # (ACME HTTP-01 / TLS-ALPN), then proxies every request to the app container's

@@ -1,13 +1,13 @@
 ---
 status: diagnosed
-trigger: "User reported large-file sync from Mac → Windows starts at 40 MB/s and degrades to <10 MB/s on uniclipboard 0.11.0-alpha.6"
+trigger: "User reported large-file sync from Mac → Windows starts at 40 MB/s and degrades to <10 MB/s on clipboard 0.11.0-alpha.6"
 created: 2026-05-24T05:00:00Z
 updated: 2026-05-24T07:00:00Z
 ---
 
 ## TL;DR
 
-Slow blob transfer is **not** an uniclipboard bug. The full application stack
+Slow blob transfer is **not** an clipboard bug. The full application stack
 (encrypt → V3 envelope → iroh-blobs publish/fetch → decrypt) hits the **same**
 ~45 MB/s ceiling as bare iroh-blobs in a minimal P2P reproduction (see
 `src-tauri/crates/p2p-bench/`).
@@ -127,12 +127,12 @@ investigation does not re-walk them.
 - **Verdict**: Cross-OS reproduction means the issue is not specific to
   Windows, NTFS, SMB, or any other Win-side stack.
 
-### 7. uniclipboard application stack (encrypt / V3 envelope / redb / connection pool)
+### 7. clipboard application stack (encrypt / V3 envelope / redb / connection pool)
 
 - **Test**: built `p2p-bench` (independent crate at
   `src-tauri/crates/p2p-bench/`) using only iroh + iroh-blobs APIs with no
   app-layer code. Ran the same 2.5 GB file Mac → Mac.
-- **Result**: `tuned BBR + FsStore` = 48.16 MB/s, matching uniclipboard's
+- **Result**: `tuned BBR + FsStore` = 48.16 MB/s, matching clipboard's
   application-layer steady-state (~45 MB/s).
 - **Verdict**: Application stack contributes near-zero overhead.
   **The ceiling is in iroh / iroh-blobs / noq.**

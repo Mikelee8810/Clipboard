@@ -56,7 +56,7 @@ commit 边界遵循 `architecture-rules.md`：`uc-core`/`uc-infra` 分 commit；
 - [x] **C3 `feat`**：capture 字段 `blob_writer: BlobWriterPort` → `blob_ingest: BlobContentIngestPort`；LocalFile 分支改 `ingest_path`；新增 `derive_file_content_digests`（LocalFile rep content_hash + Inline uri-list 逐个 `ingest_path`，失败跳过 warn）。wiring：`StoragePorts.blob_content_ingest` + assembly 单实例双 trait-object + 3 capture 站点。
 - [x] **V1 单测**（`clipboard_capture::usecase::tests`）：`inline_uri_list_identity_is_device_independent`（两设备不同路径同文件 → 同 snapshot_hash，且 ≠ 路径文本 hash）；`inline_uri_list_ingest_failure_is_skipped`。20 passed。
 - [ ] **V1 真机**：Windows 复制文件到 macOS，dashboard 单条（留待 1.B/1.C 后一起验）。
-- 备注：`uniclipboard`(src-tauri bin) build script 因缺 sidecar daemon 二进制失败，是 pre-existing 打包前置，与本改动无关；其余全 workspace `cargo check`/`--tests` 绿。
+- 备注：`clipboard`(src-tauri bin) build script 因缺 sidecar daemon 二进制失败，是 pre-existing 打包前置，与本改动无关；其余全 workspace `cargo check`/`--tests` 绿。
 
 ### Phase 1.B — inbound 存 wire H（F-4）
 

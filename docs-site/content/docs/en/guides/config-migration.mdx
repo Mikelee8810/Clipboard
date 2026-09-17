@@ -1,12 +1,12 @@
 ---
 title: Export & import config (move a device)
-description: Carry one device's clipboard history, settings, and pairings over to a freshly installed UniClipboard — without re-pairing.
+description: Carry one device's clipboard history, settings, and pairings over to a freshly installed Clipboard — without re-pairing.
 ---
 
 In short: this **moves a whole device to another machine**.
 
 Under **Settings → Storage** you export your current device into a single
-encrypted file, then import it on another copy of UniClipboard (a fresh install
+encrypted file, then import it on another copy of Clipboard (a fresh install
 is typical; importing onto a machine that's already in use replaces what's on
 it). After it restarts, your clipboard history, settings, and pairings with
 other devices are all still there — **no re-pairing needed**.
@@ -92,7 +92,7 @@ overwritten.
 
 ## Move semantics: why you can't run both at once
 
-UniClipboard identifies a device by a stable **identity** (technically a
+Clipboard identifies a device by a stable **identity** (technically a
 **NodeId**, a fixed public key). Pairings, trust, and who is allowed to receive
 whose content are all bound to this identity. Switching Wi-Fi, restarting, or
 changing IP doesn't affect it.
@@ -108,7 +108,7 @@ Export / import **carries this identity along**. So it's not a "copy", it's a
 
 <Callout type="warn">
   **Once moved, retire the original device.** After confirming the new machine works, don't start
-  UniClipboard on the original device again (or reset / uninstall it). If what you actually want is
+  Clipboard on the original device again (or reset / uninstall it). If what you actually want is
   "two independent machines, both usable", add a second device through the normal [pairing
   flow](./pairing) instead of importing.
 </Callout>

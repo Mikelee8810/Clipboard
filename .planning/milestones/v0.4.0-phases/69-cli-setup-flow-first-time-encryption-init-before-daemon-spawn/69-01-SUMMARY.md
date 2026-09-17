@@ -80,7 +80,7 @@ completed: 2026-03-28
 
 - Used `build_cli_runtime()` pattern from `space_status.rs` (already established in codebase) rather than inventing a new approach
 - Treated `EncryptionState::Initializing` as allowed (same as Uninitialized) in the guard — only `Initialized` is rejected
-- Updated next-step hint from "run setup host" to "run uniclipboard-daemon first, then setup host" to reflect the new two-step flow
+- Updated next-step hint from "run setup host" to "run clipboard-daemon first, then setup host" to reflect the new two-step flow
 
 ## Deviations from Plan
 

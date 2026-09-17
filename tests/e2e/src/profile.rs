@@ -64,19 +64,19 @@ impl TestProfile {
         {
             dirs_next::data_dir()
                 .unwrap_or_else(|| PathBuf::from("/tmp"))
-                .join(format!("app.uniclipboard.desktop-{}", profile))
+                .join(format!("app.clipboard.desktop-{}", profile))
         }
         #[cfg(target_os = "linux")]
         {
             dirs_next::data_dir()
                 .unwrap_or_else(|| PathBuf::from("/tmp"))
-                .join(format!("app.uniclipboard.desktop-{}", profile))
+                .join(format!("app.clipboard.desktop-{}", profile))
         }
         #[cfg(target_os = "windows")]
         {
             dirs_next::data_local_dir()
                 .unwrap_or_else(|| PathBuf::from("C:\\Temp"))
-                .join(format!("app.uniclipboard.desktop-{}", profile))
+                .join(format!("app.clipboard.desktop-{}", profile))
         }
     }
 
@@ -103,7 +103,7 @@ impl TestProfile {
     fn resolve_cache_dir(profile: &str) -> PathBuf {
         dirs_next::cache_dir()
             .unwrap_or_else(|| PathBuf::from("/tmp"))
-            .join(format!("app.uniclipboard.desktop-{}", profile))
+            .join(format!("app.clipboard.desktop-{}", profile))
     }
 
     fn resolve_log_dir(profile: &str) -> PathBuf {

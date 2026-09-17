@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Single-machine end-to-end test for `uniclip send --resend` — ADR-005
+# Single-machine end-to-end test for `clip send --resend` — ADR-005
 # Stage 1a CLI surface.
 #
 # Mirrors `test_clipboard_e2e.sh`'s alice/bob pairing recipe, then
@@ -25,7 +25,7 @@
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclip}"
+CLI="${CLI:-./target/debug/clip}"
 PASSPHRASE="${PASSPHRASE:-hunter22hunter22}"
 PAIR_WAIT_SECS="${PAIR_WAIT_SECS:-30}"
 WATCH_READY_SECS="${WATCH_READY_SECS:-30}"
@@ -48,12 +48,12 @@ case "$(uname -s)" in
         ;;
 esac
 
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-alice"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-bob"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-alice"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-bob"
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclip" >&2
+    echo "Build first: cargo build -p uc-cli --bin clip" >&2
     exit 2
 fi
 

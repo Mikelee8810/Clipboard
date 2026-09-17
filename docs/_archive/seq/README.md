@@ -1,6 +1,6 @@
 # Seq Signal Definitions (Archived)
 
-These saved searches were authored when UniClipboard exported spans and log events to a self-hosted Seq instance over OTLP/HTTP-protobuf.
+These saved searches were authored when Clipboard exported spans and log events to a self-hosted Seq instance over OTLP/HTTP-protobuf.
 
 The OTLP → Seq pipeline was retired in favor of Sentry Logs:
 

@@ -20,7 +20,7 @@ This phase hardens the daemon API for direct frontend access by adding layered s
 
 - POST `/auth/connect` endpoint: exchanges bearer token + client info for short-lived session token
 - Session token: HS256 signed, 5-minute TTL
-- Token claims: iss ("uniclipboard-daemon"), sub ("frontend"), iat, exp, pid, client_type, jti, access_level, encryption_ready
+- Token claims: iss ("clipboard-daemon"), sub ("frontend"), iat, exp, pid, client_type, jti, access_level, encryption_ready
 - Frontend uses `Authorization: Session <session_token>` for subsequent requests
 - JWT secret: 32 random bytes generated at daemon startup (not persisted)
 
@@ -96,7 +96,7 @@ This phase hardens the daemon API for direct frontend access by adding layered s
 <specifics>
 ## Specific Ideas
 
-- Bearer token file already exists at `~/.config/uniclipboard/daemon.token` with permission 600
+- Bearer token file already exists at `~/.config/clipboard/daemon.token` with permission 600
 - Daemon already binds to 127.0.0.1 only (loopback isolation)
 - The auth/connect flow is new — currently frontend accesses daemon only through Tauri bridge
 - Firewall rules (pfctl, iptables) are optional/deferred

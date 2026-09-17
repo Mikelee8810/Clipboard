@@ -1,4 +1,4 @@
-//! `uniclip space join` — join a space via daemon HTTP API. The route is chosen by
+//! `clip space join` — join a space via daemon HTTP API. The route is chosen by
 //! explicit intent, not by the device's setup state.
 //!
 //! * Default (no `--switch`) → calls `POST /v2/setup/redeem` (joiner side of
@@ -567,7 +567,7 @@ async fn wait_for_join(
                 return emit_join_error(
                     context.json,
                     "join_status_missing",
-                    "The pending join is no longer available. Run `uniclip space join status`.",
+                    "The pending join is no longer available. Run `clip space join status`.",
                     exit_codes::EXIT_ERROR,
                 );
             }
@@ -576,7 +576,7 @@ async fn wait_for_join(
                 return emit_join_error(
                     context.json,
                     "join_replaced",
-                    "A newer join request replaced this one. Run `uniclip space join status`.",
+                    "A newer join request replaced this one. Run `clip space join status`.",
                     exit_codes::EXIT_ERROR,
                 );
             }
@@ -833,7 +833,7 @@ async fn run_redeem(
 ///
 /// Destructive, so we confirm first unless `--yes` was passed. The daemon
 /// drives the migration internally and persists `MigrationStatePort`, so a
-/// crash mid-run auto-resumes on the next `uniclip` invocation.
+/// crash mid-run auto-resumes on the next `clip` invocation.
 async fn run_switch(
     code_str: String,
     new_passphrase: String,

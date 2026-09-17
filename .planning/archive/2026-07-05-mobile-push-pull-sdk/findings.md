@@ -6,7 +6,7 @@ decided). User explicitly approved skipping the codex adversarial review gate an
 straight to PR-A implementation (2026-07-05).
 
 Scope: `crates/uc-mobile` only. Desktop (`uc-application`) untouched. RN-side wiring is a
-separate repo (`uniclipboard-android`) — out of scope here, PR-C produces only the handoff doc.
+separate repo (`clipboard-android`) — out of scope here, PR-C produces only the handoff doc.
 
 ## Recon: current code state (verified 2026-07-05, before writing any engine code)
 

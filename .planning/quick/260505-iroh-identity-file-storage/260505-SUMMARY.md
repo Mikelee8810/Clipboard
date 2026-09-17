@@ -12,7 +12,7 @@ files_modified:
 
 ## 背景
 
-前一次 quick task `260505-keychain-prompts` 给 `DefaultSpaceAccessAdapter` 加了 `kek_observed` 进程级缓存，压住了加密路径（`unlock` / `verify_keychain_access` / `try_resume_session.store_kek`）的重复弹窗。但用户实测**首次打开应用、还没创建 new space**就被 macOS 弹 keychain，前次修复完全没覆盖这条路径。
+前一次 quick task `260505-keychain-prompts` 给 `DefaultSpaceAccessAdapter` 加了 `kek_observed` 进程级缓存，压住了加密路径（`unlock` / `verify_keychain_access` / `try_resume_session.store_kek`）的重复弹窗。但用户实测 **首次打开应用、还没创建 new space** 就被 macOS 弹 keychain，前次修复完全没覆盖这条路径。
 
 ## 真凶
 
@@ -22,10 +22,10 @@ files_modified:
 ensure_secret_key()
   → secure_storage.get("iroh-identity:v1")     ← 文件不存在等价物，但走的是 macOS keychain
   → 无 entry → SecretKey::generate()
-  → secure_storage.set("iroh-identity:v1", …)  ← macOS 弹"是否允许 UniClipboard 在 keychain 中保存数据"
+  → secure_storage.set("iroh-identity:v1", …)  ← macOS 弹"是否允许 Clipboard 在 keychain 中保存数据"
 ```
 
-这条路径**绕过所有加密 gate**：
+这条路径 **绕过所有加密 gate**：
 - 不查 `auto_unlock_enabled`（默认 false 也照样弹）
 - 不查 `setup_status.has_completed`（用户没初始化也弹）
 - 不查 `keyslot_exists()`（KEK 跟 iroh 身份是不同 keychain entry）
@@ -48,11 +48,11 @@ ensure_secret_key()
 
 ## 各 SecureStoragePort 消费方现状
 
-| 消费方 | 后端 | 启动期? |
+| 消费方 | 后端 | 启动期？|
 |---|---|---|
 | `KeyMaterialStore`（KEK / KeySlot） | macOS keychain | ❌ 仅 unlock / verify_keychain_access / 用户初始化时 |
 | `DefaultKeyMigrationAdapter`（migration_key） | macOS keychain | ❌ 仅 switch-space 时 |
-| `IrohIdentityStore`（iroh Ed25519 设备身份） | **文件后端**（本次改动） | ✅ 启动期 `IrohNodeBuilder::bind`，但**零 keychain 接触** |
+| `IrohIdentityStore`（iroh Ed25519 设备身份） | **文件后端**（本次改动） | ✅ 启动期 `IrohNodeBuilder::bind`，但 **零 keychain 接触** |
 
 ## 迁移策略（用户要求 "静默 + 零弹窗"）
 
@@ -65,7 +65,7 @@ ensure_secret_key()
 
 ## 安全权衡（与用户达成共识）
 
-iroh 设备身份是**网络栈的"我是哪台机器"标识**，不是用户秘密：
+iroh 设备身份是 **网络栈的"我是哪台机器"标识**，不是用户秘密：
 
 - **攻击者拿到 iroh 身份能做什么**：冒充该设备发起 iroh 握手；但 channel 加密走 KEK 派生的 proof key（仍在 keychain），冒充连接握手解不出来 → **无法读取 / 解密剪贴板内容**
 - **vs Keychain**：损失"同用户其它进程访问需 ACL 提示"的提示层；但 root / 物理访问 / FileVault 锁屏保护对两种方案等价

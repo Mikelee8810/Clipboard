@@ -3,7 +3,7 @@
 //! A controlled restart needs the target run mode to survive the gap between
 //! the OLD daemon exiting and a NEW daemon starting — the two processes never
 //! share memory, so the intent is persisted as a small record in the
-//! per-profile lock directory (beside `.uniclipd.lock` / `.daemon-pid`).
+//! per-profile lock directory (beside `.clipd.lock` / `.daemon-pid`).
 //!
 //! ## Lock-holding semantics, not file existence
 //!
@@ -36,8 +36,8 @@ use std::path::{Path, PathBuf};
 
 /// File name of the handover record inside the per-profile lock directory.
 ///
-/// Sits beside `.uniclipd.lock` in the app data root (the lock dir).
-pub const HANDOVER_FILE_NAME: &str = ".uniclipd-handover.json";
+/// Sits beside `.clipd.lock` in the app data root (the lock dir).
+pub const HANDOVER_FILE_NAME: &str = ".clipd-handover.json";
 
 /// A controlled-restart handover record.
 ///

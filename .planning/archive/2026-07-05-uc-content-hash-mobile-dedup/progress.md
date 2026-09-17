@@ -201,7 +201,7 @@ server "register by reference" capability that doesn't exist. `is_content_availa
 alone, with the RN handoff doc explicitly warning against using it as a blanket upload-skip.
 
 Not done (explicitly out of scope, confirmed with user earlier in conversation): the actual
-RN/TS-side code change in the separate `uniclipboard-android` repo. Only the handoff doc is
+RN/TS-side code change in the separate `clipboard-android` repo. Only the handoff doc is
 in scope here.
 
 ## Test Results

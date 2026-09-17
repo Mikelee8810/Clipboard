@@ -21,7 +21,7 @@ result: pass
 
 ### 2. Config Resolution Fallback
 
-expected: With no `uniclipboard.toml` in the project directory or ancestors, the app still starts using system-default config paths (platform dirs). Settings page shows default values. No crash or error about missing config.
+expected: With no `clipboard.toml` in the project directory or ancestors, the app still starts using system-default config paths (platform dirs). Settings page shows default values. No crash or error about missing config.
 result: pass
 
 ## Summary

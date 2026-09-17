@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Issuer value embedded in all daemon session tokens.
-pub const ISSUER: &str = "uniclipboard-daemon";
+pub const ISSUER: &str = "clipboard-daemon";
 
 /// Subject value for all session tokens (tokens are issued to frontend/CLI clients).
 pub const SUBJECT: &str = "frontend";
@@ -32,7 +32,7 @@ pub const REFRESH_AT_SECS: i64 = 240;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SessionTokenClaims {
-    /// Issuer — always "uniclipboard-daemon".
+    /// Issuer — always "clipboard-daemon".
     pub iss: String,
     /// Subject — always "frontend".
     pub sub: String,
@@ -92,7 +92,7 @@ impl SessionTokenClaims {
     ///
     /// Validates:
     /// - Signature matches using HS256 with the secret
-    /// - Issuer is "uniclipboard-daemon"
+    /// - Issuer is "clipboard-daemon"
     /// - Subject is "frontend"
     /// - Token has not expired
     ///

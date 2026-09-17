@@ -36,7 +36,7 @@
 - 之前闭环（同会话上一段）只用死 URL 抓到 stop/error 路径（`backoffGate`/`SyncError`/`route-changed`），happy-path（成功 pull→apply→converge）的持久 notice 没实跑过。
 
 ### 做了什么
-- recon：读 skill（SKILL.md 两通道模型 + `ios-logs.sh` drive/stream/show）；读 Rust client.rs 端点（`GET/PUT /SyncClipboard.json`、`/file/{name}`、`POST /api/history/query`）+ proto `Clipboard` 精确 wire 形态（`type`/`hash`/`text`/`hasData`/`dataName`/`size`，hash 大写 SHA-256）；查 AppSettings 默认（`autoApplyServerChanges=ON`、`autoPushDeviceChanges=OFF`）；确认已 build app（`UniClipboard-dgdrstiaw...`，Jun 18 07:24=`e94ffd1` 含诊断 harness）。
+- recon：读 skill（SKILL.md 两通道模型 + `ios-logs.sh` drive/stream/show）；读 Rust client.rs 端点（`GET/PUT /SyncClipboard.json`、`/file/{name}`、`POST /api/history/query`）+ proto `Clipboard` 精确 wire 形态（`type`/`hash`/`text`/`hasData`/`dataName`/`size`，hash 大写 SHA-256）；查 AppSettings 默认（`autoApplyServerChanges=ON`、`autoPushDeviceChanges=OFF`）；确认已 build app（`Clipboard-dgdrstiaw...`，Jun 18 07:24=`e94ffd1` 含诊断 harness）。
 - 写 mock SyncClipboard 服务器（Python http.server，自算 hash 保 apply 校验过；`POST /api/history/query`→`[]`；sim 经 127.0.0.1 达宿主回环）。
 - `drive http://127.0.0.1:59998` → app 启动（PID 45521），引擎 ~1Hz tick 打 mock 18+ 次。
 - **两通道全验**：
@@ -79,7 +79,7 @@
 
 ### 阶段 ⑤ 余下公开方法（iOS `157a626`）
 - acknowledgeLoopDetection/resetRuntimeState/handleActiveServerChanged/handleNetworkRouteChanged/handleEndpointChanged 全拆 dispatcher/native/viaReducer。
-- 调 `UniClipboardCore.<fn>(state:)` **模块限定**（5 个 binding 名都与原生方法同名）。reducer 折状态字段（清 buffer/staged/backoff/synced-hash 等），shell 留 engine.state(loop-trip ordering)/stagedEntry/persist I/O(saveLastSyncedHash/saveLastHistorySyncAt)/vm.historyWatermark/start/forceTickNow/cancelInFlight。
+- 调 `ClipboardCore.<fn>(state:)` **模块限定**（5 个 binding 名都与原生方法同名）。reducer 折状态字段（清 buffer/staged/backoff/synced-hash 等），shell 留 engine.state(loop-trip ordering)/stagedEntry/persist I/O(saveLastSyncedHash/saveLastHistorySyncAt)/vm.historyWatermark/start/forceTickNow/cancelInFlight。
 - handleActiveServerChangedNative 仍调 `resetRuntimeState()`（flag off 时再 dispatch 到 native，verbatim）；viaReducer 直调 reducer `handleActiveServerChanged`(内含 reset) 避嵌套。
 
 ### 测试结果（④⑤ 各自 + 组合）
@@ -103,8 +103,8 @@
 
 ### 做了什么
 - 用户确认阶段 ② push 📱 验通过 → implement 阶段 ③。
-- recon：读 SyncEngine 公开方法（markStagedApplied 270-279 / consentPush 853-891 / 周边 acknowledge/reset/handle_* 留 ⑤）+ proto `commit_consent_push`(461-475，advance+last_applied+record_and_check(Pushed)，非 trip 则 Succeeded+ 清失败计数；trip stick LoopDetected)+`mark_staged_applied`(580-591，无 staged→false no-op；否则 advance+last_applied+ 清 staged+Succeeded→true)+reducer.rs FFI wrapper(`markStagedApplied→MarkStagedStep{state,wasStaged}`/`commitConsentPush→CommitStep`)；确认 binding 签名 + `import UniClipboardCore`（app target，#if UC_RUST_CORE）。
-- 关键发现：`markStagedApplied` binding 与原生方法 **同名** → 调用点用 `UniClipboardCore.markStagedApplied(state:)` 模块限定消歧。
+- recon：读 SyncEngine 公开方法（markStagedApplied 270-279 / consentPush 853-891 / 周边 acknowledge/reset/handle_* 留 ⑤）+ proto `commit_consent_push`(461-475，advance+last_applied+record_and_check(Pushed)，非 trip 则 Succeeded+ 清失败计数；trip stick LoopDetected)+`mark_staged_applied`(580-591，无 staged→false no-op；否则 advance+last_applied+ 清 staged+Succeeded→true)+reducer.rs FFI wrapper(`markStagedApplied→MarkStagedStep{state,wasStaged}`/`commitConsentPush→CommitStep`)；确认 binding 签名 + `import ClipboardCore`（app target，#if UC_RUST_CORE）。
+- 关键发现：`markStagedApplied` binding 与原生方法 **同名** → 调用点用 `ClipboardCore.markStagedApplied(state:)` 模块限定消歧。
 - 实现（iOS，A1 flag-gated，三件套同阶段①②）：
   - `markStagedApplied()` 拆 dispatcher + `markStagedAppliedNative()`(verbatim) + `markStagedAppliedViaReducer()`：reducer 报 wasStaged，guard wasStaged 保 native no-op、`applyReducerRuntime`(advance synced+ 清 stagedServerHash，不碰 engine.state)、shell 清 stagedEntry + 设 state/.now/lastError。
   - `consentPush(_:)` 拆 dispatcher + `consentPushNative(_:)`(verbatim) + `consentPushViaReducer(_:)`：本地 record+adopt/server-state guards/`pushSnapshot` PUT/`updateHistoryDirection(.pushed)`/donation/inline 错误处理全留 native；`commitConsentPush` 折 advance-synced+last-applied+`.pushed` event+(非 trip) 清失败计数→`applyReducerRuntime`；🔴 loop-trip 同解（先 .succeeded 再 trip；trip 跳 lastSyncedAt+donation，对齐 native 866-877；consentPush 的 donation 在 trip 后 **不** 触发，与 maybePush 的 donation 在 trip 前触发不同，各自忠实）。
@@ -142,7 +142,7 @@
 ### 测试结果
 | 检查 | 结果 |
 |---|---|
-| `xcodebuild ... generic 模拟器 build`（禁签名） | **BUILD SUCCEEDED**（SyncEngine.swift arm64+x86_64 编过 maybePushViaReducer + `.push(decision)`，app 链接 UniClipboardCore） |
+| `xcodebuild ... generic 模拟器 build`（禁签名） | **BUILD SUCCEEDED**（SyncEngine.swift arm64+x86_64 编过 maybePushViaReducer + `.push(decision)`，app 链接 ClipboardCore） |
 | iOS `swift test` | **220 XCTest（0 failures）+ 50 Swift Testing 全绿**（不回归；阶段② 不加 Shared/ 测试，SyncEngine app-target only） |
 | binding 符号核验 | `commitPush`/`commitPushSkipped`/`PushDecision`(5 case)/`ServerRoute.push(decision:)` 均在 RustCore/uc_mobile.swift，签名一致；RustCore 已 staged（阶段② 不改 Rust，无需重 stage） |
 
@@ -168,7 +168,7 @@
 | 检查 | 结果 |
 |---|---|
 | iOS `swift test` | **220 XCTest + 50 Swift Testing 全绿**（48→+2 SyncLoopGuard 重建） |
-| `xcodebuild ... generic 模拟器 build`（禁签名） | **BUILD SUCCEEDED**（SyncEngine.swift x86_64+arm64 编译过，app 链接 UniClipboardCore） |
+| `xcodebuild ... generic 模拟器 build`（禁签名） | **BUILD SUCCEEDED**（SyncEngine.swift x86_64+arm64 编译过，app 链接 ClipboardCore） |
 
 ### commit
 - iOS(`mobile-sync-rust-core`，现 14 commit)：`f8ddf79` feat: route SyncEngine pull path through Rust reducer (goal-B M6-2 step 3 phase 1) + `ba3a76b` chore: log SyncEngine reducer-path decisions for on-device A/B（DEBUG-only 逐 tick 日志，preamble proceed/stop + route=converged/serverNew/push；Release flag off 不触发）。未推送/未 PR。
@@ -200,7 +200,7 @@
 ### 做了什么
 - recon：读 `SyncEngine.swift` 字段（State enum 在 app target / loopGuard 是 native `SyncLoopGuard` 封装 / 退避门 `nextNetworkAttemptAt`）+ tick 主体（preamble→getClipboard→truth-gate/server-new/push inline 决策，子步 3 换 reducer）。确认 adapter 在 Shared/ 不可达 `SyncEngine.State`（app target）。
 - 重 stage RustCore（含 step1 reducer binding，284M；后台跑）；grep 确认 binding 含 8 reducer 符号。
-- 写 `Shared/Network/SyncReducerAdapter.swift`（`#if UC_RUST_CORE`，放 Network target = 已条件依赖 UniClipboardCore + 有 UC_RUST_CORE define）：snapshot 构造（planPreamble/planAfterServerGet）+ native Clipboard⟷ClipboardMeta（复用 step2 `RustSyncClientAdapter.clipboardMeta(from:)`）+ commitStage/commitApplyFailed（接 native Clipboard）+ defaultConfig/freshState。
+- 写 `Shared/Network/SyncReducerAdapter.swift`（`#if UC_RUST_CORE`，放 Network target = 已条件依赖 ClipboardCore + 有 UC_RUST_CORE define）：snapshot 构造（planPreamble/planAfterServerGet）+ native Clipboard⟷ClipboardMeta（复用 step2 `RustSyncClientAdapter.clipboardMeta(from:)`）+ commitStage/commitApplyFailed（接 native Clipboard）+ defaultConfig/freshState。
 - **范围收窄**：State 映射留子步 3（engine 内）；hash-only commit + 纯函数无 Clipboard 映射 → 子步 3 SyncEngine 直调 binding（不为 passthrough 而封装）。
 - 10 swift test（snapshot 构造 + Clipboard 映射 + 委托：converged/server-new/push/empty-server 路由、preamble record-local+proceed/stop、stage/apply-failed commit、default config/state）。
 
@@ -260,7 +260,7 @@
 - iOS(`mobile-sync-rust-core`，现 11 commit)：`6af01ed` feat: route history endpoints through Rust core (goal-B M6-1 step 3)。未推送/未 PR。
 
 ### 下一步
-**📱 用户合并真机验 step 2+3**：翻 toggle，推送/拉取文本 + 文件、翻历史，Console(app.uniclipboard/network) 看 putClipboard/putFile/getFile/queryHistory/getHistoryPayload via Rust core。验过后 **step 4**：删 adapter native fallback（cancelInFlight 改只 cancel 共享 Rust）。工厂 native↔Rust 双路径删原生路径要等 M4/M5 也切完（M6-2+）+ 真机验后（不可逆，谨慎）。我无法跑真机（sudo 需密码），球在用户。
+**📱 用户合并真机验 step 2+3**：翻 toggle，推送/拉取文本 + 文件、翻历史，Console(app.clipboard/network) 看 putClipboard/putFile/getFile/queryHistory/getHistoryPayload via Rust core。验过后 **step 4**：删 adapter native fallback（cancelInFlight 改只 cancel 共享 Rust）。工厂 native↔Rust 双路径删原生路径要等 M4/M5 也切完（M6-2+）+ 真机验后（不可逆，谨慎）。我无法跑真机（sudo 需密码），球在用户。
 
 ## Session 2026-06-15 (cont. 7) — M6-1 step 1 📱真机通过 (+诊断坑) + step 2(put/file)
 
@@ -287,7 +287,7 @@
 - 批量问 4 设计决策 (AskUserQuestion + 推荐项)，用户全拍推荐：①共享单例;②工厂 + 协议;③信 Rust oracle + 真机/Console(host 无法注 MockURLProtocol);④tracer-bullet 先切 getClipboard。
 - 实现 plumbing(协议/工厂/单例/bridge/adapter/flag) + progressive adapter(只 getClipboard 走 Rust，其余委托内部 native fallback) + 纯映射器 (ClipboardMeta/SyncError/ServerConfig) + DEBUG toggle + 8 单测 (flag 选后端 + 映射器)。
 - 路由读路径构造点：SyncEngine tick(484 + `inFlightClient`/3 helper 签名 `any SyncClipboardClienting`) + AppViewModel.refresh + ReceiveClipboardIntent。扩展/ConnectionTester/其余 put-file-history 站点留原生待 step 2/3。
-- 踩坑修复：`private typealias` 被 internal 方法签名引用 → 访问级别报错 → 改 internal typealias。dual-build 名字消歧 (native↔Rust 同名 ServerConfig/HistoryRecord)用 `#if canImport(UniClipboardModels)` 限定/裸名两分支。
+- 踩坑修复：`private typealias` 被 internal 方法签名引用 → 访问级别报错 → 改 internal typealias。dual-build 名字消歧 (native↔Rust 同名 ServerConfig/HistoryRecord)用 `#if canImport(ClipboardModels)` 限定/裸名两分支。
 - 无 Rust 改动 (client FFI 已 M2/M3 暴露 + 测过)；RustCore 已 staged 含完整 client binding，免重 stage。
 
 ### 测试结果
@@ -301,11 +301,11 @@
 - iOS(`mobile-sync-rust-core`，现 8 commit)：`188b991` feat: route sync-client read path through Rust core (goal-B M6-1 step 1)。未推送/未 PR。
 
 ### 下一步
-**📱 用户真机验** step 1：翻"同步客户端走 Rust 核心" toggle，扫码连一台 mobile-sync 服务器，Console(subsystem app.uniclipboard/category network) 看 `SyncClient.getClipboard via Rust core`，确认同步正常 (server-wins 拉取走 Rust)。验过后 **step 2**：put/file 端点（putClipboard/putFile/getFile）从 adapter 的 native fallback 搬到 Rust，仅动 `RustSyncClient.swift`，调用点不再改。
+**📱 用户真机验** step 1：翻"同步客户端走 Rust 核心" toggle，扫码连一台 mobile-sync 服务器，Console(subsystem app.clipboard/category network) 看 `SyncClient.getClipboard via Rust core`，确认同步正常 (server-wins 拉取走 Rust)。验过后 **step 2**：put/file 端点（putClipboard/putFile/getFile）从 adapter 的 native fallback 搬到 Rust，仅动 `RustSyncClient.swift`，调用点不再改。
 
 ## Session 2026-06-15 (cont. 5) — connect-uri 📱 真机验收通过
 
-用户真机（iPhone 16 Pro / iOS 27）翻 DEBUG toggle 扫码，Console 实测 `ConnectURIRouter: parsing connect URI via Rust core`（进程 UniClipboard，18:37:31），解析正常。connect-uri 首模块灰度端到端坐实（iOS A/B 单测 + 真机日志双证）。**M6-0b 完整闭环含 📱 验收**。清单 A1 标注 📱 通过。下一步 **M6-1**（M2/M3 client）。
+用户真机（iPhone 16 Pro / iOS 27）翻 DEBUG toggle 扫码，Console 实测 `ConnectURIRouter: parsing connect URI via Rust core`（进程 Clipboard，18:37:31），解析正常。connect-uri 首模块灰度端到端坐实（iOS A/B 单测 + 真机日志双证）。**M6-0b 完整闭环含 📱 验收**。清单 A1 标注 📱 通过。下一步 **M6-1**（M2/M3 client）。
 （注：sudo 需密码我无法非交互拉真机日志，用户经 Console.app 提供截图证据。）
 
 ## Session 2026-06-15 (cont. 4) — 真机 A/B 测试入口 + 修 canImport flaky 链接 bug
@@ -313,9 +313,9 @@
 ### 做了什么
 - 用户问"真机怎么测"。补齐真机测试所缺：① 翻 flag 的入口、② 分辨走哪条的观测、③ 应用内扫码也覆盖。
 - `SettingsView` 诊断 section：`#if DEBUG` toggle 绑 `MobileCoreFlags.shared.connectURIUsesRustCore`（自定义 Binding get/set）。
-- `ConnectURIRouter.parse`：每次 `log.notice`("via Rust core"/"via native Swift")，Console.app 可见 (subsystem app.uniclipboard/category network；native 与 Rust 结果字节相同，只能靠日志分辨)。
+- `ConnectURIRouter.parse`：每次 `log.notice`("via Rust core"/"via native Swift")，Console.app 可见 (subsystem app.clipboard/category network；native 与 Rust 结果字节相同，只能靠日志分辨)。
 - `QRScannerView`/`ServerQRPayload.parse`：`ConnectURI.parse` → `ConnectURIRouter.parse`（应用内扫码也走 flag）。
-- **修 canImport flaky 链接 bug**：首次 app clean build 前的增量 build 失败——`UniClipboardShare`(Share 扩展) 编了 `ConnectURIRouter.parseViaRustCore` 但扩展不链接 core → undefined symbol（`parseConnectUri`/`ConnectUriError`）。根因：`#if canImport(UniClipboardCore)` 在扩展里依 build 顺序非确定为真（模块在共享 build 目录可见）。**改 `#if UC_RUST_CORE`**：app target build settings(Debug+Release，pbxproj 2 处) + SwiftPM `UniClipboardNetwork` `.define`(hasRustCore)。写进 iOS CLAUDE.md。
+- **修 canImport flaky 链接 bug**：首次 app clean build 前的增量 build 失败——`ClipboardShare`(Share 扩展) 编了 `ConnectURIRouter.parseViaRustCore` 但扩展不链接 core → undefined symbol（`parseConnectUri`/`ConnectUriError`）。根因：`#if canImport(ClipboardCore)` 在扩展里依 build 顺序非确定为真（模块在共享 build 目录可见）。**改 `#if UC_RUST_CORE`**：app target build settings(Debug+Release，pbxproj 2 处) + SwiftPM `ClipboardNetwork` `.define`(hasRustCore)。写进 iOS CLAUDE.md。
 
 ### 测试结果
 | 检查 | 结果 |
@@ -333,7 +333,7 @@
 ## Session 2026-06-15 (cont. 3) — app 构建硬前置（CI + 本地文档）
 
 ### 做了什么
-- W1 让 `UniClipboardCore` product 成 app 硬前置（RustCore 不在盘 → SPM 解析失败）。处理这个前置：
+- W1 让 `ClipboardCore` product 成 app 硬前置（RustCore 不在盘 → SPM 解析失败）。处理这个前置：
 - `testflight.yml`（触发：tags:v* + workflow_dispatch）：加 `rust_core_ref` dispatch 输入（默认 main）；在 Select Xcode 之后、swift test 之前插 3 步——checkout `UniClipboard/UniClipboard`(path rust-core, ref=输入||main) + `rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios` + `UC_RUST_REPO=$GITHUB_WORKSPACE/rust-core bash Scripts/build-rust-core.sh`。置于 swift test 前 → CI 也跑 Rust A/B；置于 archive 前 → 链接满足。私有仓库需 checkout PAT（注释留）。
 - `CLAUDE.md` Commands 段：补 RustCore 前置说明 + stage 命令 + "swift test 不需要 (opt-in)、app build/archive 需要"。
 - YAML `ruby -ryaml` 校验 OK（无法本地跑 GH Actions；逻辑属标准 multi-repo checkout）。
@@ -348,22 +348,22 @@
 ## Session 2026-06-15 (cont. 2) — M6-0b Part 2：Xcode app-target 链接 Rust core（W1）
 
 ### 做了什么
-- 用户拍 **W1**：app 依赖本地 SPM 包的 `UniClipboardCore` product（router 无需改码，canImport 一套机制）。
-- 手改 `UniClipboard.xcodeproj/project.pbxproj`（objectVersion 77，已有 sentry remote SPM 可镜像）：6 处外科插入——XCLocalSwiftPackageReference "." + packageReferences + XCSwiftPackageProductDependency(UniClipboardCore) + app target packageProductDependencies + PBXBuildFile + app Frameworks files。用 `4DCAFE…` 唯一 UUID。`plutil -lint` OK，`xcodebuild -list` 解析出本地包。
+- 用户拍 **W1**：app 依赖本地 SPM 包的 `ClipboardCore` product（router 无需改码，canImport 一套机制）。
+- 手改 `Clipboard.xcodeproj/project.pbxproj`（objectVersion 77，已有 sentry remote SPM 可镜像）：6 处外科插入——XCLocalSwiftPackageReference "." + packageReferences + XCSwiftPackageProductDependency(ClipboardCore) + app target packageProductDependencies + PBXBuildFile + app Frameworks files。用 `4DCAFE…` 唯一 UUID。`plutil -lint` OK，`xcodebuild -list` 解析出本地包。
 - **发现并修**：首次 app 构建 BUILD FAILED——模拟器 slice 原 arm64-only，`generic/platform=iOS Simulator` 同时编 x86_64 链接失败。构建脚本加 `x86_64-apple-ios`（`rustup target add`）+ lipo 通用模拟器 slice（`ios-arm64_x86_64-simulator`，arm64+x86_64）。
 - 重建 xcframework（3 slice：ios-arm64 / ios-arm64_x86_64-simulator / macos-arm64，280M）+ 重 stage。
 
 ### 测试结果
 | 检查 | 结果 |
 |---|---|
-| `plutil -lint project.pbxproj` | OK；`xcodebuild -list` 解析出 `UniClipboardModels @ local` |
-| `xcodebuild -scheme UniClipboard -sdk iphonesimulator -destination generic/platform=iOS Simulator build`（禁签名） | **BUILD SUCCEEDED**；UniClipboardCore 编入 app 依赖图（25 处，canImport 真→router Rust 分支编入 app） |
+| `plutil -lint project.pbxproj` | OK；`xcodebuild -list` 解析出 `ClipboardModels @ local` |
+| `xcodebuild -scheme Clipboard -sdk iphonesimulator -destination generic/platform=iOS Simulator build`（禁签名） | **BUILD SUCCEEDED**；ClipboardCore 编入 app 依赖图（25 处，canImport 真→router Rust 分支编入 app） |
 | iOS `swift test`（xcframework 变后复验） | 220 XCTest + 24 Swift Testing 全绿 |
 | lipo -info 模拟器 slice | x86_64 arm64 ✓ |
 
 ### commit
 - Rust(`military-muscle`)：`b63412a04` build: universal simulator slice.
-- iOS(`mobile-sync-rust-core`)：`d01c6db` build: link UniClipboardCore into app target via local SPM package.
+- iOS(`mobile-sync-rust-core`)：`d01c6db` build: link ClipboardCore into app target via local SPM package.
 
 ### 下一步
 M6-0b 全闭环：connect-uri 已在真 app 可灰度（flag 默认 native，运行时翻 `MobileCoreFlags.connectURIUsesRustCore` 走 Rust）。⏳ 运行时翻转效果需模拟器 + QR/URL import 验（📱 留用户）。然后 **M6-1**：M2/M3 client 模块切换（client FFI 已暴露，但需补 client 的 router/A/B + 把 `SyncClipboardClient` 调用点路由）。注意 iOS 分支 `mobile-sync-rust-core`（现 4 commit）未推送/未 PR。
@@ -371,37 +371,37 @@ M6-0b 全闭环：connect-uri 已在真 app 可灰度（flag 默认 native，运
 ## Session 2026-06-15 (cont.) — M6-0b Part 1：运行时 toggle 路由生产代码
 
 ### 做了什么
-- recon：找 connect-uri 生产调用点（**仅 `AppViewModel.handleIncomingURL:476`**，app target）；App Group 约定（`SettingsStore.appGroupID`）；Shared/ 双构建 import 模式（`#if canImport(UniClipboardModels)`）。
+- recon：找 connect-uri 生产调用点（**仅 `AppViewModel.handleIncomingURL:476`**，app target）；App Group 约定（`SettingsStore.appGroupID`）；Shared/ 双构建 import 模式（`#if canImport(ClipboardModels)`）。
 - `Shared/Network/MobileCoreFlags.swift`：App Group UserDefaults A/B flag，默认 OFF=native，可注入测试；`connectURIUsesRustCore`。
-- `Shared/Network/ConnectURIRouter.swift`：按 flag 路由 native↔Rust；`#if canImport(UniClipboardCore)` 守卫（app 未链接 core 时只编译 native 分支，安全）；返回 native `Payload`/抛 native `ParseError`（Rust `ConnectPayload`/`ConnectUriError` 映射回原生类型 + 空 urls→[url] 回落）。
+- `Shared/Network/ConnectURIRouter.swift`：按 flag 路由 native↔Rust；`#if canImport(ClipboardCore)` 守卫（app 未链接 core 时只编译 native 分支，安全）；返回 native `Payload`/抛 native `ParseError`（Rust `ConnectPayload`/`ConnectUriError` 映射回原生类型 + 空 urls→[url] 回落）。
 - `AppViewModel.handleIncomingURL` 改用 `ConnectURIRouter.parse`（零行为变更：core 未链接/flag off 等价 native）。
-- `Package.swift`：`UniClipboardNetwork` 条件依赖 `UniClipboardCore`（让 router Rust 分支在 `swift test` 编译）。
-- `Tests/UniClipboardCoreTests/ConnectURIRouterTests.swift`：两 flag 态均匹配 native + flag 默认 OFF + 错误路由仍抛 native ParseError。
-- 关键约束确认：`Shared/` 被 SwiftPM 包 + Xcode app 单模块 **双编译**；`import UniClipboardModels` 必须 `#if canImport` 守卫（app 单模块下 false）。
+- `Package.swift`：`ClipboardNetwork` 条件依赖 `ClipboardCore`（让 router Rust 分支在 `swift test` 编译）。
+- `Tests/ClipboardCoreTests/ConnectURIRouterTests.swift`：两 flag 态均匹配 native + flag 默认 OFF + 错误路由仍抛 native ParseError。
+- 关键约束确认：`Shared/` 被 SwiftPM 包 + Xcode app 单模块 **双编译**；`import ClipboardModels` 必须 `#if canImport` 守卫（app 单模块下 false）。
 
 ### 测试结果
 | 检查 | 结果 |
 |---|---|
 | iOS `swift test` | **220 XCTest + 24 Swift Testing 全绿**（+3 router） |
-| `xcodebuild -scheme UniClipboard -sdk iphonesimulator build`（禁签名） | **BUILD SUCCEEDED**，0 error（router/flag 在 app target native 路径编译过） |
+| `xcodebuild -scheme Clipboard -sdk iphonesimulator build`（禁签名） | **BUILD SUCCEEDED**，0 error（router/flag 在 app target native 路径编译过） |
 
 ### commit
 - iOS(`mobile-sync-rust-core`)：`1e14670` feat: route connect-uri parsing through runtime-toggled Rust core shim.
 
 ### 下一步
-**M6-0b Part 2**：Xcode app-target 链接 Rust core（让 `canImport(UniClipboardCore)` 在 app 为真，toggle 真生效）。推荐 W1=app 依赖本地 SPM 包 `UniClipboardCore` product（router 无需改码）。**需用户在 Xcode 操作或授权我改 .pbxproj**；toggle 真机效果验证需模拟器跑 QR/URL import。
+**M6-0b Part 2**：Xcode app-target 链接 Rust core（让 `canImport(ClipboardCore)` 在 app 为真，toggle 真生效）。推荐 W1=app 依赖本地 SPM 包 `ClipboardCore` product（router 无需改码）。**需用户在 Xcode 操作或授权我改 .pbxproj**；toggle 真机效果验证需模拟器跑 QR/URL import。
 
 ## Session 2026-06-15 — M6 启动：bug 修复 + tracer-bullet（connect-uri 管道打通 + A/B）
 
 ### 做了什么
-- recon：通读迁移方案 §M6 + 清单 D/G–L/📱；摸 iOS repo（`/Users/mark/MyProjects/iOSApp/UniClipboard`，分支 main，零 Rust 痕迹）；摸 Rust 侧 FFI 暴露面（仅 `parse_connect_uri` + M2/M3 client；M1 codec/M4/M5 未暴露）；spike B1 demo（`ios-demo/main.swift`）；现有 `build-ios-xcframework.sh`。
+- recon：通读迁移方案 §M6 + 清单 D/G–L/📱；摸 iOS repo（`/Users/mark/MyProjects/iOSApp/Clipboard`，分支 main，零 Rust 痕迹）；摸 Rust 侧 FFI 暴露面（仅 `parse_connect_uri` + M2/M3 client；M1 codec/M4/M5 未暴露）；spike B1 demo（`ios-demo/main.swift`）；现有 `build-ios-xcframework.sh`。
 - 批量问 3 决策（AskUserQuestion + 推荐项），用户拍：① maybePush bug **现在就修两处**；② M6 走 **tracer-bullet**；③ feature-flag = **运行时 toggle**。
 - **bug 修复（两 repo）**：Rust `commit_push` 改走 `record_and_check`（漏设 LoopDetected 的根因）；Swift `maybePush` 对齐同文件 `consentPush` 的 `if tripped { breaker(); return }` 模式。push trip 现 stick `LoopDetected`（同 apply）。
 - **M6-0a tracer-bullet**：
   - iOS `Scripts/build-rust-core.sh`（`UC_RUST_REPO` → 跑 xcframework 构建 + stage 进 gitignored `RustCore/`）。
   - xcframework 加 macOS slice（`swift test` host 链接）。
   - `Package.swift` 用 `FileManager` 条件加 Rust-core targets（opt-in，不破坏默认 `swift test`）。
-  - `Tests/UniClipboardCoreTests` connect-uri A/B（native ↔ Rust FFI）。
+  - `Tests/ClipboardCoreTests` connect-uri A/B（native ↔ Rust FFI）。
 - **关键发现（tracer-bullet 核心产出）**：A/B 暴露 proto parse 3 处与原生防御式解析不符——`o` 非字符串值 serde **整条报错**（原生静默丢弃）、`urls` 不过滤非 http / 不丢非字符串条目。M0/M1 清单 A1 误标这些已 🔬 覆盖（实为 strict 解析）。用户拍 **修 proto 保全零回归** → `de_lenient_string_map`/`de_lenient_url_list`（镜像 Swift `as? String`/`compactMap`+trim+http 过滤），`[url]` 回落留 shim。
 - 文档：清单 A1 订正 + C 区 loop-guard 行更新（bug 已修）；迁移方案 M5 结果段标 M6 已修；planning 三文件推进。
 

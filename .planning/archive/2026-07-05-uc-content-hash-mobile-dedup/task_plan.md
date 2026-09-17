@@ -182,7 +182,7 @@ class of bug.
   is another; Phase 4 (uc-mobile FFI) is a third. Commit them separately (see prior plan's
   "提交拆分" section already agreed with user).
 - RN/TS-side integration (Phase 5's actual code change) happens in a SEPARATE repo
-  (`uniclipboard-android`), out of scope for this repo's implementation — only the handoff doc
+  (`clipboard-android`), out of scope for this repo's implementation — only the handoff doc
   is in scope here.
 - Update phase status as you progress: pending → in_progress → complete
 - Re-read this plan before major decisions

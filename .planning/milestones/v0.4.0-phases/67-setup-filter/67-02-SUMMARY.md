@@ -99,7 +99,7 @@ when the deferred peer discovery worker starts.
 - `cargo test -p uc-daemon --lib -- app::tests`: 8 passed (all new tests pass)
 - `cargo test -p uc-bootstrap --lib`: 20 passed
 - `cargo test -p uc-app -- setup`: 31 passed
-- `cargo check -p uc-daemon --bin uniclipboard-daemon`: 0 errors, 0 warnings
+- `cargo check -p uc-daemon --bin clipboard-daemon`: 0 errors, 0 warnings
 - Pre-existing `daemon_pid_guard_removes_pid_file_on_drop` is non-deterministic (unrelated to our changes)
 
 ## Deviations from Plan
@@ -140,6 +140,6 @@ None — all connections are fully wired. The complete Phase 67 flow is:
 - [x] `app.rs` select arm updates health to `ServiceHealth::Healthy` — line 292
 - [x] `app.rs` contains `pub async fn recover_encryption_session` — line 40
 - [x] `app.rs` `run()` method does NOT contain `recover_encryption_session` call
-- [x] `cargo check -p uc-daemon --bin uniclipboard-daemon` — 0 errors
+- [x] `cargo check -p uc-daemon --bin clipboard-daemon` — 0 errors
 - [x] `cargo test -p uc-daemon --lib` — 74 passed (1 pre-existing flaky pid test)
 - [x] Commit 1a8a9b08 exists

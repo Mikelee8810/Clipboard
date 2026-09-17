@@ -23,7 +23,7 @@
 
 **最小 scope**：`public_repo`
 
-**签发账号**：建议用专用 bot 账号（如 `uniclipboard-release-bot`），避免泄露等价于泄露个人账号。
+**签发账号**：建议用专用 bot 账号（如 `clipboard-release-bot`），避免泄露等价于泄露个人账号。
 
 **创建步骤**：
 1. 用 bot 账号登录 GitHub。
@@ -39,19 +39,19 @@
 
 ## HOMEBREW_CASK_TOKEN
 
-**用途**：向 fork（默认 `UniClipboard/homebrew-cask`）推送更新的 Cask 文件，然后调用 `gh pr create` 向 `Homebrew/homebrew-cask` 上游开 PR。
+**用途**：向 fork（默认 `Clipboard/homebrew-cask`）推送更新的 Cask 文件，然后调用 `gh pr create` 向 `Homebrew/homebrew-cask` 上游开 PR。
 
 **Token 类型**：fine-grained PAT（推荐）或 classic PAT
 
 **最小权限（fine-grained）**：
-- 授权仓库：`UniClipboard/homebrew-cask`（即你持有的 fork）
+- 授权仓库：`Clipboard/homebrew-cask`（即你持有的 fork）
 - Contents：Read and write
 - Pull requests：Read and write（用于向上游仓库开 PR 时的 `gh` 鉴权）
 
-**前置条件**：token 所属账号必须已 fork `Homebrew/homebrew-cask` 并命名为 `UniClipboard/homebrew-cask`（或修改 workflow 中的 `fork_repo` 默认值）。
+**前置条件**：token 所属账号必须已 fork `Homebrew/homebrew-cask` 并命名为 `Clipboard/homebrew-cask`（或修改 workflow 中的 `fork_repo` 默认值）。
 
 **创建步骤**：
-1. 确认 `UniClipboard/homebrew-cask` fork 存在（若不存在，用仓库 owner 账号 fork `Homebrew/homebrew-cask`）。
+1. 确认 `Clipboard/homebrew-cask` fork 存在（若不存在，用仓库 owner 账号 fork `Homebrew/homebrew-cask`）。
 2. 在同一账号下生成 fine-grained PAT，按上方权限配置，90 天过期。
 3. 在 `UniClipboard/UniClipboard` 仓库新建 secret `HOMEBREW_CASK_TOKEN`。
 
@@ -68,7 +68,7 @@
 **获取方式**：
 1. 登录 [chocolatey.org](https://chocolatey.org)，使用包维护者账号。
 2. 进入账号页面 → Account → API Key，复制 key。
-3. 若尚未在 Chocolatey 上架 `uniclipboard` 包，首次需要人工提交审核（moderation）；通过后后续版本可自动推送。
+3. 若尚未在 Chocolatey 上架 `clipboard` 包，首次需要人工提交审核（moderation）；通过后后续版本可自动推送。
 
 **创建步骤**：
 1. 在 `UniClipboard/UniClipboard` 仓库新建 secret `CHOCOLATEY_API_KEY`，值为上述 key。

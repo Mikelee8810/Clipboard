@@ -1,4 +1,4 @@
-//! `uniclip send` — clipboard dispatch via daemon (text/resend) or the unified
+//! `clip send` — clipboard dispatch via daemon (text/resend) or the unified
 //! engine (file-send, dev-tools only).
 //!
 //! ## Text / resend mode (always available)
@@ -31,7 +31,7 @@ use crate::ui;
 pub struct SendArgs {
     /// Plaintext to dispatch in **new-entry** mode. When `None` and
     /// neither `file` nor `resend` is set, the command reads from stdin
-    /// until EOF — handy for `echo hi | uniclip send` and the
+    /// until EOF — handy for `echo hi | clip send` and the
     /// dual-profile test recipe. Ignored when `resend` or `file` is set
     /// (clap enforces mutual exclusion at the parser layer).
     pub text: Option<String>,

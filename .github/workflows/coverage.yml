@@ -64,12 +64,12 @@ jobs:
 
       - name: Generate coverage report
         env:
-          # ADR-008 D13 added `externalBin: ["binaries/uniclipd"]` to
+          # ADR-008 D13 added `externalBin: ["binaries/clipd"]` to
           # tauri.conf.json, so `tauri_build::build()` requires and copies
-          # `src-tauri/binaries/uniclipd-<triple>` at compile time. Real bundles
+          # `src-tauri/binaries/clipd-<triple>` at compile time. Real bundles
           # stage it via prepare-daemon-sidecar.mjs (build.yml / alpha-build.yml),
           # but this job only measures coverage and never ships the sidecar — and
-          # the copy would clobber the workspace's own instrumented `uniclipd` bin
+          # the copy would clobber the workspace's own instrumented `clipd` bin
           # in the target dir, breaking `cargo llvm-cov`'s object scan. Override
           # the config to drop the sidecar for this build (tauri-build merges
           # TAURI_CONFIG as a JSON Merge Patch; an empty array replaces the list),

@@ -1,4 +1,4 @@
-package app.uniclipboard.engineprobe;
+package app.clipboard.engineprobe;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -12,7 +12,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 public final class ProbeReceiver extends BroadcastReceiver {
-    public static final String ACTION = "app.uniclipboard.engineprobe.COMMAND";
+    public static final String ACTION = "app.clipboard.engineprobe.COMMAND";
     public static final String EXTRA_COMMAND_BASE64 = "command_base64";
 
     @Override

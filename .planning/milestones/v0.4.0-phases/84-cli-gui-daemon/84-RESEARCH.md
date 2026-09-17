@@ -48,12 +48,12 @@ self.http.get(format!("{}{}", self.base_url, path))
 
 **Key characteristics:**
 
-- Reads token from `$XDG_RUNTIME_DIR/uniclipboard-daemon.token` (profile-aware)
+- Reads token from `$XDG_RUNTIME_DIR/clipboard-daemon.token` (profile-aware)
 - Sends raw bearer token with **every** request
 - **No PID registration** -- daemon cannot track which CLI process is making requests
 - **No rate limiting by PID** -- CLI is not in the PID whitelist
 - **No token expiry/renewal** -- bearer token is effectively permanent
-- Falls back to `UNICLIPBOARD_DAEMON_TOKEN_PATH` env var
+- Falls back to `CLIPBOARD_DAEMON_TOKEN_PATH` env var
 
 ### How GUI Currently Calls Daemon
 
@@ -250,7 +250,7 @@ Key: `JWT_GUI.jti != JWT_CLI.jti` -- different tokens, different PIDs. Daemon ma
 
 **What goes wrong:** Each CLI command invocation creates a new process, so session tokens cannot be cached in-process memory. If CLI exchanges a new JWT on every command, it registers a new PID each time (or uses the same PID, depending on how it's obtained).
 
-**Why it happens:** CLI is stateless between commands. Unlike the GUI which has a long-running process, each `uniclipboard-cli status` is a fresh invocation.
+**Why it happens:** CLI is stateless between commands. Unlike the GUI which has a long-running process, each `clipboard-cli status` is a fresh invocation.
 
 **How to avoid:** Use `std::process::id()` for PID. Cache the exchanged JWT in a temporary file with appropriate permissions. Consider `--no-cache` flag for scripts. The daemon's PID whitelist naturally handles this because each CLI invocation's PID is different -- but the rate limiter tracks by PID string, so every invocation creates a new rate limit window. This is actually fine since each command is independent.
 
@@ -266,7 +266,7 @@ Key: `JWT_GUI.jti != JWT_CLI.jti` -- different tokens, different PIDs. Daemon ma
 
 **What goes wrong:** If both GUI and CLI use the same PID or same token file location without profile awareness, they could share tokens.
 
-**Why it happens:** Profile awareness gaps. The `daemon.token` file already has profile suffixes (`uniclipboard-daemon.token`, `uniclipboard-daemon-a.token`, etc.), but the profile must be consistent.
+**Why it happens:** Profile awareness gaps. The `daemon.token` file already has profile suffixes (`clipboard-daemon.token`, `clipboard-daemon-a.token`, etc.), but the profile must be consistent.
 
 **How to avoid:** Both clients already use profile-aware path resolution via `UC_PROFILE` env var. The key is ensuring daemon-client and CLI use the same resolution logic. Currently they do (both call `resolve_daemon_token_path_from`).
 

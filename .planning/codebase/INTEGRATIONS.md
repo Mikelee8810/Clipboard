@@ -8,7 +8,7 @@
 
 - GitHub Releases API - Fetches update artifacts and manifests
   - SDK/Client: `tauri-plugin-updater` 2.9.0
-  - Manifest endpoint: `https://uniclipboard.github.io/UniClipboard/{channel}.json`
+  - Manifest endpoint: `https://clipboard.github.io/Clipboard/{channel}.json`
   - Channels: `stable`, release channels with version placeholders
   - Implementation: `src-tauri/crates/uc-tauri/src/commands/updater.rs`
   - Public key signing verification included in `tauri.conf.json`
@@ -28,13 +28,13 @@
 
 - Local filesystem only - No cloud storage integration
 - Paths managed via `dirs` crate for platform-specific locations:
-  - macOS: `~/Library/Application Support/com.uniclipboard/`
-  - Linux: `~/.local/share/com.uniclipboard/`
-  - Windows: `%LOCALAPPDATA%\com.uniclipboard\`
+  - macOS: `~/Library/Application Support/com.clipboard/`
+  - Linux: `~/.local/share/com.clipboard/`
+  - Windows: `%LOCALAPPDATA%\com.clipboard\`
 - Log files:
-  - macOS: `~/Library/Logs/com.uniclipboard/`
-  - Linux: `~/.local/share/com.uniclipboard/logs/`
-  - Windows: `%LOCALAPPDATA%\com.uniclipboard\logs/`
+  - macOS: `~/Library/Logs/com.clipboard/`
+  - Linux: `~/.local/share/com.clipboard/logs/`
+  - Windows: `%LOCALAPPDATA%\com.clipboard\logs/`
 
 **Caching:**
 
@@ -105,7 +105,7 @@
 **Hosting:**
 
 - No centralized backend server - Peer-to-peer architecture
-- Update artifacts: GitHub Pages (`uniclipboard.github.io`)
+- Update artifacts: GitHub Pages (`clipboard.github.io`)
 - Distribution: GitHub Releases
 
 **CI Pipeline:**

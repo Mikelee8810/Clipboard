@@ -83,7 +83,7 @@ Pipeline output flows: `SearchPipelineInput` → `SearchTextExtractor.extract()`
 |-------------|-------------|-------------|--------|---------|
 | SIDX-07 | 90-01 | Index schema includes `index_version` field to enable safe full rebuild | ✓ SATISFIED | `index_version TEXT NOT NULL` in `search_document` and `search_index_meta`; `CURRENT_INDEX_VERSION` constant; migration smoke test verifies |
 | SIDX-03 | 90-02 | Index terms stored as HMAC(search_key, normalized_token) — no plaintext on disk | ✓ SATISFIED | `term_tag()` uses `HmacSha256::new_from_slice(search_key.as_bytes())` and updates with `normalized_token.as_bytes()`; postings store 32-byte BLOB tags |
-| SIDX-04 | 90-02 | search_key derived from master key via HKDF, scoped per profile | ✓ SATISFIED | `HkdfSearchKeyDerivation` implements `SearchKeyDerivationPort`; uses `Hkdf::<Sha256>::new(Some(profile_id), master_key)` with info string `"uniclipboard-search-index/v1"` |
+| SIDX-04 | 90-02 | search_key derived from master key via HKDF, scoped per profile | ✓ SATISFIED | `HkdfSearchKeyDerivation` implements `SearchKeyDerivationPort`; uses `Hkdf::<Sha256>::new(Some(profile_id), master_key)` with info string `"clipboard-search-index/v1"` |
 | SIDX-05 | 90-02 | Text extracted from plain text, HTML, URL, file paths, and file names | ✓ SATISFIED | `SearchTextExtractor.extract()` handles all 5 content types with specific rules per type |
 | SIDX-06 | 90-02 | Tokenization uses word-boundary splitting for Latin and bigram generation for CJK | ✓ SATISFIED | `SearchTokenizer` applies unicode_words() for Latin, CJK bigrams via `cjk_bigrams()`; plus separator and camelCase splitting |
 

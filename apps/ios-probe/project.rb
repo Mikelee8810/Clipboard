@@ -24,7 +24,7 @@ source_group.new_file("uc_ios_probe.h")
 
 target.build_configurations.each do |config|
   settings = config.build_settings
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = "app.uniclipboard.EngineProbe"
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = "app.clipboard.EngineProbe"
   settings["DEVELOPMENT_TEAM"] = "8XG39X5CL8"
   settings["CODE_SIGN_STYLE"] = "Automatic"
   settings["SWIFT_VERSION"] = "5.0"

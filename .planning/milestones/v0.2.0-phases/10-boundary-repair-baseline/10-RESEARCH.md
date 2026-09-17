@@ -6,7 +6,7 @@
 
 ## Summary
 
-This phase repairs three categories of dependency-direction violations in the UniClipboard hexagonal architecture: (1) command-layer code bypassing use cases via public `runtime.deps` access, (2) a platform adapter (`uc-platform`) directly calling an infrastructure crate (`uc-infra`) for streaming decode, and (3) non-domain port traits living in `uc-core` when they belong in `uc-platform`. All violations are structural and can be enforced at compile time by making fields private and removing Cargo dependencies.
+This phase repairs three categories of dependency-direction violations in the Clipboard hexagonal architecture: (1) command-layer code bypassing use cases via public `runtime.deps` access, (2) a platform adapter (`uc-platform`) directly calling an infrastructure crate (`uc-infra`) for streaming decode, and (3) non-domain port traits living in `uc-core` when they belong in `uc-platform`. All violations are structural and can be enforced at compile time by making fields private and removing Cargo dependencies.
 
 The codebase is well-organized into workspace crates (`uc-core`, `uc-infra`, `uc-app`, `uc-platform`, `uc-tauri`), and the existing patterns (port injection via constructor, `runtime.usecases()` accessor) provide clear templates for the fixes. The primary enforcement mechanism is the Rust compiler: once `deps` is private and `uc-infra` is removed from `uc-platform/Cargo.toml`, regressions are impossible.
 

@@ -1,12 +1,12 @@
 # mobile-sync SSE 推送设计（前台事件驱动取代轮询）
 
-状态：**grilling 逐分支拍板 + codex 10 轮对抗评审全部内嵌（2026-06-30）**——10 轮共 29 条评审意见独立核查后全部采纳、0 驳回（F-6 配置归属升级用户拍板），见各节「评审修正」标注 · 末轮仅剩 2 条 MINOR 一致性项 (已修),评审已收敛至微观一致性 · **P0(服务端)+ P1(uc-mobile 客户端) 已实现 (2026-07-03，分支 `sse`,3 个 atomic commit)**,详情见 §8 分阶段实现计划的行内标注;P2/P3(Android/TS) 交接给 `uniclipboard-android` 仓库
+状态：**grilling 逐分支拍板 + codex 10 轮对抗评审全部内嵌（2026-06-30）**——10 轮共 29 条评审意见独立核查后全部采纳、0 驳回（F-6 配置归属升级用户拍板），见各节「评审修正」标注 · 末轮仅剩 2 条 MINOR 一致性项 (已修),评审已收敛至微观一致性 · **P0(服务端)+ P1(uc-mobile 客户端) 已实现 (2026-07-03，分支 `sse`,3 个 atomic commit)**,详情见 §8 分阶段实现计划的行内标注;P2/P3(Android/TS) 交接给 `clipboard-android` 仓库
 关联：
 - 服务端 mobile-sync HTTP 在 `crates/uc-webserver/src/mobile_lan/`（axum 0.7，固定端口 42720，Basic Auth）。
 - 事件源出口已核实：`AdvanceActiveClipboardPort::advance(state) -> Ok(bool)`（issue #1017 ActiveClipboardState LWW 寄存器），adapter 唯一实现在 `crates/uc-infra/src/db/repositories/active_clipboard_register_repo.rs:44`。
 - 身份契约已核实：`ActiveClipboardState.snapshot_hash` 即 `"blake3v1:<hex>"` 内容身份（`crates/uc-core/src/clipboard/active_state.rs:19-22`），等于 `GET /SyncClipboard.json` 的 `contentId` 字段，**不是** `hash` 字段（后者随服务字节变，见 `crates/uc-webserver/src/mobile_lan/routes/sync_doc.rs:56-72`）。
 - contentId 去重契约：`.planning/2026-06-23-contentid-mobile-dedup-design.md`。
-- 客户端：`crates/uc-mobile-proto/src/sync_engine.rs` reducer + `crates/uc-mobile/src/client.rs`（reqwest，经 UniFFI），TS 侧 `uniclipboard-android`（`src/services/SyncEngine.ts`、`src/services/ClipboardMonitor.ts`）。
+- 客户端：`crates/uc-mobile-proto/src/sync_engine.rs` reducer + `crates/uc-mobile/src/client.rs`（reqwest，经 UniFFI），TS 侧 `clipboard-android`（`src/services/SyncEngine.ts`、`src/services/ClipboardMonitor.ts`）。
 - 上游协议背景：mobile-sync 对外是 SyncClipboard 兼容协议（`GET/PUT /SyncClipboard.json`、`/file/{name}`），SSE 是 `/api` 命名空间下的私有扩展。
 
 > **一句话**：SSE 是「门铃」，`GET /SyncClipboard.json` 才是「门」。SSE 只送信号，不送内容；内容与去重决策仍归现有 reducer。
@@ -56,7 +56,7 @@
 - **后台不在本期范围（已拍板）。** `background` 断 SSE，后台同步逻辑（5s tick + sync-on-resume）原样保留。OS 回收后台长连接是平台限制；后台实时唯一省电路径是系统推送（APNs/FCM，需出网），后续独立议题。
 - **向后兼容。** SSE 是纯新增端点：旧手机不调用 → 桌面零影响；旧桌面无端点 → 手机 feature-detect 失败回退轮询；第三方 SyncClipboard 客户端不受影响。
 - **鉴权复用 Basic Auth，但连接需持续有效（评审修正 F-8 + round 2 强化）。** 建连时过 middleware Basic Auth；长连接建立后凭据可能失效（注销设备 / 改密码 / 改用户名），故 handler 须在连接级 **周期性重跑 Basic Auth 校验**（**mobile-sync 主 / LAN 开关的关闭不在此列——只由 lifecycle cancel 信号处理，评审修正 round 10 F-1**）——仅查「设备是否存在」不够，改密码后设备记录仍在、"存在"仍为真，必须重跑校验才能识别凭据轮换（见 §4.4）。
-- **不引入 SignalR。** `uniclipboard-android` 的 `@microsoft/signalr` 从未使用；落地后清理。
+- **不引入 SignalR。** `clipboard-android` 的 `@microsoft/signalr` 从未使用；落地后清理。
 
 ---
 
@@ -234,7 +234,7 @@ impl MobileSyncClient {
 
 - 桌面：纯新增端点，**无条件注册**（评审修正 F-6），旧手机不调用 → 零影响；第三方 SyncClipboard 客户端不受影响；**不改桌面 settings 模型**（省去 DTO/OpenAPI/UI/迁移）。
 - 手机：feature-detect 自动回退轮询；是否启用 SSE 由 RN 本地设置控制，可平滑灰度。
-- 清理项：移除 `uniclipboard-android` 未使用的 `@microsoft/signalr` 依赖。
+- 清理项：移除 `clipboard-android` 未使用的 `@microsoft/signalr` 依赖。
 
 ---
 
@@ -277,11 +277,11 @@ impl MobileSyncClient {
   - **独立 reqwest 客户端无 read idle timeout（评审修正 F-2）**——写进验收：连接能稳定撑过多个心跳周期不被 idle 超时打断。 ✅ `build_sse_http_client` 只设 connect timeout，不设 read timeout;`heartbeat_timeout` 做成显式参数 (测试传短值验证超时路径，不必真等 50s)。
   - **自签证书 SSE 测试（评审修正 round 7，从 P0 移入；round 8 F-2 强化）**：mock HTTPS SSE server，验证 SSE reqwest 实例从 **可读 trust config 值** 重建、继承 trust-insecure-cert 设置、能连上不静默失败。须在 **toggle `set_trust_insecure_cert` 之后** 测，确认重建用更新后的值（不只构造时）。P0 桌面 LAN 是 HTTP-only，该测试属客户端侧。 ⚠️ **未完成**——已修 `trust_insecure_cert` 可读性 (新增 `AtomicBool` 字段随 `set_trust_insecure_cert` 同步) 并有单测 (`trust_insecure_cert_flag_tracks_the_toggle`) 钉死该值本身的同步，但没有起真正的自签证书 TLS mock server 做端到端握手验证——需要 `rcgen` 之类依赖搭 TLS listener，评估后判断超出本轮剩余精力，交接给下一轮。
   - 真机验证 callback 线程模型（尤其 iOS）。 ⚠️ **未完成**——本仓库无法自动化，交接给移动端团队 (§9 风险 4)。
-- **P2 客户端 TS 接入（uniclipboard-android）**
+- **P2 客户端 TS 接入（clipboard-android）**
   - epoch 绑定的并发协调状态机（F-7）；`on_update` content_id 短路（F-1）；`on_resync`/`on_hello` 无条件拉；退避重连 + feature-detect 回退；30s 兜底 tick；生命周期 active/background 建/拆。上行原样不动。RN 本地 SSE 开关（F-6）。
 - **P3 清理**：移除 `@microsoft/signalr`。
 
-P0（服务端）+ P1（`uc-mobile` 客户端，`crates/uc-mobile`）都在 **本仓库** 闭环；P2–P3（Android/TS 集成）在 `uniclipboard-android` 仓库（评审修正 round 7）。
+P0（服务端）+ P1（`uc-mobile` 客户端，`crates/uc-mobile`）都在 **本仓库** 闭环；P2–P3（Android/TS 集成）在 `clipboard-android` 仓库（评审修正 round 7）。
 
 ---
 

@@ -5,7 +5,7 @@
 
 **Date:** 2026-03-28
 **Phase:** 68-adopt-tauri-sidecar-for-daemon
-**Areas discussed:** Sidecar vs 自定义打包, 开发构建自动化, CLI 路径解析策略, stdin pipe 兼容性
+**Areas discussed:** Sidecar vs 自定义打包，开发构建自动化，CLI 路径解析策略，stdin pipe 兼容性
 
 ---
 
@@ -54,7 +54,7 @@
 | 抽取共享解析模块          | 顺便把路径解析抽到 uc-daemon-client               |          |
 
 **User's choice:** 保持现状，后续 phase 处理
-**Notes:** User envisions future `brew install uniclipboard` with single command entry point. Daemon invisible to users. This is out of Phase 68 scope.
+**Notes:** User envisions future `brew install clipboard` with single command entry point. Daemon invisible to users. This is out of Phase 68 scope.
 
 ---
 
@@ -79,5 +79,5 @@
 
 ## Deferred Ideas
 
-- Unified CLI distribution via Homebrew (single `uniclipboard` command)
+- Unified CLI distribution via Homebrew (single `clipboard` command)
 - CLI daemon path resolution unification

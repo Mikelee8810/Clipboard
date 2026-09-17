@@ -1,13 +1,13 @@
 ---
-title: 自建 UniClipboard 中继
-description: 使用 UniClipboard 官方中继镜像完成部署，并让自己的设备接入。
+title: 自建 Clipboard 中继
+description: 使用 Clipboard 官方中继镜像完成部署，并让自己的设备接入。
 ---
 
-UniClipboard 可以使用你自己管理的中继，而不是默认公共中继。推荐方案是通过 Docker
+Clipboard 可以使用你自己管理的中继，而不是默认公共中继。推荐方案是通过 Docker
 Compose 部署官方 `ghcr.io/uniclipboard/relay` 镜像，由 Caddy 自动提供 HTTPS，中继本身只在
 容器内部网络开放。
 
-每台设备都需要填写中继地址和同一个访问令牌。UniClipboard 的后台服务重启后，新配置才会生效。
+每台设备都需要填写中继地址和同一个访问令牌。Clipboard 的后台服务重启后，新配置才会生效。
 
 ## 中继的作用
 
@@ -15,7 +15,7 @@ Compose 部署官方 `ghcr.io/uniclipboard/relay` 镜像，由 Caddy 自动提�
 时间，但无法读取剪贴板内容、口令、空间 MasterKey 或成员列表。
 
 自建中继可以让你控制服务器的位置、可用性和带宽，但不能替代设备发现。首次配对仍会使用
-UniClipboard 的 rendezvous 服务。
+Clipboard 的 rendezvous 服务。
 
 完整的安全说明见[配对与同步：中继能看到什么](./pairing#中继看到的-vs-对端看到的)。
 
@@ -40,8 +40,8 @@ UniClipboard 的 rendezvous 服务。
 先把 `relay.example.com` 换成你的真实域名，再执行：
 
 ```bash
-mkdir -p uniclipboard-relay
-cd uniclipboard-relay
+mkdir -p clipboard-relay
+cd clipboard-relay
 umask 077
 printf 'RELAY_DOMAIN=relay.example.com\nUC_RELAY_TOKEN=%s\n' \
   "$(openssl rand -hex 32)" > .env
@@ -118,7 +118,7 @@ docker compose logs -f relay
 
 按 `Ctrl+C` 只会停止查看日志，容器会继续运行。
 
-## 接入 UniClipboard
+## 接入 Clipboard
 
 在每台设备上重复以下步骤：
 
@@ -128,7 +128,7 @@ docker compose logs -f relay
 4. 点击 **测试可用性**。
 5. 点击 **保存中继节点**，出现提示后再点 **立即重启**。
 
-UniClipboard 不会再次显示已经保存的令牌。需要更换时，必须明确输入新令牌并重新保存。
+Clipboard 不会再次显示已经保存的令牌。需要更换时，必须明确输入新令牌并重新保存。
 
 <Callout type="info">
   自定义中继不会在设备间同步。每台设备都要分别配置地址和令牌。删除全部自定义中继即可恢复使用默认
@@ -146,7 +146,7 @@ docker compose ps
 ```
 
 如果希望每次部署都使用完全相同的镜像，可以在 `.env` 中把 `RELAY_IMAGE` 设为
-[UniClipboard 中继镜像页面](https://github.com/UniClipboard/relay/pkgs/container/relay)提供的版本标签或
+[Clipboard 中继镜像页面](https://github.com/UniClipboard/relay/pkgs/container/relay)提供的版本标签或
 镜像摘要：
 
 ```dotenv
@@ -202,7 +202,7 @@ rules:
 
 请把下面三项结合起来检查：
 
-- **可用性测试**：地址和令牌能通过 UniClipboard 的 **测试可用性**。
+- **可用性测试**：地址和令牌能通过 Clipboard 的 **测试可用性**。
 - **服务器日志**：设备连接和同步时运行 `docker compose logs -f relay`。
 - **端到端测试**：让两台已配对设备处在无法直接连接的网络中完成同步，同时确认服务器出现中继活动。
 
@@ -215,12 +215,12 @@ rules:
 | 可用性测试提示鉴权失败                | 从 `.env` 复制完全一致的令牌。如果服务器令牌已经更换，每台设备都要更新。                      |
 | 本机能访问 `/healthz`，但域名无法访问 | 检查反向代理目标、HTTPS 证书、防火墙和 DNS 记录。                                             |
 | 已有反向代理拒绝中继连接              | 确认它支持 WebSocket 升级，并保留 `Authorization` 请求头。                                    |
-| UniClipboard 仍在使用默认中继         | 保存自定义中继后选择 **立即重启**，重启前配置不会生效。                                       |
+| Clipboard 仍在使用默认中继         | 保存自定义中继后选择 **立即重启**，重启前配置不会生效。                                       |
 | 拉取 `latest` 后看不到变化            | 同时执行 `docker compose pull` 和 `docker compose up -d`，再查看 `docker compose ps`。        |
 | 中继延迟很高                          | 选择一处到所有参与设备都有良好直连线路的服务器区域。                                          |
 
 ## 更多资料
 
-- [UniClipboard 中继源码与部署说明](https://github.com/UniClipboard/relay)
-- [UniClipboard 中继镜像](https://github.com/UniClipboard/relay/pkgs/container/relay)
+- [Clipboard 中继源码与部署说明](https://github.com/UniClipboard/relay)
+- [Clipboard 中继镜像](https://github.com/UniClipboard/relay/pkgs/container/relay)
 - [iroh 中继概念](https://docs.iroh.computer/concepts/relays)

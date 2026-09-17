@@ -1,4 +1,4 @@
-//! TestDaemon — spawn, health-wait, and kill a `uniclipd` process for testing.
+//! TestDaemon — spawn, health-wait, and kill a `clipd` process for testing.
 
 use std::fs::OpenOptions;
 use std::path::PathBuf;
@@ -28,7 +28,7 @@ struct DaemonConn {
     started_at_ms: u64,
 }
 
-/// Manages a `uniclipd` daemon process for a single test.
+/// Manages a `clipd` daemon process for a single test.
 pub struct TestDaemon {
     child: Option<Child>,
     pub profile: TestProfile,
@@ -95,7 +95,7 @@ impl TestDaemon {
         let mut command = Command::new(binary);
         command
             .env("UC_PROFILE", &profile.name)
-            .env("UNICLIPBOARD_ENV", "development")
+            .env("CLIPBOARD_ENV", "development")
             .env("UC_DAEMON_RUN_MODE", "server")
             .env("RUST_LOG", rust_log)
             .stdout(log)

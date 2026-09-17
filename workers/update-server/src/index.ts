@@ -1,5 +1,5 @@
 /**
- * UniClipboard 更新服务
+ * Clipboard 更新服务
  *
  * 基于 Cloudflare Worker，从 R2 派发更新 manifest 与二进制产物。
  *
@@ -270,7 +270,7 @@ function inferContentType(filename: string): string {
 }
 
 function handleHealth(): Response {
-  return jsonResponse({ status: 'ok', service: 'uniclipboard-update-server' }, 200)
+  return jsonResponse({ status: 'ok', service: 'clipboard-update-server' }, 200)
 }
 
 // 允许标准 semver（如 1.2.3、1.2.3-alpha.4）以及任意安全的路径段字符；

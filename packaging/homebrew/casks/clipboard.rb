@@ -1,13 +1,13 @@
-cask "uniclipboard" do
+cask "clipboard" do
   arch arm: "aarch64", intel: "x64"
 
   version "__VERSION__"
   sha256 arm:   "__SHA256_ARM__",
          intel: "__SHA256_INTEL__"
 
-  url "https://github.com/UniClipboard/UniClipboard/releases/download/v#{version}/UniClipboard_#{version}_#{arch}.dmg",
+  url "https://github.com/UniClipboard/UniClipboard/releases/download/v#{version}/Clipboard_#{version}_#{arch}.dmg",
       verified: "github.com/UniClipboard/UniClipboard/"
-  name "UniClipboard"
+  name "Clipboard"
   desc "Cross-device clipboard syncing tool"
   homepage "https://www.uniclipboard.app/"
 
@@ -18,11 +18,11 @@ cask "uniclipboard" do
 
   depends_on macos: :monterey
 
-  app "UniClipboard.app"
+  app "Clipboard.app"
 
   zap trash: [
-    "~/Library/Application Support/app.uniclipboard.desktop",
-    "~/Library/Caches/app.uniclipboard.desktop",
-    "~/Library/Logs/app.uniclipboard.desktop",
+    "~/Library/Application Support/app.clipboard.desktop",
+    "~/Library/Caches/app.clipboard.desktop",
+    "~/Library/Logs/app.clipboard.desktop",
   ]
 end

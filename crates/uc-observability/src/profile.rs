@@ -1,4 +1,4 @@
-//! Log profile selection and filter construction for UniClipboard.
+//! Log profile selection and filter construction for Clipboard.
 //!
 //! Provides the `LogProfile` enum for selecting logging verbosity profiles
 //! via the `UC_LOG_PROFILE` environment variable, with build-type defaults.
@@ -19,7 +19,7 @@ pub enum LogProfile {
     Dev,
     /// Production profile: info-level base
     Prod,
-    /// User-facing debug profile: production base with UniClipboard targets raised to debug.
+    /// User-facing debug profile: production base with Clipboard targets raised to debug.
     Debug,
     /// Clipboard debugging profile: info-level base with clipboard targets raised to debug/trace
     DebugClipboard,
@@ -61,7 +61,7 @@ const NOISE_FILTERS: &[&str] = &[
     // panic —— 因为 panic 在第三方 crate 的 trace! 求值阶段,我们栈上没有任何
     // uc_* 帧,只能在拿到 trace event 前就把该 target 截掉。上游跟踪
     // n0-computer/net-tools#148;在上游 release 修复前用 EnvFilter 硬上限堵
-    // trace。受影响 Sentry: UNICLIPBOARD-RUST-18 (Windows) / -S (macOS),
+    // trace。受影响 Sentry: CLIPBOARD-RUST-18 (Windows) / -S (macOS),
     // 同根因被按 OS 拆组。
     "netwatch::udp=debug",
     // QUIC connection state machine internals. Cap at WARN: silences the

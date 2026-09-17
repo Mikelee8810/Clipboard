@@ -33,7 +33,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORKSPACE_ROOT="$REPO_ROOT"
 TIMEOUT_SECS="${TIMEOUT_SECS:-10}"
-LOG_DIR="$(mktemp -d -t uniclip-x11-e2e.XXXXXX)"
+LOG_DIR="$(mktemp -d -t clip-x11-e2e.XXXXXX)"
 WATCH_LOG="$LOG_DIR/x11_watch.log"
 TEST_LOG="$LOG_DIR/x11_clipboard_test.log"
 WATCH_PID=""

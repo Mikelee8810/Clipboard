@@ -124,7 +124,7 @@ fn classify_display_session(
 
 #[cfg(target_os = "macos")]
 fn dev_env_forces_file_storage() -> bool {
-    std::env::var("UNICLIPBOARD_ENV")
+    std::env::var("CLIPBOARD_ENV")
         .map(|value| value == "development")
         .unwrap_or(false)
 }

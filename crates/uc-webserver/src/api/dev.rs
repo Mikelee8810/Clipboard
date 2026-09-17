@@ -32,10 +32,10 @@ use crate::security::claims::{SessionTokenClaims, LEVEL_L2, REFRESH_AT_SECS, TTL
 
 /// Check whether dev auth bypass is enabled at runtime.
 ///
-/// Enabled when `UNICLIPBOARD_ENV=development` — this is set by the CLI
+/// Enabled when `CLIPBOARD_ENV=development` — this is set by the CLI
 /// when `--dev` is passed, and propagated to the daemon process.
 fn is_dev_bypass_enabled() -> bool {
-    std::env::var("UNICLIPBOARD_ENV")
+    std::env::var("CLIPBOARD_ENV")
         .map(|v| v.trim().to_lowercase() == "development")
         .unwrap_or(false)
 }

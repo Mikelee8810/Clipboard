@@ -95,7 +95,7 @@ it.each([QuickPanelSection, ShortcutsSection])(
     await waitFor(() =>
       expect(screen.queryByText('recorded-global.toggleQuickPanel')).not.toBeInTheDocument()
     )
-    expect(screen.getByText('uniclipboard --quick-panel')).toBeInTheDocument()
+    expect(screen.getByText('clipboard --quick-panel')).toBeInTheDocument()
     expect(screen.getByText('settings.sections.quickPanel.compositorShortcuts')).toBeInTheDocument()
   }
 )

@@ -39,7 +39,7 @@ advertise 私有 target(如 `chromium/x-source-url`),`text/plain` 晚几十~几�
 | 文件 | 作用 |
 | --- | --- |
 | `lazy_owner.py` | python-xlib 写的「慢供数」X11 selection owner:own CLIPBOARD，先只 advertise 私有 `chromium/x-source-url`,`DELAY_MS` 后才补 `UTF8_STRING` + `text/plain;charset=utf-8`,**补时不重新 own**。Chrome lazy 供数的最小模型。 |
-| `repro.sh` | 编排：起 `uniclip probe watch` → 起 `lazy_owner.py <DELAY>` → 等待 → 收尾 → 判定捕获/丢失。无参跑默认矩阵，或传 `<DELAY_MS>:<WAIT_S>`。 |
+| `repro.sh` | 编排：起 `clip probe watch` → 起 `lazy_owner.py <DELAY>` → 等待 → 收尾 → 判定捕获/丢失。无参跑默认矩阵，或传 `<DELAY_MS>:<WAIT_S>`。 |
 
 ## 运行环境
 
@@ -47,7 +47,7 @@ advertise 私有 target(如 `chromium/x-source-url`),`text/plain` 晚几十~几�
   `xwayland-satellite`** 提供的 `:0`(无需 X auth,`Gdk.Display.open(":0")` 直连)。
   GNOME-on-Wayland 本身也是经 XWayland 桥跑同一条 `x11/reader.rs`,所以同样能复现。
 - `python3-xlib`(开发机为 0.33)。
-- debug 版 `uniclip`,带 `dev-tools` feature:
+- debug 版 `clip`,带 `dev-tools` feature:
 
   ```bash
   cargo build -p uc-cli --features dev-tools
@@ -70,10 +70,10 @@ advertise 私有 target(如 `chromium/x-source-url`),`text/plain` 晚几十~几�
 .planning/debug/issue-1029-x11-lazy-clipboard/repro.sh 1000:5 3500:6
 
 # repo 路径 / 二进制路径可覆盖
-UC_REPO=~/projects/UniClipboard UC_PROBE=/path/to/uniclip repro.sh
+UC_REPO=~/projects/Clipboard UC_PROBE=/path/to/clip repro.sh
 ```
 
-**判定信号**:`uniclip probe watch` 会为每次捕获的 snapshot 打印自己的 `event #N` 行;
+**判定信号**:`clip probe watch` 会为每次捕获的 snapshot 打印自己的 `event #N` 行;
 `lazy_owner.py` 供的就是固定 URL `http://example.com/lazy-chrome-url-AABBCC`,所以日志里
 **出现该 URL = 捕获成功，没出现 = 丢失**。注意 `probe` **不输出** `uc_platform` 的
 tracing 日志，所以 grep `clipboard change lost` / `recovered after retry` 是抓不到的，

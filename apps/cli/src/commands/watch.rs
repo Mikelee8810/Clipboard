@@ -1,4 +1,4 @@
-//! `uniclip watch` — foreground inbound clipboard observer
+//! `clip watch` — foreground inbound clipboard observer
 //! (Slice 2 Phase 2 · T11).
 //!
 //! Self-contained direct-mode command (no daemon). The backing

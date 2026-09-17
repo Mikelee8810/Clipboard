@@ -166,7 +166,7 @@ export const commands = {
 	timestamp: number,
 } | null) => typedError<null, CommandError>(__TAURI_INVOKE("restart_app", { trace })),
 	/**
-	 *  Restart only the `uniclipd` daemon process without touching the GUI.
+	 *  Restart only the `clipd` daemon process without touching the GUI.
 	 * 
 	 *  用于 network 等 bind-time 设置变更后：daemon 侧的 iroh endpoint 在进程
 	 *  启动时绑定一次，运行时无法热更新，所以需要重启 daemon 进程让新配置生效。

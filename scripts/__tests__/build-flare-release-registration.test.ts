@@ -15,7 +15,7 @@ describe('buildFlareReleaseRegistration', () => {
   it('maps the selected updater artifacts without promoting a channel', () => {
     const artifactsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'flare-registration-'))
     tempDirs.push(artifactsDir)
-    fs.writeFileSync(path.join(artifactsDir, 'UniClipboard.app.tar.gz'), 'artifact')
+    fs.writeFileSync(path.join(artifactsDir, 'Clipboard.app.tar.gz'), 'artifact')
 
     const registration = buildRegistration({
       version: '1.2.3-alpha.1',
@@ -26,7 +26,7 @@ describe('buildFlareReleaseRegistration', () => {
         platforms: {
           'darwin-aarch64': {
             signature: 'signed',
-            url: 'https://release.uniclipboard.app/artifacts/v1.2.3-alpha.1/UniClipboard.app.tar.gz',
+            url: 'https://release.uniclipboard.app/artifacts/v1.2.3-alpha.1/Clipboard.app.tar.gz',
           },
         },
       },
@@ -45,8 +45,8 @@ describe('buildFlareReleaseRegistration', () => {
       artifacts: [
         {
           platform: 'darwin-aarch64',
-          filename: 'UniClipboard.app.tar.gz',
-          r2Key: 'artifacts/v1.2.3-alpha.1/UniClipboard.app.tar.gz',
+          filename: 'Clipboard.app.tar.gz',
+          r2Key: 'artifacts/v1.2.3-alpha.1/Clipboard.app.tar.gz',
           size: 8,
           signature: 'signed',
         },

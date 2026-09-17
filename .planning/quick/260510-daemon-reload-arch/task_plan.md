@@ -1,7 +1,7 @@
 # Daemon reload & 架构分层重构 — task_plan
 
 > 入会上下文：用户在 mobile_sync 配置变更后点"重启" → daemon panic
-> (`JoinHandle polled after completion`)。Sentry issue UNICLIPBOARD-RUST-4，
+> (`JoinHandle polled after completion`)。Sentry issue CLIPBOARD-RUST-4，
 > Windows 上 3 次重现，release `uc-bootstrap@0.7.0`。
 >
 > 本次会话从修 panic 开始，沿因果链一路上溯到一个更深的架构错位：
@@ -192,7 +192,7 @@ daemon-lifecycle（每次 daemon start/stop 重建）：
   `cargo expand` 检查 daemon path 不再装配 facade
 - [ ] **daemon reload 不重建 sqlite pool**：在 reload 前后插探针，
   `Pool::state` 的 `&self` 地址保持稳定
-- [ ] **standalone daemon binary 仍可独立运行**：`uniclip daemon` 走
+- [ ] **standalone daemon binary 仍可独立运行**：`clip daemon` 走
   原 wire 一次 → 跑 daemon-lifecycle 路径
 - [ ] **现有功能 0 回归**：reload 后 mobile_sync 注册 / sync /
   clipboard sync 全部正常；剪贴板 history 列表跨 reload 不丢

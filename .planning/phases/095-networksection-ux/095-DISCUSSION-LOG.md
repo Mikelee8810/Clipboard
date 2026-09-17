@@ -29,7 +29,7 @@
 |--------|-------------|----------|
 | 复用 shadcn Alert | 现有 src/components/ui/alert.tsx；样式与其它 Settings 区块一致；成本最低、跳动最少 | |
 | 写专用 RestartBanner | src/components/setting/RestartBanner.tsx 独立组件，样式定制；适合后续复用（Phase 96/97 可能也需要重启提示），但要多建一个组件 | ✓ |
-| Sonner toast 带 duration:Infinity | 与 ROADMAP 「非 toast」要求字面冲突 —— 用户心智里「toast」= 浮在右上角可被点掉的短提示；不推荐但技术上可行 | |
+| Sonner toast 带 duration:Infinity | 与 ROADMAP「非 toast」要求字面冲突 —— 用户心智里「toast」= 浮在右上角可被点掉的短提示；不推荐但技术上可行 | |
 
 **User's choice:** 写专用 RestartBanner
 **Notes:** 选定独立组件以便后续 Phase 96/97 复用。
@@ -55,7 +55,7 @@
 |--------|-------------|----------|
 | Switch + 旁 Badge "Pending" | Switch 选中状态不变（跟随用户的选择），同时右侧出现一个 Badge（如 "重启后生效"）。Badge 组件已有；表达明显。需 Settings 设值 vs daemon 实际 bind 状态差异判断 | |
 | Switch 加虚线/饣色状 | pending 时 Switch 以虚线边框或饣色状态表达「还未生效」。需要改 Switch 样式变体，技术上能做但与现有 Switch 样式远。可读性不如 Badge | |
-| 只靠 RestartBanner（推荐） | 不动 Switch 本身。applied = 无 banner；pending = 有 banner。最轻量。但「三态视觉」严格说只能区分二态（applied vs pending）— 如果说 ROADMAP 的 「applied OFF / applied ON」 由 Switch 本身表达已足够，这个选项最净 | ✓ |
+| 只靠 RestartBanner（推荐） | 不动 Switch 本身。applied = 无 banner；pending = 有 banner。最轻量。但「三态视觉」严格说只能区分二态（applied vs pending）— 如果说 ROADMAP 的「applied OFF / applied ON」由 Switch 本身表达已足够，这个选项最净 | ✓ |
 
 **User's choice:**（重问后）只靠 RestartBanner（推荐）
 **Notes:** 用户最初问"为什么是三态，我理解只有两个状态"。Claude 解释清楚 ROADMAP「三态」= applied OFF / applied ON / pending change，pending 是过渡态（settings 已写盘但 daemon 没重启 / iroh 还在跑旧 bind）。重新问后用户选择最干净方案——RestartBanner 出现/消失独立表达 pending 信号，不需要 Switch 上额外 Badge。
@@ -66,7 +66,7 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| 只 cover Tauri GUI | Tauri 命令 + app.restart()（与 updater 一致的现有模式 src-tauri/.../updater.rs:301）。daemon-only 用户（uniclip daemon CLI）几乎都是后台运营，手动 systemctl restart / supervisor 重启。Phase 95 仅 GUI | ✓ |
+| 只 cover Tauri GUI | Tauri 命令 + app.restart()（与 updater 一致的现有模式 src-tauri/.../updater.rs:301）。daemon-only 用户（clip daemon CLI）几乎都是后台运营，手动 systemctl restart / supervisor 重启。Phase 95 仅 GUI | ✓ |
 | GUI + daemon 两路径 | Tauri GUI 走 app.restart()。daemon-only 模式提供 POST /admin/restart 之类 HTTP 端点调 std::process::exit + supervisor 重拉 — 但需 supervisor 在位。工作量大，且 daemon-only 模式本来没 GUI 交互 | |
 | GUI + daemon 提示手动重启 | GUI 走 app.restart()。daemon-only 模式不提供「重启」按钮，只在 PUT 响应 restart_required:true 时 daemon 打一个 tracing::warn! 提醒 "network settings changed; restart daemon to apply"。Phase 95 不包括 daemon-only 重启交互 UI | |
 
@@ -127,7 +127,7 @@
 
 详见 CONTEXT.md `<deferred>` 段。要点：
 
-- daemon-only CLI 模式 「立即重启」 UX —— 整里程碑显式排除
+- daemon-only CLI 模式「立即重启」UX —— 整里程碑显式排除
 - `bind_started_at` 通过 daemon HTTP 暴露 —— v0.7.x 后续按需
 - Phase 96 system tray icon LAN-only 状态徽章
 - Phase 97 `docs/lan-only.md` / `docs/terminology.md` / changelog（Phase 95 文案最终敲定供 Phase 97 复制）

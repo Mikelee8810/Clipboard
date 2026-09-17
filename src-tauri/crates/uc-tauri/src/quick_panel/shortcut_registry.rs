@@ -89,7 +89,7 @@ impl GlobalShortcutRegistry for TauriGlobalShortcutRegistry {
     fn register(&self, shortcut: &str) -> Result<(), ShortcutError> {
         if uses_compositor_shortcuts() {
             return Err(ShortcutError::backend(
-                "Wayland shortcuts are managed by the compositor; bind uniclipboard --quick-panel there",
+                "Wayland shortcuts are managed by the compositor; bind clipboard --quick-panel there",
             ));
         }
         let segments = chord_segments(shortcut);

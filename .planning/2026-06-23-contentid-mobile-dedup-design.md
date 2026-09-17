@@ -248,7 +248,7 @@ sync_engine 标注 "Swift sources are the NORMATIVE reference"。以上每条状
 键、`ClipboardMeta` 的 Swift init 同改。建议 Rust 与 Swift 同一轮改、共用本设计。
 
 > **评审修正 (M8)· 审查盲区声明**:`SyncEngine.swift` **不在本 repo**(在并行维护的 iOS
-> UniClipboard 仓库),本设计所有 Swift parity 断言无法在本 repo 验证。运行真相已核实：
+> Clipboard 仓库),本设计所有 Swift parity 断言无法在本 repo 验证。运行真相已核实：
 > 决策逻辑 (`plan_*`/`commit_*`) 跑在 Rust(经 UniFFI),Swift 只是 execution shell
 > (`reducer.rs:9-17`);"Swift normative"是移植溯源，iOS 去重实际走的就是这份 Rust——
 > 不存在另一份独立生效的 Swift reducer(见 §10 证伪项 #4)。
@@ -374,7 +374,7 @@ sync_engine 标注 "Swift sources are the NORMATIVE reference"。以上每条状
 
 ### 11.2 🔴 载体修正 (覆盖 §7 的过时断言)
 
-**实现后调研发现：移动端主力是 RN/Expo 跨平台 app(仓库 `uniclipboard-android`,iOS+Android 共用
+**实现后调研发现：移动端主力是 RN/Expo 跨平台 app(仓库 `clipboard-android`,iOS+Android 共用
 一套 TypeScript),不是本设计 §7 假设的 iOS Swift app。** 影响：
 
 - **§7「Swift sources are NORMATIVE」已过时。** 真正的 execution shell 是 RN 的 TS
@@ -387,7 +387,7 @@ sync_engine 标注 "Swift sources are the NORMATIVE reference"。以上每条状
 
 ### 11.3 RN 接线清单 (让本次 contentId 去重在 RN 真正生效)
 
-本次 Rust 改动是 FFI-breaking 前置，RN repo `uniclipboard-android` 需：
+本次 Rust 改动是 FFI-breaking 前置，RN repo `clipboard-android` 需：
 
 1. **重生成 binding**:rebuild mobile core → 重出 `modules/uc-core/{ios,android}` Kotlin/Swift +
    TS `index.ts` 包装 (新增 `ClipboardMeta.content_id`、`SyncRuntimeState` 两个新字段、
@@ -410,7 +410,7 @@ sync_engine 标注 "Swift sources are the NORMATIVE reference"。以上每条状
   待真机覆盖率」,维持。
 - **【归属 RN · 残留 3 历史重编码重复】**:历史在 RN 的 TS `HistoryStorage`(AsyncStorage),
   **不经 Rust core**;改本仓库 `history_log.rs` 对 RN 零效果 (schema 不兼容)。解决路径仅在 RN repo:
-  (优先)**originHash v2**「服务端内存 map + 客户端 TS 对账」(`uniclipboard-android` 的
+  (优先)**originHash v2**「服务端内存 map + 客户端 TS 对账」(`clipboard-android` 的
   `.planning/.../task_plan.md`),或在 `HistoryStorage.addItem` 的 TS 去重引入 contentId/originHash
   判重。**本设计 §2/§8 的 History tech-debt 在 RN 主力下登记到 RN repo，不在本仓库。**
 - **【评估结论 · 历史收敛到 Rust core】**:经跨仓库评估，「有条件值得、非当前第一优先级」。现有

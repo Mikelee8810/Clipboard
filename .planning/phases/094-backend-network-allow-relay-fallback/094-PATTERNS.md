@@ -2,7 +2,7 @@
 
 **Mapped:** 2026-05-04
 **Files analyzed:** 11 (8 修改 + 3 新建)
-**Analogs found:** 11 / 11 (full coverage,均为已验证行号)
+**Analogs found:** 11 / 11 (full coverage，均为已验证行号)
 
 ---
 
@@ -30,7 +30,7 @@
 
 **Analog:** 同文件 `FileSyncSettings` 子结构 (lines 166-174) + `Settings.file_sync` 挂载 (line 200)
 
-**导入模式 (lines 1-7,无变化,新增字段不需要新 import):**
+**导入模式 (lines 1-7，无变化，新增字段不需要新 import):**
 ```rust
 use std::collections::HashMap;
 use std::time::Duration;
@@ -40,7 +40,7 @@ use serde_with::{serde_as, DurationSeconds};
 pub const CURRENT_SCHEMA_VERSION: u32 = 1;
 ```
 
-**子结构定义模式 (`FileSyncSettings` lines 166-174,新增 `NetworkSettings` 镜像):**
+**子结构定义模式 (`FileSyncSettings` lines 166-174，新增 `NetworkSettings` 镜像):**
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct FileSyncSettings {
@@ -53,14 +53,14 @@ pub struct FileSyncSettings {
 }
 ```
 
-**字段 default helper 模式 (`default_telemetry_enabled` lines 29-31,关键样板,bool 字段必须显式提供 fn):**
+**字段 default helper 模式 (`default_telemetry_enabled` lines 29-31，关键样板，bool 字段必须显式提供 fn):**
 ```rust
 fn default_telemetry_enabled() -> bool {
     true
 }
 ```
 
-**Settings 顶层挂载模式 (lines 199-202,占位行已就位):**
+**Settings 顶层挂载模式 (lines 199-202，占位行已就位):**
 ```rust
     #[serde(default)]
     pub file_sync: FileSyncSettings,
@@ -68,14 +68,14 @@ fn default_telemetry_enabled() -> bool {
     // pub network: NetworkSettings,    ← 取消注释 + 真实定义在新增 struct 之后
 ```
 
-**改造动作:**
-1. 在 `FileSyncSettings` 之后(line 175 附近)新增 `pub struct NetworkSettings { #[serde(default = "default_allow_relay_fallback")] pub allow_relay_fallback: bool }`,加 `default_allow_relay_fallback() -> bool { true }` helper
-2. 取消 `model.rs:201-202` 的注释占位,挂入 `Settings`
+**改造动作：**
+1. 在 `FileSyncSettings` 之后 (line 175 附近) 新增 `pub struct NetworkSettings { #[serde(default = "default_allow_relay_fallback")] pub allow_relay_fallback: bool }`,加 `default_allow_relay_fallback() -> bool { true }` helper
+2. 取消 `model.rs:201-202` 的注释占位，挂入 `Settings`
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 2):**
 - `NetworkSettings` **禁止** `#[derive(Default)]`(`bool::default() == false` 极度危险);Default impl 写在 `defaults.rs`(见下文 §2)
-- `default_allow_relay_fallback()` 字面量 `true` 上方加注释:"默认 true = 允许 fallback。改成 false 会让所有跨网段老用户突然离线,属于 breaking change。修改默认值前请先 grep `LAN-only Mode` 文档与 changelog。"
-- **不**升 `CURRENT_SCHEMA_VERSION`(`#[serde(default)]` 已覆盖向后兼容)
+- `default_allow_relay_fallback()` 字面量 `true` 上方加注释:"默认 true = 允许 fallback。改成 false 会让所有跨网段老用户突然离线，属于 breaking change。修改默认值前请先 grep `LAN-only Mode` 文档与 changelog。"
+- **不** 升 `CURRENT_SCHEMA_VERSION`(`#[serde(default)]` 已覆盖向后兼容)
 
 ---
 
@@ -83,7 +83,7 @@ fn default_telemetry_enabled() -> bool {
 
 **Analog:** 同文件 `impl Default for FileSyncSettings` (lines 205-225) + `Default for Settings` 末段 (lines 251-262)
 
-**手写 Default impl 模式 (`FileSyncSettings` lines 205-225,所有子结构均为手写,不用 derive):**
+**手写 Default impl 模式 (`FileSyncSettings` lines 205-225，所有子结构均为手写，不用 derive):**
 ```rust
 impl Default for FileSyncSettings {
     /// Returns default `FileSyncSettings` enabling file sync with sensible limits.
@@ -105,7 +105,7 @@ impl Default for FileSyncSettings {
 }
 ```
 
-**Settings 默认装配模式 (lines 251-262,字段顺序与 model.rs:177-203 严格一致):**
+**Settings 默认装配模式 (lines 251-262，字段顺序与 model.rs:177-203 严格一致):**
 ```rust
 impl Default for Settings {
     fn default() -> Self {
@@ -124,9 +124,9 @@ impl Default for Settings {
 }
 ```
 
-**改造动作:**
-1. 在 `impl Default for FileSyncSettings` 之后(line 226 附近)新增 `impl Default for NetworkSettings { fn default() -> Self { Self { allow_relay_fallback: true } } }`,正上方加 §1 提到的三行警示注释
-2. `Default for Settings`(line 251-262)在 `file_sync: ...` 之后追加一行 `network: NetworkSettings::default(),`
+**改造动作：**
+1. 在 `impl Default for FileSyncSettings` 之后 (line 226 附近) 新增 `impl Default for NetworkSettings { fn default() -> Self { Self { allow_relay_fallback: true } } }`,正上方加 §1 提到的三行警示注释
+2. `Default for Settings`(line 251-262) 在 `file_sync: ...` 之后追加一行 `network: NetworkSettings::default(),`
 
 ---
 
@@ -147,7 +147,7 @@ pub struct FileSyncSettingsView {
 }
 ```
 
-**Patch 镜像模式 (lines 207-215,所有字段是 `Option<T>`,默认是 `Default`):**
+**Patch 镜像模式 (lines 207-215，所有字段是 `Option<T>`,默认是 `Default`):**
 ```rust
 #[derive(Debug, Clone, Default)]
 pub struct FileSyncSettingsPatch {
@@ -185,7 +185,7 @@ pub struct SettingsPatch {
 }
 ```
 
-**core → View 映射模式 (`From<core::Settings> for SettingsView` lines 386-444,末段):**
+**core → View 映射模式 (`From<core::Settings> for SettingsView` lines 386-444，末段):**
 ```rust
             file_sync: FileSyncSettingsView {
                 file_sync_enabled: value.file_sync.file_sync_enabled,
@@ -199,7 +199,7 @@ pub struct SettingsPatch {
 }
 ```
 
-**apply_settings_patch 末段模式 (lines 544-563,关键 — only Some fields update):**
+**apply_settings_patch 末段模式 (lines 544-563，关键 — only Some fields update):**
 ```rust
     if let Some(file_sync) = patch.file_sync {
         if let Some(v) = file_sync.file_sync_enabled {
@@ -225,23 +225,23 @@ pub struct SettingsPatch {
 }
 ```
 
-**改造动作:**
-1. 在 `FileSyncSettingsView` 之后(line 132 附近)新增 `NetworkSettingsView { pub allow_relay_fallback: bool }`,trait derive 与 `FileSyncSettingsView` 相同(`Debug, Clone, PartialEq, Eq`)
-2. 在 `FileSyncSettingsPatch` 之后(line 216 附近)新增 `NetworkSettingsPatch { pub allow_relay_fallback: Option<bool> }`,trait derive 与 `FileSyncSettingsPatch` 相同(`Debug, Clone, Default`)
-3. `SettingsView`(line 142 之后)、`SettingsPatch`(line 225 之后)各加 `network` 字段
-4. `From<core::Settings> for SettingsView`(line 442 之后)末段补 `network: NetworkSettingsView { ... }`
-5. `apply_settings_patch`(line 563 之后)末段补 `if let Some(network) = patch.network { ... }`
+**改造动作：**
+1. 在 `FileSyncSettingsView` 之后 (line 132 附近) 新增 `NetworkSettingsView { pub allow_relay_fallback: bool }`,trait derive 与 `FileSyncSettingsView` 相同 (`Debug, Clone, PartialEq, Eq`)
+2. 在 `FileSyncSettingsPatch` 之后 (line 216 附近) 新增 `NetworkSettingsPatch { pub allow_relay_fallback: Option<bool> }`,trait derive 与 `FileSyncSettingsPatch` 相同 (`Debug, Clone, Default`)
+3. `SettingsView`(line 142 之后)、`SettingsPatch`(line 225 之后) 各加 `network` 字段
+4. `From<core::Settings> for SettingsView`(line 442 之后) 末段补 `network: NetworkSettingsView { ... }`
+5. `apply_settings_patch`(line 563 之后) 末段补 `if let Some(network) = patch.network { ... }`
 
-**Pitfall 防御:**
-- `NetworkSettingsPatch` 必须 `#[derive(Default)]`(empty patch = 全部 None,符合 "patch only Some fields update" 语义,旧客户端不带 `network` 段不会抹掉已有字段)
+**Pitfall 防御：**
+- `NetworkSettingsPatch` 必须 `#[derive(Default)]`(empty patch = 全部 None，符合 "patch only Some fields update" 语义，旧客户端不带 `network` 段不会抹掉已有字段)
 
 ---
 
 ### 4. `src-tauri/crates/uc-application/src/facade/settings/mod.rs` (facade re-export 白名单)
 
-**Analog:** 同文件 lines 5-12 现有 `pub use` 列表(11 个 view/patch 类型)
+**Analog:** 同文件 lines 5-12 现有 `pub use` 列表 (11 个 view/patch 类型)
 
-**白名单模式 (lines 1-13,严格 alphabetic 顺序):**
+**白名单模式 (lines 1-13，严格 alphabetic 顺序):**
 ```rust
 mod facade;
 mod models;
@@ -257,12 +257,12 @@ pub use models::{
 };
 ```
 
-**改造动作:**
-- 在第 8 行(`PairingSettingsPatch, PairingSettingsView,` 之后)插入 `NetworkSettingsPatch, NetworkSettingsView,`(保持 alphabetic 顺序;`Network` 排在 `Pairing` 之前,所以实际位置在第 8 行的 `Pairing*` **之前**;按现行排序应在第 7 行的 `GeneralSettingsView,` 之后)
+**改造动作：**
+- 在第 8 行 (`PairingSettingsPatch, PairingSettingsView,` 之后) 插入 `NetworkSettingsPatch, NetworkSettingsView,`(保持 alphabetic 顺序;`Network` 排在 `Pairing` 之前，所以实际位置在第 8 行的 `Pairing*` **之前**;按现行排序应在第 7 行的 `GeneralSettingsView,` 之后)
 
 **Pitfall 防御 (来自 AGENTS.md §11.4):**
 - 严禁 `lib.rs` 或外部 crate 直接 `use uc_application::facade::settings::models::NetworkSettingsView`;必须通过 `pub use` 白名单暴露
-- 白名单是 §11.4.7 的"新增类型必须显式 pub use"红线,反模式直接 reject
+- 白名单是 §11.4.7 的"新增类型必须显式 pub use"红线，反模式直接 reject
 
 ---
 
@@ -270,7 +270,7 @@ pub use models::{
 
 **Analog:** 同文件 `FileSyncSettingsDto` (lines 186-195) + `FileSyncSettingsPatchDto` (lines 288-297) + `From<core::FileSyncSettings>` (lines 458-468) + `SettingsDto.file_sync` (line 207) + `UpdateSettingsResponse` 当前定义 (lines 17-23)
 
-**DTO 镜像模式 (lines 186-195,加 `ToSchema` + camelCase rename):**
+**DTO 镜像模式 (lines 186-195，加 `ToSchema` + camelCase rename):**
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -284,7 +284,7 @@ pub struct FileSyncSettingsDto {
 }
 ```
 
-**PatchDto 镜像模式 (lines 288-297,字段全 `Option<T>`):**
+**PatchDto 镜像模式 (lines 288-297，字段全 `Option<T>`):**
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -353,7 +353,7 @@ impl From<core::Settings> for SettingsDto {
 }
 ```
 
-**UpdateSettingsResponse 模式 (lines 17-23,需扩展):**
+**UpdateSettingsResponse 模式 (lines 17-23，需扩展):**
 ```rust
 #[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -365,16 +365,16 @@ pub struct UpdateSettingsResponse {
 }
 ```
 
-**改造动作:**
-1. 在 `FileSyncSettingsDto` 之后(line 196 附近)新增 `NetworkSettingsDto { allow_relay_fallback: bool }`,trait derive 与 `FileSyncSettingsDto` 完全相同
-2. 在 `FileSyncSettingsPatchDto` 之后(line 298 附近)新增 `NetworkSettingsPatchDto { allow_relay_fallback: Option<bool> }`
-3. `SettingsDto`(line 207 之后)、`SettingsPatchDto`(line 313 之后)各加 `network` 字段
-4. 新增 `impl From<core::NetworkSettings> for NetworkSettingsDto`(在 `impl From<core::FileSyncSettings>` 之后,line 469 附近)
-5. `From<core::Settings> for SettingsDto`(line 550 之后)末段补 `network: value.network.into(),`
-6. `UpdateSettingsResponse`(line 22 之后)新增 `pub restart_required: bool,`(camelCase wire = `restartRequired`)
+**改造动作：**
+1. 在 `FileSyncSettingsDto` 之后 (line 196 附近) 新增 `NetworkSettingsDto { allow_relay_fallback: bool }`,trait derive 与 `FileSyncSettingsDto` 完全相同
+2. 在 `FileSyncSettingsPatchDto` 之后 (line 298 附近) 新增 `NetworkSettingsPatchDto { allow_relay_fallback: Option<bool> }`
+3. `SettingsDto`(line 207 之后)、`SettingsPatchDto`(line 313 之后) 各加 `network` 字段
+4. 新增 `impl From<core::NetworkSettings> for NetworkSettingsDto`(在 `impl From<core::FileSyncSettings>` 之后，line 469 附近)
+5. `From<core::Settings> for SettingsDto`(line 550 之后) 末段补 `network: value.network.into(),`
+6. `UpdateSettingsResponse`(line 22 之后) 新增 `pub restart_required: bool,`(camelCase wire = `restartRequired`)
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 1):**
-- DTO 字段名 = core 字段名 = `allow_relay_fallback`(只通过 `serde(rename_all = "camelCase")` 转 wire);**禁止**在 DTO 层重命名为 `lan_only` 或类似镜像名
+- DTO 字段名 = core 字段名 = `allow_relay_fallback`(只通过 `serde(rename_all = "camelCase")` 转 wire);**禁止** 在 DTO 层重命名为 `lan_only` 或类似镜像名
 
 ---
 
@@ -420,7 +420,7 @@ pub struct UpdateSettingsResponse {
         // },
 ```
 
-**update_settings_handler 模式 (lines 69-85,需扩展返回 restart_required):**
+**update_settings_handler 模式 (lines 69-85，需扩展返回 restart_required):**
 ```rust
 async fn update_settings_handler(
     State(state): State<DaemonApiState>,
@@ -442,15 +442,15 @@ async fn update_settings_handler(
 }
 ```
 
-**改造动作:**
-1. `settings_patch_from_dto`(line 158 之后)末段补 `network` 段
-2. `settings_view_to_dto`(line 216 之后)末段补 `network` 段
-3. `update_settings_handler`(lines 80-84)的 response 构造加 `restart_required: bool` 字段填充
-4. `restart_required` 计算逻辑:patch 中 `network` 段非空且至少含一个字段变更(D-D1)。Planner 决策:在 webserver handler 内联计算 vs application 层提供 `(SettingsView, bool)` 返回(D-D2)
-5. import 列表(lines 14-20)新增 `NetworkSettingsDto, NetworkSettingsPatchDto`
+**改造动作：**
+1. `settings_patch_from_dto`(line 158 之后) 末段补 `network` 段
+2. `settings_view_to_dto`(line 216 之后) 末段补 `network` 段
+3. `update_settings_handler`(lines 80-84) 的 response 构造加 `restart_required: bool` 字段填充
+4. `restart_required` 计算逻辑:patch 中 `network` 段非空且至少含一个字段变更 (D-D1)。Planner 决策：在 webserver handler 内联计算 vs application 层提供 `(SettingsView, bool)` 返回 (D-D2)
+5. import 列表 (lines 14-20) 新增 `NetworkSettingsDto, NetworkSettingsPatchDto`
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 1):**
-- handler 里读出 `patch.network` 仅做"是否存在/字段是否变更"判断,不读取布尔值本身;**禁止**在此处对 `allow_relay_fallback` 做 `!` 运算(取反唯一一处在 §10 `network_policy.rs`)
+- handler 里读出 `patch.network` 仅做"是否存在/字段是否变更"判断，不读取布尔值本身;**禁止** 在此处对 `allow_relay_fallback` 做 `!` 运算 (取反唯一一处在 §10 `network_policy.rs`)
 
 ---
 
@@ -493,10 +493,10 @@ use crate::api::dto::settings::{
             // ...
 ```
 
-**改造动作:**
-1. import 列表(lines 28-33)新增 `NetworkSettingsDto`
-2. `components.schemas`(line 138 之后,在 `FileSyncSettingsDto,` 之后)插入 `NetworkSettingsDto,`
-3. `UpdateSettingsResponse` 已经在列表(line 128),无需重新加,但其字段变更会自动反映到 OpenAPI(D-D3)
+**改造动作：**
+1. import 列表 (lines 28-33) 新增 `NetworkSettingsDto`
+2. `components.schemas`(line 138 之后，在 `FileSyncSettingsDto,` 之后) 插入 `NetworkSettingsDto,`
+3. `UpdateSettingsResponse` 已经在列表 (line 128),无需重新加，但其字段变更会自动反映到 OpenAPI(D-D3)
 
 ---
 
@@ -517,7 +517,7 @@ use crate::api::dto::settings::{
 // 类型:Arc<dyn SettingsPort>,接口:async fn load(&self) -> anyhow::Result<Settings>
 ```
 
-**改造模式 (按 D-B1 分流策略,Pitfall 1 + Pitfall 2 防御):**
+**改造模式 (按 D-B1 分流策略，Pitfall 1 + Pitfall 2 防御):**
 ```rust
     // 启动期读 settings:NotFound → default,其他错误 → 硬失败
     let settings = match wired.deps.settings.load().await {
@@ -542,17 +542,17 @@ use crate::api::dto::settings::{
         .map_err(|e| anyhow::anyhow!("Slice 1+ assembly build failed: {e}"))?;
 ```
 
-**改造动作:**
-1. 在 line 178 之前插入 `wired.deps.settings.load().await` + 错误分流(D-B1)
+**改造动作：**
+1. 在 line 178 之前插入 `wired.deps.settings.load().await` + 错误分流 (D-B1)
 2. 调 `crate::network_policy::relay_policy_to_iroh_config(settings.network.allow_relay_fallback, None)` 替换原来的 `IrohNodeConfig::default()`
-3. `tracing::info!` 启动日志:`applying network.allow_relay_fallback={value} → disable_relays={value}`(D-B3)
+3. `tracing::info!` 启动日志：`applying network.allow_relay_fallback={value} → disable_relays={value}`(D-B3)
 4. import:加 `use crate::network_policy::relay_policy_to_iroh_config;`(若新模块定义为 `pub(crate)`)
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 3):**
-- `IrohNodeBuilder::bind` 加 `OnceCell` 守护 → bind 一次后 attempt 第二次 panic,从结构上阻断"运行时热切换"诱惑(在 `uc-infra/src/network/iroh/node.rs` 内部)
-- 本文件不写"运行时切换 settings → rebuild endpoint"的逻辑,仅启动时读一次
+- `IrohNodeBuilder::bind` 加 `OnceCell` 守护 → bind 一次后 attempt 第二次 panic，从结构上阻断"运行时热切换"诱惑 (在 `uc-infra/src/network/iroh/node.rs` 内部)
+- 本文件不写"运行时切换 settings → rebuild endpoint"的逻辑，仅启动时读一次
 
-**注意 D-B2 决策:** Planner 实施前需要核对 `SettingsPort::load` 当前错误返回类型(目前是 `anyhow::Result<Settings>`,见 `uc-core/src/ports/settings.rs:7`,**未区分 NotFound vs Parse**)。`FileSettingsRepository::load` 内部已经做了 NotFound 兜底(`repository.rs:166-168` 直接返回 `Settings::default()`),所以**实际发生 NotFound 时不会到分流分支**;Parse / IO 错误才会冒泡。这意味着 D-B1 的"分流"在当前代码上等价于"任何 load 失败即硬失败"(NotFound 已被吃掉)。Planner 需决定:(a) 接受现状(NotFound 在 infra 层兜底,分流退化为单分支);(b) 调整 `FileSettingsRepository::load` 不兜底 + port 错误类型加区分(属本 phase 范围内的小调整,见 D-B2)。
+**注意 D-B2 决策：** Planner 实施前需要核对 `SettingsPort::load` 当前错误返回类型 (目前是 `anyhow::Result<Settings>`,见 `uc-core/src/ports/settings.rs:7`,**未区分 NotFound vs Parse**)。`FileSettingsRepository::load` 内部已经做了 NotFound 兜底 (`repository.rs:166-168` 直接返回 `Settings::default()`),所以 **实际发生 NotFound 时不会到分流分支**;Parse / IO 错误才会冒泡。这意味着 D-B1 的"分流"在当前代码上等价于"任何 load 失败即硬失败"(NotFound 已被吃掉)。Planner 需决定:(a) 接受现状 (NotFound 在 infra 层兜底，分流退化为单分支);(b) 调整 `FileSettingsRepository::load` 不兜底 + port 错误类型加区分 (属本 phase 范围内的小调整，见 D-B2)。
 
 ---
 
@@ -567,8 +567,8 @@ use crate::api::dto::settings::{
         .map_err(|err| anyhow::anyhow!("failed to bind iroh endpoint: {err}"))?;
 ```
 
-**改造动作:**
-- 与 §8 完全相同(读 settings → 错误分流 → 调 helper → 喂给 `build_space_setup_assembly`)
+**改造动作：**
+- 与 §8 完全相同 (读 settings → 错误分流 → 调 helper → 喂给 `build_space_setup_assembly`)
 - 此文件第 278 行已经 `let (config, wired) = crate::builders::build_slice1_cli_context(log_profile)?;` 拿到 `wired`,所以 `wired.deps.settings.load().await` 在第 280 行之前直接可用
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 1):**
@@ -576,7 +576,7 @@ use crate::api::dto::settings::{
 
 ---
 
-### 10. **(NEW)** `src-tauri/crates/uc-bootstrap/src/network_policy.rs` (helper module,核心新增)
+### 10. **(NEW)** `src-tauri/crates/uc-bootstrap/src/network_policy.rs` (helper module，核心新增)
 
 **Analog:** 无直接 analog;最近的"翻译/装配 helper"模式 = `space_setup::build_space_setup_assembly` (`space_setup.rs:208-228`,接 settings → 装配 infra cfg)
 
@@ -637,7 +637,7 @@ mod tests {
 }
 ```
 
-**lib.rs 暴露模式 (基于 `lib.rs:8-17` 现有 `pub mod` 风格,`network_policy` 需为 `mod`,不 `pub mod`):**
+**lib.rs 暴露模式 (基于 `lib.rs:8-17` 现有 `pub mod` 风格，`network_policy` 需为 `mod`,不 `pub mod`):**
 ```rust
 // uc-bootstrap/src/lib.rs
 pub mod assembly;
@@ -649,23 +649,23 @@ pub mod non_gui_runtime;
 pub mod space_setup;
 ```
 
-**改造动作:**
-1. 新建 `uc-bootstrap/src/network_policy.rs`(40 行左右,含 truth-table 单测)
-2. `lib.rs` 加 `mod network_policy;`(注意:不是 `pub mod`;`pub(crate)` 即可,§8/§9 调用方在同 crate 内)
+**改造动作：**
+1. 新建 `uc-bootstrap/src/network_policy.rs`(40 行左右，含 truth-table 单测)
+2. `lib.rs` 加 `mod network_policy;`(注意：不是 `pub mod`;`pub(crate)` 即可，§8/§9 调用方在同 crate 内)
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 1):**
 - truth-table `(true→false, false→true)` 是 Pitfall 1 的核心防御;**两个测试都不能合并**(覆盖单一方向 + 反向独立断言)
-- 函数命名 `relay_policy_to_iroh_config` 而非 `to_config`/`build_cfg`(语义自明,review 一眼能识别"这是翻译点")
+- 函数命名 `relay_policy_to_iroh_config` 而非 `to_config`/`build_cfg`(语义自明，review 一眼能识别"这是翻译点")
 
 ---
 
 ### 11. **(NEW)** `src-tauri/crates/uc-infra/tests/lan_only_relay_mode.rs` (integration test)
 
-**Analog:** `uc-infra/tests/iroh_presence_probe.rs` 全文(尤其 lines 17-42 的 bind 套路 + 直接 `Endpoint::builder` API);**不复用** `slice1_handshake_e2e.rs` 等大型 e2e 文件的 fixture(那些重在驱动 pairing 协议,本测试只验证 endpoint bind 时 `addrs` 内容)
+**Analog:** `uc-infra/tests/iroh_presence_probe.rs` 全文 (尤其 lines 17-42 的 bind 套路 + 直接 `Endpoint::builder` API);**不复用** `slice1_handshake_e2e.rs` 等大型 e2e 文件的 fixture(那些重在驱动 pairing 协议，本测试只验证 endpoint bind 时 `addrs` 内容)
 
 **Loopback bind 模式 (`iroh_presence_probe.rs:17-29`):**
 ```rust
-const PROBE_ALPN: &[u8] = b"uniclipboard/presence-probe/0";
+const PROBE_ALPN: &[u8] = b"clipboard/presence-probe/0";
 
 /// Bind a single endpoint with relays disabled and `PROBE_ALPN` registered.
 async fn bind_endpoint() -> Endpoint {
@@ -691,7 +691,7 @@ async fn wait_for_direct_addrs(endpoint: &Endpoint) {
 }
 ```
 
-**新增测试目标 (Tier B 自动化,验证 bind-time `RelayMode` 决策结果):**
+**新增测试目标 (Tier B 自动化，验证 bind-time `RelayMode` 决策结果):**
 ```rust
 //! LAN-only Mode bind-time 行为断言:验证 `IrohNodeConfig.disable_relays`
 //! 通过 iroh `Endpoint::builder().relay_mode(...).bind()` 路径正确翻译为
@@ -706,7 +706,7 @@ async fn wait_for_direct_addrs(endpoint: &Endpoint) {
 use std::time::Duration;
 use iroh::{Endpoint, RelayMode, TransportAddr};
 
-const TEST_ALPN: &[u8] = b"uniclipboard/lan-only-test/0";
+const TEST_ALPN: &[u8] = b"clipboard/lan-only-test/0";
 
 async fn bind_with_relay_mode(mode: RelayMode) -> Endpoint {
     Endpoint::builder(iroh::endpoint::presets::N0)
@@ -751,16 +751,16 @@ async fn relay_disabled_publishes_no_relay_addrs() {
 // 错* 即可,具体行为留给 Tier C 抓包验证。
 ```
 
-**改造动作:**
+**改造动作：**
 1. 新建 `uc-infra/tests/lan_only_relay_mode.rs`(50 行左右)
 2. 用 `RelayMode::Disabled` + `RelayMode::Default` 两组 bind
 3. 断言 `endpoint.addr().addrs` 中是否含 `TransportAddr::Relay(_)` 项
 
 **Pitfall 防御 (来自 PITFALLS.md Pitfall 8):**
-- **不**复用 `IrohNodeConfig { disable_relays: true, .. }` 形式的 production-flavored config;直接用 iroh API,语义最直接
-- 测试名 `relay_disabled_publishes_no_relay_addrs`(描述行为,非"测开关")— review 一眼能定位
+- **不** 复用 `IrohNodeConfig { disable_relays: true, .. }` 形式的 production-flavored config;直接用 iroh API，语义最直接
+- 测试名 `relay_disabled_publishes_no_relay_addrs`(描述行为，非"测开关")— review 一眼能定位
 
-**Cargo.toml 影响:** `uc-infra/Cargo.toml` 不需要改动 — `iroh` / `tokio test-util` 都已在 dev-dependencies(see `STACK.md §5.1`)
+**Cargo.toml 影响：** `uc-infra/Cargo.toml` 不需要改动 — `iroh` / `tokio test-util` 都已在 dev-dependencies(see `STACK.md §5.1`)
 
 ---
 
@@ -768,11 +768,11 @@ async fn relay_disabled_publishes_no_relay_addrs() {
 
 ### Pattern A: 反向命名只翻译一次 (Pitfall 1 防御)
 
-**Source:** `uc-bootstrap/src/network_policy.rs::relay_policy_to_iroh_config()` (新增,§10)
+**Source:** `uc-bootstrap/src/network_policy.rs::relay_policy_to_iroh_config()` (新增，§10)
 
 **Apply to:** 全工程
 
-**铁律:**
+**铁律：**
 - 全工程只允许 **一处** 出现 `disable_relays = !allow_relay_fallback`(网络策略翻译点)
 - DTO ↔ View ↔ core 三层只搬运 `allow_relay_fallback`(业务正向语义),不取反
 - IPC wire 字段名 `allowRelayFallback`(camelCase),前端 store 不维护 `lanOnly` 镜像状态
@@ -799,7 +799,7 @@ pub(crate) fn relay_policy_to_iroh_config(
 
 **Apply to:** `NetworkSettings` 定义 + `Settings.network` 挂载
 
-**模式:**
+**模式：**
 1. `Settings.network` 字段标 `#[serde(default)]`(顶层挂载)
 2. `NetworkSettings.allow_relay_fallback` 字段标 `#[serde(default = "default_allow_relay_fallback")]`(字段级)
 3. `NetworkSettings` **禁止** `#[derive(Default)]`,必须在 `defaults.rs` 手写 `impl Default`
@@ -817,7 +817,7 @@ impl Default for FileSyncSettings {
 }
 ```
 
-**为什么(Pitfall 2):** Rust `#[derive(Default)]` 对 `bool` 默认 `false`;`NetworkSettings::default()` 若被自动 derive 会得到 `allow_relay_fallback: false` = LAN-only on = 老用户跨网段设备突然离线 = breaking change。手写 `true` + 注释警示是结构性防御。
+**为什么 (Pitfall 2):** Rust `#[derive(Default)]` 对 `bool` 默认 `false`;`NetworkSettings::default()` 若被自动 derive 会得到 `allow_relay_fallback: false` = LAN-only on = 老用户跨网段设备突然离线 = breaking change。手写 `true` + 注释警示是结构性防御。
 
 ---
 
@@ -827,8 +827,8 @@ impl Default for FileSyncSettings {
 
 **Apply to:** `NetworkSettingsView` / `NetworkSettingsPatch` 定义 + `apply_settings_patch` 末段
 
-**模式三步走:**
-1. View(全字段必填,`Debug, Clone, PartialEq, Eq`)+ Patch(全字段 `Option<T>`,`Debug, Clone, Default`)
+**模式三步走：**
+1. View(全字段必填，`Debug, Clone, PartialEq, Eq`)+ Patch(全字段 `Option<T>`,`Debug, Clone, Default`)
 2. `From<core::Settings> for SettingsView` 末段映射
 3. `apply_settings_patch` 末段 "only Some fields update" 分支
 
@@ -842,7 +842,7 @@ if let Some(file_sync) = patch.file_sync {
 }
 ```
 
-**为什么:** "only Some fields update" 是 NETSET-02 success criterion #2 的硬约束 — 旧客户端 PUT 不带 `network` 段时,行为应为 no-op,不抹掉已存在 `network` 字段。这是 patch 语义的核心。
+**为什么：** "only Some fields update" 是 NETSET-02 success criterion #2 的硬约束 — 旧客户端 PUT 不带 `network` 段时，行为应为 no-op，不抹掉已存在 `network` 字段。这是 patch 语义的核心。
 
 ---
 
@@ -852,7 +852,7 @@ if let Some(file_sync) = patch.file_sync {
 
 **Apply to:** `NetworkSettingsDto` / `NetworkSettingsPatchDto` + `UpdateSettingsResponse.restart_required`
 
-**模式:**
+**模式：**
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -861,7 +861,7 @@ pub struct NetworkSettingsDto {
 }
 ```
 
-**为什么:** Rust 用 snake_case (`allow_relay_fallback`),JSON wire 用 camelCase (`allowRelayFallback`);项目 `SettingsDto` 整族都用 `#[serde(rename_all = "camelCase")]` 自动转换。前端 TypeScript 直接 import wire 类型,不用手写映射。
+**为什么：** Rust 用 snake_case (`allow_relay_fallback`),JSON wire 用 camelCase (`allowRelayFallback`);项目 `SettingsDto` 整族都用 `#[serde(rename_all = "camelCase")]` 自动转换。前端 TypeScript 直接 import wire 类型，不用手写映射。
 
 ---
 
@@ -871,7 +871,7 @@ pub struct NetworkSettingsDto {
 
 **Apply to:** `NetworkSettingsView, NetworkSettingsPatch` 暴露
 
-**模式:**
+**模式：**
 ```rust
 pub use models::{
     // ... alphabetic 顺序 ...
@@ -880,7 +880,7 @@ pub use models::{
 };
 ```
 
-**为什么:** `uc-application/AGENTS.md` §11.4.7 明确:"新增类型必须显式 pub use,不允许下游直接从 `models.rs` import"。这是阻止 §11.4.7 历史欠账重发的唯一红线。
+**为什么：** `uc-application/AGENTS.md` §11.4.7 明确:"新增类型必须显式 pub use，不允许下游直接从 `models.rs` import"。这是阻止 §11.4.7 历史欠账重发的唯一红线。
 
 ---
 
@@ -890,7 +890,7 @@ pub use models::{
 
 **Apply to:** §8/§9 builders 改造点的日志输出
 
-**模式 (info! 单行,字段固定):**
+**模式 (info! 单行，字段固定):**
 ```rust
 tracing::info!(
     target: "settings.network",   // 或不带 target,planner 决定(D-Discretion)
@@ -902,19 +902,19 @@ tracing::info!(
 
 **字段名照抄 CONTEXT.md `<specifics>` 第三条:** `applying network.allow_relay_fallback={value} → disable_relays={value}`
 
-**为什么:** 启动期必须有 audit log,方便 support 排障("我开了 LAN-only 重启了为什么还在走 relay?" → 查日志找 startup 这一行)。**不**在 OTLP 加 attribute(避免与 Pitfall 6 OTLP 不联动原则擦边)。
+**为什么：** 启动期必须有 audit log，方便 support 排障 ("我开了 LAN-only 重启了为什么还在走 relay?" → 查日志找 startup 这一行)。**不** 在 OTLP 加 attribute(避免与 Pitfall 6 OTLP 不联动原则擦边)。
 
 ---
 
 ## 无 analog 的文件
 
-无 — 所有 11 个文件都有可锚定的近邻模式(同文件 `FileSync*` 镜像 / 同 crate 装配点 / 同测试目录 loopback fixture),Phase 94 不需要从研究层 RESEARCH.md 抠模式。
+无 — 所有 11 个文件都有可锚定的近邻模式 (同文件 `FileSync*` 镜像 / 同 crate 装配点 / 同测试目录 loopback fixture),Phase 94 不需要从研究层 RESEARCH.md 抠模式。
 
 ---
 
 ## 元数据
 
-**Analog 搜索范围:**
+**Analog 搜索范围：**
 - `src-tauri/crates/uc-core/src/settings/`
 - `src-tauri/crates/uc-application/src/facade/settings/`
 - `src-tauri/crates/uc-daemon-contract/src/api/dto/`
@@ -926,22 +926,22 @@ tracing::info!(
 - `src-tauri/crates/uc-infra/src/settings/`
 - `src-tauri/crates/uc-core/src/ports/`
 
-**已扫描文件数:** 19(全部为已 grep 验证的具体行号锚点;无开放性搜索)
+**已扫描文件数：** 19(全部为已 grep 验证的具体行号锚点;无开放性搜索)
 
 **Pattern extraction date:** 2026-05-04
 
-**关键依赖确认:**
-- `iroh 0.98` API:`Endpoint::builder().relay_mode(...).bind()` + `endpoint.addr().addrs` + `TransportAddr::{Ip, Relay}` 全部已在项目代码使用(`node.rs:368-405`),版本锁在 `uc-infra/Cargo.toml:79`
-- `serde_with` 派生模式:已在 `model.rs:1-5` 就位,无需新依赖
+**关键依赖确认：**
+- `iroh 0.98` API:`Endpoint::builder().relay_mode(...).bind()` + `endpoint.addr().addrs` + `TransportAddr::{Ip, Relay}` 全部已在项目代码使用 (`node.rs:368-405`),版本锁在 `uc-infra/Cargo.toml:79`
+- `serde_with` 派生模式：已在 `model.rs:1-5` 就位，无需新依赖
 - `tokio test-util`:已在 `uc-infra/Cargo.toml:99`(`features = ["full", "test-util"]`),无需新依赖
-- `SettingsMigrator::migrations` vec:`migration.rs:36-43` 当前为空(注释只写了示例 placeholder),Phase 94 **不**升 `CURRENT_SCHEMA_VERSION = 1`,vec 保持空
+- `SettingsMigrator::migrations` vec:`migration.rs:36-43` 当前为空 (注释只写了示例 placeholder),Phase 94 **不** 升 `CURRENT_SCHEMA_VERSION = 1`,vec 保持空
 
-**关键不变量(PR review 必查):**
-1. 全工程除 `uc-bootstrap/src/network_policy.rs` + `uc-infra/src/network/iroh/node.rs:153-162` + 测试文件外,无 `disable_relays = !` 类反向写法
+**关键不变量 (PR review 必查):**
+1. 全工程除 `uc-bootstrap/src/network_policy.rs` + `uc-infra/src/network/iroh/node.rs:153-162` + 测试文件外，无 `disable_relays = !` 类反向写法
 2. `Settings.network.allow_relay_fallback` 默认 `true`(老 settings.json 反序列化必须 `== true`)
-3. `apply_settings_patch` 处理 `network` 段时,patch.network = None 不抹掉已有字段值
-4. `IrohNodeBuilder::bind` 一进程只能调一次(OnceCell 守护,Pitfall 3 结构性防御 — 实施在 §8 改造时可能不在 Phase 94 范围,planner 决策是否纳入)
-5. `UpdateSettingsResponse.restart_required: bool` wire 契约就位,前端 Phase 95 同步消费
+3. `apply_settings_patch` 处理 `network` 段时，patch.network = None 不抹掉已有字段值
+4. `IrohNodeBuilder::bind` 一进程只能调一次 (OnceCell 守护，Pitfall 3 结构性防御 — 实施在 §8 改造时可能不在 Phase 94 范围，planner 决策是否纳入)
+5. `UpdateSettingsResponse.restart_required: bool` wire 契约就位，前端 Phase 95 同步消费
 
 ---
 

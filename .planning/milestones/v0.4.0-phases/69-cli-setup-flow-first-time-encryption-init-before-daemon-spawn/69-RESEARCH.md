@@ -12,7 +12,7 @@
 
 1. 检测加密状态：若 `Uninitialized`，CLI 直接完成初始化（不启动 daemon）
 2. 若已 `Initialized`，拒绝再次执行 `new-space`（提示用户加密已就绪）
-3. 初始化成功后，告知用户运行 `uniclipboard-cli start`（或等效命令）启动 daemon
+3. 初始化成功后，告知用户运行 `clipboard-cli start`（或等效命令）启动 daemon
 
 **Primary recommendation:** 在 `run_new_space()` 中移除 `ensure_local_daemon_running()` 调用，改为直接使用 `build_cli_runtime()` + `CoreUseCases::initialize_encryption()` 在本地完成加密初始化，初始化后给出 `start` 命令提示，并在已初始化时提前返回错误。
 
@@ -111,7 +111,7 @@ run_new_space()
 │   ├── Ok(()) → 成功
 │   └── Err(AlreadyInitialized) → 提示已初始化
 │   └── Err(其他) → 显示错误
-└── ui::info("Next step", "run `uniclipboard-cli start` to start the daemon")
+└── ui::info("Next step", "run `clipboard-cli start` to start the daemon")
 ```
 
 ### 不需要 daemon 的好处
@@ -133,7 +133,7 @@ run_new_space()
 | Library                   | Version | Purpose                              | Why Standard                                 |
 | ------------------------- | ------- | ------------------------------------ | -------------------------------------------- |
 | `uc-bootstrap` (internal) | —       | CLI runtime bootstrap                | 已有 `build_cli_runtime()`                   |
-| `uc-app` (internal)       | —       | Use case访问                         | 已有 `CoreUseCases::initialize_encryption()` |
+| `uc-app` (internal)       | —       | Use case 访问                         | 已有 `CoreUseCases::initialize_encryption()` |
 | `uc-core` (internal)      | —       | `Passphrase`, `EncryptionState` 类型 | 域模型层                                     |
 | `indicatif`               | 已有    | CLI spinner/progress                 | 已在 `ui.rs` 封装                            |
 
@@ -224,7 +224,7 @@ async fn run_new_space() -> i32 {
 
     if state == uc_core::security::state::EncryptionState::Initialized {
         ui::error("Space already initialized.");
-        ui::info("Hint", "run `uniclipboard-cli start` to launch the daemon");
+        ui::info("Hint", "run `clipboard-cli start` to launch the daemon");
         return exit_codes::EXIT_ERROR;
     }
 
@@ -253,7 +253,7 @@ async fn run_new_space() -> i32 {
     // 5. 成功提示
     ui::bar();
     ui::success("Setup complete! Your space is ready.");
-    ui::info("Next step", "run `uniclipboard-cli start` to launch the daemon");
+    ui::info("Next step", "run `clipboard-cli start` to launch the daemon");
     ui::end("");
     exit_codes::EXIT_SUCCESS
 }
@@ -281,10 +281,10 @@ cd src-tauri && grep -A5 '\[dependencies\]' crates/uc-cli/Cargo.toml | head -20
 
 ## Open Questions
 
-1. **`uniclipboard-cli start` 命令是否存在？**
+1. **`clipboard-cli start` 命令是否存在？**
    - What we know: 当前 CLI `Commands` 枚举中有 `Status`, `Setup`, `Devices`, `SpaceStatus`，没有 `Start`
-   - What's unclear: Phase 69 的提示语应该是什么命令？是 `start` 还是手动运行 `uniclipboard-daemon`？
-   - Recommendation: 本 Phase 仅修复 `new-space` 流程；提示语使用 `uniclipboard-daemon` 或按项目约定命令；添加 `start` 子命令是独立工作，不在此范围
+   - What's unclear: Phase 69 的提示语应该是什么命令？是 `start` 还是手动运行 `clipboard-daemon`？
+   - Recommendation: 本 Phase 仅修复 `new-space` 流程；提示语使用 `clipboard-daemon` 或按项目约定命令；添加 `start` 子命令是独立工作，不在此范围
 
 2. **`run_host()` 中也有类似问题？**
    - What we know: `run_host()` 也调用 `ensure_local_daemon_running()`，但它用于 pairing 流程，需要 daemon 参与发现

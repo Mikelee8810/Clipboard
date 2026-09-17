@@ -3,7 +3,7 @@ name = "uc-app-paths"
 version.workspace = true
 license.workspace = true
 edition = "2021"
-description = "Directory-layout authority: the single source of truth for UniClipboard's app data/cache directory resolution (profile suffix, portable redirect). Depends on dirs + std only."
+description = "Directory-layout authority: the single source of truth for Clipboard's app data/cache directory resolution (profile suffix, portable redirect). Depends on dirs + std only."
 
 [lib]
 name = "uc_app_paths"

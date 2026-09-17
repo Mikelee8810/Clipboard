@@ -1,4 +1,4 @@
-//! `uniclip blob` —— 大 payload 发布 / 拉取诊断命令。
+//! `clip blob` —— 大 payload 发布 / 拉取诊断命令。
 //!
 //! 这组命令通过统一核心执行 hash 去重、业务加解密和 iroh-blobs 发布/拉取。`publish` 输出 ticket
 //! 与 entry_id,`fetch` 带回二者:ticket 定位内容,entry_id 登记归属。
@@ -187,7 +187,7 @@ async fn build_ready_session(verbose: bool) -> Result<CliAppSession, i32> {
         Ok(false) => {
             ui::spinner_finish_error(
                 &resume_spinner,
-                "No space on this profile — run `uniclip space init` or `uniclip space join` first.",
+                "No space on this profile — run `clip space init` or `clip space join` first.",
             );
             cli.shutdown().await;
             Err(exit_codes::EXIT_ERROR)

@@ -4,17 +4,17 @@
 **Status:** Locked
 **Implemented:** 2026-07-30
 **Branch:** main
-**Research question:** desktop 应如何采用 `UniClipboard/Engine` 的 `v0.20.0-rc.11`，并保证来源与版本锁定一致？
+**Research question:** desktop 应如何采用 `Clipboard/Engine` 的 `v0.20.0-rc.11`，并保证来源与版本锁定一致？
 
 ## Recommendation
 
-将 desktop 的共享引擎依赖从重命名前的仓库地址和 `core-v*` 标签切换到 `UniClipboard/Engine` 的 `v0.20.0-rc.11`，并同步更新锁文件、来源校验入口和当前维护文档。
+将 desktop 的共享引擎依赖从重命名前的仓库地址和 `core-v*` 标签切换到 `Clipboard/Engine` 的 `v0.20.0-rc.11`，并同步更新锁文件、来源校验入口和当前维护文档。
 
 ## Key findings
 
 1. desktop 当前标签名虽然也是 `rc.11`，实际锁定的是旧标签提交 `b742208f230b779cc4bc741e5b190cb7134d18db`。
 2. 新 Release 标签指向 `8f9d09789cbe14d3d6bd328edca17fa6a0b14ef9`，比旧标签多 7 个提交。
-3. Engine 已将公开仓库身份、Release 标签和发布资产命名统一到 `UniClipboard/Engine` 与 `v*`。
+3. Engine 已将公开仓库身份、Release 标签和发布资产命名统一到 `Clipboard/Engine` 与 `v*`。
 
 ## Approach
 

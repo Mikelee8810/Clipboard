@@ -4,7 +4,7 @@
 
 ### 调查阶段
 
-- 拉 Sentry issue UNICLIPBOARD-RUST-4 → 拿到完整 panic stack + 用户日志
+- 拉 Sentry issue CLIPBOARD-RUST-4 → 拿到完整 panic stack + 用户日志
   片段；定位到 `uc-desktop/src/daemon/app.rs` 同一个 `JoinHandle` 被
   poll 两次。
 - 用户提供复现路径："改 mobile_sync 配置 → 点重启 → 崩溃"。沿因果链定位

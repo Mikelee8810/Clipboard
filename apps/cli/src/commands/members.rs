@@ -1,4 +1,4 @@
-//! `uniclip members` — list this space's members: the local device plus
+//! `clip members` — list this space's members: the local device plus
 //! paired peers, with each peer's reachability (ADR-008 P5-2a). Also reachable
 //! under the `devices` alias.
 //!

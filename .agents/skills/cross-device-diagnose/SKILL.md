@@ -106,8 +106,8 @@ networksetup -getsocksfirewallproxy Wi-Fi 2>/dev/null
 # Check for TUN interfaces (198.18.x = Clash fake-ip, 100.x = Tailscale)
 ifconfig | grep -A2 'utun\|tun' | grep inet
 
-# Uniclipboard daemon status
-pgrep -lf uniclip 2>/dev/null
+# Clipboard daemon status
+pgrep -lf clip 2>/dev/null
 .agents/skills/local-log-debug/uc-logs.sh status 2>/dev/null
 ```
 
@@ -255,7 +255,7 @@ For each hypothesis marked as "supported by evidence":
    ```
    To test H1, please:
      1. Disable Clash on your Mac (quit the app or toggle TUN off)
-     2. Restart the uniclipboard daemon
+     2. Restart the clipboard daemon
      3. Try the sync again
    
    If it's still slow after this, H1 is ruled out.
@@ -295,7 +295,7 @@ Root cause identified (HIGH confidence):
     ✓ Falsification survived: disabling Clash on Mac → sync improved to 17MB/s
 
   Recommended fix:
-    - Short term: disable Clash TUN when using uniclipboard
+    - Short term: disable Clash TUN when using clipboard
     - Long term: filter Clash fake-ip (198.18.0.0/15) from iroh candidates
 ```
 
@@ -378,7 +378,7 @@ sshpass -p "$WIN_PASS" ssh win "<command>"
 - Use `findstr` instead of `grep`
 - Use `type` instead of `cat`
 - Use `tasklist` instead of `ps`
-- Paths use backslashes: `%LOCALAPPDATA%\app.uniclipboard.desktop-dev\logs\`
+- Paths use backslashes: `%LOCALAPPDATA%\app.clipboard.desktop-dev\logs\`
 - For complex queries, use `powershell -Command "..."` explicitly
 
 ## Safety guardrails

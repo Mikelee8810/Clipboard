@@ -371,7 +371,7 @@ use uc_app::task_registry::TaskRegistry;  // was: uc_tauri::bootstrap::task_regi
 
 ```rust
 // In uc-app/src/usecases/app_lifecycle/adapters.rs
-const DEFAULT_PAIRING_DEVICE_NAME: &str = "Uniclipboard Device";
+const DEFAULT_PAIRING_DEVICE_NAME: &str = "Clipboard Device";
 
 // Inlined from assembly.rs:resolve_pairing_device_name
 async fn resolve_pairing_device_name(settings: Arc<dyn SettingsPort>) -> String {

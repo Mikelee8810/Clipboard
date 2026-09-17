@@ -1,10 +1,10 @@
-# SyncClipboard Shortcut template: `uniclipboard://connect` support
+# SyncClipboard Shortcut template: `clipboard://connect` support
 
 **Audience**: the maintainer of the SyncClipboard "Clipboard EX" iCloud-shared
 Shortcut template (linked from `SYNC_CLIPBOARD_EX_INSTALL_URL`).
 **Source of truth for the wire protocol**: `docs/architecture/mobile-sync-connect-uri.md`.
 This document tells you how to teach the existing template to recognize the new
-`uniclipboard://connect?…` URI, without throwing away the manual-three-field flow that
+`clipboard://connect?…` URI, without throwing away the manual-three-field flow that
 existing users rely on.
 
 ---
@@ -13,8 +13,8 @@ existing users rely on.
 
 The desktop app has two onboarding affordances for iOS users:
 
-1. The **native iOS App** (`app.uniclipboard.UniClipboard`) registers the
-   `uniclipboard://` URL scheme and handles connect URIs through `.onOpenURL`. This is
+1. The **native iOS App** (`app.clipboard.Clipboard`) registers the
+   `clipboard://` URL scheme and handles connect URIs through `.onOpenURL`. This is
    the primary path going forward (see sibling guide `ios-app-connect-uri.md`).
 2. The **SyncClipboard Shortcut template** is a **fallback for users who don't have
    the native App installed**. The desktop's credential modal continues to surface the
@@ -22,7 +22,7 @@ The desktop app has two onboarding affordances for iOS users:
 
 Until phase 2 of issue #789, the desktop QR encoded the iCloud install URL. The
 existing Shortcut template doesn't read the QR at all — it asks the user to type three
-fields by hand. From phase 2 onward, the desktop QR encodes a `uniclipboard://connect`
+fields by hand. From phase 2 onward, the desktop QR encodes a `clipboard://connect`
 URI carrying url / user / pwd. To keep the fallback path useful, the Shortcut template
 must learn to:
 
@@ -68,7 +68,7 @@ keychain values" steps and disable those manual prompts when the subroutine fire
 | #   | Action                | Configuration                                                                                              | → Variable          |
 | --- | --------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------- |
 | 1   | **Receive Input**     | Accepts: URLs. Top of the Shortcut, marked "Show in Share Sheet"                                           | `ShortcutInput`     |
-| 2   | **If**                | `ShortcutInput` `contains` `uniclipboard://connect`                                                        | (branch start)      |
+| 2   | **If**                | `ShortcutInput` `contains` `clipboard://connect`                                                        | (branch start)      |
 | 3   | **Get URLs from Input** | Input: `ShortcutInput`                                                                                   | `RawURL`            |
 | 4   | **URL Encode**        | Mode: **Decode** · Input: `RawURL`                                                                         | `DecodedURL`        |
 | 5   | **Get Component of URL** | Component: `Query` · URL: `DecodedURL`                                                                  | `Query`             |
@@ -126,7 +126,7 @@ Spec §7.1 publishes one happy-path URI that all conformant decoders agree on. U
 to dry-run the Shortcut without touching the desktop:
 
 ```
-uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
+clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
 ```
 
 After running the Shortcut with this URI, the bound variables MUST equal:

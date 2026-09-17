@@ -6,7 +6,7 @@
 
 ## Summary
 
-Phase 42 adds three clipboard subcommands to the existing `uniclipboard-cli` binary: `clipboard list`, `clipboard get <id>`, and `clipboard clear`. All three are "direct mode" commands — they bootstrap via `build_cli_context()` + `build_non_gui_runtime()` and query the SQLite database directly, without requiring the daemon to be running.
+Phase 42 adds three clipboard subcommands to the existing `clipboard-cli` binary: `clipboard list`, `clipboard get <id>`, and `clipboard clear`. All three are "direct mode" commands — they bootstrap via `build_cli_context()` + `build_non_gui_runtime()` and query the SQLite database directly, without requiring the daemon to be running.
 
 The existing CLI skeleton (Phase 41) provides a well-established pattern: clap-based argument parsing, `output::print_result()` for dual JSON/human output, exit code constants, and the bootstrap flow (`CliBootstrapContext` → `build_non_gui_runtime()` → `CoreUseCases`). All three required use cases already exist in `uc-app`: `ListClipboardEntryProjections::execute()` for listing with rich projections, `GetEntryDetailUseCase::execute()` for single entry detail with full content, and `ClearClipboardHistory::execute()` for bulk clear.
 

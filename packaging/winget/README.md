@@ -2,9 +2,9 @@
 
 本目录是提交到 [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) 的 manifest 源（3 文件 schema）：
 
-- `UniClipboard.UniClipboard.installer.yaml`
-- `UniClipboard.UniClipboard.locale.en-US.yaml`
-- `UniClipboard.UniClipboard.yaml`（version）
+- `Clipboard.Clipboard.installer.yaml`
+- `Clipboard.Clipboard.locale.en-US.yaml`
+- `Clipboard.Clipboard.yaml`（version）
 
 最终落在 `manifests/u/UniClipboard/UniClipboard/0.15.0/`。
 
@@ -12,7 +12,7 @@
 
 已用 7zip 在 Repology 的完整源列表验证过——**Repology 不抓 winget**。所以这一步 **不会让 packaging-status 徽章变化**。做它的理由是补上 Windows 官方包管理器的安装入口：
 ```powershell
-winget install uniclipboard
+winget install clipboard
 ```
 
 ## 推荐路径：用 wingetcreate（自动算 hash + 自动提 PR）
@@ -24,8 +24,8 @@ winget install wingetcreate
 
 # 首次创建：交互式，自动下载两个 setup.exe 算 hash
 wingetcreate new `
-  https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/UniClipboard_0.15.0_x64-setup.exe `
-  https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/UniClipboard_0.15.0_arm64-setup.exe
+  https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/Clipboard_0.15.0_x64-setup.exe `
+  https://github.com/UniClipboard/UniClipboard/releases/download/v0.15.0/Clipboard_0.15.0_arm64-setup.exe
 
 # 校验 + 提交（需 GitHub token，会自动 fork + 开 PR）
 wingetcreate submit --token <GITHUB_TOKEN>
@@ -33,7 +33,7 @@ wingetcreate submit --token <GITHUB_TOKEN>
 
 后续版本升级更省事：
 ```powershell
-wingetcreate update UniClipboard.UniClipboard `
+wingetcreate update Clipboard.Clipboard `
   --version <new> `
   --urls <x64-url> <arm64-url> `
   --submit --token <GITHUB_TOKEN>

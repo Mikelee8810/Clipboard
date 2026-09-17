@@ -1,6 +1,6 @@
 # ADR-008 P0 Perf Spike 结果：blob 过 loopback（OQ-perf-gate）
 
-- **目的**：回答 [ADR-008](./adr-008-uniclipd-split-gui-as-client.md) 的 **OQ-perf-gate / D6**——GUI 拆进程后大负载经 `127.0.0.1` HTTP 按需拉取，loopback 链路够不够快、现有 **全量 buffer**（`BlobReaderPort::get → Vec<u8> → Body::from = Full<Bytes>`）会不会拖垮 daemon 内存。
+- **目的**：回答 [ADR-008](./adr-008-clipd-split-gui-as-client.md) 的 **OQ-perf-gate / D6**——GUI 拆进程后大负载经 `127.0.0.1` HTTP 按需拉取，loopback 链路够不够快、现有 **全量 buffer**（`BlobReaderPort::get → Vec<u8> → Body::from = Full<Bytes>`）会不会拖垮 daemon 内存。
 - **日期**：2026-05-30
 - **机器**：Apple M4 / 10 core / 24 GB（macOS darwin）。loopback 吞吐为 **上界**（无真实网络拥塞）。
 - **bench**：`src-tauri/crates/p2p-bench/src/bin/http_blob_bench.rs`（throwaway，`publish=false`，iroh 依赖已 feature-gate 不牵连）。最小 axum server 忠实复刻生产 full-buffer blob 端点 + 一个对照 streaming 变体（从磁盘分块读，模拟流式 `BlobReaderPort`）。

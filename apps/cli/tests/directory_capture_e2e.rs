@@ -29,11 +29,11 @@ impl CliProfile {
     }
 
     fn run(&self, args: &[String]) -> Output {
-        Command::new(env!("CARGO_BIN_EXE_uniclip"))
+        Command::new(env!("CARGO_BIN_EXE_clip"))
             .args(["--dev", "--profile", self.name.as_str()])
             .args(args)
             .output()
-            .expect("run uniclip")
+            .expect("run clip")
     }
 
     fn init(&self) {
@@ -101,7 +101,7 @@ fn member_pairs(value: &Value) -> Vec<(&str, &str)> {
 }
 
 #[test]
-#[ignore = "requires a prebuilt uniclipd sibling"]
+#[ignore = "requires a prebuilt clipd sibling"]
 fn cli_captures_directory_members_and_deduplicates_repeat_capture() {
     let profile = CliProfile::new("tree");
     profile.init();
@@ -146,7 +146,7 @@ fn cli_captures_directory_members_and_deduplicates_repeat_capture() {
 }
 
 #[test]
-#[ignore = "requires a prebuilt uniclipd sibling"]
+#[ignore = "requires a prebuilt clipd sibling"]
 fn cli_captures_mixed_roots_and_applies_member_cap() {
     let profile = CliProfile::new("mixed-cap");
     profile.init();
@@ -199,7 +199,7 @@ fn cli_captures_mixed_roots_and_applies_member_cap() {
 
 #[cfg(unix)]
 #[test]
-#[ignore = "requires a prebuilt uniclipd sibling"]
+#[ignore = "requires a prebuilt clipd sibling"]
 fn cli_rejects_symlink_and_socket_members() {
     use std::os::unix::fs::symlink;
     use std::os::unix::net::UnixListener;
@@ -231,29 +231,29 @@ fn profile_data_dir(profile: &str) -> PathBuf {
     #[cfg(target_os = "macos")]
     return home_dir()
         .join("Library/Application Support")
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "linux")]
     return std::env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| home_dir().join(".local/share"))
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "windows")]
     return std::env::var_os("LOCALAPPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(r"C:\Temp"))
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
 }
 
 fn profile_cache_dir(profile: &str) -> PathBuf {
     #[cfg(target_os = "macos")]
     return home_dir()
         .join("Library/Caches")
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "linux")]
     return std::env::var_os("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| home_dir().join(".cache"))
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "windows")]
     return profile_data_dir(profile).join("cache");
 }
@@ -262,17 +262,17 @@ fn profile_log_dir(profile: &str) -> PathBuf {
     #[cfg(target_os = "macos")]
     return home_dir()
         .join("Library/Logs")
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "linux")]
     return std::env::var_os("XDG_STATE_HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| home_dir().join(".local/state"))
-        .join(format!("app.uniclipboard.desktop-{profile}"));
+        .join(format!("app.clipboard.desktop-{profile}"));
     #[cfg(target_os = "windows")]
     return std::env::var_os("LOCALAPPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(r"C:\Temp"))
-        .join(format!("app.uniclipboard.desktop-{profile}"))
+        .join(format!("app.clipboard.desktop-{profile}"))
         .join("logs");
 }
 

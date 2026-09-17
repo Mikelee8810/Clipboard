@@ -1,11 +1,11 @@
-//! Detached spawn of the `uniclipd` daemon binary.
+//! Detached spawn of the `clipd` daemon binary.
 //!
 //! Shared between every desktop-side process that needs to bring a local
 //! daemon up out-of-process:
 //!
-//! - `uc-cli` (`uniclip start`) — the historical caller.
+//! - `uc-cli` (`clip start`) — the historical caller.
 //! - GUI shells (`uc-tauri`, future native) — ADR-008 P3: the GUI becomes a
-//!   pure client and spawns the daemon as an independent `uniclipd` process
+//!   pure client and spawns the daemon as an independent `clipd` process
 //!   instead of hosting it in-process.
 //!
 //! This module only knows how to *spawn detached* + *resolve the binary*. The
@@ -27,7 +27,7 @@ use crate::process_metadata::{DaemonSpawnOrigin, SPAWN_ORIGIN_ENV};
 /// crate dependency-light and buildable on every target, including Windows.
 #[derive(Debug)]
 pub enum SpawnDaemonError {
-    /// The `uniclipd` binary could not be located (neither as a sibling of the
+    /// The `clipd` binary could not be located (neither as a sibling of the
     /// current executable nor on `PATH`).
     ResolveBinary(anyhow::Error),
     /// `Command::spawn` failed for the resolved binary.
@@ -38,7 +38,7 @@ impl fmt::Display for SpawnDaemonError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ResolveBinary(error) => {
-                write!(f, "failed to resolve `uniclipd` binary for spawn: {error}")
+                write!(f, "failed to resolve `clipd` binary for spawn: {error}")
             }
             Self::Spawn(error) => write!(f, "failed to spawn daemon process: {error}"),
         }
@@ -47,7 +47,7 @@ impl fmt::Display for SpawnDaemonError {
 
 impl std::error::Error for SpawnDaemonError {}
 
-/// Spawn `uniclipd` as a **detached** background process.
+/// Spawn `clipd` as a **detached** background process.
 ///
 /// "Detached" means the new process survives the spawning process exiting —
 /// that's the whole point of bringing up a daemon. We rely on three pieces:
@@ -174,20 +174,16 @@ fn configure_detached(_command: &mut Command) {
     // our real targets (macOS / Linux / Windows) all hit the paths above.
 }
 
-/// Resolve the path to the `uniclipd` daemon binary.
+/// Resolve the path to the `clipd` daemon binary.
 ///
 /// Strategy:
-/// 1. Look for `uniclipd` (or `uniclipd.exe` on Windows) as a sibling of the
+/// 1. Look for `clipd` (or `clipd.exe` on Windows) as a sibling of the
 ///    current executable. This covers Tauri sidecar bundles, `cargo build`
 ///    output directories, and Docker images where both binaries sit in the
 ///    same directory.
 /// 2. Fall back to a `PATH` lookup so system-wide installs work.
 pub fn resolve_daemon_exe_path() -> Result<PathBuf, SpawnDaemonError> {
-    let daemon_name = if cfg!(windows) {
-        "uniclipd.exe"
-    } else {
-        "uniclipd"
-    };
+    let daemon_name = if cfg!(windows) { "clipd.exe" } else { "clipd" };
 
     // Strategy 1: sibling of current executable.
     if let Ok(self_exe) = std::env::current_exe() {
@@ -215,7 +211,7 @@ mod tests {
     fn display_resolve_binary_self_identifies() {
         let err = SpawnDaemonError::ResolveBinary(anyhow::anyhow!("not on PATH"));
         let s = err.to_string();
-        assert!(s.contains("uniclipd"), "must name the binary: {s}");
+        assert!(s.contains("clipd"), "must name the binary: {s}");
         assert!(s.contains("not on PATH"), "must surface the cause: {s}");
     }
 
@@ -229,7 +225,7 @@ mod tests {
 
     #[test]
     fn resolve_daemon_exe_path_does_not_panic() {
-        // In a cargo test environment `uniclipd` may or may not be built. We
+        // In a cargo test environment `clipd` may or may not be built. We
         // only assert the resolver doesn't panic — the actual resolution
         // depends on the build layout.
         let _result = resolve_daemon_exe_path();

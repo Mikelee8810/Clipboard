@@ -344,7 +344,7 @@ For V2, `encrypted_content` (the raw bytes in `ClipboardMessage`) is:
 For the receiver-side blob file on disk (used by `EncryptedBlobStore`):
 
 ```
-[4 bytes] magic: 0x55 0x43 0x42 0x31 ("UCB1" - UniClipboard Blob v1)
+[4 bytes] magic: 0x55 0x43 0x42 0x31 ("UCB1" - Clipboard Blob v1)
 [16 bytes] blob_id (UUID raw bytes)
 [4 bytes] total_chunks (u32 LE)
 [4 bytes] chunk_size (u32 LE)
@@ -407,7 +407,7 @@ The existing `ClipboardMessage.content_hash` is a single representation's hash (
 
 ### What Sends Clipboard Data (Outbound Path)
 
-File: `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_outbound.rs`
+File: `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_outbound.rs`
 
 Current V1 flow:
 
@@ -421,7 +421,7 @@ V2 change: Replace steps 1-4 with multi-representation bundle + chunked encrypt.
 
 ### What Receives Clipboard Data (Inbound Path)
 
-File: `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_inbound.rs`
+File: `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_inbound.rs`
 
 Current V1 flow:
 
@@ -435,7 +435,7 @@ V2 change: After step 1, check `message.payload_version`. If V2, decode binary c
 
 ### Where libp2p Streams Are Written (Outbound Transport)
 
-File: `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs`
+File: `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs`
 
 Key function: `execute_business_stream` (line 1682)
 
@@ -459,7 +459,7 @@ For very large payloads (e.g., 50MB image), holding the entire encrypted `Vec<u8
 
 ### Where libp2p Streams Are Read (Inbound Transport)
 
-File: `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs`
+File: `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs`
 
 Key function: `spawn_business_stream_handler` (line 855)
 
@@ -805,17 +805,17 @@ async fn read_u32_le(reader: &mut impl AsyncReadExt + Unpin) -> anyhow::Result<u
 
 ### Primary (HIGH confidence) — Direct codebase inspection
 
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs` — complete transport layer: business stream send/receive, timeouts, command dispatch
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_outbound.rs` — full outbound use case with V1 encryption flow
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_inbound.rs` — full inbound use case with V1 decrypt flow, dedup logic, echo prevention
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-core/src/network/protocol/clipboard.rs` — `ClipboardMessage` struct
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-core/src/network/protocol/clipboard_payload.rs` — `ClipboardTextPayloadV1`
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-infra/src/security/encryption.rs` — XChaCha20-Poly1305 implementation with AAD
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-core/src/security/aad.rs` — AAD pattern conventions
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-core/src/clipboard/system.rs` — `SystemClipboardSnapshot`, `ObservedClipboardRepresentation`, `snapshot_hash()`
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-infra/Cargo.toml` — confirms `chacha20poly1305 = "0.10.1"`, `blake3 = "1.8.2"`
-- `/home/wuy6/myprojects/UniClipboard/src-tauri/crates/uc-platform/Cargo.toml` — confirms `tokio-util`, `futures`, `bytes`
-- `/home/wuy6/myprojects/UniClipboard/.planning/phases/02-unified-transfer-layer/02-CONTEXT.md` — all locked decisions
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-platform/src/adapters/libp2p_network.rs` — complete transport layer: business stream send/receive, timeouts, command dispatch
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_outbound.rs` — full outbound use case with V1 encryption flow
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-app/src/usecases/clipboard/sync_inbound.rs` — full inbound use case with V1 decrypt flow, dedup logic, echo prevention
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-core/src/network/protocol/clipboard.rs` — `ClipboardMessage` struct
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-core/src/network/protocol/clipboard_payload.rs` — `ClipboardTextPayloadV1`
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-infra/src/security/encryption.rs` — XChaCha20-Poly1305 implementation with AAD
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-core/src/security/aad.rs` — AAD pattern conventions
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-core/src/clipboard/system.rs` — `SystemClipboardSnapshot`, `ObservedClipboardRepresentation`, `snapshot_hash()`
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-infra/Cargo.toml` — confirms `chacha20poly1305 = "0.10.1"`, `blake3 = "1.8.2"`
+- `/home/wuy6/myprojects/Clipboard/src-tauri/crates/uc-platform/Cargo.toml` — confirms `tokio-util`, `futures`, `bytes`
+- `/home/wuy6/myprojects/Clipboard/.planning/phases/02-unified-transfer-layer/02-CONTEXT.md` — all locked decisions
 
 ---
 

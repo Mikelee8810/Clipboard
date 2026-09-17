@@ -15,16 +15,16 @@ const stage = path.join(work, 'baseline')
 fs.mkdirSync(stage)
 execFileSync('tar', ['-xzf', path.join(fixture, manifest.archive), '-C', stage])
 for (const file of manifest.files) assert.equal(hash(fs.readFileSync(path.join(stage, file.path))), file.sha256)
-const root = path.join(work, 'data', `app.uniclipboard.desktop-${profile}`)
+const root = path.join(work, 'data', `app.clipboard.desktop-${profile}`)
 fs.cpSync(path.join(stage, 'data'), root, { recursive: true })
-fs.copyFileSync(path.resolve('target/debug/uniclipd'), path.join(work, 'uniclipd'))
-fs.chmodSync(path.join(work, 'uniclipd'), 0o700)
+fs.copyFileSync(path.resolve('target/debug/clipd'), path.join(work, 'clipd'))
+fs.chmodSync(path.join(work, 'clipd'), 0o700)
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const results = []
 const expected = JSON.parse(fs.readFileSync(path.join(fixture, 'expected.json')))
 for (const phase of ['upgrade', 'restart']) {
   const fd = fs.openSync(path.join(work, `${phase}.log`), 'w')
-  const child = spawn(path.join(work, 'uniclipd'), [], { env: { ...process.env, UC_PROFILE: profile,
+  const child = spawn(path.join(work, 'clipd'), [], { env: { ...process.env, UC_PROFILE: profile,
     UC_PORTABLE: '1', UC_DAEMON_RUN_MODE: 'server', RUST_LOG: 'warn' }, stdio: ['ignore', fd, fd] })
   fs.closeSync(fd)
   child.on('error', error => { throw error })

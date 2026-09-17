@@ -125,7 +125,7 @@ export function updateCargoToml(
 
 export function updateCargoLock(newVersion, dryRun) {
   // The cargo workspace lives at the repo root, so Cargo.lock does too; the
-  // `uniclipboard` package manifest still lives in src-tauri/Cargo.toml.
+  // `clipboard` package manifest still lives in src-tauri/Cargo.toml.
   const cargoTomlPath = path.join(process.cwd(), 'src-tauri', 'Cargo.toml')
   const cargoLockPath = path.join(process.cwd(), 'Cargo.lock')
 
@@ -237,7 +237,7 @@ export function run(options = parseArgs()) {
   console.log(`${options.dryRun ? '[DRY RUN]' : '✓'} ${rootCargoResult.path}`)
   console.log(`  ${rootCargoResult.old} → ${rootCargoResult.new}`)
 
-  // Tauri bin package manifest: [package] version of `uniclipboard`.
+  // Tauri bin package manifest: [package] version of `clipboard`.
   const cargoResult = updateCargoToml(newVersion, options.dryRun)
   console.log(`${options.dryRun ? '[DRY RUN]' : '✓'} ${cargoResult.path}`)
   console.log(`  ${cargoResult.old} → ${cargoResult.new}`)

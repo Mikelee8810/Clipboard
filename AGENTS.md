@@ -61,10 +61,10 @@ Use when:
 ### 2a. Port definition / evolution / refactoring
 Read: `docs/architecture/ports.md`
 
-Port 的可写事实来源现位于 `UniClipboard/Engine`。本仓中的这份文档只作为迁移期参考；不得在 desktop 下重新创建或修改 Engine 内部包。
+Port 的可写事实来源现位于 `Clipboard/Engine`。本仓中的这份文档只作为迁移期参考；不得在 desktop 下重新创建或修改 Engine 内部包。
 
 Use when:
-- 规划必须在 `UniClipboard/Engine` 实现的 Port 变更
+- 规划必须在 `Clipboard/Engine` 实现的 Port 变更
 - adding methods to existing port traits
 - deciding port granularity or naming
 - refactoring large port interfaces into smaller ones
@@ -99,21 +99,21 @@ Then selectively read:
 - `src/AGENTS.md` for frontend-local navigation
 - `crates/AGENTS.md` for Rust-workspace navigation (crates/ + apps/ + src-tauri/)
 - `src-tauri/AGENTS.md` for Tauri packaging specifics
-- `apps/cli/AGENTS.md` for `uniclip` CLI-local rules
+- `apps/cli/AGENTS.md` for `clip` CLI-local rules
 
 Log file locations (platform-conventional, separate from the data root; single
 source of truth is `uc_app_paths::app_log_dir()`):
-- macOS: `~/Library/Logs/app.uniclipboard.desktop[-<profile>]/`
-- Linux: `~/.local/state/app.uniclipboard.desktop[-<profile>]/logs/`
-- Windows: `%LOCALAPPDATA%\\app.uniclipboard.desktop[-<profile>]\\logs\\`
+- macOS: `~/Library/Logs/app.clipboard.desktop[-<profile>]/`
+- Linux: `~/.local/state/app.clipboard.desktop[-<profile>]/logs/`
+- Windows: `%LOCALAPPDATA%\\app.clipboard.desktop[-<profile>]\\logs\\`
 
-Per-role files (`uniclipboard-{gui,daemon,cli}.json.<date>`), daily rotation,
+Per-role files (`clipboard-{gui,daemon,cli}.json.<date>`), daily rotation,
 7-day retention (older files pruned on start). Portable builds keep logs under
 `<exe>/data/logs/`.
 
-Do not assume the older `uniclipboard` root is current, and note logs are no
+Do not assume the older `clipboard` root is current, and note logs are no
 longer under the data root's `logs/` subdir on macOS/Linux. The app dir name is
-`app.uniclipboard.desktop`, with an optional `UC_PROFILE` suffix such as `-dev`.
+`app.clipboard.desktop`, with an optional `UC_PROFILE` suffix such as `-dev`.
 
 Use when:
 - entering an unfamiliar subsystem

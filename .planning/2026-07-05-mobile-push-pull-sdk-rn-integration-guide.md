@@ -1,6 +1,6 @@
 # push/pull 同步 SDK · 移动端 (RN) 对接指南
 
-面向 `uniclipboard-android`(RN/Expo，iOS + Android 共用 TS) 团队。
+面向 `clipboard-android`(RN/Expo，iOS + Android 共用 TS) 团队。
 对应设计：`.planning/2026-07-05-mobile-push-pull-sdk-design.md`（PR-A 已在本仓实现，
 `crates/uc-mobile/src/engine.rs`）。
 

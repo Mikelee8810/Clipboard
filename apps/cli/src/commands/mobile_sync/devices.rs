@@ -112,7 +112,7 @@ pub(crate) async fn add(args: AddArgs, json: bool, verbose: bool) -> i32 {
                 );
                 ui::warn("The password above will NOT be shown again. Copy it now.");
                 ui::warn(
-                    "Run `uniclip start` so the LAN listener accepts requests \
+                    "Run `clip start` so the LAN listener accepts requests \
                      from this device.",
                 );
                 shared::finish_daemon(ctx, exit_codes::EXIT_SUCCESS).await

@@ -1,6 +1,6 @@
 # Mobile Sync Connect URI — Protocol Specification
 
-> Single source of truth for the `uniclipboard://connect` deep-link protocol used to maintain
+> Single source of truth for the `clipboard://connect` deep-link protocol used to maintain
 > supported compatibility clients (iOS Shortcut and Android SyncClipboard-compatible clients)
 > by encoding `base_url`, `username`, `password`, and extensible metadata into a single QR code.
 >
@@ -46,18 +46,18 @@ Design constraints driving the shape below:
 ## 2. URI shape
 
 ```text
-uniclipboard://connect?v=1&svc=mobile-sync&p=<PAYLOAD>
+clipboard://connect?v=1&svc=mobile-sync&p=<PAYLOAD>
 ```
 
 | Component   | Value                                                          |
 | ----------- | -------------------------------------------------------------- |
-| Scheme      | `uniclipboard` — the **only** accepted scheme                  |
+| Scheme      | `clipboard` — the **only** accepted scheme                  |
 | Host        | `connect`                                                      |
 | Query `v`   | URI envelope version. v1 = `1`.                                |
 | Query `svc` | Service identifier. v1 supports `mobile-sync` only.            |
 | Query `p`   | **base64url (no padding)** of the UTF-8 JSON payload (see §3). |
 
-**Why a single scheme?** Earlier internal docs and comments speculated about a `uniclip://`
+**Why a single scheme?** Earlier internal docs and comments speculated about a `clip://`
 short alias. v1 deliberately rejects that idea: a single canonical scheme keeps Intent
 filters / URL handlers / parser logic simple, removes one source of cross-platform
 inconsistency, and avoids accidentally splitting clients into "accepts both" vs.
@@ -217,7 +217,7 @@ flowchart TD
   scan --> trim[Trim whitespace]
   trim --> parseUri{Parse as URI}
   parseUri -->|fail| eScheme[INVALID_SCHEME]
-  parseUri --> checkScheme{scheme == uniclipboard?}
+  parseUri --> checkScheme{scheme == clipboard?}
   checkScheme -->|no| eScheme
   checkScheme --> checkHost{host == connect?}
   checkHost -->|no| eScheme
@@ -242,7 +242,7 @@ flowchart TD
 ```text
 raw = trim(qr_text)
 uri = parse(raw)                              # may throw → INVALID_SCHEME
-require uri.scheme == "uniclipboard"          # else INVALID_SCHEME
+require uri.scheme == "clipboard"          # else INVALID_SCHEME
 require uri.host == "connect"                       # else INVALID_SCHEME
 
 v   = int(uri.query["v"])                     # missing/non-int → UNSUPPORTED_VERSION
@@ -274,7 +274,7 @@ foreach (k, v) in (payload.o or {}):
 
 | Code                    | Trigger                                              | UX hint                                |
 | ----------------------- | ---------------------------------------------------- | -------------------------------------- |
-| `INVALID_SCHEME`        | Scheme ≠ `uniclipboard` or host ≠ `connect`.         | "Not a UniClipboard QR."               |
+| `INVALID_SCHEME`        | Scheme ≠ `clipboard` or host ≠ `connect`.         | "Not a Clipboard QR."               |
 | `UNSUPPORTED_VERSION`   | URI `v` ≠ 1 or payload `v` ≠ 1.                      | "Please update your app."              |
 | `UNSUPPORTED_SERVICE`   | URI `svc` ≠ `mobile-sync`.                           | "Service not supported in this build." |
 | `PAYLOAD_DECODE_FAILED` | `p` missing, base64url malformed, or JSON malformed. | "QR is corrupted — regenerate it."     |
@@ -299,7 +299,7 @@ because:
 **Mandatory rules for any code path handling the URI:**
 
 - MUST NOT log the full URI, the decoded payload, or the password. Log only redacted
-  views (e.g. `uniclipboard://connect?v=1&svc=mobile-sync&p=<…48 chars…>`).
+  views (e.g. `clipboard://connect?v=1&svc=mobile-sync&p=<…48 chars…>`).
 - MUST NOT include the URI in analytics events, crash reports, or error attachments.
 - MUST NOT persist the URI to disk after the credential modal closes.
 
@@ -363,7 +363,7 @@ suites MUST assert against the exact strings below.
 **Encoded URI:**
 
 ```text
-uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
+clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
 ```
 
 > **Note**: implementors MUST verify this string at test-time by round-tripping
@@ -390,7 +390,7 @@ uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vMTkyLjE
 **Encoded URI:**
 
 ```text
-uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwczovLzIwMy0wLTExMy0xMC5zc2xpcC5pbyIsInVybHMiOlsiaHR0cHM6Ly8yMDMtMC0xMTMtMTAuc3NsaXAuaW8iLCJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJodHRwOi8vMTAwLjY0LjAuNTo0MjcyMCJdLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
+clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwczovLzIwMy0wLTExMy0xMC5zc2xpcC5pbyIsInVybHMiOlsiaHR0cHM6Ly8yMDMtMC0xMTMtMTAuc3NsaXAuaW8iLCJodHRwOi8vMTkyLjE2OC4xLjU6NDI3MjAiLCJodHRwOi8vMTAwLjY0LjAuNTo0MjcyMCJdLCJ1c2VyIjoibW9iaWxlX2FhYmJjY2RkIiwicHdkIjoiQWJDZEVmR2hJaktsTW5PcFFyU3QiLCJvIjp7ImRpZCI6ImRpZF8wMTIzYWJjZCIsImxhYmVsIjoiVGVzdCIsInByb3RvIjoic3luY2NsaXBib2FyZCJ9fQ
 ```
 
 The §7.1 vector (no `urls`) MUST keep passing unchanged — single-candidate payloads are
@@ -403,11 +403,11 @@ Each vector below MUST produce the listed error code on parse:
 | #   | Input                                                                                                                      | Expected error          |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | 1   | `https://example.com/connect?v=1&svc=mobile-sync&p=eyJ2IjoxfQ`                                                             | `INVALID_SCHEME`        |
-| 2   | `uniclipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ`                                                                  | `UNSUPPORTED_VERSION`   |
-| 3   | `uniclipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ`                                                                        | `UNSUPPORTED_SERVICE`   |
-| 4   | `uniclipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#`                                                         | `PAYLOAD_DECODE_FAILED` |
-| 5   | `uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ` (no `pwd`)               | `MISSING_FIELD`         |
-| 6   | `uniclipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ` (ftp scheme) | `INVALID_URL`           |
+| 2   | `clipboard://connect?v=2&svc=mobile-sync&p=eyJ2IjoxfQ`                                                                  | `UNSUPPORTED_VERSION`   |
+| 3   | `clipboard://connect?v=1&svc=other&p=eyJ2IjoxfQ`                                                                        | `UNSUPPORTED_SERVICE`   |
+| 4   | `clipboard://connect?v=1&svc=mobile-sync&p=not-valid-base64!@#`                                                         | `PAYLOAD_DECODE_FAILED` |
+| 5   | `clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJodHRwOi8vYS5iIiwidXNlciI6InUifQ` (no `pwd`)               | `MISSING_FIELD`         |
+| 6   | `clipboard://connect?v=1&svc=mobile-sync&p=eyJ2IjoxLCJ1cmwiOiJmdHA6Ly9hLmIiLCJ1c2VyIjoidSIsInB3ZCI6InAifQ` (ftp scheme) | `INVALID_URL`           |
 
 ---
 
@@ -444,10 +444,10 @@ After first install, every subsequent device add only needs the connect-URI scan
 The three paths below document supported compatibility clients. They are not onboarding
 routes for the new P2P architecture, and their order does not imply future investment.
 
-### 9.1 Native UniClipboard iOS App (compatibility mode)
+### 9.1 Native Clipboard iOS App (compatibility mode)
 
-The iOS App registers the `uniclipboard` URL scheme. When the user points the system
-Camera app at the desktop's QR, iOS surfaces an "Open in UniClipboard?" smart action
+The iOS App registers the `clipboard` URL scheme. When the user points the system
+Camera app at the desktop's QR, iOS surfaces an "Open in Clipboard?" smart action
 and routes the URL into the App's `.onOpenURL` handler. The App parses per §4 and
 either pre-fills the Add Server form or asks the user to confirm before saving.
 
@@ -464,7 +464,7 @@ Two-phase UX for users without the native App:
 
 1. **First time only**: install the SyncClipboard Shortcut template via the iCloud
    share link (`SYNC_CLIPBOARD_EX_INSTALL_URL`). One-time signed Apple Shortcut bundle.
-2. **Every add-device thereafter**: feed the `uniclipboard://connect?…` URI to the
+2. **Every add-device thereafter**: feed the `clipboard://connect?…` URI to the
    template. It detects the URI prefix, extracts the `p` query parameter,
    base64url-decodes it, parses the JSON, and writes `url` / `user` / `pwd` into the
    template's three keychain values.
@@ -476,7 +476,7 @@ card. Step-by-step Shortcut actions are documented in
 
 ### 9.3 Android / other third-party clients
 
-Register an Intent filter (Android) or equivalent for `uniclipboard://connect`. On
+Register an Intent filter (Android) or equivalent for `clipboard://connect`. On
 scan or URL receipt:
 
 1. Parse per §4.

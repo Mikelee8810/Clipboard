@@ -35,7 +35,7 @@ pub struct ScopeContext {
     /// `vault_dir/device_id.txt` 里持久化的 UUID。`None` 表示文件还没生成
     /// （首次启动且 setup 流程尚未把它写盘）。
     pub device_id: Option<String>,
-    /// 同一台设备上区分多个 UniClipboard 进程的角色：
+    /// 同一台设备上区分多个 Clipboard 进程的角色：
     /// `gui-host`（Tauri 主进程）/`daemon`（standalone 后台进程）/
     /// `cli`（终端入口）/`unknown`（库测试等无法判定的场景）。
     pub device_role: &'static str,
@@ -89,11 +89,11 @@ pub fn global_scope() -> Option<&'static ScopeContext> {
 ///
 /// 优先级：
 ///
-/// 1. **`UC_HOST_ROLE` 环境变量** —— 显式覆盖。`uniclip daemon` 子命令会在
-///    调 bootstrap 之前先把它设为 `daemon`，因为同一个 `uniclip` 二进制既能
+/// 1. **`UC_HOST_ROLE` 环境变量** —— 显式覆盖。`clip daemon` 子命令会在
+///    调 bootstrap 之前先把它设为 `daemon`，因为同一个 `clip` 二进制既能
 ///    是 CLI 又能是 daemon，光看 `current_exe` 区分不出来。
-/// 2. **`current_exe()` basename** —— `uniclipboard` → `gui-host`，
-///    `uniclip` → `cli`。
+/// 2. **`current_exe()` basename** —— `clipboard` → `gui-host`，
+///    `clip` → `cli`。
 /// 3. 兜底 `unknown`，避免误报。
 fn detect_role() -> &'static str {
     if let Ok(raw) = env::var("UC_HOST_ROLE") {
@@ -111,23 +111,23 @@ fn detect_role() -> &'static str {
         .and_then(|s| s.to_str())
         .unwrap_or("");
     match stem {
-        "uniclipboard" | "UniClipboard" => "gui-host",
-        "uniclip" => "cli",
+        "clipboard" | "Clipboard" => "gui-host",
+        "clip" => "cli",
         _ => "unknown",
     }
 }
 
 /// Per-role log file stem (ADR-008 D20 P4-0).
 ///
-/// Two co-resident processes (the GUI host and the detached `uniclipd`) must
+/// Two co-resident processes (the GUI host and the detached `clipd`) must
 /// not append to the same rolling log file — concurrent appends race and the
 /// merged stream is unreadable. The daily appender prefixes the file with the
 /// process role so each writes its own family:
 ///
-/// - `gui-host` → `uniclipboard-gui` → `uniclipboard-gui.json.<date>`
-/// - `daemon`   → `uniclipboard-daemon`
-/// - `cli`      → `uniclipboard-cli`
-/// - `unknown`  → `uniclipboard` (legacy base name; only lib tests / edge
+/// - `gui-host` → `clipboard-gui` → `clipboard-gui.json.<date>`
+/// - `daemon`   → `clipboard-daemon`
+/// - `cli`      → `clipboard-cli`
+/// - `unknown`  → `clipboard` (legacy base name; only lib tests / edge
 ///   processes land here and never run concurrently with a real process).
 ///
 /// Resolves the role the same way [`ScopeContext::resolve`] does — via
@@ -135,10 +135,10 @@ fn detect_role() -> &'static str {
 /// correct even when called before [`set_global_scope`].
 pub fn role_log_file_stem() -> &'static str {
     match detect_role() {
-        "gui-host" => "uniclipboard-gui",
-        "daemon" => "uniclipboard-daemon",
-        "cli" => "uniclipboard-cli",
-        _ => "uniclipboard",
+        "gui-host" => "clipboard-gui",
+        "daemon" => "clipboard-daemon",
+        "cli" => "clipboard-cli",
+        _ => "clipboard",
     }
 }
 
@@ -182,9 +182,9 @@ mod tests {
     fn log_file_stem_is_role_prefixed() {
         let _guard = ENV_LOCK.lock().unwrap();
         for (role, expected) in [
-            ("gui-host", "uniclipboard-gui"),
-            ("daemon", "uniclipboard-daemon"),
-            ("cli", "uniclipboard-cli"),
+            ("gui-host", "clipboard-gui"),
+            ("daemon", "clipboard-daemon"),
+            ("cli", "clipboard-cli"),
         ] {
             std::env::set_var("UC_HOST_ROLE", role);
             assert_eq!(role_log_file_stem(), expected, "role {role}");
@@ -196,7 +196,7 @@ mod tests {
     fn log_file_stem_unknown_keeps_legacy_base() {
         let _guard = ENV_LOCK.lock().unwrap();
         std::env::set_var("UC_HOST_ROLE", "bogus-value");
-        assert_eq!(role_log_file_stem(), "uniclipboard");
+        assert_eq!(role_log_file_stem(), "clipboard");
         std::env::remove_var("UC_HOST_ROLE");
     }
 }

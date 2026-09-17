@@ -1,4 +1,4 @@
-# Phase 87: 全面迁移 OTLP, 兼容 Seq 展示, 采用 OTLP 最佳实践 - Research
+# Phase 87: 全面迁移 OTLP, 兼容 Seq 展示，采用 OTLP 最佳实践 - Research
 
 **Researched:** 2026-04-04
 **Domain:** OpenTelemetry Rust SDK + OTLP/HTTP-protobuf exporter, W3C trace context propagation, Seq OTLP ingestion, tracing-opentelemetry bridge
@@ -15,12 +15,12 @@
 - **D-01:** 本期导出 **Traces + Logs** 两类信号。Metrics 推迟到后续 phase
   - Span 通过 `tracing-opentelemetry` bridge → OTLP traces
   - `tracing::info!/error!/warn!` 等 event → OTLP logs
-  - Seq 原生支持两者,并可在 trace 详情页直接关联 logs
+  - Seq 原生支持两者，并可在 trace 详情页直接关联 logs
 
-**迁移策略: 硬切换**
+**迁移策略：硬切换**
 
 - **D-02:** 一步到位硬切换 — 直接删除 `uc-observability/src/seq/layer.rs`、`sender.rs` 以及 `clef_format.rs`
-- **D-03:** 不保留 feature flag、不双写、不并行运行 — Seq 是 dev-only 工具,回归风险低,减少长期维护代价
+- **D-03:** 不保留 feature flag、不双写、不并行运行 — Seq 是 dev-only 工具，回归风险低，减少长期维护代价
 - **D-04:** `docker-compose.seq.yml` 本期更新为启用 Seq OTLP ingestion endpoint
 
 **Span 拓扑重构**
@@ -34,28 +34,28 @@
   - `flow_id` 不再作为 span attribute — 语义由 OTel `trace_id` 承担
   - `stage` 作为 **span name**(e.g. `clipboard.cache_representations`),不再以 `stage=xxx` 字段形式出现
   - `device_id` 提升为 resource attribute(`service.instance.id` 或 `uc.device.id` — Claude 选择)
-  - `service.name = uniclipboard-desktop` / `service.version` / `deployment.environment` 等按 semconv 填充
+  - `service.name = clipboard-desktop` / `service.version` / `deployment.environment` 等按 semconv 填充
 - **D-08:** Phase 22/23 留下的 Seq saved searches / signals 必须同步重写
 
-**跨设备传播: W3C TraceContext**
+**跨设备传播：W3C TraceContext**
 
 - **D-09:** 使用 **W3C traceparent** 作为跨设备 flow 链接的标准机制
 - **D-10:** `ClipboardMessage` 协议头新增 `traceparent: Option<String>` 字段
   - serde(default) + skip_serializing_if 兼容旧 peer
   - 发送端导出当前 root flow span 的 traceparent
   - 接收端用 traceparent 作为 inbound span 的 remote parent
-  - 旧 peer 不带 traceparent 时:本地新 root span + warn
-- **D-11:** `origin_flow_id` 在本期从**逻辑**层移除(W3C trace context 代替),协议结构体字段**保留**做向后兼容,新代码不再读写,由后续 phase 清理
+  - 旧 peer 不带 traceparent 时：本地新 root span + warn
+- **D-11:** `origin_flow_id` 在本期从 **逻辑** 层移除 (W3C trace context 代替),协议结构体字段 **保留** 做向后兼容，新代码不再读写，由后续 phase 清理
 
 **导出协议与配置**
 
-- **D-12:** 使用 **OTLP/HTTP-protobuf** 作为 transport(复用 reqwest + rustls-tls,不引入 tonic/gRPC)
+- **D-12:** 使用 **OTLP/HTTP-protobuf** 作为 transport(复用 reqwest + rustls-tls，不引入 tonic/gRPC)
 - **D-13:** 环境变量全面切换到 **OTel 标准**(`OTEL_EXPORTER_OTLP_ENDPOINT` / `OTEL_EXPORTER_OTLP_HEADERS` / `OTEL_SERVICE_NAME`)
-- **D-14:** `UC_SEQ_URL` / `UC_SEQ_API_KEY` 本期**停用**,检测到仍被设置时 log warn 不做隐式 fallback
+- **D-14:** `UC_SEQ_URL` / `UC_SEQ_API_KEY` 本期 **停用**,检测到仍被设置时 log warn 不做隐式 fallback
 
 ### Claude's Discretion
 
-- OTLP exporter 的 batch size / flush interval / 超时参数(沿用默认或微调)
+- OTLP exporter 的 batch size / flush interval / 超时参数 (沿用默认或微调)
 - `device_id` 映射为 `service.instance.id` 还是 `uc.device.id`(研究 semconv 后决定;优先 semconv 标准字段)
 - Root flow span 的具体 span name(`clipboard.flow` vs `clipboard.capture_flow` 等)
 - Cross-crate instrumentation 改造的具体切入点与 Span scope 传递方式
@@ -63,7 +63,7 @@
 - `tracing-opentelemetry` bridge 配置与 Layer 组合顺序
 - 重写后的 Seq signals JSON 结构
 - 旧 `origin_flow_id` 字段 deprecated 注释方式
-- 测试策略(mock OTLP collector、集成测试 Seq 可见性等)
+- 测试策略 (mock OTLP collector、集成测试 Seq 可见性等)
 
 ### Deferred Ideas (OUT OF SCOPE)
 
@@ -86,7 +86,7 @@ Roadmap marks requirements as TBD; the following are derived from CONTEXT.md D-0
 | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | REQ-87-01 | Replace `uc-observability/src/seq/{layer,sender,mod}.rs` + `clef_format.rs` with `opentelemetry` + `opentelemetry-otlp` + `tracing-opentelemetry` OTLP pipeline exporting traces & logs   | Standard Stack (opentelemetry-otlp 0.31.x, tracing-opentelemetry 0.32.x), Architecture Pattern §2 (pipeline init), Code Example §A                                      |
 | REQ-87-02 | OTLP transport is HTTP/protobuf, reusing existing `reqwest` + `rustls-tls` stack (no tonic/gRPC dependency added)                                                                             | Standard Stack (feature flags `http-proto` + `reqwest-rustls`), D-12                                                                                                     |
-| REQ-87-03 | Resource attributes conform to OTel semantic conventions: `service.name=uniclipboard-desktop`, `service.version` from Cargo, `service.instance.id` (or `uc.device.id`) from device_id, `deployment.environment` from build type | Semantic Conventions §3, Code Example §C                                                                                                                                 |
+| REQ-87-03 | Resource attributes conform to OTel semantic conventions: `service.name=clipboard-desktop`, `service.version` from Cargo, `service.instance.id` (or `uc.device.id`) from device_id, `deployment.environment` from build type | Semantic Conventions §3, Code Example §C                                                                                                                                 |
 | REQ-87-04 | Clipboard pipeline becomes a parent-child span tree: one root flow span covers the whole pipeline; `normalize` / `persist_event` / `cache_representations` / etc. become its direct children | Architecture Pattern §4 (root flow span), Current Code Audit (all 11 stage spans currently flat), Code Example §D                                                        |
 | REQ-87-05 | Stage names use dotted semconv-aligned form as span names (`clipboard.normalize`, `clipboard.cache_representations`, …); `stage = xxx` field is removed; `flow_id` attribute is removed in favor of OTel `trace_id` | Semantic Conventions §3, D-07                                                                                                                                            |
 | REQ-87-06 | `ClipboardMessage` gains `traceparent: Option<String>` with `serde(default)` + `skip_serializing_if`; outbound sync injects current context; inbound sync extracts and uses as remote parent | W3C Context Propagation §5, Code Example §E (inject/extract), existing `origin_flow_id` backward-compat pattern                                                          |
@@ -104,7 +104,7 @@ Roadmap marks requirements as TBD; the following are derived from CONTEXT.md D-0
 
 ## Summary
 
-Phase 87 replaces UniClipboard's custom CLEF-over-HTTP Seq exporter with the OpenTelemetry Rust SDK, using OTLP/HTTP-protobuf as transport. This is a **hard switch** — the old `SeqLayer` + `CLEFFormat` + hand-written batching `sender_loop` in `uc-observability/src/seq/` is deleted in the same phase. The new pipeline is built from three official crates (`opentelemetry`, `opentelemetry-otlp`, `tracing-opentelemetry`) that compose naturally with the existing `tracing-subscriber` Registry pattern (console layer + JSON file layer stay unchanged; the Seq layer slot is replaced by an `OpenTelemetryLayer` backed by an OTLP `SpanExporter`). Seq 2025.x natively accepts OTLP/HTTP-protobuf on `/ingest/otlp/v1/{traces,logs}` on the same port as its UI, so Phase 22/23's docker-compose setup only needs a minor binding adjustment (port 5341 already serves both).
+Phase 87 replaces Clipboard's custom CLEF-over-HTTP Seq exporter with the OpenTelemetry Rust SDK, using OTLP/HTTP-protobuf as transport. This is a **hard switch** — the old `SeqLayer` + `CLEFFormat` + hand-written batching `sender_loop` in `uc-observability/src/seq/` is deleted in the same phase. The new pipeline is built from three official crates (`opentelemetry`, `opentelemetry-otlp`, `tracing-opentelemetry`) that compose naturally with the existing `tracing-subscriber` Registry pattern (console layer + JSON file layer stay unchanged; the Seq layer slot is replaced by an `OpenTelemetryLayer` backed by an OTLP `SpanExporter`). Seq 2025.x natively accepts OTLP/HTTP-protobuf on `/ingest/otlp/v1/{traces,logs}` on the same port as its UI, so Phase 22/23's docker-compose setup only needs a minor binding adjustment (port 5341 already serves both).
 
 The second theme is **span topology + semantic conventions**. Today the clipboard pipeline emits 11 flat sibling spans (`detect`, `normalize`, `persist_event`, `cache_representations`, `select_policy`, `persist_entry`, `spool_blobs`, `outbound_prepare`, `outbound_send`, `inbound_decode`, `inbound_apply`) linked loosely by a `flow_id` attribute. This is not how OTel waterfalls work. Phase 87 introduces a **root flow span** (`clipboard.flow`) and restructures all 11 stages as its direct children — which means the root span's `SpanContext` is now the OTel trace identity, and `flow_id` disappears as a user field. Cross-device linking switches from the custom `origin_flow_id` header to W3C **traceparent**, using `OpenTelemetrySpanExt::context()` + `TraceContextPropagator::inject` on send and `propagator.extract` + `Span::set_parent` on receive.
 
@@ -282,7 +282,7 @@ where
         .with_resource(resource)
         .build();
 
-    let tracer = provider.tracer("uniclipboard-desktop");
+    let tracer = provider.tracer("clipboard-desktop");
 
     // 5. Bridge layer (tracing → OTel)
     let otel_layer = OpenTelemetryLayer::new(tracer).with_filter(profile.json_filter());
@@ -297,13 +297,13 @@ where
 
 | Key                         | Value                                  | Source                                          |
 | --------------------------- | -------------------------------------- | ----------------------------------------------- |
-| `service.name`              | `"uniclipboard-desktop"`               | hardcoded, overridable via `OTEL_SERVICE_NAME`  |
+| `service.name`              | `"clipboard-desktop"`               | hardcoded, overridable via `OTEL_SERVICE_NAME`  |
 | `service.version`           | `env!("CARGO_PKG_VERSION")`            | compile-time                                    |
 | `service.instance.id`       | `device_id` (UUID)                     | `global_device_id()` from `context.rs`          |
 | `deployment.environment.name` | `"development"` \| `"debug_clipboard"` | derived from `LogProfile`                       |
 | `os.type`                   | `std::env::consts::OS`                 | compile-time                                    |
 
-**Decision on `service.instance.id` vs `uc.device.id`:** OTel semconv 1.27+ officially defines `service.instance.id` as "a string uniquely identifying the instance of the service that emitted the signal". UniClipboard's `device_id` is stable per-install per-device — this is semantically exactly what `service.instance.id` is for. **Recommendation: use `service.instance.id`** and do NOT introduce a project-local `uc.device.id` attribute. This gives forward compatibility with any future OTel backend (Tempo/Jaeger/Honeycomb) which know the standard key but would not know the custom one.
+**Decision on `service.instance.id` vs `uc.device.id`:** OTel semconv 1.27+ officially defines `service.instance.id` as "a string uniquely identifying the instance of the service that emitted the signal". Clipboard's `device_id` is stable per-install per-device — this is semantically exactly what `service.instance.id` is for. **Recommendation: use `service.instance.id`** and do NOT introduce a project-local `uc.device.id` attribute. This gives forward compatibility with any future OTel backend (Tempo/Jaeger/Honeycomb) which know the standard key but would not know the custom one.
 
 ```rust
 // uc-observability/src/otlp/resource.rs
@@ -313,7 +313,7 @@ use opentelemetry_semantic_conventions::resource as semconv;
 
 pub fn build_resource(device_id: Option<&str>) -> Resource {
     let mut kvs = vec![
-        KeyValue::new(semconv::SERVICE_NAME, "uniclipboard-desktop"),
+        KeyValue::new(semconv::SERVICE_NAME, "clipboard-desktop"),
         KeyValue::new(semconv::SERVICE_VERSION, env!("CARGO_PKG_VERSION")),
         KeyValue::new(semconv::OS_TYPE, std::env::consts::OS),
         KeyValue::new(semconv::DEPLOYMENT_ENVIRONMENT_NAME,
@@ -419,7 +419,7 @@ async move {
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | SDK auto-read (overrides base)   | —                                     | Use only if traces and logs need different endpoints                 |
 | `OTEL_EXPORTER_OTLP_HEADERS`   | SDK auto-read                          | —                                     | Example: `X-Seq-ApiKey=abcd1234`                                     |
 | `OTEL_EXPORTER_OTLP_PROTOCOL`  | SDK auto-read                          | `http/protobuf` (per our feature)     | Could be `grpc` but we don't build with that feature                 |
-| `OTEL_SERVICE_NAME`            | SDK auto-read; overrides `Resource`    | `"uniclipboard-desktop"` hardcoded    | —                                                                    |
+| `OTEL_SERVICE_NAME`            | SDK auto-read; overrides `Resource`    | `"clipboard-desktop"` hardcoded    | —                                                                    |
 | `OTEL_RESOURCE_ATTRIBUTES`     | SDK auto-read; merges with `Resource`  | —                                     | E.g. `deployment.environment=dev,foo=bar`                            |
 | `OTEL_EXPORTER_OTLP_TIMEOUT`   | SDK auto-read                          | 10s                                   | —                                                                    |
 | `OTEL_TRACES_SAMPLER`          | SDK auto-read                          | `parentbased_always_on`               | Leave default                                                        |
@@ -531,7 +531,7 @@ Phase 87 is a telemetry-layer migration. The relevant "runtime state" category i
 **What goes wrong:** Every message from a legacy peer triggers a warn-level log. Development logs are flooded.
 **Why it happens:** Graceful degradation path logs unconditionally.
 **How to avoid:** Track "peer X has sent N messages without traceparent" in a per-peer counter; log warn only once per peer per session. Or log at debug level, not warn.
-**Warning signs:** `grep "missing traceparent" uniclipboard.json | wc -l` returns thousands during a normal sync session.
+**Warning signs:** `grep "missing traceparent" clipboard.json | wc -l` returns thousands during a normal sync session.
 
 ### Pitfall 5: Resource attributes set after provider construction are ignored
 

@@ -70,7 +70,7 @@ Output: Clean codebase with no transfer progress artifacts.
    - Remove `transfer: transferReducer,` from the reducer config (line 14)
      </action>
      <verify>
-     <automated>cd /Users/mark/conductor/workspaces/uniclipboard-desktop/jakarta-v1 && bun run build 2>&1 | tail -5</automated>
+     <automated>cd /Users/mark/conductor/workspaces/clipboard-desktop/jakarta-v1 && bun run build 2>&1 | tail -5</automated>
      </verify>
      <done>All three files deleted, DashboardPage and store cleaned of transfer references, frontend builds without errors.</done>
      </task>

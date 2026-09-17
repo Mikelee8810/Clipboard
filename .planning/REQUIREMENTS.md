@@ -30,7 +30,7 @@
 - [x] **NETSET-03**：用户在 settings 中关闭 "允许中继回落" 后重启 daemon，启动路径会把字段值通过唯一的取反 helper 注入 `IrohNodeConfig.disable_relays`，使 iroh endpoint 以 `RelayMode::Disabled` 模式 bind，且 `Endpoint::addr().addrs` 中不含 `TransportAddr::Relay` 项 — validated in Phase 94 (2026-05-04, human UAT 2/2 PASSED via real daemon log: home_relay 注册/缺席对比 + LAN-only 死循环重试外网 peer)
 - [ ] **NETSET-04**：用户在 Settings → Network 分类下能看到 "LAN-only Mode" 开关，默认 OFF（关闭=允许 fallback），切换不立即生效
 - [ ] **NETSET-05**：用户切换 LAN-only 开关后，UI 显示持久化的 inline "重启生效" 通知（不是一秒 toast），且开关呈现三态视觉（applied OFF / applied ON / pending change），通知内含"立即重启"按钮可触发 daemon 优雅 shutdown + relaunch
-- [ ] **NETSET-06**：用户在 LAN-only 开关附近能看到 info icon / tooltip，明确披露开启后**仍会走外网**的 4 类请求（首次配对 rendezvous、OTLP 遥测、pkarr DHT NodeId 解析、auto-update GitHub 检查）
+- [ ] **NETSET-06**：用户在 LAN-only 开关附近能看到 info icon / tooltip，明确披露开启后 **仍会走外网** 的 4 类请求（首次配对 rendezvous、OTLP 遥测、pkarr DHT NodeId 解析、auto-update GitHub 检查）
 
 ### INDIC — 连接通道指示器（4 条）
 
@@ -66,13 +66,13 @@
 
 - **自托管 rendezvous** —— rendezvous 服务暂未开源，需要先给出部署文档/容器化才能让用户暴露；attachment 中用户已确认"暂时不可自建"
 - **运行时热切换 LAN-only Mode** —— iroh `RelayMode` 是 bind 时常量，热切换需重建 endpoint + 重挂 ALPN handler + 处理活跃 transfer，本里程碑用"重启生效"提示替代
-- **独立 LAN-only 二进制 flavor（uniclip-lan）** —— 双 binary 维护成本高；先做开关，flavor 看后续真实需求
-- **完全无联网首次配对** —— 接受首次需联网经 rendezvous；侧信道配对（QR+蓝牙+NFC）是独立子项目
+- **独立 LAN-only 二进制 flavor（clip-lan）** —— 双 binary 维护成本高；先做开关，flavor 看后续真实需求
+- **完全无联网首次配对** —— 接受首次需联网经 rendezvous；侧信道配对（QR+ 蓝牙+NFC）是独立子项目
 - **自动检测 LAN/Relay 而省略开关** —— Syncthing 论坛已证实 auto detection 在 NAT/IP 缓存边界容易误判
 - **基于 IP 段的白名单/黑名单** —— 家用 DHCP 易把自己锁出，NodeId 才是更精确的身份层
 - **关闭 pkarr DHT 的 "Strict mode"** —— 关掉后跨网段连接率会从 ~90% 跌到接近 0；pkarr 性质类似 DNS，不算 relay
 - **自定义 rendezvous URL 输入框** —— 与"自托管 rendezvous" 一致，先有部署文档再考虑用户暴露
-- **LAN-only 联动遥测开关** —— OTLP 遥测由 `general.telemetry_enabled` 独立控制，本里程碑**禁止**联动；如有需求请由用户在 General 分类显式关闭遥测
+- **LAN-only 联动遥测开关** —— OTLP 遥测由 `general.telemetry_enabled` 独立控制，本里程碑 **禁止** 联动；如有需求请由用户在 General 分类显式关闭遥测
 
 ---
 

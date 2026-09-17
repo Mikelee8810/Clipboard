@@ -1,8 +1,8 @@
 $ErrorActionPreference = 'Stop'
 
 $packageArgs = @{
-  packageName  = 'uniclipboard'
-  softwareName = 'UniClipboard*'
+  packageName  = 'clipboard'
+  softwareName = 'Clipboard*'
   fileType     = 'exe'
   silentArgs   = '/S'   # NSIS silent uninstall
   validExitCodes = @(0)

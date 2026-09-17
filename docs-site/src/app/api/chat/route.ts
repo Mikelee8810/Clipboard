@@ -78,7 +78,7 @@ function getClientLocale(messages: ChatUIMessage[]): DocsLocale {
 
 function createSearchTool(defaultLocale: DocsLocale) {
   return tool({
-    description: 'Search UniClipboard documentation and return matching sections.',
+    description: 'Search Clipboard documentation and return matching sections.',
     inputSchema: z.object({
       query: z.string().min(1),
       locale: z.enum(['en', 'zh']).optional(),
@@ -112,7 +112,7 @@ export type ChatUIMessage = UIMessage<
 >
 
 const systemPrompt = [
-  '你是 UniClipboard 文档站的 AI 助手。',
+  '你是 Clipboard 文档站的 AI 助手。',
   '需要文档依据时，先调用 `search` 工具检索相关文档。',
   '根据用户语言回答：中文问题用中文回答，英文问题用英文回答。',
   '使用搜索结果作为依据，并用结果里的 `url` 字段添加 Markdown 链接引用。',

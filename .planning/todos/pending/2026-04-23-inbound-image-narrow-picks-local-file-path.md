@@ -14,7 +14,7 @@ files:
 在同 LAN 下跨设备复制小图片（PixPin 截图）验证，**出站 dispatch 成功 (`accepted=1`)**，
 但对端粘贴"什么都没有"或拿到一个文件占位。
 
-真机日志（`~/Library/Application Support/app.uniclipboard.desktop-abc/logs/uniclipboard.json.2026-04-23`，行 1744-1784）显示 PixPin 往系统剪贴板塞了 7 种 representation：
+真机日志（`~/Library/Application Support/app.clipboard.desktop-abc/logs/clipboard.json.2026-04-23`，行 1744-1784）显示 PixPin 往系统剪贴板塞了 7 种 representation：
 
 ```
 format_ids = [
@@ -40,7 +40,7 @@ format_ids = [
 /Users/mark/Library/Application Support/PixPin/Temp/PixPin_2026-04-23_19-57-48.png
 ```
 
-对端把这串路径写进系统剪贴板，但**对端文件系统里根本没有那个文件**。Paste 时：
+对端把这串路径写进系统剪贴板，但 **对端文件系统里根本没有那个文件**。Paste 时：
 - Finder / 资源管理器：看到"文件"图标但打不开
 - 图像类应用：一般表现为"没复制任何东西"
 
@@ -77,5 +77,5 @@ Legacy libp2p `sync_outbound` 试图把 PNG 文件真的传过去（`uc_app::use
 
 ## Decision log
 
-- 2026-04-23：真机同 LAN 验证时暴露。先记录为已知问题，**不阻塞**跨 LAN 场景测试。
+- 2026-04-23：真机同 LAN 验证时暴露。先记录为已知问题，**不阻塞** 跨 LAN 场景测试。
   等跨 LAN 验证 + Slice 3/5 的 blob/file 路径规划落定后，再决定走哪条修法。

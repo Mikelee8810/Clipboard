@@ -65,7 +65,7 @@ Injected `device_id` as a static field into every CLEF event sent to Seq, enabli
 ### docker-compose.seq.yml
 
 - Changed port binding to `0.0.0.0:5341:80` for LAN access
-- Added `SEQ_FIRSTRUN_ADMINPASSWORD: 'uniclipboard'` for development
+- Added `SEQ_FIRSTRUN_ADMINPASSWORD: 'clipboard'` for development
 - Added warning comment about development-only configuration
 
 ## Verification

@@ -1,11 +1,11 @@
 ---
 name: dual-side-sync
-description: Push the macOS working-tree changes to the Windows peer's repo via rsync over SSH. Use when the user wants to "sync to win", "push my changes to windows", "mirror the working tree", or otherwise propagate uncommitted edits from this Mac to the paired Windows machine for cross-platform testing of uniclipboard. Replaces the older SMB-mount strategy.
+description: Push the macOS working-tree changes to the Windows peer's repo via rsync over SSH. Use when the user wants to "sync to win", "push my changes to windows", "mirror the working tree", or otherwise propagate uncommitted edits from this Mac to the paired Windows machine for cross-platform testing of clipboard. Replaces the older SMB-mount strategy.
 ---
 
 # dual-side-sync
 
-This project pairs a macOS host with a Windows peer to test uniclipboard's cross-platform sync. During active development the same uncommitted change often needs to run on both sides at once. This skill mirrors the **mac working tree** onto a **remote Windows checkout** of the same repo, using `rsync` over `ssh`.
+This project pairs a macOS host with a Windows peer to test clipboard's cross-platform sync. During active development the same uncommitted change often needs to run on both sides at once. This skill mirrors the **mac working tree** onto a **remote Windows checkout** of the same repo, using `rsync` over `ssh`.
 
 The helper script lives at `.agents/skills/dual-side-sync/sync-to-win.sh`. It is the **only** thing you should invoke for this task — do not hand-roll `scp`, `git apply`, or SMB copy commands.
 
@@ -27,7 +27,7 @@ The script needs the developer to provide:
 | `WIN_HOST` | yes | IPv4/IPv6 or hostname of the Windows machine. |
 | `WIN_PORT` | no  | SSH port. Defaults to `22`. |
 | `WIN_USER` | yes | Windows account (the SSH login). |
-| `WIN_REPO` | yes | Absolute path of the repo on win, in a form the remote shell understands (e.g. `/c/Users/mark/projects/UniClipboard`). |
+| `WIN_REPO` | yes | Absolute path of the repo on win, in a form the remote shell understands (e.g. `/c/Users/mark/projects/Clipboard`). |
 | `WIN_PASS` | one of | Password auth. Requires `sshpass` on the Mac. |
 | `WIN_KEY`  | one of | Private-key auth. Or leave both empty and use `ssh-agent` / `~/.ssh/config`. |
 

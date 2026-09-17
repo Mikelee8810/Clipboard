@@ -20,7 +20,7 @@
 - 新增 `src-tauri/crates/uc-desktop`，承接原 daemon 宿主实现。
 - `uc-desktop` 暂时包含 daemon 模式、服务、worker、状态和进程元数据等宿主代码。
 - `uc-daemon` 现在只保留兼容入口，避免破坏外部命令和旧调用路径。
-- `uniclipboard-daemon` 二进制名称未变。
+- `clipboard-daemon` 二进制名称未变。
 - 新增 `uc-desktop/AGENTS.md` 记录边界：桌面宿主不写业务规则，业务调用走 `uc-application` facade。
 - 第二阶段新增 `uc-bootstrap::build_app_facade_from_deps`，将共同的 `AppFacade` 子 facade 拼装收拢到单一函数。
 - `uc-desktop`、`uc-tauri`、CLI runtime 现在共用同一个 `AppFacade` 装配函数。
@@ -81,84 +81,84 @@
 
 - `cargo check -p uc-desktop -p uc-daemon -p uc-tauri` 通过。
 - `cargo check -p uc-cli` 通过，说明旧 `uc_daemon::*` 兼容路径没有断。
-- `cargo check -p uniclipboard` 通过，说明根桌面应用仍可编译，并成功准备 daemon 二进制。
+- `cargo check -p clipboard` 通过，说明根桌面应用仍可编译，并成功准备 daemon 二进制。
 - `cargo check -p uc-bootstrap -p uc-desktop -p uc-tauri` 通过。
-- `cargo check -p uc-cli -p uniclipboard` 通过。
+- `cargo check -p uc-cli -p clipboard` 通过。
 - `cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true` 无输出，说明 `uc-tauri` 没有重新依赖 `uc-desktop` 或 `uc-daemon`。
 - `git diff --check` 通过。
 - `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
-- `cargo check -p uc-desktop -p uc-daemon -p uc-cli -p uniclipboard` 通过。
+- `cargo check -p uc-desktop -p uc-daemon -p uc-cli -p clipboard` 通过。
 - `cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- `cargo check -p uniclipboard` 通过。
+- `cargo check -p clipboard` 通过。
 - `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 GUI 管理模式关闭信号后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 GUI 管理模式关闭信号后，`cargo check -p uniclipboard` 通过。
+- 抽出 GUI 管理模式关闭信号后，`cargo check -p clipboard` 通过。
 - 引入 `DaemonRunMode` 后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 引入 `DaemonRunMode` 后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 引入 `DaemonRunMode` 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 引入 `DaemonRunMode` 后，`cargo check -p uniclipboard` 通过。
+- 引入 `DaemonRunMode` 后，`cargo check -p clipboard` 通过。
 - 收口 daemon 运行模式参数解析后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 收口 daemon 运行模式参数解析后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 收口 daemon 运行模式参数解析后，`cargo check -p uniclipboard` 通过。
+- 收口 daemon 运行模式参数解析后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 搜索服务装配后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 搜索服务装配后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 搜索服务装配后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 搜索服务装配后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 搜索服务装配后，`cargo check -p clipboard` 通过。
 - 抽出 daemon AppFacade 装配后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon AppFacade 装配后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon AppFacade 装配后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon AppFacade 装配后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon AppFacade 装配后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 后台 blob 任务启动后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 后台 blob 任务启动后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 后台 blob 任务启动后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 后台 blob 任务启动后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 后台 blob 任务启动后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 应用实例装配后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 应用实例装配后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 应用实例装配后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 应用实例装配后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 应用实例装配后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 运行循环后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 运行循环后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 运行循环后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 运行循环后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 运行循环后，`cargo check -p clipboard` 通过。
 - 抽出 daemon Tokio runtime 创建后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon Tokio runtime 创建后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon Tokio runtime 创建后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon Tokio runtime 创建后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon Tokio runtime 创建后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 运行控制量后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 运行控制量后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 运行控制量后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 运行控制量后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 运行控制量后，`cargo check -p clipboard` 通过。
 - 抽出 daemon 服务清单装配后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon 服务清单装配后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon 服务清单装配后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon 服务清单装配后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon 服务清单装配后，`cargo check -p clipboard` 通过。
 - 抽出 daemon bootstrap 拆包装配后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 抽出 daemon bootstrap 拆包装配后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 抽出 daemon bootstrap 拆包装配后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 抽出 daemon bootstrap 拆包装配后，`cargo check -p uniclipboard` 通过。
+- 抽出 daemon bootstrap 拆包装配后，`cargo check -p clipboard` 通过。
 - 收回 daemon API facade 句柄后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 收回 daemon API facade 句柄后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 收回 daemon API facade 句柄后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 收回 daemon API facade 句柄后，`cargo check -p uniclipboard` 通过。
+- 收回 daemon API facade 句柄后，`cargo check -p clipboard` 通过。
 - 迁移 daemon host 实现后，`cargo test -p uc-desktop daemon::run_mode -- --nocapture` 通过。
 - 迁移 daemon host 实现后，`cargo test -p uc-desktop daemon::service_plan -- --nocapture` 通过。
 - 迁移 daemon host 实现后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 通过。
-- 迁移 daemon host 实现后，`cargo check -p uniclipboard` 通过。
+- 迁移 daemon host 实现后，`cargo check -p clipboard` 通过。
 - 收窄 `uc-daemon` 兼容导出面后，`cargo check -p uc-daemon -p uc-cli` 通过。
-- 收窄 `uc-daemon` 兼容导出面后，`cargo check -p uniclipboard` 通过。
+- 收窄 `uc-daemon` 兼容导出面后，`cargo check -p clipboard` 通过。
 - 收窄 `uc-daemon` 兼容导出面后，`cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true` 无输出。
 - `uc-cli` 迁出 `uc-daemon` 兼容壳后，`cargo check -p uc-cli -p uc-daemon -p uc-desktop` 通过。
-- `uc-cli` 迁出 `uc-daemon` 兼容壳后，`cargo check -p uniclipboard` 通过，并成功准备 daemon 二进制。
+- `uc-cli` 迁出 `uc-daemon` 兼容壳后，`cargo check -p clipboard` 通过，并成功准备 daemon 二进制。
 - `uc-cli` 迁出 `uc-daemon` 兼容壳后，`cargo tree -p uc-tauri | rg "uc-desktop|uc-daemon v" || true` 仍无输出。
 - `uc-cli` 迁出 `uc-daemon` 兼容壳后，`rg -n "uc_daemon::|uc-daemon =" src-tauri/crates/uc-cli src-tauri/crates/uc-cli/Cargo.toml` 无输出。
-- 删除 `uc-desktop::entrypoint` 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p uniclipboard` 均通过。
-- 收窄 `uc-desktop` 根模块公开面后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p uniclipboard` 均通过。
-- 删除 `uc-desktop::process_metadata` 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p uniclipboard` 均通过。
-- 移动 daemon 服务状态模块后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p uniclipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
-- 移动 daemon workers 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p uniclipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
-- 移动 daemon peers/search 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p uniclipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
-- 移动 daemon app 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p uniclipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
-- 收窄 `daemon` 子模块公开面后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p uniclipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
+- 删除 `uc-desktop::entrypoint` 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p clipboard` 均通过。
+- 收窄 `uc-desktop` 根模块公开面后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p clipboard` 均通过。
+- 删除 `uc-desktop::process_metadata` 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli` 和 `cargo check -p clipboard` 均通过。
+- 移动 daemon 服务状态模块后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p clipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
+- 移动 daemon workers 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p clipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
+- 移动 daemon peers/search 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p clipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
+- 移动 daemon app 后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p clipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
+- 收窄 `daemon` 子模块公开面后，`cargo check -p uc-desktop -p uc-daemon -p uc-cli`、`cargo check -p clipboard` 和 `cargo test -p uc-desktop daemon::service_plan -- --nocapture` 均通过。
 
 ## 后续 gap
 

@@ -1,18 +1,18 @@
 ---
 title: Getting Started
-description: Install uniclip, start the daemon, and create or join a space — all from the terminal.
+description: Install clip, start the daemon, and create or join a space — all from the terminal.
 ---
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-The `uniclip` binary is the terminal-side equivalent of the desktop
+The `clip` binary is the terminal-side equivalent of the desktop
 app. It talks to the background daemon over HTTP, so anything the GUI
 can do — pair, sync, send, search — works headlessly over SSH, in
-tmux, on a server, or from a script. If no daemon is running, `uniclip`
+tmux, on a server, or from a script. If no daemon is running, `clip`
 starts one automatically.
 
 Install via the [Install](../getting-started/install) page (Homebrew
-on macOS, the headless `uniclip` artefact on Linux servers, etc.).
+on macOS, the headless `clip` artefact on Linux servers, etc.).
 
 ## Global flags
 
@@ -33,11 +33,11 @@ different `--profile` value.
 
 | Command                      | Effect                                                                                                                                              |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `uniclip start`              | Start the daemon in the background.                                                                                                                 |
-| `uniclip start --foreground` | Run the daemon in the foreground; logs go to the TTY.                                                                                               |
-| `uniclip start --server`     | Run as a headless server node: no system clipboard or clipboard watcher; syncs over iroh as a normal member. For a VPS / container with no display. |
-| `uniclip stop`               | Stop the running daemon.                                                                                                                            |
-| `uniclip space status`             | Show daemon health and a device-trust summary, including local membership, pending changes, and devices that need an update.                        |
+| `clip start`              | Start the daemon in the background.                                                                                                                 |
+| `clip start --foreground` | Run the daemon in the foreground; logs go to the TTY.                                                                                               |
+| `clip start --server`     | Run as a headless server node: no system clipboard or clipboard watcher; syncs over iroh as a normal member. For a VPS / container with no display. |
+| `clip stop`               | Stop the running daemon.                                                                                                                            |
+| `clip space status`             | Show daemon health and a device-trust summary, including local membership, pending changes, and devices that need an update.                        |
 
 The daemon starts automatically when you run a command that needs it,
 so explicit `start` is mostly for log-streaming setups and headless
@@ -58,10 +58,10 @@ The CLI mirrors the GUI flow described in
 
 ```bash
 # Create a fresh encrypted space on this profile
-uniclip space init
+clip space init
 
 # Issue a one-time invitation and wait for the joiner
-uniclip space invite
+clip space invite
 ```
 
 `space init` prompts for the passphrase interactively. Pass `--passphrase`
@@ -74,10 +74,10 @@ script).
 
 ```bash
 # Redeem an invitation and join the sponsor's space
-uniclip space join <invitation-code>
+clip space join <invitation-code>
 
 # Verify the pairing landed
-uniclip members
+clip members
 ```
 
 `space join` prompts for the passphrase if `--passphrase` is omitted. The
@@ -89,8 +89,8 @@ By default, `space join` waits until the request is accepted or rejected. Use
 or cancel that same request later:
 
 ```bash
-uniclip space join status
-uniclip space join cancel
+clip space join status
+clip space join cancel
 ```
 
 Pressing Ctrl-C only stops the local wait. It does not cancel the join request.
@@ -104,7 +104,7 @@ local history under the new MasterKey), run `space join` with the new
 sponsor's invitation and the `--switch` flag:
 
 ```bash
-uniclip space join --switch --code <new-invitation-code>
+clip space join --switch --code <new-invitation-code>
 ```
 
 The switch is destructive (local history is re-encrypted), so `space join`
@@ -119,7 +119,7 @@ records).
 ## Rebuild the current space
 
 ```bash
-uniclip space reset --yes
+clip space reset --yes
 ```
 
 This creates a new space containing only this device and permanently discards

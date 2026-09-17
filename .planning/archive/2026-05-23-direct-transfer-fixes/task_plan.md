@@ -62,7 +62,7 @@
 | `bcd41143` | bug1  | fix(file-transfer): batch-aware lifecycle in multi-blob fetch（2026-05-23；防止 PNG 缩略图 fetch 完成把整批 transfer 提前标 completed） |
 | `6922e632` | P5    | feat(file-transfer): persist partial entry when inbound transfer is cancelled（2026-05-23；问题 5 全链路修复） |
 
-vendor submodule 也有一个对应 commit `56b29c25 feat(api/downloader): expose shutdown_endpoint for external cancel` 在 `uniclipboard/0.100.0-patched` 分支上。
+vendor submodule 也有一个对应 commit `56b29c25 feat(api/downloader): expose shutdown_endpoint for external cancel` 在 `clipboard/0.100.0-patched` 分支上。
 
 #### 剩余任务
 
@@ -227,7 +227,7 @@ cancelled 语义全链路恢复 —— 双端 UI 不再把"用户取消"显示�
 
 #### 设计要点（advisor 复核后修订版）
 
-**关键 hazard（advisor #1）**：partial entry 不能让 OS clipboard write 把 `uniclip-missing://` URI 推到系统剪贴板（用户 cmd-V 出垃圾比当前 bug 更糟）。
+**关键 hazard（advisor #1）**：partial entry 不能让 OS clipboard write 把 `clip-missing://` URI 推到系统剪贴板（用户 cmd-V 出垃圾比当前 bug 更糟）。
 
 **关键边界（advisor #2）**：rep_refs 阶段 cancel 时，已声明但未 fetch 的 representation 残留 envelope stub bytes —— 必须 drop（不能 capture 半残 rep）。drop 后如果 snapshot 没有 supported rep，`CaptureClipboardUseCase::has_supported_representation` 返回 false → `Ok(None)` 不落 entry。需要 envelope text rep 兜底（envelope 本身的 title/text rep 不依赖 fetch，始终有效）。
 
@@ -254,8 +254,8 @@ advisor 建议过 struct + missing list 而不是 enum —— 一个 caller 不�
 
 - 暴露 `InboundBlobFetcher::is_cancel_error(&AnyhowError) -> bool` 或让 fetcher 返回结构化错误（`FetcherError::Cancelled`）—— cancel detection 是必要的信令，与方案选择无关
 - rep_refs 循环：cancel 时 break，**不要** `set_inline_bytes`（保留 rep 的原 envelope bytes 不安全 → 把当前 + 后续未完成的 rep 从 `snapshot.representations` 中删除）
-- file_refs 循环：cancel 时 break，把已完成的 path 加进 file:// URI 列表，未完成的 file_refs 加进 missing list 并写成 `uniclip-missing:///{filename}?size={N}&reason={r}` URI
-- rewrite file-list rep：file:// + uniclip-missing:// 混合 uri-list
+- file_refs 循环：cancel 时 break，把已完成的 path 加进 file:// URI 列表，未完成的 file_refs 加进 missing list 并写成 `clip-missing:///{filename}?size={N}&reason={r}` URI
+- rewrite file-list rep：file:// + clip-missing:// 混合 uri-list
 
 **5.3 apply_inbound 处理 partial**（usecase.rs:199-245）
 
@@ -295,10 +295,10 @@ emit_host_event(ClipboardHostEvent::NewContent { origin: Remote, .. });  // 前�
 
 **5.6 URI 渲染解析**
 
-- 候选 A（推荐）：renderer 解析 file-list rep bytes，识别 `uniclip-missing://` scheme → 渲染 missing 态
+- 候选 A（推荐）：renderer 解析 file-list rep bytes，识别 `clip-missing://` scheme → 渲染 missing 态
 - 候选 C 兼容（可叠加）：渲染时附带查 file_transfer.status='cancelled' 做 missing 信号兜底
 
-`uniclip-missing://` 优势：自包含、跨设备稳定、不依赖 join。
+`clip-missing://` 优势：自包含、跨设备稳定、不依赖 join。
 
 **5.7 UI 组件**（ClipboardItemRow / FilePreview / FileContextMenu）
 
@@ -309,7 +309,7 @@ emit_host_event(ClipboardHostEvent::NewContent { origin: Remote, .. });  // 前�
 
 ##### Schema 变更
 
-**无**。`clipboard_entry` 不加列，`file_transfer` 表已有 cancelled 状态。partial 信号靠 representation bytes 内的 `uniclip-missing://` URI 表达。
+**无**。`clipboard_entry` 不加列，`file_transfer` 表已有 cancelled 状态。partial 信号靠 representation bytes 内的 `clip-missing://` URI 表达。
 
 ##### 边界情况清单
 
@@ -317,7 +317,7 @@ emit_host_event(ClipboardHostEvent::NewContent { origin: Remote, .. });  // 前�
 |---|---|
 | cancel 在第一个 fetch 都没开始 | snapshot 只剩 envelope rep（text/title 等）；若已有 supported rep → 照常走 partial capture；若全无 → materializer 在 partial 退出前 mint 一个 `text/plain` rep 兜底，内容形如 `"[Cancelled transfer from {device}]\n{filename_1}\n..."`，**不需要 fetch**，从 advertised_filenames + from_device 直接构造（用户决策 2026-05-23 session 7） |
 | cancel 在 rep_refs 阶段（PNG 缩略图） | 该 rep 从 snapshot.representations 删除；如果 envelope 还有其他 supported rep，照常 capture；如果全删光，同上 |
-| cancel 在 file_refs 阶段 | 最常见路径：已完成的 file 用 file://，未完成的用 uniclip-missing://；总有 rep 可 capture |
+| cancel 在 file_refs 阶段 | 最常见路径：已完成的 file 用 file://，未完成的用 clip-missing://；总有 rep 可 capture |
 | dedup（`find_recent_duplicate`） | content_hash 是 envelope hash（不依赖 fetch），visible_key 也来自 input → partial entry 不会被误判为 dup |
 | Timeout 路径（P1-8 实施后） | materializer cancel detection 不分 reason；is_cancel_error 对所有 `BlobTransferError::Cancelled` 命中即可 |
 
@@ -345,7 +345,7 @@ emit_host_event(ClipboardHostEvent::NewContent { origin: Remote, .. });  // 前�
 
 - 阶段顺序按"问题 2 → 1 → 4 → 3"，因为前 3 个共享 cancel 链路、问题 3 独立可后置
 - 阶段 1 拆成 7 个 commit（P1-0/1-3/1-4/1-5 已完成；P1-6/1-7/1-8 待做）
-- vendor 改动直接打补丁，后续给 iroh-blobs upstream 提 PR（见 `src-tauri/vendor/iroh-blobs/UNICLIPBOARD_PATCH.md` Patch 3）
+- vendor 改动直接打补丁，后续给 iroh-blobs upstream 提 PR（见 `src-tauri/vendor/iroh-blobs/CLIPBOARD_PATCH.md` Patch 3）
 - **没有** 新建 iroh 双向控制通道：advisor 复核后确认是过度设计；用 `ConnectionPool::close` 拆 receiver 端 connection 后，sender 端 iroh provider 自然 EOF 退出
 - 三件套规划文件用完后归档（移动到 `.planning/archive/2026-05-22-direct-transfer-fixes/` 或并入 PR 描述后删除）
 

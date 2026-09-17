@@ -1,4 +1,4 @@
-//! E2E tests for the `uniclip watch --json` event stream.
+//! E2E tests for the `clip watch --json` event stream.
 //!
 //! Covers: WATCH_READY signal emission, clean Ctrl-C exit, and
 //! pre-init failure mode.
@@ -45,7 +45,7 @@ async fn setup_initialized_node(name: &str, device_name: &str) -> (TestDaemon, T
     (daemon, cli)
 }
 
-/// Spawn `uniclip watch --json` as a background child process.
+/// Spawn `clip watch --json` as a background child process.
 /// Returns the Child with piped stdout and stderr.
 fn spawn_watch(cli: &TestCli) -> std::process::Child {
     Command::new(cli.binary_path())

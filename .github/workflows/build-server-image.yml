@@ -13,7 +13,7 @@ run-name: "build-server-image-${{ github.ref_name }}-${{ github.run_number }}"
 # push by digest,最后用 buildx imagetools 合并成一个 manifest list。这与
 # build-cli.yml 的 native 多 arch 思路一致。
 #
-# 首次推送后请到 GitHub Packages 设置里把 uniclipboard-server 的 visibility
+# 首次推送后请到 GitHub Packages 设置里把 clipboard-server 的 visibility
 # 调成 public,否则用户 `docker compose pull` 会 401。
 on:
   push:
@@ -40,7 +40,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   # GHCR path 必须小写,owner 大小写不一定一致,merge 时再 lowercase。
-  IMAGE_NAME: ${{ github.repository_owner }}/uniclipboard-server
+  IMAGE_NAME: ${{ github.repository_owner }}/clipboard-server
 
 jobs:
   build:

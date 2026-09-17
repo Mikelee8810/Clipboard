@@ -150,7 +150,7 @@ Remediating architecture defects from issue #214: enforced hexagonal boundary co
 
 ### Delivered
 
-Evolved UniClipboard from baseline LAN clipboard sync into a production-ready daily driver with unified encrypted transfer, true streaming inbound decode, optimized at-rest blob format, reliable Windows image capture, cross-platform dashboard image rendering, setup-flow UX redesign, V3 binary sync protocol with zero-copy fanout, and large-image clipboard read/memory optimizations.
+Evolved Clipboard from baseline LAN clipboard sync into a production-ready daily driver with unified encrypted transfer, true streaming inbound decode, optimized at-rest blob format, reliable Windows image capture, cross-platform dashboard image rendering, setup-flow UX redesign, V3 binary sync protocol with zero-copy fanout, and large-image clipboard read/memory optimizations.
 
 ### Accomplishments
 

@@ -7,7 +7,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
 This page is organized as "symptom → what to check." The mobile app is a
 LAN-only / self-hosted sync client: it connects to a computer running the
-UniClipboard **desktop app with "mobile sync" enabled**; two phones don't
+Clipboard **desktop app with "mobile sync" enabled**; two phones don't
 sync with each other, they each talk to the desktop. Keep this structure in
 mind when troubleshooting — most problems are either in **that computer**,
 in the **network between phone and computer**, or in **OS permissions**.
@@ -19,7 +19,7 @@ loads — this is usually one of the three cases below.
 
 | Symptom                                  | Cause                                                                                              | What to do                                                                                                                                                             |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Address unreachable / connection timeout | Desktop isn't listening, phone and computer aren't on the same Wi-Fi, or the address/port is wrong | Confirm mobile sync is enabled in the UniClipboard desktop app; confirm the phone and computer are on the same Wi-Fi; double-check the server address and port         |
+| Address unreachable / connection timeout | Desktop isn't listening, phone and computer aren't on the same Wi-Fi, or the address/port is wrong | Confirm mobile sync is enabled in the Clipboard desktop app; confirm the phone and computer are on the same Wi-Fi; double-check the server address and port         |
 | Auth failed / unauthorized               | Wrong username or password                                                                         | Verify the credentials; the password is shown only once when the device is added on the desktop — if you forgot it, rotate the password on the desktop and re-enter it |
 | Certificate error                        | The desktop uses self-signed HTTPS                                                                 | Turn on "allow insecure certificates" for that server; plain HTTP doesn't need this                                                                                    |
 
@@ -129,7 +129,7 @@ the OS's battery / background restriction, not sync itself being broken.
   Shizuku method can also disable MIUI's "smart clipboard" restriction — see
   [Android background access](./android-access).
 - The battery-optimization authorization dialog usually appears only once per
-  install. If you missed it, add UniClipboard to the list exempt from battery
+  install. If you missed it, add Clipboard to the list exempt from battery
   optimization manually in **system Settings**.
 
 <Callout type="info">
@@ -144,7 +144,7 @@ The keyboard or share extension says "server not configured yet," even though
 the main app is clearly connected to the desktop.
 
 - The keyboard extension must have **"Allow Full Access"** enabled: system
-  Settings → General → Keyboard → Keyboards → UniClip Keyboard → Allow Full
+  Settings → General → Keyboard → Keyboards → Clip Keyboard → Allow Full
   Access. Without full access, the keyboard can't read the clipboard and can't
   connect to the server.
 - The status in the app's **Settings → Keyboard** (not added / added / ready)

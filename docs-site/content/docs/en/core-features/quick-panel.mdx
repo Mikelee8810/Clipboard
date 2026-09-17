@@ -5,7 +5,7 @@ description: The keyboard-first clipboard history overlay — invoke, filter, pr
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 
-The Quick Panel is UniClipboard's keyboard-first entry point: a
+The Quick Panel is Clipboard's keyboard-first entry point: a
 floating overlay that lists the current space's clipboard history.
 Arrow-key your way to an item, hit Enter, and it pastes back into the
 app you came from — without ever bringing the main window forward.
@@ -29,11 +29,11 @@ hold focus indefinitely.
 </Callout>
 
 On native Wayland sessions whose compositor cannot provide global hotkeys, bind this command in
-the compositor instead. It opens the panel when UniClipboard is not running yet, and toggles the
+the compositor instead. It opens the panel when Clipboard is not running yet, and toggles the
 existing panel otherwise:
 
 ```bash
-uniclipboard --quick-panel
+clipboard --quick-panel
 ```
 
 ## Keyboard controls
@@ -65,7 +65,7 @@ fidelity that the destination app understands.
 
 To paste plain text, hold `Option` / `Alt` while confirming an item:
 press `Enter`, click an item, or use a `Cmd` / `Ctrl` + number
-shortcut while the modifier is held. UniClipboard writes only the
+shortcut while the modifier is held. Clipboard writes only the
 `text/plain` representation to the system clipboard first; if the item
 has no plain-text representation, it silently falls back to the normal
 multi-format paste.
@@ -155,7 +155,7 @@ sessions — every reopen starts unfiltered. The panel is a use-and-throw
 surface, not a workbench.
 
 <Callout type="info">
-  The CLI equivalent is `uniclip search` with `--type`, `--ext`, `--from-ms`, and `--to-ms`. See
+  The CLI equivalent is `clip search` with `--type`, `--ext`, `--from-ms`, and `--to-ms`. See
   [CLI reference — Search](../cli/reference#search).
 </Callout>
 
@@ -165,7 +165,7 @@ The recorded key combination remains the primary trigger. Under **Settings → Q
 Double-tap modifier**, you can also choose Option/Alt, Control, or Command/Windows/Super and tap
 that modifier twice to open the panel. Turning this off does not change the recorded shortcut.
 
-On macOS, modifier double-tap requires the separate **Accessibility** permission. UniClipboard
+On macOS, modifier double-tap requires the separate **Accessibility** permission. Clipboard
 checks the permission without showing a system prompt; use the **Open Accessibility settings**
 button to grant it explicitly. Native Wayland sessions are not supported, including sessions that
 also expose an XWayland `DISPLAY`; use the recorded shortcut there.
@@ -204,7 +204,7 @@ Combinations that are unlikely to clash with system or IDE shortcuts:
 | What you want                                      | Best surface                                                        |
 | -------------------------------------------------- | ------------------------------------------------------------------- |
 | Paste a recent item right now                      | Quick Panel                                                         |
-| Find something from days ago across devices        | Quick Panel filters (type / source / time), or CLI `uniclip search` |
+| Find something from days ago across devices        | Quick Panel filters (type / source / time), or CLI `clip search` |
 | Long sessions of triage, bulk delete, export       | Main window (Dashboard)                                             |
 | Configure filters or per-device content-type rules | [Devices](./devices) / [Settings](../guides/settings)               |
 
@@ -215,11 +215,11 @@ Combinations that are unlikely to clash with system or IDE shortcuts:
   On macOS confirm **Input Monitoring** is granted and the app was
   fully relaunched afterwards.
 - Modifier double-tap is disabled on macOS: grant **Accessibility** from the button beside the
-  setting, then return to UniClipboard. On Linux, native Wayland sessions intentionally report this
+  setting, then return to Clipboard. On Linux, native Wayland sessions intentionally report this
   trigger as unsupported; the recorded hotkey remains available.
 - Items you just copied don't appear: the daemon isn't running or the
   clipboard listener was sandboxed. Check `daemon.running` and the
-  clipboard logs in `uniclip space status`.
+  clipboard logs in `clip space status`.
 - A peer's clip never shows up: the sending device may have it gated
   out — check
   [Devices — Content-type allowlist](./devices#content-type-allowlist)

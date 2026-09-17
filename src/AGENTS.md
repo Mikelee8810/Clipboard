@@ -4,7 +4,7 @@ Follow root rules in `AGENTS.md`. This file adds frontend-only guidance.
 
 ## OVERVIEW
 
-React 19 + TypeScript + Vite UI layer for desktop app flows (setup, unlock, dashboard, devices, settings). Since ADR-008 the UI is primarily a client of the standalone `uniclipd` daemon over loopback HTTP + WebSocket (`src/api/daemon/`, generated SDK in `src/api/generated/`, realtime via `src/lib/daemon-ws.ts`); a shrinking set of native-only operations still go through Tauri `invoke` (`src/api/` + `src/lib/tauri-command.ts`).
+React 19 + TypeScript + Vite UI layer for desktop app flows (setup, unlock, dashboard, devices, settings). Since ADR-008 the UI is primarily a client of the standalone `clipd` daemon over loopback HTTP + WebSocket (`src/api/daemon/`, generated SDK in `src/api/generated/`, realtime via `src/lib/daemon-ws.ts`); a shrinking set of native-only operations still go through Tauri `invoke` (`src/api/` + `src/lib/tauri-command.ts`).
 
 ## STRUCTURE
 
@@ -31,7 +31,7 @@ src/
 | --------------------------- | ---------------------------------------------- | -------------------------------------------- |
 | App bootstrap               | `src/main.tsx`                                 | `Provider`, Sentry init, platform typography |
 | Routing and auth-like gates | `src/App.tsx`                                  | setup state + encryption session routing     |
-| Daemon HTTP/WS client       | `src/api/daemon/` + `src/api/generated/` + `src/lib/daemon-ws.ts` | ADR-008: primary path to the `uniclipd` daemon |
+| Daemon HTTP/WS client       | `src/api/daemon/` + `src/api/generated/` + `src/lib/daemon-ws.ts` | ADR-008: primary path to the `clipd` daemon |
 | Native Tauri command calls  | `src/api/` + `src/lib/tauri-command.ts`        | residual native ops; prefer `invokeWithTrace` over raw invoke |
 | Global state                | `src/store/`                                   | `store/api.ts` + slices + hooks              |
 | Setup flow UI               | `src/pages/SetupPage.tsx` + `src/pages/setup/` | multi-step onboarding/join flows             |

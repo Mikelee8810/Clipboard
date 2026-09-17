@@ -9,6 +9,6 @@
 ## 代码复核
 
 - `uc-cli` 的业务命令必须通过 `AppFacade`，不能直接读 infra / iroh endpoint。
-- 当前正常 `invite` 调用链是 `uniclip invite` → `AppFacade::issue_pairing_invitation` → `SpaceSetupFacade` → `IssuePairingInvitationUseCase` → `PairingInvitationPort`。
+- 当前正常 `invite` 调用链是 `clip invite` → `AppFacade::issue_pairing_invitation` → `SpaceSetupFacade` → `IssuePairingInvitationUseCase` → `PairingInvitationPort`。
 - `RendezvousPairingInvitationAdapter` 已有单一 ticket 过滤入口 `serialize_filtered_endpoint_ticket`，新增“指定 IP”应复用该过滤结果后再收窄，避免与 OnlyLan/虚拟网卡规则分叉。
 - `PairingInvitationPort` 目前只负责签发/消费邀请；新增“列出可发布地址”和“按指定地址签发”属于同一 sponsor-side invitation 能力，但需要保持 core 文档只描述领域语义，不写 CLI/iroh/rendezvous。

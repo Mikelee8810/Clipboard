@@ -34,7 +34,7 @@ Create `uc-daemon` and `uc-cli` as independent binary crates that validate the e
 ### RPC transport — Unix domain socket with JSON-RPC 2.0
 
 - Unix domain socket on macOS/Linux (Windows named pipe support deferred to a future phase)
-- Socket path: `{app_data_dir}/uniclipboard-daemon.sock` (resolved via uc-bootstrap config)
+- Socket path: `{app_data_dir}/clipboard-daemon.sock` (resolved via uc-bootstrap config)
 - Protocol: minimal JSON-RPC 2.0 over newline-delimited JSON (one request per line)
 - No external RPC framework — use `tokio::net::UnixListener` + `serde_json` directly
 - Methods for skeleton: `ping`, `status`, `device_list`
@@ -42,8 +42,8 @@ Create `uc-daemon` and `uc-cli` as independent binary crates that validate the e
 
 ### Binary structure — separate workspace crates
 
-- `src-tauri/crates/uc-daemon/` → produces `uniclipboard-daemon` binary
-- `src-tauri/crates/uc-cli/` → produces `uniclipboard-cli` binary
+- `src-tauri/crates/uc-daemon/` → produces `clipboard-daemon` binary
+- `src-tauri/crates/uc-cli/` → produces `clipboard-cli` binary
 - Both depend on `uc-bootstrap` for dependency wiring and `uc-core` for domain types
 - Shared RPC types (request/response enums, socket path resolution) live in a `rpc` module within `uc-daemon`, re-exported as library. `uc-cli` depends on `uc-daemon` as a library dependency (not binary) for these shared types
 - `uc-daemon` has both `[[bin]]` and `[lib]` sections in Cargo.toml
@@ -78,9 +78,9 @@ Create `uc-daemon` and `uc-cli` as independent binary crates that validate the e
 
 ### CLI command routing — dual dispatch
 
-- `uniclipboard-cli status` → connects to daemon via Unix socket, sends JSON-RPC `status` request
-- `uniclipboard-cli devices` → uses `build_cli_context()` directly, constructs CoreRuntime, queries device list via `CoreUseCases::list_paired_devices()` without daemon
-- `uniclipboard-cli space-status` → uses `build_cli_context()` directly, constructs CoreRuntime, queries encryption/space status via CoreRuntime runtime-level methods (e.g., `encryption_state()`, `is_encryption_ready()`) without daemon
+- `clipboard-cli status` → connects to daemon via Unix socket, sends JSON-RPC `status` request
+- `clipboard-cli devices` → uses `build_cli_context()` directly, constructs CoreRuntime, queries device list via `CoreUseCases::list_paired_devices()` without daemon
+- `clipboard-cli space-status` → uses `build_cli_context()` directly, constructs CoreRuntime, queries encryption/space status via CoreRuntime runtime-level methods (e.g., `encryption_state()`, `is_encryption_ready()`) without daemon
 - `--json` global flag: outputs JSON on stdout; default: human-readable key-value text
 - Human-readable format: simple key-value lines (no table/color libraries for skeleton)
 

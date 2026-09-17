@@ -1,4 +1,4 @@
-# Build container for UniClipboard Linux Tauri + CLI builds.
+# Build container for Clipboard Linux Tauri + CLI builds.
 #
 # 替代 .github/workflows/{build,build-cli}.yml 里每次重复 1m+ 的
 # `apt-get install` step。镜像同时覆盖:

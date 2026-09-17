@@ -33,7 +33,7 @@
 
 ### 2.1 密钥与加密设施
 
-- **search_key 派生**：`SearchKeyDerivationPort`（`crates/uc-core/src/ports/search/search_key.rs:14`）→ `HkdfSearchKeyDerivation`（`crates/uc-infra/src/search/search_key_derivation.rs:51-69`）→ `DeriveSpaceSubkeyPort::derive_subkey`（`crates/uc-infra/src/security/space_access_adapter.rs:508-526`）：`HKDF-SHA256(ikm=master_key, salt=profile_id, info=b"uniclipboard-search-index/v1")` → 32B。无缓存，每次实时派生；锁定态返回 `SessionLocked`。
+- **search_key 派生**：`SearchKeyDerivationPort`（`crates/uc-core/src/ports/search/search_key.rs:14`）→ `HkdfSearchKeyDerivation`（`crates/uc-infra/src/search/search_key_derivation.rs:51-69`）→ `DeriveSpaceSubkeyPort::derive_subkey`（`crates/uc-infra/src/security/space_access_adapter.rs:508-526`）：`HKDF-SHA256(ikm=master_key, salt=profile_id, info=b"clipboard-search-index/v1")` → 32B。无缓存，每次实时派生；锁定态返回 `SessionLocked`。
 - **term_tag 是 HMAC-SHA256 PRF tag，非加密**（`search_key_derivation.rs:78-83`）：确定性、无 nonce、不可逆。倒排表本身不泄露明文——明文泄露仅来自 render 列。
 - **可复用 AEAD**：`crates/uc-infra/src/security/v1_aead.rs` 提供 `encrypt_blob_xchacha(master_key: &MasterKey, plaintext, aad)` / `decrypt_blob_xchacha(...)`（`:115`/`:150`），XChaCha20-Poly1305 + 24B 随机 nonce。**注意签名绑定 `MasterKey` 类型，不接受任意 32B key**——本方案需先下沉出一个以裸 32B key 为参的底层 helper（见 §3.2）。现有两个消费者（`BlobCipherAdapter`、`EncryptedBlobStore`）都直接用 master_key。
 - **AAD 约定**（`crates/uc-core/src/crypto/aad.rs`）：`uc:<type>:v<n>|<ids>`，如 `uc:inline:v1|{event_id}|{rep_id}`、`uc:blob:v2|{blob_id}`。
@@ -98,7 +98,7 @@
 
 ### 3.2 密钥：HKDF 派生独立 render_key，每个外层操作派生一次
 
-- 派生：`derive_subkey(salt=profile_id, info=b"uniclipboard-search-render/v1")`，与 search_key 同端口、同风格。
+- 派生：`derive_subkey(salt=profile_id, info=b"clipboard-search-render/v1")`，与 search_key 同端口、同风格。
 - 不复用 search_key：其用途是 HMAC-PRF（term_tag），兼职 AEAD key 违反用途分离。
 - 不直接用 master_key：保持搜索域隔离（inline_data 直用 master_key 是存量现状，新代码不延续）。
 - AAD：`uc:search_render:v1|{entry_id}`，绑定密文到行，防跨行搬运替换。在 `aad.rs` 增加 `for_search_render(entry_id)`。
@@ -196,7 +196,7 @@
 | AEAD 原语 | `crates/uc-infra/src/security/v1_aead.rs` | 下沉裸 32B key 底层 helper，`MasterKey` 包装改调它（纯重构） |
 | 维护端口 | `crates/uc-core/src/ports/search/` + infra adapter | `SearchIndexMaintenancePort::purge_plaintext_residue()`（checkpoint/VACUUM/残留表清扫/标记写入在 infra） |
 | DAO | `crates/uc-infra/src/search/sqlite_index.rs` | 3 处 raw-SQL 列清单切换；hydrate 解密 + 单行降级；操作级 key 派生 |
-| 密钥 | `crates/uc-infra/src/search/search_key_derivation.rs`（或旁邻新模块）、`crates/uc-core/src/crypto/aad.rs` | render_key 派生（`uniclipboard-search-render/v1`）+ `for_search_render` AAD |
+| 密钥 | `crates/uc-infra/src/search/search_key_derivation.rs`（或旁邻新模块）、`crates/uc-core/src/crypto/aad.rs` | render_key 派生（`clipboard-search-render/v1`）+ `for_search_render` AAD |
 | 端口 | `crates/uc-core/src/ports/search/` + `uc-core/src/search/` | 扩展 key 派生端口（render_key）+ `RenderKey` newtype；meta port 增补 purge 标记读写；损坏 entry 上报通道 |
 | coordinator | `crates/uc-application/src/facade/search/coordinator.rs` | 合并去重的单 entry 修复任务（`schedule_repair` + 单条 entry 加载依赖）；清理任务调度；startup_evaluation 增 purge 补跑分支；`on_session_ready()` 解锁触发器 |
 | encryption facade | unlock 成功路径 | 通知 `SearchCoordinator::on_session_ready()` |

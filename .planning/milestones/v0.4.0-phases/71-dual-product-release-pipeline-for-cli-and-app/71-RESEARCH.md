@@ -6,7 +6,7 @@
 
 ## Summary
 
-The project currently ships a single Tauri GUI app through a well-structured release pipeline. Phase 71 adds a second product — the `uniclipboard-cli` binary — that must be built, packaged, and distributed alongside the app from the same repository. The CLI is a standalone Rust binary (no Tauri, no frontend), so its build path is a plain `cargo build --release -p uc-cli` invocation, and its distribution model is direct binary download (no installer, no update manifest).
+The project currently ships a single Tauri GUI app through a well-structured release pipeline. Phase 71 adds a second product — the `clipboard-cli` binary — that must be built, packaged, and distributed alongside the app from the same repository. The CLI is a standalone Rust binary (no Tauri, no frontend), so its build path is a plain `cargo build --release -p uc-cli` invocation, and its distribution model is direct binary download (no installer, no update manifest).
 
 The key challenge is that the CLI crate (`uc-cli`) has a **hardcoded version `"0.1.0"`** instead of inheriting `version.workspace = true`. This means version bumps to the workspace do not propagate to the CLI binary. The fix is mechanical but must happen in Phase 71. Once the CLI follows the workspace version, both products share a single version number throughout the release process.
 
@@ -50,11 +50,11 @@ build.yml             (reusable workflow_call + manual workflow_dispatch)
 
 `tauri-action` produces bundles in `src-tauri/target/{target}/release/bundle/`:
 
-- macOS: `.dmg`, `UniClipboard.app.tar.gz`, `.sig`
+- macOS: `.dmg`, `Clipboard.app.tar.gz`, `.sig`
 - Linux: `.deb`, `.AppImage`, `.AppImage.tar.gz.sig`
 - Windows: `.exe` (NSIS), `.msi`, `.nsis.zip.sig`
 
-Upload artifact name pattern: `uniclipboard-{target}` (e.g., `uniclipboard-aarch64-apple-darwin`)
+Upload artifact name pattern: `clipboard-{target}` (e.g., `clipboard-aarch64-apple-darwin`)
 
 ### Prepare-Release Commits These Files
 
@@ -76,7 +76,7 @@ git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Ca
 ### R2 Storage Structure
 
 ```
-uniclipboard-releases/
+clipboard-releases/
 ├── manifests/
 │   ├── stable.json
 │   ├── alpha.json
@@ -84,8 +84,8 @@ uniclipboard-releases/
 │   └── rc.json
 └── artifacts/
     └── v{VERSION}/
-        ├── UniClipboard_aarch64-apple-darwin.dmg
-        ├── UniClipboard_x86_64-apple-darwin.dmg
+        ├── Clipboard_aarch64-apple-darwin.dmg
+        ├── Clipboard_x86_64-apple-darwin.dmg
         ├── ...
         └── (all release bundles flat)
 ```
@@ -128,20 +128,20 @@ This manifest is **App-only**. The CLI does not use Tauri's updater mechanism an
 
 ### CLI Binary Naming Convention
 
-Tauri uses target-triple suffixes for sidecars (`uniclipboard-daemon-aarch64-apple-darwin`). For direct CLI distribution, the convention is to include the target triple in the artifact filename:
+Tauri uses target-triple suffixes for sidecars (`clipboard-daemon-aarch64-apple-darwin`). For direct CLI distribution, the convention is to include the target triple in the artifact filename:
 
 ```
-uniclipboard-cli-{VERSION}-{target}.tar.gz   (macOS, Linux — tar.gz with the binary)
-uniclipboard-cli-{VERSION}-{target}.zip      (Windows — zip with .exe)
+clipboard-cli-{VERSION}-{target}.tar.gz   (macOS, Linux — tar.gz with the binary)
+clipboard-cli-{VERSION}-{target}.zip      (Windows — zip with .exe)
 ```
 
 Examples:
 
 ```
-uniclipboard-cli-0.4.0-aarch64-apple-darwin.tar.gz
-uniclipboard-cli-0.4.0-x86_64-apple-darwin.tar.gz
-uniclipboard-cli-0.4.0-x86_64-unknown-linux-gnu.tar.gz
-uniclipboard-cli-0.4.0-x86_64-pc-windows-msvc.zip
+clipboard-cli-0.4.0-aarch64-apple-darwin.tar.gz
+clipboard-cli-0.4.0-x86_64-apple-darwin.tar.gz
+clipboard-cli-0.4.0-x86_64-unknown-linux-gnu.tar.gz
+clipboard-cli-0.4.0-x86_64-pc-windows-msvc.zip
 ```
 
 This pattern is consistent with what `rustup`, `cargo-binstall`, and similar tools expect.
@@ -168,7 +168,7 @@ build.yml               (existing — unchanged)
   └─ builds Tauri app per platform
 
 build-cli.yml           (NEW reusable workflow)
-  └─ builds uniclipboard-cli per platform
+  └─ builds clipboard-cli per platform
   └─ uploads artifacts: cli-{target}
 
 release.yml
@@ -233,18 +233,18 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TARGET="${{ matrix.target }}"
-          BIN_NAME="uniclipboard-cli"
+          BIN_NAME="clipboard-cli"
           if [ "${{ matrix.platform }}" = "windows-latest" ]; then
-            7z a "uniclipboard-cli-${VERSION}-${TARGET}.zip" \
+            7z a "clipboard-cli-${VERSION}-${TARGET}.zip" \
               "src-tauri/target/${TARGET}/release/${BIN_NAME}.exe"
           else
-            tar -czf "uniclipboard-cli-${VERSION}-${TARGET}.tar.gz" \
+            tar -czf "clipboard-cli-${VERSION}-${TARGET}.tar.gz" \
               -C "src-tauri/target/${TARGET}/release" "${BIN_NAME}"
           fi
       - uses: actions/upload-artifact@v4
         with:
           name: cli-${{ matrix.target }}
-          path: uniclipboard-cli-*.{tar.gz,zip}
+          path: clipboard-cli-*.{tar.gz,zip}
 ```
 
 ### Pattern 2: Version Alignment
@@ -260,7 +260,7 @@ edition = "2021"
 
 Update `scripts/bump-version.js` to also update `uc-cli/Cargo.toml` in Cargo.lock. Since the workspace root `Cargo.toml` already uses `bump-version.js`'s `updateCargoToml` function (which updates `src-tauri/Cargo.toml` `[package].version` AND `[workspace.package].version`), and `uc-cli` will inherit via `version.workspace = true`, the Cargo.lock entry for `uc-cli` must also be updated.
 
-The current `updateCargoLock()` function only patches the `uniclipboard` package entry in Cargo.lock. After setting `version.workspace = true` in `uc-cli`, the lock file will have a `uc-cli` entry that Cargo will update automatically on the next build. However, the CI version commit step must regenerate or patch the lock file correctly.
+The current `updateCargoLock()` function only patches the `clipboard` package entry in Cargo.lock. After setting `version.workspace = true` in `uc-cli`, the lock file will have a `uc-cli` entry that Cargo will update automatically on the next build. However, the CI version commit step must regenerate or patch the lock file correctly.
 
 **Recommended approach:** After `bump-version.js` writes the new workspace version, run `cargo update --workspace --manifest-path src-tauri/Cargo.toml` in CI to regenerate Cargo.lock with the correct uc-cli version before committing.
 
@@ -289,10 +289,10 @@ Add `{{CLI_SECTION}}` placeholder to `.github/release-notes/release.md.tmpl`.
 CLI artifacts go to the same R2 path structure as App artifacts:
 
 ```
-artifacts/v{VERSION}/uniclipboard-cli-{VERSION}-{target}.tar.gz
+artifacts/v{VERSION}/clipboard-cli-{VERSION}-{target}.tar.gz
 ```
 
-The current release workflow uploads everything in `release-assets/` flat to `artifacts/v{VERSION}/`. Since CLI binary names (`uniclipboard-cli-*`) do not collide with App bundle names (`UniClipboard_*`, `*.dmg`, `*.deb`, etc.), no namespace prefix is needed. The flat structure works as-is.
+The current release workflow uploads everything in `release-assets/` flat to `artifacts/v{VERSION}/`. Since CLI binary names (`clipboard-cli-*`) do not collide with App bundle names (`Clipboard_*`, `*.dmg`, `*.deb`, etc.), no namespace prefix is needed. The flat structure works as-is.
 
 ### Pattern 5: build-cli Platform Dependencies
 
@@ -304,7 +304,7 @@ The current release workflow uploads everything in `release-assets/` flat to `ar
 - **Building CLI inside Tauri action**: `tauri-action` wraps `bun tauri build`, which builds the full app. CLI must be built separately with `cargo build -p uc-cli`.
 - **Uploading CLI to the updater manifest**: The Tauri updater manifest (`stable.json`) is app-only. CLI binaries must NOT be listed in it or `assemble-update-manifest.js` will fail/corrupt the manifest.
 - **Not caching Rust between CLI and app jobs**: If both jobs share the same runner via matrix, the Rust build cache key should differentiate CLI vs App to avoid cache invalidation.
-- **Forgetting the Windows binary extension**: The CLI binary on Windows is `uniclipboard-cli.exe`. The packaging step must handle the `.exe` extension.
+- **Forgetting the Windows binary extension**: The CLI binary on Windows is `clipboard-cli.exe`. The packaging step must handle the `.exe` extension.
 
 ---
 
@@ -352,7 +352,7 @@ Step 2.5: SKIPPED (not a rename/refactor/migration phase).
 
 **How to avoid:** Change `uc-cli/Cargo.toml` to `version.workspace = true`. Then `cargo update --workspace` after the bump script ensures Cargo.lock reflects the correct version.
 
-**Warning signs:** `uniclipboard-cli --version` outputs `0.1.0` when workspace is at a different version.
+**Warning signs:** `clipboard-cli --version` outputs `0.1.0` when workspace is at a different version.
 
 ### Pitfall 2: CLI Build Requires libxcb on Linux
 
@@ -368,9 +368,9 @@ Step 2.5: SKIPPED (not a rename/refactor/migration phase).
 
 **What goes wrong:** The `prepare-release-assets` step in `release.yml` flattens all artifacts into `release-assets/`. If a CLI file has the same name as an App file, one overwrites the other silently.
 
-**Why it happens:** The flattening logic uses `basename` and only special-cases the macOS `.app.tar.gz` collision. CLI binaries with generic names like `uniclipboard-cli.tar.gz` would collide across platforms.
+**Why it happens:** The flattening logic uses `basename` and only special-cases the macOS `.app.tar.gz` collision. CLI binaries with generic names like `clipboard-cli.tar.gz` would collide across platforms.
 
-**How to avoid:** Include the target triple in the CLI archive filename at packaging time: `uniclipboard-cli-{VERSION}-{target}.tar.gz`. This guarantees uniqueness across platforms. The flattening script does not need modification since filenames are already unique.
+**How to avoid:** Include the target triple in the CLI archive filename at packaging time: `clipboard-cli-{VERSION}-{target}.tar.gz`. This guarantees uniqueness across platforms. The flattening script does not need modification since filenames are already unique.
 
 **Warning signs:** `ls release-assets/` shows fewer CLI files than expected.
 
@@ -386,7 +386,7 @@ Step 2.5: SKIPPED (not a rename/refactor/migration phase).
 
 ### Pitfall 5: Cargo.lock Not Updated in Version Bump Commit
 
-**What goes wrong:** `scripts/bump-version.js` patches the Cargo.lock entry for the `uniclipboard` workspace root package only. After `uc-cli` switches to `version.workspace = true`, the `uc-cli` entry in Cargo.lock still shows the old version. This causes `cargo check` to fail or produce an inconsistent state when the release workflow builds.
+**What goes wrong:** `scripts/bump-version.js` patches the Cargo.lock entry for the `clipboard` workspace root package only. After `uc-cli` switches to `version.workspace = true`, the `uc-cli` entry in Cargo.lock still shows the old version. This causes `cargo check` to fail or produce an inconsistent state when the release workflow builds.
 
 **Why it happens:** `updateCargoLock()` in `bump-version.js` uses a regex to find and replace only the root package entry. Workspace members are not touched.
 
@@ -414,13 +414,13 @@ Step 2.5: SKIPPED (not a rename/refactor/migration phase).
 # Source: standard Unix/Windows archive conventions
 VERSION=$(node -p "require('./package.json').version")
 TARGET="${{ matrix.target }}"
-BIN_SRC="src-tauri/target/${TARGET}/release/uniclipboard-cli"
+BIN_SRC="src-tauri/target/${TARGET}/release/clipboard-cli"
 
 if [ "${{ matrix.platform }}" = "windows-latest" ]; then
-  7z a "uniclipboard-cli-${VERSION}-${TARGET}.zip" "${BIN_SRC}.exe"
+  7z a "clipboard-cli-${VERSION}-${TARGET}.zip" "${BIN_SRC}.exe"
 else
-  tar -czf "uniclipboard-cli-${VERSION}-${TARGET}.tar.gz" \
-    -C "src-tauri/target/${TARGET}/release" uniclipboard-cli
+  tar -czf "clipboard-cli-${VERSION}-${TARGET}.tar.gz" \
+    -C "src-tauri/target/${TARGET}/release" clipboard-cli
 fi
 ```
 
@@ -431,7 +431,7 @@ fi
 name = "uc-cli"
 version.workspace = true   # Fix: was version = "0.1.0"
 edition = "2021"
-description = "Command-line interface for UniClipboard"
+description = "Command-line interface for Clipboard"
 ```
 
 ### Cargo.lock Refresh After Version Bump
@@ -470,8 +470,8 @@ while IFS= read -r src; do
   filename="$(basename "$src")"
   cp "$src" "release-assets/$filename"
 done < <(find artifacts -type f \( \
-  -name "uniclipboard-cli-*.tar.gz" -o \
-  -name "uniclipboard-cli-*.zip" \
+  -name "clipboard-cli-*.tar.gz" -o \
+  -name "clipboard-cli-*.zip" \
 \) | sort)
 ```
 
@@ -496,12 +496,12 @@ done < <(find artifacts -type f \( \
 1. **Should CLI artifacts be code-signed?**
    - What we know: App artifacts are signed (Apple codesign + Tauri minisign). CLI archives are not currently signed.
    - What's unclear: Whether macOS Gatekeeper will block unsigned CLI binaries downloaded by users.
-   - Recommendation: For v0.4.0-alpha, skip code signing for CLI. Add a note in release notes that users may need `xattr -d com.apple.quarantine ./uniclipboard-cli` on macOS. Plan code signing for stable release.
+   - Recommendation: For v0.4.0-alpha, skip code signing for CLI. Add a note in release notes that users may need `xattr -d com.apple.quarantine ./clipboard-cli` on macOS. Plan code signing for stable release.
 
 2. **Should the CLI have its own update mechanism?**
    - What we know: Tauri's updater is App-only. The CLI would need a separate mechanism (e.g., `cargo-binstall`, `gh release download`, or a custom check).
    - What's unclear: User preference for CLI update flow.
-   - Recommendation: Out of scope for Phase 71. CLI users check GitHub Releases manually or use `uniclipboard-cli update` (future CLI command).
+   - Recommendation: Out of scope for Phase 71. CLI users check GitHub Releases manually or use `clipboard-cli update` (future CLI command).
 
 3. **Does `uc-cli` compilation require all Linux GUI libs?**
    - What we know: `uc-cli` → `uc-daemon` → `uc-platform` → `clipboard-rs`. The clipboard-rs crate may require X11/xcb dev headers even when no GUI is started.
@@ -528,7 +528,7 @@ done < <(find artifacts -type f \( \
 | `bump-version.js` updates uc-cli Cargo.toml   | unit      | `bun test -- scripts/__tests__/bump-version.test.ts`           | Extend existing test         |
 | CLI archive created with correct filename     | smoke     | Manual inspection in CI artifact                               | Script-level test not needed |
 | `generate-release-notes.js` emits CLI section | unit      | `bun test -- scripts/__tests__/generate-release-notes.test.ts` | Extend existing test         |
-| CLI binary reports correct version            | smoke     | `./uniclipboard-cli --version` in CI                           | Manual or CI output check    |
+| CLI binary reports correct version            | smoke     | `./clipboard-cli --version` in CI                           | Manual or CI output check    |
 
 ### Wave 0 Gaps
 

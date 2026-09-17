@@ -398,7 +398,7 @@ impl CommonClipboardImpl {
             // slicer aborts the process when those offsets land inside a
             // multi-byte UTF-8 character. Some source apps (Chinese-language
             // Office, certain chat clients) ship payloads where that happens
-            // for the trailing CJK character. See Sentry UNICLIPBOARD-RUST-1V
+            // for the trailing CJK character. See Sentry CLIPBOARD-RUST-1V
             // and the regression tests in `super::cf_html`.
             //
             // The Windows path reads raw CF_HTML bytes via `clipboard-win` and

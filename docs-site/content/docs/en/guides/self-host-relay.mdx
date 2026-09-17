@@ -1,13 +1,13 @@
 ---
-title: Self-host a UniClipboard relay
-description: Deploy the official UniClipboard relay image and connect your devices to it.
+title: Self-host a Clipboard relay
+description: Deploy the official Clipboard relay image and connect your devices to it.
 ---
 
-UniClipboard can use a relay you operate instead of the default public relays. The recommended
+Clipboard can use a relay you operate instead of the default public relays. The recommended
 deployment uses the official `ghcr.io/uniclipboard/relay` image with Docker Compose. Caddy provides
 HTTPS automatically, while the relay stays private inside the container network.
 
-Each device needs the relay URL and the same access token. Changes take effect after UniClipboard
+Each device needs the relay URL and the same access token. Changes take effect after Clipboard
 restarts its background service.
 
 ## What a relay does
@@ -17,7 +17,7 @@ connection metadata and the size and timing of encrypted traffic, but it cannot 
 content, passphrases, the space MasterKey, or the membership list.
 
 Running your own relay gives you control over its location, availability, and bandwidth. It does
-not replace peer discovery: first-time pairing still uses UniClipboard's rendezvous service.
+not replace peer discovery: first-time pairing still uses Clipboard's rendezvous service.
 
 See
 [Pairing & sync - What the relay sees vs. what your peers see](./pairing#what-the-relay-sees-vs-what-your-peers-see)
@@ -45,8 +45,8 @@ records before continuing.
 Replace `relay.example.com` with your relay domain, then run:
 
 ```bash
-mkdir -p uniclipboard-relay
-cd uniclipboard-relay
+mkdir -p clipboard-relay
+cd clipboard-relay
 umask 077
 printf 'RELAY_DOMAIN=relay.example.com\nUC_RELAY_TOKEN=%s\n' \
   "$(openssl rand -hex 32)" > .env
@@ -123,7 +123,7 @@ Replace the domain in the `curl` command. The health endpoint should return a JS
 
 Press `Ctrl+C` to stop following the logs; the containers keep running.
 
-## Connect UniClipboard
+## Connect Clipboard
 
 Repeat these steps on every device:
 
@@ -133,7 +133,7 @@ Repeat these steps on every device:
 4. Click **Test availability**.
 5. Click **Save relay node**, then **Restart now** when prompted.
 
-UniClipboard does not display a saved token again. To replace it, enter the new token explicitly
+Clipboard does not display a saved token again. To replace it, enter the new token explicitly
 and save the relay again.
 
 <Callout type="info">
@@ -153,7 +153,7 @@ docker compose ps
 
 For a reproducible deployment, set `RELAY_IMAGE` in `.env` to an available version tag or image
 digest from the
-[UniClipboard relay package page](https://github.com/UniClipboard/relay/pkgs/container/relay):
+[Clipboard relay package page](https://github.com/UniClipboard/relay/pkgs/container/relay):
 
 ```dotenv
 RELAY_IMAGE=ghcr.io/uniclipboard/relay@sha256:YOUR_IMAGE_DIGEST
@@ -209,7 +209,7 @@ Only bypass the proxy when the relay is directly reachable from that network.
 
 Use all three checks together:
 
-- **Availability test:** the URL and token pass **Test availability** in UniClipboard.
+- **Availability test:** the URL and token pass **Test availability** in Clipboard.
 - **Server logs:** run `docker compose logs -f relay` while the devices connect and sync.
 - **End-to-end test:** sync between two paired devices on networks where a direct connection is
   unavailable, and confirm relay activity appears at the same time.
@@ -220,15 +220,15 @@ Use all three checks together:
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Caddy cannot obtain a certificate                   | Confirm DNS points to this server and TCP ports `80` and `443` are publicly reachable. Check `docker compose logs caddy`. |
 | Relay is unhealthy or keeps restarting              | Confirm `.env` contains a non-empty `UC_RELAY_TOKEN`, then check `docker compose logs relay`.                             |
-| Availability test reports an authentication error   | Copy the exact token from `.env` to UniClipboard. If the server token changed, update every device.                       |
+| Availability test reports an authentication error   | Copy the exact token from `.env` to Clipboard. If the server token changed, update every device.                       |
 | `/healthz` works locally but not through the domain | Check the reverse proxy target, HTTPS certificate, firewall, and DNS records.                                             |
 | An existing proxy rejects relay connections         | Confirm it supports WebSocket upgrades and preserves the `Authorization` header.                                          |
-| UniClipboard keeps using default relays             | Save the custom relay and choose **Restart now**. The change is not active before restart.                                |
+| Clipboard keeps using default relays             | Save the custom relay and choose **Restart now**. The change is not active before restart.                                |
 | Pulling `latest` appears to do nothing              | Run both `docker compose pull` and `docker compose up -d`, then inspect `docker compose ps`.                              |
 | Relay latency is high                               | Choose a server region with good direct routes to all participating devices.                                              |
 
 ## More references
 
-- [UniClipboard relay source and deployment notes](https://github.com/UniClipboard/relay)
-- [UniClipboard relay container package](https://github.com/UniClipboard/relay/pkgs/container/relay)
+- [Clipboard relay source and deployment notes](https://github.com/UniClipboard/relay)
+- [Clipboard relay container package](https://github.com/UniClipboard/relay/pkgs/container/relay)
 - [iroh relay concepts](https://docs.iroh.computer/concepts/relays)

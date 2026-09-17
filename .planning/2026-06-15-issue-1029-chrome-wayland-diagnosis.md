@@ -17,7 +17,7 @@
 
 ### 1. #1054 在 0.15 里在工作（不是修错了）
 
-Linux daemon 日志 `uniclipboard-daemon.json.2026-06-15`：
+Linux daemon 日志 `clipboard-daemon.json.2026-06-15`：
 
 ```text
 06:45:18.093  reader: "x11 read: owner advertised no interesting mimes — empty snapshot"
@@ -131,7 +131,7 @@ Linux clipboard event loop: native X11 (x11rb + XFIXES)   wayland_session:true
 
 ## 日志原始位置
 
-- `/tmp/uc1029/linux_logs/uniclipboard-daemon.json.2026-06-15`（13328 行）
-- `/tmp/uc1029/windows_logs/uniclipboard-daemon.json.2026-06-15`（5143 行）
+- `/tmp/uc1029/linux_logs/clipboard-daemon.json.2026-06-15`（13328 行）
+- `/tmp/uc1029/windows_logs/clipboard-daemon.json.2026-06-15`（5143 行）
 - 两端 device_id：Linux `879d46fb-...`、Windows `00af67ad-...`
 - 注意：`/tmp` 是临时目录，如需保留请尽快归档。

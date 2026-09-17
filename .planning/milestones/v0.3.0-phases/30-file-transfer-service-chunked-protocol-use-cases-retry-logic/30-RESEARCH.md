@@ -16,7 +16,7 @@ This section maps phase requirements to testable validation criteria.
 
 ### Validation Criteria
 
-1. **FileTransferService accepts and opens streams** — Unit test: service registers `/uniclipboard/file-transfer/1.0.0` protocol, accept loop processes incoming streams
+1. **FileTransferService accepts and opens streams** — Unit test: service registers `/clipboard/file-transfer/1.0.0` protocol, accept loop processes incoming streams
 2. **Chunked transfer protocol works end-to-end** — Unit test: sender chunks file into 256KB blocks, receiver reassembles, Blake3 hash matches
 3. **Atomic file write with temp file** — Unit test: file written to `.tmp` suffix, renamed after hash verification, permissions 0600 on Unix
 4. **Serial queue processes files in order** — Unit test: queue accepts multiple files, processes sequentially, new files appended during transfer
@@ -53,7 +53,7 @@ The PairingStreamService provides the canonical libp2p stream service pattern wi
 
 **Location:** `src-tauri/crates/uc-core/src/network/protocol_ids.rs`
 
-Current protocols: `Pairing`, `PairingStream`, `Business`. Phase 28 should have added `FileTransfer` variant with `/uniclipboard/file-transfer/1.0.0`. This phase consumes that.
+Current protocols: `Pairing`, `PairingStream`, `Business`. Phase 28 should have added `FileTransfer` variant with `/clipboard/file-transfer/1.0.0`. This phase consumes that.
 
 ### NetworkEvent Extensions
 

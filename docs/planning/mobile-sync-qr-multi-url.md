@@ -1,6 +1,6 @@
 # Mobile Sync 二维码多候选地址（桌面端生成）
 
-> 需求规格 —— 让桌面端注册移动设备时生成的 `uniclipboard://connect` 二维码，
+> 需求规格 —— 让桌面端注册移动设备时生成的 `clipboard://connect` 二维码，
 > 一次性携带 **全部可达候选地址**（内网网卡 + 公网入口），使同一个码在内网与
 > 公网下都能被扫码端探活连通。
 >
@@ -34,8 +34,8 @@ let base_url = match settings.mobile_sync.lan_advertise_base_url.clone() {
 
 | 部署形态 | `lan_advertise_base_url` | 命中分支 | 二维码 `url` 内容 |
 | --- | --- | --- | --- |
-| **桌面端**（普通 GUI / `uniclip start`） | **不涉及，恒为 `None`** | 只走 `None` | 自动挑的 **单个网卡 IP** `http://<ip>:<port>` |
-| **Server 端**（`uniclip start --server`，VPS 部署） | **专属，置备时写入**（`network set --url https://域名`，见 ADR-007 §2.5） | 走 `Some(url)` | **只剩那个公网域名**，无任何网卡 IP |
+| **桌面端**（普通 GUI / `clip start`） | **不涉及，恒为 `None`** | 只走 `None` | 自动挑的 **单个网卡 IP** `http://<ip>:<port>` |
+| **Server 端**（`clip start --server`，VPS 部署） | **专属，置备时写入**（`network set --url https://域名`，见 ADR-007 §2.5） | 走 `Some(url)` | **只剩那个公网域名**，无任何网卡 IP |
 
 换言之：**`lan_advertise_base_url` 是 server 端专属的配置——桌面端的二维码里压根
 不存在它，永远只有一个本机网卡 IP；只有 server 端的二维码才会带 `lan_advertise_base_url`，

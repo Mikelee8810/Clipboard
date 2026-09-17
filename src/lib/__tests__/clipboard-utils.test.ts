@@ -76,7 +76,7 @@ describe('fileUriToLocalPath', () => {
   })
 
   it('returns null for non-file URIs and unparseable input', () => {
-    expect(fileUriToLocalPath('uniclip-missing:///lost.bin?size=42')).toBeNull()
+    expect(fileUriToLocalPath('clip-missing:///lost.bin?size=42')).toBeNull()
     expect(fileUriToLocalPath('https://example.com/a')).toBeNull()
     expect(fileUriToLocalPath('')).toBeNull()
   })

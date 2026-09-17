@@ -22,7 +22,7 @@ pub const V0_19_1_UPGRADE_RELEASE: UpgradeRelease = UpgradeRelease {
     tag: V0_19_1_RELEASE_TAG,
     manifest_sha256: V0_19_1_SHA256SUMS_SHA256,
     macos_aarch64_asset: ReleaseAsset {
-        filename: "uniclipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz",
+        filename: "clipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz",
         format: ArchiveFormat::TarGz,
     },
     macos_aarch64_asset_sha256: "df8966aa0b462c69de8a304a99f71228ea2c9119fa3a327a33bb48df9b27b4e6",
@@ -45,7 +45,7 @@ pub const UPGRADE_RELEASES: &[UpgradeRelease] = &[
         tag: "v0.20.0-alpha.2",
         manifest_sha256: "c86f90b2f6ae46c07445f0e17c0e7245bc8958ae81d01dcbd0f4d9e3398a422c",
         macos_aarch64_asset: ReleaseAsset {
-            filename: "uniclipboard-cli-0.20.0-alpha.2-aarch64-apple-darwin.tar.gz",
+            filename: "clipboard-cli-0.20.0-alpha.2-aarch64-apple-darwin.tar.gz",
             format: ArchiveFormat::TarGz,
         },
         macos_aarch64_asset_sha256:
@@ -57,7 +57,7 @@ pub const UPGRADE_RELEASES: &[UpgradeRelease] = &[
         tag: "v0.20.0-alpha.6",
         manifest_sha256: LEGACY_SHA256SUMS_SHA256,
         macos_aarch64_asset: ReleaseAsset {
-            filename: "uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz",
+            filename: "clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz",
             format: ArchiveFormat::TarGz,
         },
         macos_aarch64_asset_sha256:
@@ -69,7 +69,7 @@ pub const UPGRADE_RELEASES: &[UpgradeRelease] = &[
         tag: "v1.0.0-alpha.4",
         manifest_sha256: "fd10e8b3e4d2c5d07fbcddd9748a532d0cd2635baf29d24a1ac74f5d81a430ff",
         macos_aarch64_asset: ReleaseAsset {
-            filename: "uniclipboard-cli-1.0.0-alpha.4-aarch64-apple-darwin.tar.gz",
+            filename: "clipboard-cli-1.0.0-alpha.4-aarch64-apple-darwin.tar.gz",
             format: ArchiveFormat::TarGz,
         },
         macos_aarch64_asset_sha256:
@@ -99,23 +99,23 @@ pub struct ReleaseAsset {
 pub fn fixed_legacy_release_asset(os: &str, arch: &str) -> Result<ReleaseAsset, String> {
     let (filename, format) = match (os, arch) {
         ("macos", "aarch64") => (
-            "uniclipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz",
+            "clipboard-cli-0.20.0-alpha.6-aarch64-apple-darwin.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("macos", "x86_64") => (
-            "uniclipboard-cli-0.20.0-alpha.6-x86_64-apple-darwin.tar.gz",
+            "clipboard-cli-0.20.0-alpha.6-x86_64-apple-darwin.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("linux", "aarch64") => (
-            "uniclipboard-cli-0.20.0-alpha.6-aarch64-unknown-linux-musl.tar.gz",
+            "clipboard-cli-0.20.0-alpha.6-aarch64-unknown-linux-musl.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("linux", "x86_64") => (
-            "uniclipboard-cli-0.20.0-alpha.6-x86_64-unknown-linux-musl.tar.gz",
+            "clipboard-cli-0.20.0-alpha.6-x86_64-unknown-linux-musl.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("windows", "x86_64") => (
-            "uniclipboard-cli-0.20.0-alpha.6-x86_64-pc-windows-msvc.zip",
+            "clipboard-cli-0.20.0-alpha.6-x86_64-pc-windows-msvc.zip",
             ArchiveFormat::Zip,
         ),
         _ => return Err(format!("unsupported legacy release target: {os}/{arch}")),
@@ -126,23 +126,23 @@ pub fn fixed_legacy_release_asset(os: &str, arch: &str) -> Result<ReleaseAsset, 
 pub fn v0_19_1_release_asset(os: &str, arch: &str) -> Result<ReleaseAsset, String> {
     let (filename, format) = match (os, arch) {
         ("macos", "aarch64") => (
-            "uniclipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz",
+            "clipboard-cli-0.19.1-aarch64-apple-darwin.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("macos", "x86_64") => (
-            "uniclipboard-cli-0.19.1-x86_64-apple-darwin.tar.gz",
+            "clipboard-cli-0.19.1-x86_64-apple-darwin.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("linux", "aarch64") => (
-            "uniclipboard-cli-0.19.1-aarch64-unknown-linux-musl.tar.gz",
+            "clipboard-cli-0.19.1-aarch64-unknown-linux-musl.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("linux", "x86_64") => (
-            "uniclipboard-cli-0.19.1-x86_64-unknown-linux-musl.tar.gz",
+            "clipboard-cli-0.19.1-x86_64-unknown-linux-musl.tar.gz",
             ArchiveFormat::TarGz,
         ),
         ("windows", "x86_64") => (
-            "uniclipboard-cli-0.19.1-x86_64-pc-windows-msvc.zip",
+            "clipboard-cli-0.19.1-x86_64-pc-windows-msvc.zip",
             ArchiveFormat::Zip,
         ),
         _ => return Err(format!("unsupported v0.19.1 release target: {os}/{arch}")),
@@ -398,9 +398,9 @@ fn accepted_binary_name(path: &Path) -> Option<&str> {
     }
     let name = path.file_name()?.to_str()?;
     let accepted = if cfg!(windows) {
-        ["uniclip.exe", "uniclipd.exe"].contains(&name)
+        ["clip.exe", "clipd.exe"].contains(&name)
     } else {
-        ["uniclip", "uniclipd"].contains(&name)
+        ["clip", "clipd"].contains(&name)
     };
     accepted.then_some(name)
 }

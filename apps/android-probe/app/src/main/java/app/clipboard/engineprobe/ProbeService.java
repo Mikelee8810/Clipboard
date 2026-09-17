@@ -1,4 +1,4 @@
-package app.uniclipboard.engineprobe;
+package app.clipboard.engineprobe;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -25,7 +25,7 @@ public final class ProbeService extends Service {
         }
         Notification notification = new Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_notify_sync)
-                .setContentTitle("UniClipboard engine probe")
+                .setContentTitle("Clipboard engine probe")
                 .setContentText("Android acceptance run in progress")
                 .setOngoing(true)
                 .build();

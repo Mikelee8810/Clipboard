@@ -87,7 +87,7 @@ In ClipboardContent.tsx, add a `useRef<boolean>` called `wasAtFirstPositionRef` 
 This covers both local (prependItem) and remote (full reload) paths since both result in flatItems changing. The existing scroll-to-active useEffect (line 217-219) will automatically smooth-scroll to the new active item.
 </action>
 <verify>
-<automated>cd /Users/mark/MyProjects/uniclipboard-desktop && npx tsc --noEmit --pretty 2>&1 | head -30</automated>
+<automated>cd /Users/mark/MyProjects/clipboard-desktop && npx tsc --noEmit --pretty 2>&1 | head -30</automated>
 </verify>
 <done> - TypeScript compiles without errors - wasAtFirstPositionRef is declared and updated via useEffect - Auto-follow logic fires when active was at index 0 and flatItems[0] changes - Existing auto-select behavior preserved for null/not-found cases - No behavior change when active item is NOT at index 0
 </done>

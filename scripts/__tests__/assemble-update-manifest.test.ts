@@ -30,24 +30,21 @@ describe('assemble-update-manifest', () => {
     const baseUrl = 'https://github.com/UniClipboard/UniClipboard/releases/download/v0.1.0-alpha.2'
 
     writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_aarch64-apple-darwin.app.tar.gz.sig'),
+      path.join(artifactsDir, 'Clipboard_aarch64-apple-darwin.app.tar.gz.sig'),
       'sig-macos-arm64'
     )
     writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_x86_64-apple-darwin.app.tar.gz.sig'),
+      path.join(artifactsDir, 'Clipboard_x86_64-apple-darwin.app.tar.gz.sig'),
       'sig-macos-x64'
     )
+    writeSigFile(path.join(artifactsDir, 'Clipboard_0.1.0-alpha.2_amd64.AppImage.sig'), 'sig-linux')
+    writeSigFile(path.join(artifactsDir, 'Clipboard_0.1.0-alpha.2_x64-setup.exe.sig'), 'sig-win')
     writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_0.1.0-alpha.2_amd64.AppImage.sig'),
-      'sig-linux'
-    )
-    writeSigFile(path.join(artifactsDir, 'UniClipboard_0.1.0-alpha.2_x64-setup.exe.sig'), 'sig-win')
-    writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_0.1.0-alpha.2_arm64-setup.exe.sig'),
+      path.join(artifactsDir, 'Clipboard_0.1.0-alpha.2_arm64-setup.exe.sig'),
       'sig-win-arm64'
     )
-    writeSigFile(path.join(artifactsDir, 'UniClipboard-0.1.0-alpha.2-1.x86_64.rpm.sig'), 'sig-rpm')
-    writeSigFile(path.join(artifactsDir, 'UniClipboard_0.1.0-alpha.2_amd64.deb.sig'), 'sig-deb')
+    writeSigFile(path.join(artifactsDir, 'Clipboard-0.1.0-alpha.2-1.x86_64.rpm.sig'), 'sig-rpm')
+    writeSigFile(path.join(artifactsDir, 'Clipboard_0.1.0-alpha.2_amd64.deb.sig'), 'sig-deb')
 
     execFileSync(
       'node',
@@ -83,19 +80,19 @@ describe('assemble-update-manifest', () => {
     ])
 
     expect(manifest.platforms['darwin-aarch64'].url).toBe(
-      `${baseUrl}/UniClipboard_aarch64-apple-darwin.app.tar.gz`
+      `${baseUrl}/Clipboard_aarch64-apple-darwin.app.tar.gz`
     )
     expect(manifest.platforms['darwin-x86_64'].url).toBe(
-      `${baseUrl}/UniClipboard_x86_64-apple-darwin.app.tar.gz`
+      `${baseUrl}/Clipboard_x86_64-apple-darwin.app.tar.gz`
     )
     expect(manifest.platforms['linux-x86_64'].url).toBe(
-      `${baseUrl}/UniClipboard_0.1.0-alpha.2_amd64.AppImage`
+      `${baseUrl}/Clipboard_0.1.0-alpha.2_amd64.AppImage`
     )
     expect(manifest.platforms['windows-x86_64'].url).toBe(
-      `${baseUrl}/UniClipboard_0.1.0-alpha.2_x64-setup.exe`
+      `${baseUrl}/Clipboard_0.1.0-alpha.2_x64-setup.exe`
     )
     expect(manifest.platforms['windows-aarch64'].url).toBe(
-      `${baseUrl}/UniClipboard_0.1.0-alpha.2_arm64-setup.exe`
+      `${baseUrl}/Clipboard_0.1.0-alpha.2_arm64-setup.exe`
     )
   })
 
@@ -108,7 +105,7 @@ describe('assemble-update-manifest', () => {
     const baseUrl = 'https://example.com/dl/v0.14.1'
 
     writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_aarch64-apple-darwin.app.tar.gz.sig'),
+      path.join(artifactsDir, 'Clipboard_aarch64-apple-darwin.app.tar.gz.sig'),
       'sig-macos-arm64'
     )
 
@@ -167,7 +164,7 @@ describe('assemble-update-manifest', () => {
     const outputPath = path.join(tempDir, 'updates', 'alpha.json')
 
     writeSigFile(
-      path.join(artifactsDir, 'UniClipboard_aarch64-apple-darwin.app.tar.gz.sig'),
+      path.join(artifactsDir, 'Clipboard_aarch64-apple-darwin.app.tar.gz.sig'),
       'sig-macos-arm64'
     )
 

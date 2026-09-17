@@ -1,6 +1,6 @@
 # VISION.md
 
-**UniClipboard 是一款端到端加密的跨平台剪贴板同步工具，通过 P2P 网络让个人拥有的多台设备共享同一份剪贴板。**
+**Clipboard 是一款端到端加密的跨平台剪贴板同步工具，通过 P2P 网络让个人拥有的多台设备共享同一份剪贴板。**
 
 ---
 
@@ -9,7 +9,7 @@
 - 产品定位：「多台设备服务一个人」——不是协作工具，不是消息队列
 - 支持 macOS、Windows、Linux、iOS、Android、HarmonyOS；所有平台都是同一 Space 中的完整 P2P 对等节点
 - 同步内容涵盖文本、图片、文件、链接、富文本、代码片段
-- 交付形态：GUI 桌面应用（Tauri + React）、原生移动应用、CLI 工具（uniclip）、桌面后台 daemon（uniclipd）
+- 交付形态：GUI 桌面应用（Tauri + React）、原生移动应用、CLI 工具（clip）、桌面后台 daemon（clipd）
 - 核心交互入口：Quick Panel（Spotlight 式全局快捷面板，搜索历史、即时粘贴）
 
 ## 核心目标

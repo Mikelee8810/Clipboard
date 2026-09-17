@@ -10,7 +10,7 @@
 **ProtocolId enum** (`uc-core/src/network/protocol_ids.rs`):
 
 - Currently has 3 variants: `Pairing`, `PairingStream`, `Business`
-- Each maps to a string like `/uniclipboard/business/1.0.0`
+- Each maps to a string like `/clipboard/business/1.0.0`
 - Adding `FileTransfer` follows the same pattern
 
 **ClipboardBinaryPayload** (`uc-core/src/network/protocol/clipboard_payload_v3.rs`):

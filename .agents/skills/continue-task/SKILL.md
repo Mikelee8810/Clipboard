@@ -200,7 +200,7 @@ If the user switched branches between sessions:
 
 ### Multiple projects with state files
 
-If the user works on multiple projects (uniclipboard, uc-website, uniclipboard-android), each has its own state file under its own project key. No conflict.
+If the user works on multiple projects (clipboard, uc-website, clipboard-android), each has its own state file under its own project key. No conflict.
 
 ### Parallel branches in the same project (worktrees)
 

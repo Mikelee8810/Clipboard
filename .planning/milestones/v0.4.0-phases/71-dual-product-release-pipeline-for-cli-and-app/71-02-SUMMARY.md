@@ -40,7 +40,7 @@ Created `.github/workflows/build-cli.yml` — a reusable workflow callable by `r
 - `workflow_dispatch` with choice dropdown for standalone manual runs
 - Same 4-platform matrix: `aarch64-apple-darwin`, `x86_64-apple-darwin`, `x86_64-unknown-linux-gnu`, `x86_64-pc-windows-msvc`
 - `Swatinem/rust-cache@v2` with `shared-key: cli-{target}` to avoid cache conflicts with app build
-- Archive naming: `uniclipboard-cli-{VERSION}-{target}.tar.gz` (Unix) / `.zip` (Windows)
+- Archive naming: `clipboard-cli-{VERSION}-{target}.tar.gz` (Unix) / `.zip` (Windows)
 - Artifact names: `cli-{target}` with `cli-` prefix for disambiguation in release workflows
 - Binary path fallback: checks `target/{target}/release/` then falls back to `target/release/` for non-cross builds
 
@@ -60,7 +60,7 @@ Created `.github/workflows/build-cli.yml` — a reusable workflow callable by `r
 - Contains `upload-artifact` with `name: cli-${{ matrix.target }}`
 - Contains Linux apt-get install step for ubuntu-22.04
 - Contains Windows 7z packaging and Unix tar.gz packaging
-- Contains `uniclipboard-cli-${VERSION}-${TARGET}` archive naming pattern
+- Contains `clipboard-cli-${VERSION}-${TARGET}` archive naming pattern
 - Contains `Swatinem/rust-cache@v2` with `shared-key: cli-${{ matrix.target }}`
 
 ## Deviations from Plan

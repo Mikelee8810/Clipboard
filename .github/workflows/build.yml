@@ -247,11 +247,11 @@ jobs:
           echo "app_env=$APP_ENV" >> "$GITHUB_OUTPUT"
           echo "Resolved APP_ENV=$APP_ENV (from channel=$CHANNEL)"
 
-      - name: prepare uniclipd sidecar
-        # ADR-008 D13: the standalone `uniclipd` daemon ships *inside* the GUI
+      - name: prepare clipd sidecar
+        # ADR-008 D13: the standalone `clipd` daemon ships *inside* the GUI
         # installer as a Tauri sidecar (externalBin), so the GUI can spawn it as
         # a sibling of its own executable (uc-daemon-local spawn.rs). `tauri
-        # build` verifies `src-tauri/binaries/uniclipd-<triple>` exists, so this
+        # build` verifies `src-tauri/binaries/clipd-<triple>` exists, so this
         # must run first. We forward the same `${{ matrix.args }}` (`--target
         # <triple>` or empty) the GUI build uses, so the staged sidecar name is
         # exactly what tauri-cli looks up. The daemon shares the GUI's
@@ -346,7 +346,7 @@ jobs:
           python3 scripts/check-linux-bundles.py target/release/bundle
 
       - name: package Windows portable zip
-        # Portable ("green") build: the standalone exe + the `uniclipd` daemon +
+        # Portable ("green") build: the standalone exe + the `clipd` daemon +
         # a `portable.dat` marker that flips both binaries into portable mode at
         # runtime (data stored next to the exe, no install, no system traces).
         # The NSIS installer does NOT ship the marker, so the same compiled exe
@@ -354,7 +354,7 @@ jobs:
         # upload glob picks it up.
         #
         # The daemon MUST ship in the zip: the GUI is a pure external-daemon
-        # client (ADR-008 P3-3) and resolves `uniclipd.exe` as a sibling of its
+        # client (ADR-008 P3-3) and resolves `clipd.exe` as a sibling of its
         # own exe — the NSIS bundle gets it via tauri's externalBin, but this
         # hand-rolled zip has to copy it explicitly (v0.14.0 shipped without it
         # and the portable build could not start).
@@ -378,10 +378,10 @@ jobs:
             RELEASE_DIR="target/release"
           fi
 
-          # Tauri may rename the cargo binary (uniclipboard.exe) to the
-          # productName (UniClipboard.exe); accept either, ship as UniClipboard.exe.
+          # Tauri may rename the cargo binary (clipboard.exe) to the
+          # productName (Clipboard.exe); accept either, ship as Clipboard.exe.
           EXE=""
-          for cand in "UniClipboard.exe" "uniclipboard.exe"; do
+          for cand in "Clipboard.exe" "clipboard.exe"; do
             if [ -f "$RELEASE_DIR/$cand" ]; then EXE="$RELEASE_DIR/$cand"; break; fi
           done
           if [ -z "$EXE" ]; then
@@ -393,9 +393,9 @@ jobs:
           # Daemon sidecar: prepare-daemon-sidecar.mjs built it into the same
           # release dir before `tauri build`. Hard-fail if missing — a portable
           # zip without the daemon cannot start at all.
-          DAEMON="$RELEASE_DIR/uniclipd.exe"
+          DAEMON="$RELEASE_DIR/clipd.exe"
           if [ ! -f "$DAEMON" ]; then
-            echo "::error::uniclipd.exe not found under $RELEASE_DIR — portable zip would be unusable"
+            echo "::error::clipd.exe not found under $RELEASE_DIR — portable zip would be unusable"
             ls -la "$RELEASE_DIR" || true
             exit 1
           fi
@@ -404,13 +404,13 @@ jobs:
           OUT_DIR="$RELEASE_DIR/bundle/portable"
           rm -rf "$STAGE"
           mkdir -p "$STAGE" "$OUT_DIR"
-          cp "$EXE" "$STAGE/UniClipboard.exe"
-          cp "$DAEMON" "$STAGE/uniclipd.exe"
+          cp "$EXE" "$STAGE/Clipboard.exe"
+          cp "$DAEMON" "$STAGE/clipd.exe"
           # Marker file: presence next to the exe enables portable mode.
           : > "$STAGE/portable.dat"
           cp packaging/windows/portable/README.txt "$STAGE/README.txt"
 
-          ZIP="$OUT_DIR/UniClipboard_${VERSION}_${ARCH}${BUILD_SUFFIX}-portable.zip"
+          ZIP="$OUT_DIR/Clipboard_${VERSION}_${ARCH}${BUILD_SUFFIX}-portable.zip"
           powershell -Command "Compress-Archive -Path '$STAGE/*' -DestinationPath '$ZIP' -Force"
           echo "Built portable zip:"
           ls -la "$OUT_DIR"
@@ -447,5 +447,5 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: uniclipboard-${{ matrix.target }}${{ steps.build-mode.outputs.suffix }}
+          name: clipboard-${{ matrix.target }}${{ steps.build-mode.outputs.suffix }}
           path: target/**/release/bundle/**

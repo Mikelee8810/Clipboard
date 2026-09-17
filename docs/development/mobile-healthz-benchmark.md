@@ -22,13 +22,13 @@ cargo test -p uc-webserver --release --lib -- \
 
 `mobile_healthz_process_bench` 会执行以下完整流程：
 
-1. 启动独立 `uniclipd` profile，并从 `Child::id()` 获取被采样 PID。
+1. 启动独立 `clipd` profile，并从 `Child::id()` 获取被采样 PID。
    benchmark 强制使用 portable 文件安全存储，结束后删除该 profile 的 data/cache，
    不在系统 Keychain、Credential Manager 或 Secret Service 遗留 KEK。profile
    只允许 ASCII 字母、数字、`-`、`_`，且 daemon/CLI 必须与 benchmark
    二进制同目录；清理前还会校验目标路径与该 portable profile 精确相等。
-2. 通过 `uniclip init` 初始化加密 Space。
-3. 通过非交互 `uniclip --json mobile setup` 启用 mobile LAN listener，
+2. 通过 `clip init` 初始化加密 Space。
+3. 通过非交互 `clip --json mobile setup` 启用 mobile LAN listener，
    注册使用生产 Argon2id 的 Basic Auth 设备。
 4. 等待默认 5 秒启动稳定期，避免把 iroh 首次 relay 建连等一次性后台事件
    归因给请求路径。
@@ -46,8 +46,8 @@ cargo test -p uc-webserver --release --lib -- \
 先分别构建三个 release 二进制，避免 Cargo 多包目标选择掩盖缺失产物：
 
 ```bash
-cargo build --release -p uc-daemon --bin uniclipd
-cargo build --release -p uc-cli --bin uniclip
+cargo build --release -p uc-daemon --bin clipd
+cargo build --release -p uc-cli --bin clip
 cargo build --release -p p2p-bench --bin mobile_healthz_process_bench
 ```
 
@@ -87,8 +87,8 @@ UC_LOG_FILE="$(pwd)/target/mobile-healthz-daemon.jsonl" \
 ```bash
 UC_LOG_FILE="$(pwd)/target/mobile-healthz-daemon-smoke.jsonl" \
   target/debug/mobile_healthz_process_bench \
-  --daemon-bin target/debug/uniclipd \
-  --cli-bin target/debug/uniclip \
+  --daemon-bin target/debug/clipd \
+  --cli-bin target/debug/clip \
   --concurrency 2 \
   --duration-secs 1
 ```

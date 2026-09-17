@@ -1,4 +1,4 @@
-//! `uniclip dev dump-clipboard` —— 调试 / E2E 测试用：读出最近 N 条剪贴板
+//! `clip dev dump-clipboard` —— 调试 / E2E 测试用：读出最近 N 条剪贴板
 //! 条目的明文 preview。
 //!
 //! 通过统一核心读取解密后的历史预览。switch-space 之后跑一次能验证旧
@@ -43,7 +43,7 @@ pub async fn run(args: DumpClipboardArgs, json: bool, verbose: bool) -> i32 {
         Ok(true) => {}
         Ok(false) => {
             ui::error(
-                "This device is not set up yet. Use `uniclip space init` or `uniclip space join` first.",
+                "This device is not set up yet. Use `clip space init` or `clip space join` first.",
             );
             bundle.shutdown().await;
             return exit_codes::EXIT_ERROR;

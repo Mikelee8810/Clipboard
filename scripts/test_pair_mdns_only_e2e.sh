@@ -4,7 +4,7 @@
 # discovery channel introduced in Phase 3 without any rendezvous
 # round-trips.
 #
-# Forks two `uniclipboard-cli` processes under separate `--profile`
+# Forks two `clipboard-cli` processes under separate `--profile`
 # names with `settings.network.allow_relay_fallback = false` (a.k.a.
 # LAN-only Mode). Under that flag:
 #   * sponsor adapter's `issue_invitation` skips the rendezvous POST
@@ -23,7 +23,7 @@
 #   - macOS (profile data dirs live under ~/Library/Application Support)
 #   - --dev mode to avoid Keychain collisions between the two profiles
 #   - python3 (used to patch settings.json)
-#   - Built CLI binary; default at target/debug/uniclipboard-cli
+#   - Built CLI binary; default at target/debug/clipboard-cli
 #
 # Notes:
 #   - Multicast on macOS loopback is restricted; swarm-discovery uses
@@ -32,7 +32,7 @@
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclipboard-cli}"
+CLI="${CLI:-./target/debug/clipboard-cli}"
 PASSPHRASE="${PASSPHRASE:-hunter22hunter22}"
 WAIT_SECS="${WAIT_SECS:-30}"
 COMMON_FLAGS="--dev"
@@ -44,7 +44,7 @@ fi
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclipboard-cli" >&2
+    echo "Build first: cargo build -p uc-cli --bin clipboard-cli" >&2
     exit 2
 fi
 
@@ -54,8 +54,8 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 APP_ROOT="$HOME/Library/Application Support"
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-alice"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-bob"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-alice"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-bob"
 
 cleanup() {
     if [[ -n "${ALICE_PID:-}" ]] && kill -0 "$ALICE_PID" 2>/dev/null; then

@@ -1,13 +1,13 @@
 [Desktop Entry]
-Name=UniClipboard
+Name=Clipboard
 GenericName=Clipboard Sync
 Comment=Encrypted peer-to-peer clipboard sync between your devices
-Exec=uniclipboard %U
-Icon=uniclipboard
+Exec=clipboard %U
+Icon=clipboard
 Type=Application
 Categories=Network;Utility;
 Terminal=false
 StartupNotify=true
-StartupWMClass=UniClipboard
+StartupWMClass=Clipboard
 X-GNOME-UsesNotifications=true
 Keywords=clipboard;sync;p2p;encrypted;

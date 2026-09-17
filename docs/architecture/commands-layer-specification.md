@@ -1,6 +1,6 @@
 # Commands Layer Architecture Specification
 
-This document defines the mandatory architecture rules for the **Commands Layer** (`uc-tauri/src/commands/`) in UniClipboard's hexagonal architecture.
+This document defines the mandatory architecture rules for the **Commands Layer** (`uc-tauri/src/commands/`) in Clipboard's hexagonal architecture.
 
 ## Overview
 

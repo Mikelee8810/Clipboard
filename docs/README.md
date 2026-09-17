@@ -1,6 +1,6 @@
-# UniClipboard Documentation
+# Clipboard Documentation
 
-UniClipboard Desktop is a privacy-first, cross-device clipboard synchronization tool built with Tauri 2, React, and a modular Rust workspace.
+Clipboard Desktop is a privacy-first, cross-device clipboard synchronization tool built with Tauri 2, React, and a modular Rust workspace.
 
 This documentation set is a mix of:
 
@@ -13,7 +13,7 @@ When documentation conflicts with code, treat the code as the source of truth an
 
 **For New Developers:**
 
-- [Project Overview](overview.md) - What is UniClipboard and how it works
+- [Project Overview](overview.md) - What is Clipboard and how it works
 - [Architecture Principles](architecture/principles.md) - Understanding Hexagonal Architecture
 - [Module Boundaries](architecture/module-boundaries.md) - What each crate/layer may depend on
 
@@ -54,13 +54,13 @@ When documentation conflicts with code, treat the code as the source of truth an
 ```
 ┌───────────────────────────────────────┐   ┌──────────────────┐
 │       GUI (uc-tauri + React)          │   │  CLI (uc-cli)    │
-│  Quick Panel / Tray / Settings        │   │  uniclip 命令行  │
+│  Quick Panel / Tray / Settings        │   │  clip 命令行  │
 └──────────────────┬────────────────────┘   └────────┬─────────┘
                    │  HTTP + WebSocket (127.0.0.1)    │
                    └──────────────────┬───────────────┘
                                       ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                     Daemon (uniclipd)                         │
+│                     Daemon (clipd)                         │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ uc-webserver (axum API)                                │  │
 │  └────────────────────────┬───────────────────────────────┘  │

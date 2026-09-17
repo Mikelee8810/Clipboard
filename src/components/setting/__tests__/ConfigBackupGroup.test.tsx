@@ -51,7 +51,7 @@ describe('ConfigBackupGroup export', () => {
   it('exports the config in one click (no password) and reveals the bundle', async () => {
     const { revealPath } = await import('@/api/storage')
     const user = userEvent.setup()
-    mockExport.mockResolvedValue({ path: '/home/test/uniclipboard-config.ucbundle' })
+    mockExport.mockResolvedValue({ path: '/home/test/clipboard-config.ucbundle' })
 
     render(<ConfigBackupGroup />)
 
@@ -63,7 +63,7 @@ describe('ConfigBackupGroup export', () => {
       expect(mockExport).toHaveBeenCalledTimes(1)
     })
     expect(mockExport).toHaveBeenCalledWith()
-    expect(vi.mocked(revealPath)).toHaveBeenCalledWith('/home/test/uniclipboard-config.ucbundle')
+    expect(vi.mocked(revealPath)).toHaveBeenCalledWith('/home/test/clipboard-config.ucbundle')
   })
 })
 

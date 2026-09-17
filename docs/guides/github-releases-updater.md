@@ -1,6 +1,6 @@
 # GitHub Releases Updater
 
-This guide documents how UniClipboard publishes Tauri updater artifacts to GitHub Releases and serves `latest.json` for auto-updates.
+This guide documents how Clipboard publishes Tauri updater artifacts to GitHub Releases and serves `latest.json` for auto-updates.
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ Notes:
 Generate the keypair locally:
 
 ```bash
-cargo tauri signer generate -w ~/.tauri/uniclipboard.key
+cargo tauri signer generate -w ~/.tauri/clipboard.key
 ```
 
 Store these in CI secrets:
@@ -90,7 +90,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: UniClipboard ${{ github.ref_name }}
+          releaseName: Clipboard ${{ github.ref_name }}
           releaseBody: 'See the assets to download.'
           releaseDraft: true
 ```
@@ -122,7 +122,7 @@ When using a static updater file, Tauri expects JSON in this shape (simplified):
   "pub_date": "2026-01-01T00:00:00Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://github.com/UniClipboard/UniClipboard/releases/download/v1.2.3/UniClipboard.app.tar.gz",
+      "url": "https://github.com/UniClipboard/UniClipboard/releases/download/v1.2.3/Clipboard.app.tar.gz",
       "signature": "<SIG_CONTENT>"
     }
   }

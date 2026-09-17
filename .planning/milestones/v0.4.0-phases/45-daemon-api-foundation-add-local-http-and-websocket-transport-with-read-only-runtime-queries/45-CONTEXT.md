@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Establish the first local daemon-facing `HTTP + WebSocket` API surface for UniClipboard. This phase is limited to transport foundation and read-only runtime queries so GUI and CLI can begin acting as daemon clients without exposing clipboard content, write operations, or pairing state transitions yet.
+Establish the first local daemon-facing `HTTP + WebSocket` API surface for Clipboard. This phase is limited to transport foundation and read-only runtime queries so GUI and CLI can begin acting as daemon clients without exposing clipboard content, write operations, or pairing state transitions yet.
 
 **In scope:**
 

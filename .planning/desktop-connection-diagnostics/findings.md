@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Engine capture is owned only by `uniclipd`.
+- Engine capture is owned only by `clipd`.
 - GUI and applicable CLI commands use the same authenticated daemon API.
 - Repeated starts reuse one capture without extending it; stop uses `capture_id`.
 - Daemon restart returns a new run in standard mode; clients discard stale capture display.

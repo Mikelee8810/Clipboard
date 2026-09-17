@@ -19,7 +19,7 @@ Issue: #1329（T3，P1）· Map: #1325
 - 原子发布器地基（#1382）：`AtomicPublishPort`（`crates/uc-core/src/ports/atomic_publish.rs`）+
   `FsAtomicPublisher`（三平台 no-replace，`crates/uc-infra/src/fs/atomic_publish.rs`）+
   内存态 `DirectoryPublication`（commit/rollback/`RollbackOutcome`，`materializer.rs:296`）+
-  `.uniclip-incoming-*` 隐藏暂存 + 启动前缀清扫（`materializer::sweep_inbound_staging`）。
+  `.clip-incoming-*` 隐藏暂存 + 启动前缀清扫（`materializer::sweep_inbound_staging`）。
 - `file_transfer` 表（PK=`transfer_id`，按 `entry_id` 分组索引），成员 id
   `{entry}:member:{i}`（`materializer.rs:1466`），`file_size` 列已在（可空）。
 - `FindEntryIdForTransferPort`（transfer_id→entry_id，`ports/file_transfer.rs:151`）。

@@ -26,7 +26,7 @@
 
 set -euo pipefail
 
-CLI="${CLI:-./target/debug/uniclipboard-cli}"
+CLI="${CLI:-./target/debug/clipboard-cli}"
 PASSPHRASE="${PASSPHRASE:-hunter22hunter22}"
 PAIR_WAIT_SECS="${PAIR_WAIT_SECS:-30}"
 DELIVER_SECS="${DELIVER_SECS:-10}"
@@ -39,13 +39,13 @@ fi
 
 if [[ ! -x "$CLI" ]]; then
     echo "ERROR: CLI binary not found at $CLI" >&2
-    echo "Build first: cargo build -p uc-cli --bin uniclipboard-cli" >&2
+    echo "Build first: cargo build -p uc-cli --bin clipboard-cli" >&2
     exit 2
 fi
 
 APP_ROOT="$HOME/Library/Application Support"
-ALICE_DIR="$APP_ROOT/app.uniclipboard.desktop-alice"
-BOB_DIR="$APP_ROOT/app.uniclipboard.desktop-bob"
+ALICE_DIR="$APP_ROOT/app.clipboard.desktop-alice"
+BOB_DIR="$APP_ROOT/app.clipboard.desktop-bob"
 
 ALICE_OUT=""
 BOB_WATCH_OUT=""

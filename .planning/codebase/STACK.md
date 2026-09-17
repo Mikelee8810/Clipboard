@@ -186,7 +186,7 @@
 **Environment:**
 
 - `TAURI_DEV_HOST` - Dev server hostname for hot module reload
-- `UNICLIPBOARD_ENV` - Application environment (development/production)
+- `CLIPBOARD_ENV` - Application environment (development/production)
 - `UC_DISABLE_SINGLE_INSTANCE` - Override single-instance enforcement (development only)
 - `UC_PROFILE` - User profile selection (development multi-peer testing)
 - `UC_CLIPBOARD_MODE` - Clipboard behavior (full/passive mode)
@@ -221,7 +221,7 @@
 **Production:**
 
 - Deployment: Desktop application via self-contained binary
-- Update mechanism: GitHub releases with `uniclipboard.github.io` manifest
+- Update mechanism: GitHub releases with `clipboard.github.io` manifest
 - Supported platforms: macOS (Apple Silicon + x86_64), Linux, Windows
 - No server infrastructure required (peer-to-peer and local-first)
 

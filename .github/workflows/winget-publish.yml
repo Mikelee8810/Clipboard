@@ -60,7 +60,7 @@ jobs:
           # 拉取微软官方 wingetcreate(自带下载安装器 + 算 hash + 生成 manifest)。
           Invoke-WebRequest -Uri https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
 
-          .\wingetcreate.exe update UniClipboard.UniClipboard `
+          .\wingetcreate.exe update Clipboard.Clipboard `
             --version $env:VERSION `
-            --urls "$base/UniClipboard_${env:VERSION}_x64-setup.exe" "$base/UniClipboard_${env:VERSION}_arm64-setup.exe" `
+            --urls "$base/Clipboard_${env:VERSION}_x64-setup.exe" "$base/Clipboard_${env:VERSION}_arm64-setup.exe" `
             --submit --token $env:WINGET_TOKEN

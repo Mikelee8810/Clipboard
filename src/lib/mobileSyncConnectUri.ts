@@ -1,5 +1,5 @@
 /**
- * `mobile_sync::connect_uri` 的 TS 镜像实现 —— `uniclipboard://connect` 深链
+ * `mobile_sync::connect_uri` 的 TS 镜像实现 —— `clipboard://connect` 深链
  * 协议 v1 的编解码纯函数。
  *
  * # 为什么需要这个文件
@@ -124,7 +124,7 @@ function formatMessage(
 ): string {
   switch (code) {
     case 'INVALID_SCHEME':
-      return 'invalid scheme or host (must be uniclipboard://connect)'
+      return 'invalid scheme or host (must be clipboard://connect)'
     case 'UNSUPPORTED_VERSION':
       return 'unsupported version (only v=1 is supported)'
     case 'UNSUPPORTED_SERVICE':
@@ -142,7 +142,7 @@ function formatMessage(
 
 // ─── constants ──────────────────────────────────────────────────────────
 
-const SCHEME = 'uniclipboard:'
+const SCHEME = 'clipboard:'
 const HOST = 'connect'
 const ENVELOPE_VERSION = '1'
 const SERVICE = 'mobile-sync'
@@ -157,7 +157,7 @@ export const URI_MAX_LEN = 2000
 
 /**
  * 把候选地址 + 凭据 + 元数据编码成
- * `uniclipboard://connect?v=1&svc=mobile-sync&p=<…>`。
+ * `clipboard://connect?v=1&svc=mobile-sync&p=<…>`。
  *
  * 与 Rust [`build_mobile_sync_connect_uri`] 字节级镜像 —— 任何漂移会在
  * 跨语言 golden vector 测试中立刻失败。
@@ -213,7 +213,7 @@ export function buildConnectUri(
 
   const json = JSON.stringify(payload)
   const p = bytesToBase64Url(utf8Encode(json))
-  const uri = `uniclipboard://${HOST}?v=${ENVELOPE_VERSION}&svc=${SERVICE}&p=${p}`
+  const uri = `clipboard://${HOST}?v=${ENVELOPE_VERSION}&svc=${SERVICE}&p=${p}`
 
   if (uri.length > URI_MAX_LEN) {
     throw new ConnectUriError('URI_TOO_LONG', { len: uri.length, max: URI_MAX_LEN })

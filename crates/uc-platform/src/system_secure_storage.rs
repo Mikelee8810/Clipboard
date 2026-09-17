@@ -3,8 +3,6 @@ use keyring::Entry;
 use crate::ports::{SecureStorageError, SecureStorageProvider};
 
 const SERVICE_NAME: &str = "Clipboard";
-/// Service name used before the app was renamed; entries found here are migrated on read.
-const LEGACY_SERVICE_NAME: &str = "UniClipboard";
 
 /// Classify a `keyring::Error::PlatformFailure` into a domain `SecureStorageError`.
 ///
@@ -59,13 +57,13 @@ fn classify_platform_failure(msg: &str) -> SecureStorageError {
 /// The returned name is `SERVICE_NAME` when no environment-derived suffixes are present;
 /// otherwise the suffixes are appended with hyphens (for example: `Clipboard-dev-profile`).
 ///
-/// The function appends the `"dev"` suffix when `UNICLIPBOARD_ENV` is set to `"development"` or `"dev"` (case-insensitive).
+/// The function appends the `"dev"` suffix when `CLIPBOARD_ENV` is set to `"development"` or `"dev"` (case-insensitive).
 /// It also appends a profile suffix taken from `UC_PROFILE` if non-empty, or from `crate::default_profile()` if `UC_PROFILE` is unset or empty.
 fn resolve_service_name() -> String {
     let mut suffixes: Vec<String> = Vec::new();
 
     if matches!(
-        std::env::var("UNICLIPBOARD_ENV"),
+        std::env::var("CLIPBOARD_ENV"),
         Ok(value) if value.eq_ignore_ascii_case("development") || value.eq_ignore_ascii_case("dev")
     ) {
         suffixes.push("dev".to_string());
@@ -106,32 +104,6 @@ impl SystemSecureStorage {
         }
     }
 
-    /// Service name of the same profile under the pre-rename `UniClipboard` prefix.
-    fn legacy_service_name(&self) -> String {
-        self.service_name
-            .replacen(SERVICE_NAME, LEGACY_SERVICE_NAME, 1)
-    }
-
-    /// Look up `key` under the legacy service name and, if found, copy it to the new one.
-    fn migrate_legacy(&self, key: &str) -> Result<Option<Vec<u8>>, SecureStorageError> {
-        let legacy = Entry::new(&self.legacy_service_name(), key).map_err(|e| {
-            SecureStorageError::Other(format!("failed to create keyring entry: {e}"))
-        })?;
-        match legacy.get_secret() {
-            Ok(secret) => {
-                self.set(key, &secret)?;
-                Ok(Some(secret))
-            }
-            Err(keyring::Error::NoEntry) => Ok(None),
-            Err(keyring::Error::PlatformFailure(msg)) => {
-                Err(classify_platform_failure(&msg.to_string()))
-            }
-            Err(err) => Err(SecureStorageError::Other(format!(
-                "failed to read secure storage: {err}"
-            ))),
-        }
-    }
-
     fn entry_for_key(&self, key: &str) -> Result<Entry, SecureStorageError> {
         Entry::new(&self.service_name, key)
             .map_err(|e| SecureStorageError::Other(format!("failed to create keyring entry: {e}")))
@@ -143,7 +115,7 @@ impl SecureStorageProvider for SystemSecureStorage {
         let entry = self.entry_for_key(key)?;
         match entry.get_secret() {
             Ok(secret) => Ok(Some(secret)),
-            Err(keyring::Error::NoEntry) => self.migrate_legacy(key),
+            Err(keyring::Error::NoEntry) => Ok(None),
             Err(keyring::Error::PlatformFailure(msg)) => {
                 Err(classify_platform_failure(&msg.to_string()))
             }

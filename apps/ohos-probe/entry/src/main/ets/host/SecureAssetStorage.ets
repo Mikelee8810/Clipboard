@@ -4,7 +4,7 @@ import { util } from '@kit.ArkTS';
 
 const ASSET_NOT_FOUND = 24000002;
 const ASSET_ALREADY_EXISTS = 24000003;
-const ALIAS_PREFIX = 'app.uniclipboard.engine.';
+const ALIAS_PREFIX = 'app.clipboard.engine.';
 
 export class SecureAssetStorage {
   private readonly encoder = new util.TextEncoder();

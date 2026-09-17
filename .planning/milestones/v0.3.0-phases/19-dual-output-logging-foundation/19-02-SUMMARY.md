@@ -11,7 +11,7 @@ requires:
 provides:
   - Working app with dual-output logging (console + JSON) via uc-observability integration
   - Sentry layer composed with uc-observability layers in uc-tauri
-  - Legacy logging cleaned up (no more uniclipboard.log file output)
+  - Legacy logging cleaned up (no more clipboard.log file output)
   - Updated architecture documentation with profile system
 affects: [phase-20, phase-21, phase-22]
 
@@ -62,7 +62,7 @@ completed: 2026-03-10
 
 - Exposed build_console_layer() and build_json_layer() as generic public API from uc-observability for caller composition
 - Rewrote uc-tauri/bootstrap/tracing.rs as thin wrapper composing uc-observability layers + Sentry layer
-- Removed LogDir target from logging.rs (JSON file via tracing replaces uniclipboard.log)
+- Removed LogDir target from logging.rs (JSON file via tracing replaces clipboard.log)
 - Updated logging-architecture.md with profile system, dual output, JSON format, and troubleshooting
 
 ## Task Commits

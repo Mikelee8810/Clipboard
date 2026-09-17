@@ -23,7 +23,7 @@ tech-stack:
   added:
     - libc = "0.2" (unix target dep in uc-daemon-client for process-existence check)
   patterns:
-    - Sidecar spawn: app.shell().sidecar("uniclipboard-daemon").args(["--gui-managed"]).spawn() returns (Receiver, CommandChild)
+    - Sidecar spawn: app.shell().sidecar("clipboard-daemon").args(["--gui-managed"]).spawn() returns (Receiver, CommandChild)
     - stdin tether (D-06): CommandChild held in GuiOwnedDaemonState; dropping it sends EOF to daemon
     - rx drain: background task consumes Receiver events to prevent pipe blocking
     - PID shutdown: terminate_local_daemon_pid → libc::kill(pid, 0) polling → CommandChild::kill() on timeout
@@ -84,7 +84,7 @@ completed: 2026-03-28
 
 ### Task 2: Sidecar spawn API and AppHandle wiring (c5e7dd7d)
 
-- Replaced `spawn_daemon_process()` (std::process::Command) with sidecar version using `app.shell().sidecar("uniclipboard-daemon").args(["--gui-managed"]).spawn()`
+- Replaced `spawn_daemon_process()` (std::process::Command) with sidecar version using `app.shell().sidecar("clipboard-daemon").args(["--gui-managed"]).spawn()`
 - Deleted `resolve_daemon_binary_path()` and `daemon_binary_name()` — Tauri handles binary path and platform naming
 - Background task drains sidecar `Receiver` to prevent pipe blocking; `CommandChild` ownership in `GuiOwnedDaemonState` maintains stdin tether (D-06)
 - `bootstrap_daemon_connection<R: Runtime>` now takes `&AppHandle<R>` as first parameter

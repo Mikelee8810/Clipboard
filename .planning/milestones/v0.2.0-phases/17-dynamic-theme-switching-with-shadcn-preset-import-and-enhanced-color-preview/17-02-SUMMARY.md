@@ -39,8 +39,8 @@ This plan upgraded the Settings → Appearance theme color picker to use multi-d
 
 **Files:**
 
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/components/setting/AppearanceSection.tsx
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/constants/theme.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/components/setting/AppearanceSection.tsx
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/constants/theme.ts
 
 Changes:
 
@@ -69,7 +69,7 @@ This satisfies the must-haves:
 
 **File:**
 
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/components/setting/**tests**/AppearanceSection.test.tsx
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/components/setting/**tests**/AppearanceSection.test.tsx
 
 Tests added:
 
@@ -95,7 +95,7 @@ The persistence contract (click → `updateGeneralSetting({ theme_color: name })
 
 **File:**
 
-- /Users/mark/conductor/workspaces/uniclipboard-desktop/new-york-v1/src/styles/**tests**/theme-migration.test.ts
+- /Users/mark/conductor/workspaces/clipboard-desktop/new-york-v1/src/styles/**tests**/theme-migration.test.ts
 
 While running `bun run build`, TypeScript failed due to missing Node typings for `fs`, `path`, and `url` in the CSS migration test introduced in Plan 17-01. To keep the project’s main TS config focused on frontend types while still keeping this assertion, the following change was applied:
 

@@ -17,7 +17,7 @@ import {
 export const SUPPORTED_LANGUAGES = ['zh-CN', 'zh-TW', 'en-US', 'ja-JP', 'ru-RU', 'pt-BR'] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
 
-const STORAGE_KEY = 'uniclipboard.language'
+const STORAGE_KEY = 'clipboard.language'
 
 export function isSupportedLanguage(language: unknown): language is SupportedLanguage {
   return SUPPORTED_LANGUAGES.includes(language as SupportedLanguage)
